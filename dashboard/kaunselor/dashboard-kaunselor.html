@@ -169,10 +169,10 @@
       font-size: 0.9rem;
     }
 
-    /* menu grid - responsive 4 cards */
+    /* menu grid - responsive 5 cards */
     .menu-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
       gap: 2rem;
       margin-top: 1rem;
     }
@@ -293,10 +293,10 @@
   <!-- Welcome Banner -->
   <div class="welcome-banner">
     <h2><i class="fas fa-hand-sparkles"></i> Selamat kembali, Kaunselor!</h2>
-    <p>Urus data pelajar, guru, keputusan ujian & merit dengan lebih efisien.</p>
+    <p>Urus data pelajar, guru, keputusan ujian, merit & tempahan kaunseling.</p>
   </div>
 
-  <!-- Menu Grid (4 menu) -->
+  <!-- Menu Grid (5 menu) -->
   <div class="menu-grid">
     <!-- 1. KEPUTUSAN UJIAN INVENTORI -->
     <div class="menu-card" data-menu="keputusan-ujian">
@@ -314,7 +314,7 @@
       <div class="menu-btn">Urus Merit <i class="fas fa-arrow-right"></i></div>
     </div>
 
-    <!-- 3. AKAUN PELAJAR -> Redirect ke akaun-pelajar.html dalam FOLDER YANG SAMA (kaunselor/) -->
+    <!-- 3. AKAUN PELAJAR -->
     <div class="menu-card" data-menu="akaun-pelajar">
       <div class="menu-icon"><i class="fas fa-users"></i></div>
       <h3>Akaun Pelajar</h3>
@@ -328,6 +328,14 @@
       <h3>Akaun Guru</h3>
       <div class="menu-desc">Urus profil guru, akses sistem & maklumat peribadi guru.</div>
       <div class="menu-btn">Urus Akaun Guru <i class="fas fa-arrow-right"></i></div>
+    </div>
+
+    <!-- 5. TEMPAHAN KAUNSELING (TAMBAHAN BARU) -->
+    <div class="menu-card" data-menu="tempahan-kaunseling">
+      <div class="menu-icon"><i class="fas fa-calendar-check"></i></div>
+      <h3>Tempahan Kaunseling</h3>
+      <div class="menu-desc">Urus temujanji pelajar, semak & sahkan tempahan sesi kaunseling.</div>
+      <div class="menu-btn">Urus Tempahan <i class="fas fa-arrow-right"></i></div>
     </div>
   </div>
 
@@ -345,18 +353,19 @@
 
     switch(menuType) {
       case 'keputusan-ujian':
-        // Sementara - boleh ubah nanti
         targetUrl = '../dashboard/keputusan-ujian.html';
         break;
       case 'mata-merit':
         targetUrl = '../dashboard/mata-merit.html';
         break;
       case 'akaun-pelajar':
-        // ✅ ARAH KE akaun-pelajar.html dalam FOLDER YANG SAMA (kaunselor/)
         targetUrl = 'akaun-pelajar.html';
         break;
       case 'akaun-guru':
         targetUrl = '../dashboard/akaun-guru.html';
+        break;
+      case 'tempahan-kaunseling':
+        targetUrl = 'tempahan-kaunseling.html';
         break;
       default:
         return;

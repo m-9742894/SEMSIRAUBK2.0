@@ -352,8 +352,8 @@
       sessionStorage.setItem('teacherYear', teacherData.year || '2026');
       sessionStorage.setItem('teacherLoginTime', new Date().toISOString());
       
-      // ✅ PATH YANG BETUL: dari dashboard/page-guru.html ke guru/dashboard-guru.html
-      // Naik satu folder (..) ke root, kemudian masuk folder guru/
+      // ✅ Redirect ke dashboard guru (folder guru di root)
+      // Dari dashboard/page-guru.html ke guru/dashboard-guru.html
       window.location.href = "../guru/dashboard-guru.html";
       return true;
       
@@ -401,7 +401,7 @@
      STRUKTUR FOLDER YANG BETUL:
      ============================================================
      
-     root folder (SEMSIRAUBK2.0)/
+     root folder/
      │
      ├── index.html
      │
@@ -409,19 +409,24 @@
      │   └── page-guru.html (FAIL INI)
      │
      └── guru/
-         └── dashboard-guru.html (FAIL DASHBOARD)
+         └── dashboard-guru.html (FAIL DASHBOARD GURU)
      
      ============================================================
-     PATH REDIRECT YANG DIGUNAKAN:
+     PATH REDIRECT: "../guru/dashboard-guru.html"
      ============================================================
-     window.location.href = "../guru/dashboard-guru.html";
-     
-     Penjelasan:
      - ".." = naik satu folder (dari dashboard/ ke root)
-     - "guru/dashboard-guru.html" = masuk folder guru dan buka fail tersebut
+     - "guru/dashboard-guru.html" = masuk folder guru dan buka dashboard
      
-     Hasil URL yang betul: https://.../guru/dashboard-guru.html
      ============================================================
+     STRUKTUR FIRESTORE COLLECTION 'teachers':
+     ============================================================
+     {
+       "fullname": "Puan Sarah binti Abdullah",
+       "icNumber": "800101-01-1234",
+       "teacherClass": "5 Cemerlang",
+       "year": "2026",
+       "createdAt": "2026-01-15T10:30:00.000Z"
+     }
 -->
 </body>
 </html>

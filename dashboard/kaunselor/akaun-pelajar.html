@@ -111,29 +111,59 @@
       }
     };
 
-    // Edit student in Firestore
-    window.editStudentInFirebase = async function(id, newClass, newSession) {
+    // Edit ALL student fields in Firestore (Nama, IC, Kelas, Tahun)
+    window.editStudentFullInFirebase = async function(id, newFullname, newIcNumber, newClass, newSession) {
       try {
-        const studentRef = doc(db, "students", id);
-        await updateDoc(studentRef, {
-          class: newClass,
-          session: newSession
-        });
+        // Jika No. IC berubah, semak sama ada IC baru sudah wujud untuk pelajar lain
+        if (newIcNumber) {
+          const q = query(studentsCollection, where("icNumber", "==", newIcNumber));
+          const querySnapshot = await getDocs(q);
+          // Cari jika ada dokumen lain dengan IC yang sama (bukan dokumen ini)
+          let icExists = false;
+          querySnapshot.forEach((docSnap) => {
+            if (docSnap.id !== id) {
+              icExists = true;
+            }
+          });
+          if (icExists) {
+            window.showMessage(`❌ No. IC ${newIcNumber} sudah wujud untuk pelajar lain!`, "error");
+            return false;
+          }
+        }
         
+        const studentRef = doc(db, "students", id);
+        const updateData = {};
+        if (newFullname) updateData.fullname = newFullname.trim();
+        if (newIcNumber) updateData.icNumber = newIcNumber.trim();
+        if (newClass !== undefined) updateData.class = newClass.trim() || "-";
+        if (newSession !== undefined) updateData.session = newSession.trim() || "2026";
+        
+        await updateDoc(studentRef, updateData);
+        
+        // Update local array
         const student = window.students.find(s => s.id === id);
         if (student) {
-          student.class = newClass;
-          student.session = newSession;
+          if (newFullname) student.fullname = newFullname.trim();
+          if (newIcNumber) student.icNumber = newIcNumber.trim();
+          if (newClass !== undefined) student.class = newClass.trim() || "-";
+          if (newSession !== undefined) student.session = newSession.trim() || "2026";
         }
         
         await window.saveStudentCredentials();
         window.renderStudentList();
         window.updateClassFilter();
-        window.showMessage("Maklumat pelajar dikemaskini.", "success");
+        window.showMessage("✅ Maklumat pelajar berjaya dikemaskini!", "success");
+        return true;
       } catch (error) {
         console.error("Error editing student:", error);
         window.showMessage("Gagal mengemaskini pelajar: " + error.message, "error");
+        return false;
       }
+    };
+
+    // Edit individual field (legacy - keep for compatibility)
+    window.editStudentInFirebase = async function(id, newClass, newSession) {
+      return window.editStudentFullInFirebase(id, null, null, newClass, newSession);
     };
 
     // Save all student credentials to localStorage for login page
@@ -179,6 +209,43 @@
       return filtered;
     };
 
+    // Open comprehensive edit dialog
+    window.openFullEditDialog = function(id, currentName, currentIc, currentClass, currentSession) {
+      // Create modal dialog using prompt sequence (simpler, but effective)
+      const newName = prompt("✏️ Edit Nama Penuh:", currentName);
+      if (newName === null) return;
+      if (newName.trim() === "") {
+        window.showMessage("Nama tidak boleh kosong!", "error");
+        return;
+      }
+      
+      const newIc = prompt("✏️ Edit No. Kad Pengenalan:", currentIc);
+      if (newIc === null) return;
+      if (newIc.trim() === "") {
+        window.showMessage("No. Kad Pengenalan tidak boleh kosong!", "error");
+        return;
+      }
+      
+      const newClass = prompt("✏️ Edit Kelas / Tingkatan:", currentClass);
+      if (newClass === null) return;
+      
+      const newSession = prompt("✏️ Edit Tahun / Sesi:", currentSession);
+      if (newSession === null) return;
+      
+      window.editStudentFullInFirebase(id, newName, newIc, newClass, newSession);
+    };
+    
+    // Legacy edit dialog (for class & session only)
+    window.openEditDialog = function(id, currentClass, currentSession) {
+      const newClass = prompt("Edit Kelas/Tingkatan:", currentClass);
+      if (newClass !== null) {
+        const newSession = prompt("Edit Tahun/Sesi:", currentSession);
+        if (newSession !== null) {
+          window.editStudentInFirebase(id, newClass, newSession);
+        }
+      }
+    };
+
     window.renderStudentList = function() {
       const filtered = window.getFilteredStudents();
       const container = document.getElementById('studentListContainer');
@@ -202,7 +269,7 @@
             </div>
           </div>
           <div>
-            <button class="btn-edit" onclick="window.openEditDialog('${student.id}', '${window.escapeHtml(student.class)}', '${student.session}')">
+            <button class="btn-edit-full" onclick="window.openFullEditDialog('${student.id}', '${window.escapeHtml(student.fullname)}', '${window.escapeHtml(student.icNumber)}', '${window.escapeHtml(student.class)}', '${student.session}')">
               <i class="fas fa-edit"></i> Edit
             </button>
             <button class="btn-delete" onclick="window.deleteStudentFromFirebase('${student.id}')">
@@ -211,16 +278,6 @@
           </div>
         </div>
       `).join('');
-    };
-
-    window.openEditDialog = function(id, currentClass, currentSession) {
-      const newClass = prompt("Edit Kelas/Tingkatan:", currentClass);
-      if (newClass !== null) {
-        const newSession = prompt("Edit Tahun/Sesi:", currentSession);
-        if (newSession !== null) {
-          window.editStudentInFirebase(id, newClass, newSession);
-        }
-      }
     };
 
     window.updateTotalCount = function() {
@@ -243,7 +300,7 @@
       msgDiv.style.backgroundColor = type === 'success' ? '#dcfce7' : '#fee2e2';
       msgDiv.style.color = type === 'success' ? '#166534' : '#991b1b';
       msgDiv.style.display = 'block';
-      setTimeout(() => { msgDiv.style.display = 'none'; }, 3000);
+      setTimeout(() => { msgDiv.style.display = 'none'; }, 4000);
     };
 
     // Single registration
@@ -508,7 +565,7 @@
       transition: 0.2s;
     }
     .btn-delete:hover { background: #fecaca; }
-    .btn-edit {
+    .btn-edit-full {
       background: #e0e7ff;
       color: #4f46e5;
       border: none;
@@ -520,7 +577,7 @@
       margin-right: 0.5rem;
       transition: 0.2s;
     }
-    .btn-edit:hover { background: #c7d2fe; }
+    .btn-edit-full:hover { background: #c7d2fe; }
     .student-list { max-height: 550px; overflow-y: auto; }
     .student-item {
       background: #f8fafc;

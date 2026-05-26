@@ -87,14 +87,7 @@
             box-shadow: 0 8px 20px -8px rgba(0,0,0,0.08);
             border: 1px solid rgba(79,70,229,0.1);
         }
-        .records-section h3 {
-            font-size: 1.2rem;
-            color: #1e293b;
-            margin-bottom: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
+        .records-section h3 { font-size: 1.2rem; color: #1e293b; margin-bottom: 1rem; display: flex; align-items: center; gap: 10px; }
         .records-section h3 i { color: #4f46e5; }
         
         .merit-record {
@@ -103,60 +96,22 @@
             padding: 1rem;
             margin-bottom: 0.8rem;
             border-left: 4px solid;
-            transition: 0.2s;
         }
         .merit-record-positive { border-left-color: #10b981; }
         .merit-record-negative { border-left-color: #dc2626; }
         
-        .record-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            margin-bottom: 0.5rem;
-        }
-        .record-type {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 0.2rem 0.8rem;
-            border-radius: 40px;
-            font-size: 0.7rem;
-            font-weight: 600;
-        }
+        .record-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-bottom: 0.5rem; }
+        .record-type { display: inline-flex; align-items: center; gap: 6px; padding: 0.2rem 0.8rem; border-radius: 40px; font-size: 0.7rem; font-weight: 600; }
         .record-type.positive { background: #dcfce7; color: #166534; }
         .record-type.negative { background: #fee2e2; color: #dc2626; }
-        
-        .record-points {
-            font-weight: 700;
-            font-size: 1rem;
-        }
+        .record-points { font-weight: 700; font-size: 1rem; }
         .record-points.positive { color: #10b981; }
         .record-points.negative { color: #dc2626; }
-        
-        .record-description {
-            font-size: 0.85rem;
-            color: #1e293b;
-            margin: 0.5rem 0;
-            line-height: 1.5;
-        }
-        
-        .record-meta {
-            font-size: 0.7rem;
-            color: #94a3b8;
-            display: flex;
-            gap: 1rem;
-            flex-wrap: wrap;
-            margin-top: 0.5rem;
-        }
+        .record-description { font-size: 0.85rem; color: #1e293b; margin: 0.5rem 0; line-height: 1.5; }
+        .record-meta { font-size: 0.7rem; color: #94a3b8; display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 0.5rem; }
         .record-meta i { margin-right: 3px; }
         
-        .empty-state {
-            text-align: center;
-            padding: 2rem;
-            color: #94a3b8;
-        }
-        
+        .empty-state { text-align: center; padding: 2rem; color: #94a3b8; }
         .alert { padding: 12px; border-radius: 12px; margin-bottom: 15px; font-size: 0.8rem; display: none; }
         .alert.success { background: #dcfce7; color: #166534; display: block; }
         .alert.error { background: #fee2e2; color: #dc2626; display: block; }
@@ -181,9 +136,7 @@
     <div id="alertMessage" class="alert"></div>
     
     <div id="profileCard" class="profile-card">
-        <div class="profile-avatar">
-            <i class="fas fa-user-graduate"></i>
-        </div>
+        <div class="profile-avatar"><i class="fas fa-user-graduate"></i></div>
         <div class="profile-info">
             <h3 id="studentName">-</h3>
             <p><i class="fas fa-id-card"></i> No. Kad Pengenalan: <span id="studentIC">-</span></p>
@@ -197,28 +150,14 @@
     </div>
     
     <div class="stats-row">
-        <div class="stat-box positive">
-            <i class="fas fa-heart"></i>
-            <div class="stat-number" id="positiveCount">0</div>
-            <div class="stat-label">Kebaikan</div>
-        </div>
-        <div class="stat-box negative">
-            <i class="fas fa-exclamation-triangle"></i>
-            <div class="stat-number" id="negativeCount">0</div>
-            <div class="stat-label">Kesalahan</div>
-        </div>
-        <div class="stat-box">
-            <i class="fas fa-calendar-alt"></i>
-            <div class="stat-number" id="totalRecords">0</div>
-            <div class="stat-label">Jumlah Rekod</div>
-        </div>
+        <div class="stat-box positive"><i class="fas fa-heart"></i><div class="stat-number" id="positiveCount">0</div><div class="stat-label">Kebaikan</div></div>
+        <div class="stat-box negative"><i class="fas fa-exclamation-triangle"></i><div class="stat-number" id="negativeCount">0</div><div class="stat-label">Kesalahan</div></div>
+        <div class="stat-box"><i class="fas fa-calendar-alt"></i><div class="stat-number" id="totalRecords">0</div><div class="stat-label">Jumlah Rekod</div></div>
     </div>
     
     <div class="records-section">
         <h3><i class="fas fa-list-alt"></i> Senarai Transaksi Merit</h3>
-        <div id="recordsContainer">
-            <div class="empty-state"><i class="fas fa-spinner fa-pulse"></i> Memuatkan data...</div>
-        </div>
+        <div id="recordsContainer"><div class="empty-state"><i class="fas fa-spinner fa-pulse"></i> Memuatkan data...</div></div>
     </div>
 </div>
 
@@ -238,7 +177,6 @@
     
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
-    const studentsCollection = collection(db, "students");
     const meritCollection = collection(db, "merit_records");
     
     // Get student info from sessionStorage
@@ -247,168 +185,95 @@
     const studentClass = sessionStorage.getItem('studentClass') || '-';
     const studentSession = sessionStorage.getItem('studentSession') || '2026';
     
-    // Display student profile immediately
+    // Display student profile
     document.getElementById('studentName').innerText = studentName;
     document.getElementById('studentIC').innerText = studentIC;
     document.getElementById('studentClass').innerText = studentClass;
     document.getElementById('studentSession').innerText = studentSession;
     
-    let allMeritRecords = [];
-    
-    function showAlert(msg, type) {
-        const alertDiv = document.getElementById('alertMessage');
-        alertDiv.textContent = msg;
-        alertDiv.className = `alert ${type}`;
-        setTimeout(() => { alertDiv.style.display = 'none'; }, 4000);
-    }
-    
-    // Method 1: Try to get records by studentIC directly from merit_records
-    async function loadMeritByIC() {
-        console.log("Mencari rekod merit dengan IC:", studentIC);
-        
-        if (!studentIC || studentIC === '-') {
-            console.log("Tiada IC pelajar");
-            return false;
-        }
-        
-        try {
-            // Query merit_records using studentIC field
-            const q = query(meritCollection, where("studentIC", "==", studentIC), orderBy("createdAt", "desc"));
-            const snapshot = await getDocs(q);
-            
-            console.log("Rekod ditemui (by IC):", snapshot.size);
-            
-            snapshot.forEach(doc => {
-                allMeritRecords.push({ id: doc.id, ...doc.data() });
-            });
-            
-            return allMeritRecords.length > 0;
-        } catch(e) {
-            console.error("Error loading by IC:", e);
-            return false;
-        }
-    }
-    
-    // Method 2: Try to get student ID and then get records
-    async function loadMeritByStudentId() {
-        console.log("Mencari studentId untuk IC:", studentIC);
-        
-        try {
-            // Find student document using IC
-            const studentQuery = query(studentsCollection, where("icNumber", "==", studentIC));
-            const studentSnapshot = await getDocs(studentQuery);
-            
-            if (studentSnapshot.empty) {
-                console.log("Pelajar tidak ditemui dalam collection students");
-                return false;
-            }
-            
-            let studentId = null;
-            studentSnapshot.forEach(doc => {
-                studentId = doc.id;
-            });
-            
-            console.log("StudentId ditemui:", studentId);
-            
-            // Query merit_records using studentId
-            const meritQuery = query(meritCollection, where("studentId", "==", studentId), orderBy("createdAt", "desc"));
-            const meritSnapshot = await getDocs(meritQuery);
-            
-            console.log("Rekod merit ditemui (by studentId):", meritSnapshot.size);
-            
-            meritSnapshot.forEach(doc => {
-                allMeritRecords.push({ id: doc.id, ...doc.data() });
-            });
-            
-            return allMeritRecords.length > 0;
-        } catch(e) {
-            console.error("Error loading by studentId:", e);
-            return false;
-        }
-    }
-    
-    // Try both methods to get merit records
-    async function loadAllMeritRecords() {
+    async function loadMeritRecords() {
         const container = document.getElementById('recordsContainer');
         
-        // Show loading
-        container.innerHTML = '<div class="empty-state"><i class="fas fa-spinner fa-pulse"></i> Memuatkan data merit...</div>';
-        
-        // Reset records array
-        allMeritRecords = [];
-        
-        // Try Method 1: by studentIC
-        let hasRecords = await loadMeritByIC();
-        
-        // If no records found, try Method 2: by studentId
-        if (!hasRecords) {
-            console.log("Tiada rekod menggunakan IC, cuba dengan studentId...");
-            hasRecords = await loadMeritByStudentId();
-        }
-        
-        console.log("Jumlah rekod merit ditemui:", allMeritRecords.length);
-        
-        if (allMeritRecords.length === 0) {
-            container.innerHTML = '<div class="empty-state"><i class="fas fa-star"></i><p>Tiada rekod merit lagi</p><p style="font-size:12px;">Teruskan melakukan kebaikan untuk mendapat merit!</p></div>';
-            
-            // Update totals to zero
-            document.getElementById('totalMerit').innerText = '0';
-            document.getElementById('totalMerit').className = '';
-            document.getElementById('positiveCount').innerText = '0';
-            document.getElementById('negativeCount').innerText = '0';
-            document.getElementById('totalRecords').innerText = '0';
+        if (!studentIC || studentIC === '-') {
+            container.innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-triangle"></i><p>Tiada data pelajar. Sila log masuk semula.</p></div>';
             return;
         }
         
-        // Calculate totals
-        const total = allMeritRecords.reduce((sum, r) => sum + (r.points || 0), 0);
-        const totalElement = document.getElementById('totalMerit');
-        totalElement.innerText = total;
-        totalElement.className = total >= 0 ? 'positive' : 'negative';
+        console.log("Mencari rekod merit untuk IC:", studentIC);
         
-        const positiveCount = allMeritRecords.filter(r => r.type === 'positive').length;
-        const negativeCount = allMeritRecords.filter(r => r.type === 'negative').length;
-        document.getElementById('positiveCount').innerText = positiveCount;
-        document.getElementById('negativeCount').innerText = negativeCount;
-        document.getElementById('totalRecords').innerText = allMeritRecords.length;
-        
-        // Render records
-        let html = '';
-        for (const record of allMeritRecords) {
-            const isPositive = record.type === 'positive';
-            const typeClass = isPositive ? 'positive' : 'negative';
-            const typeIcon = isPositive ? '<i class="fas fa-heart"></i>' : '<i class="fas fa-exclamation-triangle"></i>';
-            const typeText = isPositive ? 'Kebaikan' : 'Kesalahan';
-            const pointSymbol = isPositive ? '+' : '';
-            const pointClass = isPositive ? 'positive' : 'negative';
+        try {
+            // Query terus menggunakan studentIC dalam merit_records
+            const q = query(meritCollection, where("studentIC", "==", studentIC), orderBy("createdAt", "desc"));
+            const snapshot = await getDocs(q);
             
-            let levelText = '';
-            if (!isPositive && record.level) {
-                const levelMap = {
-                    'ringan': 'Ringan',
-                    'sederhana': 'Sederhana',
-                    'berat': 'Berat'
-                };
-                levelText = `<span style="font-size:0.7rem; color:#5b6e8c;"> (${levelMap[record.level] || record.level})</span>`;
+            console.log("Jumlah rekod ditemui:", snapshot.size);
+            
+            if (snapshot.empty) {
+                container.innerHTML = '<div class="empty-state"><i class="fas fa-star"></i><p>Tiada rekod merit lagi</p><p style="font-size:12px;">Teruskan melakukan kebaikan untuk mendapat merit!</p></div>';
+                document.getElementById('totalMerit').innerText = '0';
+                document.getElementById('positiveCount').innerText = '0';
+                document.getElementById('negativeCount').innerText = '0';
+                document.getElementById('totalRecords').innerText = '0';
+                return;
             }
             
-            html += `
-                <div class="merit-record merit-record-${typeClass}">
-                    <div class="record-header">
-                        <span class="record-type ${typeClass}">${typeIcon} ${typeText}${levelText}</span>
-                        <span class="record-points ${pointClass}">${pointSymbol}${record.points} markah</span>
+            let records = [];
+            let totalPoints = 0;
+            let positiveCount = 0;
+            let negativeCount = 0;
+            
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                records.push(data);
+                totalPoints += (data.points || 0);
+                if (data.type === 'positive') positiveCount++;
+                else if (data.type === 'negative') negativeCount++;
+            });
+            
+            // Update display
+            const totalElement = document.getElementById('totalMerit');
+            totalElement.innerText = totalPoints;
+            totalElement.className = totalPoints >= 0 ? 'positive' : 'negative';
+            document.getElementById('positiveCount').innerText = positiveCount;
+            document.getElementById('negativeCount').innerText = negativeCount;
+            document.getElementById('totalRecords').innerText = records.length;
+            
+            // Render records
+            let html = '';
+            for (const record of records) {
+                const isPositive = record.type === 'positive';
+                const typeClass = isPositive ? 'positive' : 'negative';
+                const typeIcon = isPositive ? '<i class="fas fa-heart"></i>' : '<i class="fas fa-exclamation-triangle"></i>';
+                const typeText = isPositive ? 'Kebaikan' : 'Kesalahan';
+                const pointSymbol = isPositive ? '+' : '';
+                const pointClass = isPositive ? 'positive' : 'negative';
+                
+                let levelText = '';
+                if (!isPositive && record.level) {
+                    const levelMap = { 'ringan': 'Ringan', 'sederhana': 'Sederhana', 'berat': 'Berat' };
+                    levelText = `<span style="font-size:0.7rem; color:#5b6e8c;"> (${levelMap[record.level] || record.level})</span>`;
+                }
+                
+                html += `
+                    <div class="merit-record merit-record-${typeClass}">
+                        <div class="record-header">
+                            <span class="record-type ${typeClass}">${typeIcon} ${typeText}${levelText}</span>
+                            <span class="record-points ${pointClass}">${pointSymbol}${record.points} markah</span>
+                        </div>
+                        <div class="record-description">${escapeHtml(record.description)}</div>
+                        <div class="record-meta">
+                            <span><i class="fas fa-calendar"></i> ${formatDate(record.createdAt)}</span>
+                            <span><i class="fas fa-user-check"></i> Didaftar oleh: ${escapeHtml(record.createdBy || 'Guru/Kaunselor')}</span>
+                        </div>
                     </div>
-                    <div class="record-description">
-                        ${escapeHtml(record.description)}
-                    </div>
-                    <div class="record-meta">
-                        <span><i class="fas fa-calendar"></i> ${formatDate(record.createdAt)}</span>
-                        <span><i class="fas fa-user-check"></i> Didaftar oleh: ${escapeHtml(record.createdBy || 'Guru/Kaunselor')}</span>
-                    </div>
-                </div>
-            `;
+                `;
+            }
+            container.innerHTML = html;
+            
+        } catch(error) {
+            console.error("Error:", error);
+            container.innerHTML = '<div class="empty-state"><p style="color:#dc2626;">Ralat memuat data. Sila refresh.</p></div>';
         }
-        container.innerHTML = html;
     }
     
     function formatDate(dateStr) {
@@ -416,9 +281,7 @@
         try {
             const date = new Date(dateStr);
             return date.toLocaleDateString('ms-MY', { day: 'numeric', month: 'long', year: 'numeric' });
-        } catch(e) {
-            return dateStr;
-        }
+        } catch(e) { return dateStr; }
     }
     
     function escapeHtml(str) {
@@ -426,49 +289,8 @@
         return str.replace(/[&<>]/g, m => m==='&'?'&amp;':m==='<'?'&lt;':'&gt;');
     }
     
-    // Initialize
-    console.log("=== MATA MERIT PELAJAR ===");
-    console.log("Student Name:", studentName);
     console.log("Student IC:", studentIC);
-    console.log("Student Class:", studentClass);
-    console.log("Student Session:", studentSession);
-    
-    loadAllMeritRecords();
+    loadMeritRecords();
 </script>
-
-<!-- NOTA PENTING:
-     ============================================================
-     STRUKTUR FIRESTORE COLLECTIONS:
-     ============================================================
-     
-     1. students:
-        - id (auto)
-        - fullname
-        - icNumber
-        - class
-        - session
-     
-     2. merit_records:
-        - id (auto)
-        - studentId (rujukan kepada students.id) ATAU
-        - studentIC (No. Kad Pengenalan pelajar)
-        - studentName
-        - studentClass
-        - type: "positive" / "negative"
-        - level: "ringan" / "sederhana" / "berat"
-        - description
-        - points: 5 / -2 / -5 / -10
-        - createdAt
-        - createdBy
-     
-     ============================================================
-     CARA KERJA:
-     ============================================================
-     1. Halaman akan cuba 2 kaedah untuk cari rekod merit:
-        - Kaedah 1: Mencari terus menggunakan studentIC dalam merit_records
-        - Kaedah 2: Mencari studentId dari students, kemudian cari merit_records
-     
-     2. Paparkan semua rekod yang ditemui
--->
 </body>
 </html>

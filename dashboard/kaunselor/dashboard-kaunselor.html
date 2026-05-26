@@ -314,7 +314,7 @@
       <div class="menu-btn">Urus Merit <i class="fas fa-arrow-right"></i></div>
     </div>
 
-    <!-- 3. AKAUN PELAJAR -->
+    <!-- 3. AKAUN PELAJAR -> Redirect ke akaun-pelajar.html dalam FOLDER YANG SAMA (kaunselor/) -->
     <div class="menu-card" data-menu="akaun-pelajar">
       <div class="menu-icon"><i class="fas fa-users"></i></div>
       <h3>Akaun Pelajar</h3>
@@ -322,7 +322,7 @@
       <div class="menu-btn">Urus Akaun <i class="fas fa-arrow-right"></i></div>
     </div>
 
-    <!-- 4. AKAUN GURU (TAMBAHAN BARU) -->
+    <!-- 4. AKAUN GURU -->
     <div class="menu-card" data-menu="akaun-guru">
       <div class="menu-icon"><i class="fas fa-chalkboard-user"></i></div>
       <h3>Akaun Guru</h3>
@@ -337,30 +337,31 @@
 </div>
 
 <script>
-  // Fungsi untuk membuka halaman mengikut menu
-  // Setiap menu akan redirect ke page di dalam folder dashboard/
+  // ============================================================
+  // FUNGSI MEMBUKA HALAMAN MENGIKUT MENU
+  // ============================================================
   function openMenuPage(menuType) {
-    let fileName = '';
+    let targetUrl = '';
 
     switch(menuType) {
       case 'keputusan-ujian':
-        fileName = 'keputusan-ujian.html';
+        // Sementara - boleh ubah nanti
+        targetUrl = '../dashboard/keputusan-ujian.html';
         break;
       case 'mata-merit':
-        fileName = 'mata-merit.html';
+        targetUrl = '../dashboard/mata-merit.html';
         break;
       case 'akaun-pelajar':
-        fileName = 'akaun-pelajar.html';
+        // ✅ ARAH KE akaun-pelajar.html dalam FOLDER YANG SAMA (kaunselor/)
+        targetUrl = 'akaun-pelajar.html';
         break;
       case 'akaun-guru':
-        fileName = 'akaun-guru.html';
+        targetUrl = '../dashboard/akaun-guru.html';
         break;
       default:
         return;
     }
 
-    // Redirect ke page baru dalam folder dashboard/
-    const targetUrl = `dashboard/${fileName}`;
     window.location.href = targetUrl;
   }
 
@@ -373,10 +374,10 @@
     });
   });
 
-  // Logout button - kembali ke halaman utama (index.html)
+  // Logout button - kembali ke halaman utama (index.html di root)
   const logoutBtn = document.getElementById('logoutBtn');
   logoutBtn.addEventListener('click', () => {
-    window.location.href = 'index.html';
+    window.location.href = '../index.html';
   });
 </script>
 </body>

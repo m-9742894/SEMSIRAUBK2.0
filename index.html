@@ -425,7 +425,7 @@
 </div>
 
 <div class="container">
-  <!-- Header dengan slot logo KOSONG (tiada icon, tiada button upload) -->
+  <!-- Header dengan slot logo KOSONG (untuk logo PNG) -->
   <div class="header" data-aos="fade-down" data-aos-duration="800">
     <div class="logo-wrapper">
       <div class="logo-empty-slot" id="logoEmptySlot">
@@ -467,7 +467,7 @@
       <span><i class="fas fa-sign-in-alt"></i> Akses Sistem</span>
     </div>
     <div class="card-grid">
-      <!-- 1. GUEST -> Terus ke portal-utama.html (sudah sedia ada) -->
+      <!-- 1. GUEST -> Terus ke portal-utama.html (root folder) -->
       <div class="access-card" data-role="guest" data-url="portal-utama.html">
         <div class="card-icon"><i class="fas fa-user-friends"></i></div>
         <h3>GUEST</h3>
@@ -475,24 +475,24 @@
         <div class="btn-enter"><span>Masuk</span> <i class="fas fa-arrow-right"></i></div>
       </div>
       
-      <!-- 2. LOGIN PELAJAR -> redirect ke page kosong pelajar -->
-      <div class="access-card" data-role="pelajar" data-url="page-pelajar.html">
+      <!-- 2. LOGIN PELAJAR -> redirect ke dashboard/page-pelajar.html -->
+      <div class="access-card" data-role="pelajar" data-url="dashboard/page-pelajar.html">
         <div class="card-icon"><i class="fas fa-graduation-cap"></i></div>
         <h3>LOGIN PELAJAR</h3>
         <p>Akses ruang pelajar</p>
         <div class="btn-enter"><span>Masuk</span> <i class="fas fa-arrow-right"></i></div>
       </div>
       
-      <!-- 3. LOGIN GURU -> redirect ke page kosong guru -->
-      <div class="access-card" data-role="guru" data-url="page-guru.html">
+      <!-- 3. LOGIN GURU -> redirect ke dashboard/page-guru.html -->
+      <div class="access-card" data-role="guru" data-url="dashboard/page-guru.html">
         <div class="card-icon"><i class="fas fa-chalkboard-user"></i></div>
         <h3>LOGIN GURU</h3>
         <p>Akses profesional guru</p>
         <div class="btn-enter"><span>Masuk</span> <i class="fas fa-arrow-right"></i></div>
       </div>
       
-      <!-- 4. LOGIN KAUNSELOR -> redirect ke page kosong kaunselor -->
-      <div class="access-card" data-role="kaunselor" data-url="page-kaunselor.html">
+      <!-- 4. LOGIN KAUNSELOR -> redirect ke dashboard/page-kaunselor.html -->
+      <div class="access-card" data-role="kaunselor" data-url="dashboard/page-kaunselor.html">
         <div class="card-icon"><i class="fas fa-user-graduate"></i></div>
         <h3>LOGIN KAUNSELOR</h3>
         <p>Panel kaunseling sekolah</p>
@@ -522,7 +522,10 @@
 
   // ============================================================
   // SETIAP BUTANG AKAN DIRECT KE PAGE HTML YANG BERLAINAN
-  // (BUKAN about:blank / popup kosong)
+  // GUEST -> portal-utama.html (root)
+  // PELAJAR -> dashboard/page-pelajar.html
+  // GURU -> dashboard/page-guru.html
+  // KAUNSELOR -> dashboard/page-kaunselor.html
   // ============================================================
   
   // Dapatkan semua kad akses
@@ -530,42 +533,45 @@
   
   accessCards.forEach(card => {
     card.addEventListener('click', (e) => {
-      // Hentikan event bubbling
       e.stopPropagation();
       
-      // Dapatkan URL dari attribute data-url
       const targetUrl = card.getAttribute('data-url');
       const role = card.getAttribute('data-role');
       
       if (targetUrl) {
-        // Jika URL wujud, redirect ke halaman tersebut
         window.location.href = targetUrl;
       } else {
-        // Fallback: jika tiada data-url, beri amaran (tidak sepatutnya berlaku)
         console.warn(`Tiada URL untuk role: ${role}`);
         alert("Halaman destinasi belum disediakan. Sila pastikan fail HTML wujud.");
       }
     });
   });
   
-  // Nota: Untuk memastikan semua halaman berfungsi, sila cipta fail berikut dalam direktori yang sama:
-  // 1. portal-utama.html   (Guest / Portal Utama - sudah pun anda ada dari sebelumnya)
-  // 2. page-pelajar.html   (Halaman kosong untuk pelajar - boleh diisi kemudian)
-  // 3. page-guru.html      (Halaman kosong untuk guru)
-  // 4. page-kaunselor.html (Halaman kosong untuk kaunselor)
+  // ============================================================
+  // STRUKTUR FOLDER YANG DISARANKAN:
+  // 
+  // root folder/
+  // ├── index.html (fail ini)
+  // ├── portal-utama.html (halaman guest)
+  // ├── LOGO SEMSIRA.png (logo)
+  // └── dashboard/
+  //     ├── page-pelajar.html
+  //     ├── page-guru.html
+  //     └── page-kaunselor.html
   //
-  // Contoh kandungan asas untuk fail kosong (page-pelajar.html, page-guru.html, page-kaunselor.html):
+  // Contoh kandungan minimum untuk fail di dalam folder dashboard:
   /*
   <!DOCTYPE html>
   <html>
-  <head><meta charset="UTF-8"><title>Halaman [Role]</title></head>
+  <head><meta charset="UTF-8"><title>Dashboard [Role]</title></head>
   <body style="font-family: sans-serif; text-align: center; padding: 3rem;">
-    <h1>Halaman [Role]</h1>
+    <h1>Dashboard [Role]</h1>
     <p>Kandungan akan ditambah kemudian.</p>
-    <a href="index.html">Kembali ke Laman Utama</a>
+    <a href="../index.html">Kembali ke Laman Utama</a>
   </body>
   </html>
   */
+  // ============================================================
 </script>
 </body>
 </html>

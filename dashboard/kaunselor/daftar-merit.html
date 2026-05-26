@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Daftar Merit Pelajar | E-MindCare SEMSIRA</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: linear-gradient(135deg, #f0f4ff 0%, #e9eef6 100%); min-height: 100vh; padding: 20px; }
+        
+        .container { max-width: 900px; margin: 0 auto; }
+        
+        /* Header */
+        .header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 2px solid rgba(79,70,229,0.2); }
+        .logo-area { display: flex; align-items: center; gap: 1rem; }
+        .logo-icon { background: linear-gradient(145deg, #4f46e5, #7c3aed); width: 50px; height: 50px; border-radius: 28px; display: flex; align-items: center; justify-content: center; }
+        .logo-icon i { font-size: 1.8rem; color: white; }
+        .logo-text h1 { font-size: 1.5rem; font-weight: 800; background: linear-gradient(135deg, #1e293b, #4f46e5); -webkit-background-clip: text; background-clip: text; color: transparent; }
+        .back-btn { background: #eef2ff; border: none; padding: 0.6rem 1.2rem; border-radius: 40px; cursor: pointer; font-weight: 600; color: #4f46e5; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; }
+        .back-btn:hover { background: #4f46e5; color: white; }
+        
+        /* User Info Bar */
+        .user-bar { background: white; border-radius: 1rem; padding: 0.8rem 1.2rem; margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .user-info-display { display: flex; align-items: center; gap: 12px; }
+        .user-info-display i { font-size: 1.2rem; color: #4f46e5; }
+        .user-info-display span { font-weight: 600; color: #1e293b; }
+        
+        /* Search Section */
+        .search-card { background: white; border-radius: 1.5rem; padding: 1.5rem; margin-bottom: 1.5rem; box-shadow: 0 8px 20px -8px rgba(0,0,0,0.08); }
+        .search-card h3 { font-size: 1.2rem; color: #1e293b; margin-bottom: 1rem; display: flex; align-items: center; gap: 10px; }
+        .search-card h3 i { color: #4f46e5; }
+        
+        .search-input-group { display: flex; gap: 0.5rem; flex-wrap: wrap; position: relative; }
+        .search-input-group input { flex: 1; padding: 0.8rem 1rem; border: 1.5px solid #e2e8f0; border-radius: 1rem; font-family: inherit; outline: none; }
+        .search-input-group input:focus { border-color: #4f46e5; }
+        .search-btn { background: #4f46e5; color: white; border: none; padding: 0.8rem 1.5rem; border-radius: 1rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; }
+        .search-btn:hover { background: #4338ca; }
+        
+        /* Suggestions */
+        .suggestions { position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #e2e8f0; border-radius: 1rem; max-height: 200px; overflow-y: auto; z-index: 100; box-shadow: 0 4px 12px rgba(0,0,0,0.1); display: none; }
+        .suggestion-item { padding: 0.8rem 1rem; cursor: pointer; border-bottom: 1px solid #e2e8f0; }
+        .suggestion-item:hover { background: #eef2ff; }
+        .suggestion-name { font-weight: 600; color: #1e293b; }
+        .suggestion-ic { font-size: 0.7rem; color: #5b6e8c; }
+        
+        /* Profile Card */
+        .profile-card { background: linear-gradient(135deg, #4f46e5, #7c3aed); color: white; border-radius: 1.5rem; padding: 1.5rem; margin-bottom: 1.5rem; display: none; }
+        .profile-card h3 { font-size: 1.1rem; margin-bottom: 1rem; opacity: 0.9; }
+        .profile-details { display: flex; flex-wrap: wrap; gap: 1.5rem; }
+        .profile-details p { margin: 0.5rem 0; display: flex; align-items: center; gap: 8px; }
+        .profile-details i { width: 20px; }
+        
+        /* Merit Type Tabs */
+        .merit-tabs { display: flex; gap: 1rem; margin-bottom: 1.5rem; }
+        .merit-tab { flex: 1; padding: 0.8rem; background: #e2e8f0; border: none; border-radius: 1rem; font-weight: 600; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .merit-tab.active { background: #4f46e5; color: white; }
+        .merit-tab.negative.active { background: #dc2626; color: white; }
+        .merit-tab.positive.active { background: #10b981; color: white; }
+        
+        /* Form Sections */
+        .form-section { background: white; border-radius: 1.5rem; padding: 1.5rem; margin-bottom: 1.5rem; box-shadow: 0 8px 20px -8px rgba(0,0,0,0.08); display: none; }
+        .form-group { margin-bottom: 1rem; }
+        .form-group label { display: block; font-weight: 600; font-size: 0.8rem; margin-bottom: 0.4rem; color: #1e293b; }
+        .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 0.8rem; border: 1.5px solid #e2e8f0; border-radius: 0.8rem; font-family: inherit; outline: none; }
+        .form-group input:focus, .form-group textarea:focus, .form-group select:focus { border-color: #4f46e5; }
+        
+        .point-display { background: #f1f5f9; padding: 0.8rem; border-radius: 0.8rem; margin-bottom: 1rem; text-align: center; font-weight: 600; }
+        .point-display span { font-size: 1.5rem; color: #4f46e5; }
+        
+        .btn-submit { width: 100%; padding: 0.8rem; background: linear-gradient(95deg, #4f46e5, #7c3aed); color: white; border: none; border-radius: 2rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .btn-submit:hover { transform: translateY(-2px); }
+        .btn-submit-negative { background: linear-gradient(95deg, #dc2626, #b91c1c); }
+        
+        .alert { padding: 12px; border-radius: 12px; margin-bottom: 15px; font-size: 0.8rem; display: none; }
+        .alert.success { background: #dcfce7; color: #166534; display: block; }
+        .alert.error { background: #fee2e2; color: #dc2626; display: block; }
+        
+        .empty-state { text-align: center; padding: 2rem; color: #94a3b8; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <div class="logo-area">
+            <div class="logo-icon"><i class="fas fa-star"></i></div>
+            <div class="logo-text"><h1>Daftar Merit Pelajar</h1></div>
+        </div>
+        <a href="dashboard-kaunselor.html" class="back-btn"><i class="fas fa-arrow-left"></i> Kembali ke Dashboard</a>
+    </div>
+    
+    <!-- User Info Bar - Siapa yang sedang login -->
+    <div class="user-bar">
+        <div class="user-info-display">
+            <i class="fas fa-user-shield"></i>
+            <span>👤 Didaftar oleh:</span>
+        </div>
+        <div class="user-info-display">
+            <i class="fas fa-id-card"></i>
+            <span id="counselorName">Kaunselor</span>
+            <span id="counselorIC" style="font-size:0.7rem; color:#5b6e8c;"></span>
+        </div>
+    </div>
+    
+    <div id="alertMessage" class="alert"></div>
+    
+    <!-- Search Section -->
+    <div class="search-card">
+        <h3><i class="fas fa-search"></i> Cari Pelajar</h3>
+        <div class="search-input-group">
+            <input type="text" id="searchInput" placeholder="Taip nama atau No. Kad Pengenalan..." autocomplete="off">
+            <div id="suggestions" class="suggestions"></div>
+            <button class="search-btn" id="searchBtn"><i class="fas fa-search"></i> Cari</button>
+        </div>
+    </div>
+    
+    <!-- Profile Card -->
+    <div id="profileCard" class="profile-card">
+        <h3><i class="fas fa-user-graduate"></i> Profil Pelajar</h3>
+        <div class="profile-details">
+            <div>
+                <p><i class="fas fa-user"></i> <strong>Nama:</strong> <span id="profileName">-</span></p>
+                <p><i class="fas fa-id-card"></i> <strong>No. IC:</strong> <span id="profileIC">-</span></p>
+            </div>
+            <div>
+                <p><i class="fas fa-school"></i> <strong>Kelas:</strong> <span id="profileClass">-</span></p>
+                <p><i class="fas fa-calendar"></i> <strong>Tahun:</strong> <span id="profileSession">-</span></p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Merit Type Tabs -->
+    <div class="merit-tabs" id="meritTabs" style="display: none;">
+        <button class="merit-tab negative" data-type="negative"><i class="fas fa-exclamation-triangle"></i> Kesalahan</button>
+        <button class="merit-tab positive" data-type="positive"><i class="fas fa-heart"></i> Kebaikan</button>
+    </div>
+    
+    <!-- Form Kesalahan -->
+    <div id="negativeForm" class="form-section">
+        <h3 style="margin-bottom: 1rem; color:#dc2626;"><i class="fas fa-exclamation-triangle"></i> Daftar Kesalahan</h3>
+        <div class="form-group">
+            <label><i class="fas fa-edit"></i> Nyatakan Kesalahan</label>
+            <textarea id="offenseDesc" rows="3" placeholder="Contoh: Tidak menghormati guru, ponteng sekolah, bergaduh..."></textarea>
+        </div>
+        <div class="form-group">
+            <label><i class="fas fa-balance-scale"></i> Tahap Kesalahan</label>
+            <select id="offenseLevel">
+                <option value="ringan">Ringan - Tolak 2 markah</option>
+                <option value="sederhana">Sederhana - Tolak 5 markah</option>
+                <option value="berat">Berat - Tolak 10 markah</option>
+            </select>
+        </div>
+        <div class="point-display" id="negativePointDisplay">Markah akan ditolak: <span>-2</span> markah</div>
+        <button class="btn-submit btn-submit-negative" id="submitNegativeBtn"><i class="fas fa-save"></i> Daftar Kesalahan</button>
+    </div>
+    
+    <!-- Form Kebaikan -->
+    <div id="positiveForm" class="form-section">
+        <h3 style="margin-bottom: 1rem; color:#10b981;"><i class="fas fa-heart"></i> Daftar Kebaikan</h3>
+        <div class="form-group">
+            <label><i class="fas fa-edit"></i> Nyatakan Kebaikan</label>
+            <textarea id="goodDeedDesc" rows="3" placeholder="Contoh: Menolong rakan, aktif dalam kokurikulum, kebersihan kelas..."></textarea>
+        </div>
+        <div class="point-display" style="background:#dcfce7;">Markah akan ditambah: <span style="color:#10b981;">+5</span> markah</div>
+        <button class="btn-submit" id="submitPositiveBtn" style="background: linear-gradient(95deg, #10b981, #059669);"><i class="fas fa-save"></i> Daftar Kebaikan</button>
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, collection, addDoc, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    
+    const firebaseConfig = {
+        apiKey: "AIzaSyCfu7XC8pXtpDyQ-9Cjdg4AobA-EVEwWcc",
+        authDomain: "e-mindcare.firebaseapp.com",
+        projectId: "e-mindcare",
+        storageBucket: "e-mindcare.firebasestorage.app",
+        messagingSenderId: "1021883944936",
+        appId: "1:1021883944936:web:39c75a0c98d19a37afde5d",
+        measurementId: "G-3CJVKWGEXV"
+    };
+    
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const studentsCollection = collection(db, "students");
+    const meritCollection = collection(db, "merit_records");
+    
+    // ==================== GET COUNSELOR INFO ====================
+    // Cuba ambil dari sessionStorage (kaunselor yang login)
+    let counselorName = sessionStorage.getItem('counselorName') || sessionStorage.getItem('teacherName') || 'Kaunselor';
+    let counselorIC = sessionStorage.getItem('counselorIC') || sessionStorage.getItem('teacherIC') || '-';
+    let counselorId = sessionStorage.getItem('counselorId') || sessionStorage.getItem('teacherId') || '-';
+    
+    // Jika tiada data kaunselor, set default
+    if (counselorName === 'Kaunselor' && counselorIC === '-') {
+        // Cuba cari dari localStorage
+        const storedCounselor = localStorage.getItem('currentCounselor');
+        if (storedCounselor) {
+            try {
+                const counselor = JSON.parse(storedCounselor);
+                counselorName = counselor.name || 'Kaunselor';
+                counselorIC = counselor.ic || '-';
+                counselorId = counselor.id || '-';
+            } catch(e) {}
+        }
+    }
+    
+    // Paparkan maklumat kaunselor
+    document.getElementById('counselorName').innerHTML = `<i class="fas fa-user-circle"></i> ${counselorName}`;
+    document.getElementById('counselorIC').innerHTML = `No. IC: ${counselorIC}`;
+    
+    console.log("Kaunselor yang mendaftar:", counselorName, counselorIC);
+    
+    let allStudents = [];
+    let selectedStudent = null;
+    let currentMeritType = "negative";
+    
+    function showAlert(msg, type) {
+        const alertDiv = document.getElementById('alertMessage');
+        alertDiv.textContent = msg;
+        alertDiv.className = `alert ${type}`;
+        setTimeout(() => { alertDiv.style.display = 'none'; }, 3000);
+    }
+    
+    // Load all students for suggestions
+    async function loadStudents() {
+        try {
+            const snapshot = await getDocs(studentsCollection);
+            allStudents = [];
+            snapshot.forEach(doc => {
+                allStudents.push({ id: doc.id, ...doc.data() });
+            });
+            console.log("Students loaded:", allStudents.length);
+        } catch(e) { console.error(e); }
+    }
+    
+    // Search suggestions
+    const searchInput = document.getElementById('searchInput');
+    const suggestionsDiv = document.getElementById('suggestions');
+    
+    searchInput.addEventListener('input', (e) => {
+        const query = e.target.value.toLowerCase().trim();
+        if (query.length < 2) {
+            suggestionsDiv.style.display = 'none';
+            return;
+        }
+        
+        const filtered = allStudents.filter(s => 
+            s.fullname.toLowerCase().includes(query) || 
+            s.icNumber.includes(query)
+        ).slice(0, 8);
+        
+        if (filtered.length === 0) {
+            suggestionsDiv.style.display = 'none';
+            return;
+        }
+        
+        suggestionsDiv.innerHTML = filtered.map(s => `
+            <div class="suggestion-item" onclick="selectStudent('${s.id}', '${escapeHtml(s.fullname)}', '${escapeHtml(s.icNumber)}', '${escapeHtml(s.class)}', '${s.session}')">
+                <div class="suggestion-name">${escapeHtml(s.fullname)}</div>
+                <div class="suggestion-ic"><i class="fas fa-id-card"></i> ${escapeHtml(s.icNumber)} | Kelas: ${escapeHtml(s.class)}</div>
+            </div>
+        `).join('');
+        suggestionsDiv.style.display = 'block';
+    });
+    
+    // Hide suggestions when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!searchInput.contains(e.target) && !suggestionsDiv.contains(e.target)) {
+            suggestionsDiv.style.display = 'none';
+        }
+    });
+    
+    window.selectStudent = function(id, name, ic, className, session) {
+        selectedStudent = { id, name, ic, class: className, session };
+        
+        // Update profile card
+        document.getElementById('profileName').innerText = name;
+        document.getElementById('profileIC').innerText = ic;
+        document.getElementById('profileClass').innerText = className || '-';
+        document.getElementById('profileSession').innerText = session || '-';
+        document.getElementById('profileCard').style.display = 'block';
+        document.getElementById('meritTabs').style.display = 'flex';
+        
+        // Default show negative form
+        document.getElementById('negativeForm').style.display = 'block';
+        document.getElementById('positiveForm').style.display = 'none';
+        currentMeritType = 'negative';
+        
+        // Update tab active states
+        document.querySelectorAll('.merit-tab').forEach(tab => tab.classList.remove('active'));
+        document.querySelector('.merit-tab.negative').classList.add('active');
+        
+        // Clear search input and suggestions
+        searchInput.value = name;
+        suggestionsDiv.style.display = 'none';
+    };
+    
+    // Search button click
+    document.getElementById('searchBtn').addEventListener('click', async () => {
+        const query = searchInput.value.trim();
+        if (!query) {
+            showAlert('Sila masukkan nama atau No. Kad Pengenalan', 'error');
+            return;
+        }
+        
+        const found = allStudents.find(s => 
+            s.fullname.toLowerCase() === query.toLowerCase() || 
+            s.icNumber === query
+        );
+        
+        if (found) {
+            selectStudent(found.id, found.fullname, found.icNumber, found.class, found.session);
+        } else {
+            showAlert('Pelajar tidak ditemui. Pastikan nama atau IC betul.', 'error');
+        }
+    });
+    
+    // Tab switching
+    document.querySelectorAll('.merit-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            document.querySelectorAll('.merit-tab').forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            
+            currentMeritType = tab.dataset.type;
+            if (currentMeritType === 'negative') {
+                document.getElementById('negativeForm').style.display = 'block';
+                document.getElementById('positiveForm').style.display = 'none';
+            } else {
+                document.getElementById('negativeForm').style.display = 'none';
+                document.getElementById('positiveForm').style.display = 'block';
+            }
+        });
+    });
+    
+    // Update point display for negative
+    const offenseLevel = document.getElementById('offenseLevel');
+    const negativePointDisplay = document.getElementById('negativePointDisplay');
+    
+    offenseLevel.addEventListener('change', () => {
+        const level = offenseLevel.value;
+        let points = 2;
+        if (level === 'ringan') points = 2;
+        else if (level === 'sederhana') points = 5;
+        else points = 10;
+        negativePointDisplay.innerHTML = `Markah akan ditolak: <span>-${points}</span> markah`;
+    });
+    
+    // Submit Negative (Kesalahan)
+    document.getElementById('submitNegativeBtn').addEventListener('click', async () => {
+        if (!selectedStudent) {
+            showAlert('Sila cari dan pilih pelajar terlebih dahulu', 'error');
+            return;
+        }
+        
+        const description = document.getElementById('offenseDesc').value.trim();
+        const level = offenseLevel.value;
+        
+        if (!description) {
+            showAlert('Sila nyatakan kesalahan', 'error');
+            return;
+        }
+        
+        let points = 2;
+        if (level === 'ringan') points = 2;
+        else if (level === 'sederhana') points = 5;
+        else points = 10;
+        
+        const btn = document.getElementById('submitNegativeBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Menyimpan...';
+        
+        try {
+            await addDoc(meritCollection, {
+                studentId: selectedStudent.id,
+                studentName: selectedStudent.name,
+                studentIC: selectedStudent.ic,
+                studentClass: selectedStudent.class,
+                type: 'negative',
+                level: level,
+                description: description,
+                points: -points,
+                createdAt: new Date().toISOString(),
+                createdBy: counselorName,
+                createdByIC: counselorIC,
+                createdById: counselorId,
+                createdByRole: 'Kaunselor'
+            });
+            
+            showAlert(`✅ Kesalahan berjaya didaftarkan oleh ${counselorName}! -${points} markah`, 'success');
+            document.getElementById('offenseDesc').value = '';
+            offenseLevel.value = 'ringan';
+            negativePointDisplay.innerHTML = 'Markah akan ditolak: <span>-2</span> markah';
+            
+        } catch(e) {
+            console.error(e);
+            showAlert('❌ Gagal menyimpan data', 'error');
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-save"></i> Daftar Kesalahan';
+        }
+    });
+    
+    // Submit Positive (Kebaikan)
+    document.getElementById('submitPositiveBtn').addEventListener('click', async () => {
+        if (!selectedStudent) {
+            showAlert('Sila cari dan pilih pelajar terlebih dahulu', 'error');
+            return;
+        }
+        
+        const description = document.getElementById('goodDeedDesc').value.trim();
+        
+        if (!description) {
+            showAlert('Sila nyatakan kebaikan', 'error');
+            return;
+        }
+        
+        const btn = document.getElementById('submitPositiveBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Menyimpan...';
+        
+        try {
+            await addDoc(meritCollection, {
+                studentId: selectedStudent.id,
+                studentName: selectedStudent.name,
+                studentIC: selectedStudent.ic,
+                studentClass: selectedStudent.class,
+                type: 'positive',
+                description: description,
+                points: 5,
+                createdAt: new Date().toISOString(),
+                createdBy: counselorName,
+                createdByIC: counselorIC,
+                createdById: counselorId,
+                createdByRole: 'Kaunselor'
+            });
+            
+            showAlert(`✅ Kebaikan berjaya didaftarkan oleh ${counselorName}! +5 markah`, 'success');
+            document.getElementById('goodDeedDesc').value = '';
+            
+        } catch(e) {
+            console.error(e);
+            showAlert('❌ Gagal menyimpan data', 'error');
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-save"></i> Daftar Kebaikan';
+        }
+    });
+    
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, m => m==='&'?'&amp;':m==='<'?'&lt;':'&gt;');
+    }
+    
+    // Initialize
+    loadStudents();
+</script>
+</body>
+</html>

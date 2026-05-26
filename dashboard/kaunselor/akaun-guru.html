@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Akaun Guru | Dashboard Kaunselor</title>
+  <!-- Fonts & Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: linear-gradient(135deg, #f0f4ff 0%, #e9eef6 100%);
+      min-height: 100vh;
+      padding: 2rem;
+    }
+    .container { max-width: 1400px; margin: 0 auto; }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 2rem;
+      padding-bottom: 1rem;
+      border-bottom: 2px solid rgba(79, 70, 229, 0.2);
+    }
+    .logo-area { display: flex; align-items: center; gap: 1rem; }
+    .logo-icon {
+      background: linear-gradient(145deg, #4f46e5, #7c3aed);
+      width: 50px;
+      height: 50px;
+      border-radius: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .logo-icon i { font-size: 1.8rem; color: white; }
+    .logo-text h1 {
+      font-size: 1.5rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #1e293b, #4f46e5);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    .logo-text p { font-size: 0.7rem; color: #5b6e8c; }
+    .back-btn {
+      background: #eef2ff;
+      border: none;
+      padding: 0.6rem 1.2rem;
+      border-radius: 40px;
+      cursor: pointer;
+      font-weight: 600;
+      color: #4f46e5;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: 0.2s;
+    }
+    .back-btn:hover { background: #4f46e5; color: white; }
+    .stats {
+      background: white;
+      border-radius: 1.2rem;
+      padding: 1rem 1.5rem;
+      margin-bottom: 2rem;
+      display: inline-block;
+    }
+    .stats span { font-weight: 800; color: #4f46e5; font-size: 1.3rem; }
+    .card {
+      background: white;
+      border-radius: 1.5rem;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 8px 20px -8px rgba(0, 0, 0, 0.08);
+      border: 1px solid rgba(79, 70, 229, 0.1);
+    }
+    .card h2 {
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-bottom: 1.2rem;
+      color: #1f2a44;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-left: 4px solid #4f46e5;
+      padding-left: 12px;
+    }
+    .form-group { margin-bottom: 1rem; }
+    .form-group label {
+      display: block;
+      font-weight: 600;
+      font-size: 0.8rem;
+      color: #1f2a44;
+      margin-bottom: 0.4rem;
+    }
+    .form-group label i { margin-right: 6px; color: #4f46e5; }
+    .form-group input {
+      width: 100%;
+      padding: 0.8rem 1rem;
+      font-size: 0.9rem;
+      font-family: inherit;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 1rem;
+      background: white;
+      outline: none;
+    }
+    .form-group input:focus { border-color: #4f46e5; box-shadow: 0 0 0 3px rgba(79,70,229,0.1); }
+    .btn-submit {
+      background: linear-gradient(95deg, #4f46e5, #7c3aed);
+      border: none;
+      padding: 0.8rem;
+      border-radius: 2rem;
+      font-weight: 600;
+      color: white;
+      cursor: pointer;
+      width: 100%;
+      transition: 0.2s;
+    }
+    .btn-submit:hover { transform: translateY(-2px); background: linear-gradient(95deg, #4338ca, #6d28d9); }
+    .teacher-item {
+      background: #f8fafc;
+      border-radius: 1rem;
+      padding: 0.8rem 1rem;
+      margin-bottom: 0.8rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    .teacher-item:hover { background: #f1f5f9; }
+    .teacher-info { flex: 1; }
+    .teacher-name {
+      font-weight: 700;
+      color: #1e293b;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .teacher-detail { font-size: 0.75rem; color: #5b6e8c; margin-top: 4px; }
+    .teacher-badge {
+      background: #e0e7ff;
+      padding: 0.2rem 0.6rem;
+      border-radius: 20px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: #4f46e5;
+    }
+    .btn-edit-full, .btn-delete {
+      padding: 0.4rem 0.8rem;
+      border-radius: 2rem;
+      cursor: pointer;
+      font-size: 0.7rem;
+      font-weight: 600;
+      border: none;
+      margin-left: 0.3rem;
+    }
+    .btn-edit-full { background: #e0e7ff; color: #4f46e5; }
+    .btn-edit-full:hover { background: #c7d2fe; }
+    .btn-delete { background: #fee2e2; color: #dc2626; }
+    .btn-delete:hover { background: #fecaca; }
+    .empty-state { text-align: center; padding: 2rem; color: #94a3b8; }
+    .success-msg {
+      background: #dcfce7;
+      color: #166534;
+      padding: 0.5rem 1rem;
+      border-radius: 2rem;
+      font-size: 0.8rem;
+      margin-bottom: 1rem;
+      display: none;
+    }
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow-y: auto;
+      padding: 2rem;
+    }
+    .modal-content {
+      max-width: 700px;
+      width: 100%;
+      background: white;
+      border-radius: 2rem;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    .modal-header {
+      padding: 1.5rem;
+      border-bottom: 1px solid #e2e8f0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .modal-header h2 { color: #1e293b; }
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+    .modal-body { padding: 1.5rem; }
+    .edit-section {
+      background: #f8fafc;
+      border-radius: 1rem;
+      padding: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .student-list-modal {
+      max-height: 300px;
+      overflow-y: auto;
+    }
+    .student-item-modal {
+      background: #f1f5f9;
+      border-radius: 0.8rem;
+      padding: 0.8rem;
+      margin-bottom: 0.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    @media (max-width: 900px) {
+      body { padding: 1rem; }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div class="logo-area">
+      <div class="logo-icon"><i class="fas fa-chalkboard-user"></i></div>
+      <div class="logo-text">
+        <h1>Akaun Guru</h1>
+        <p>Urus data profil guru • Firebase Cloud</p>
+      </div>
+    </div>
+    <a href="dashboard-kaunselor.html" class="back-btn"><i class="fas fa-arrow-left"></i> Kembali ke Dashboard</a>
+  </div>
+
+  <div class="stats">
+    <i class="fas fa-user-tie"></i> Jumlah Guru: <span id="totalTeachers">0</span>
+  </div>
+
+  <div id="successMsg" class="success-msg"></div>
+
+  <!-- Add Teacher Form -->
+  <div class="card">
+    <h2><i class="fas fa-user-plus"></i> Tambah Guru Baru</h2>
+    <form id="addTeacherForm">
+      <div class="form-group">
+        <label><i class="fas fa-user"></i> Nama Penuh</label>
+        <input type="text" id="fullname" placeholder="cth: Puan Sarah binti Abdullah" required>
+      </div>
+      <div class="form-group">
+        <label><i class="fas fa-id-card"></i> Nombor Kad Pengenalan</label>
+        <input type="text" id="icNumber" placeholder="cth: 800101-01-1234" required>
+      </div>
+      <div class="form-group">
+        <label><i class="fas fa-school"></i> Mengajar Kelas / Tingkatan</label>
+        <input type="text" id="teacherClass" placeholder="cth: 5 Cemerlang, Tingkatan 4 Amanah">
+      </div>
+      <div class="form-group">
+        <label><i class="fas fa-calendar"></i> Tahun / Sesi</label>
+        <input type="text" id="year" placeholder="cth: 2024, 2025, 2026" value="2026">
+      </div>
+      <button type="submit" class="btn-submit"><i class="fas fa-cloud-upload-alt"></i> Daftar ke Firebase</button>
+    </form>
+  </div>
+
+  <!-- Teacher List -->
+  <div class="card">
+    <h2><i class="fas fa-list"></i> Senarai Guru Berdaftar</h2>
+    <div id="teacherListContainer">
+      <div class="empty-state"><i class="fas fa-spinner fa-pulse"></i> Memuat data dari Firebase...</div>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+  // Import Firebase SDK
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+  import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+  
+  // Firebase configuration
+  const firebaseConfig = {
+    apiKey: "AIzaSyCfu7XC8pXtpDyQ-9Cjdg4AobA-EVEwWcc",
+    authDomain: "e-mindcare.firebaseapp.com",
+    projectId: "e-mindcare",
+    storageBucket: "e-mindcare.firebasestorage.app",
+    messagingSenderId: "1021883944936",
+    appId: "1:1021883944936:web:39c75a0c98d19a37afde5d",
+    measurementId: "G-3CJVKWGEXV"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const teachersCollection = collection(db, "teachers");
+  const studentsCollection = collection(db, "students");
+
+  // ==================== GLOBAL VARIABLES ====================
+  let teachers = [];
+  let students = [];
+  let currentEditTeacherId = null;
+
+  // ==================== HELPER FUNCTIONS ====================
+  function escapeHtml(str) {
+    if (!str) return '';
+    return str.replace(/[&<>]/g, function(m) {
+      if (m === '&') return '&amp;';
+      if (m === '<') return '&lt;';
+      if (m === '>') return '&gt;';
+      return m;
+    });
+  }
+
+  function showMessage(msg, type) {
+    const msgDiv = document.getElementById('successMsg');
+    msgDiv.textContent = msg;
+    msgDiv.style.backgroundColor = type === 'success' ? '#dcfce7' : '#fee2e2';
+    msgDiv.style.color = type === 'success' ? '#166534' : '#991b1b';
+    msgDiv.style.display = 'block';
+    setTimeout(() => { msgDiv.style.display = 'none'; }, 4000);
+  }
+
+  function closeModal() {
+    const modal = document.getElementById('teacherModal');
+    if (modal) modal.remove();
+  }
+
+  // ==================== LOAD DATA ====================
+  async function loadTeachers() {
+    try {
+      const querySnapshot = await getDocs(teachersCollection);
+      teachers = [];
+      querySnapshot.forEach((doc) => {
+        teachers.push({ id: doc.id, ...doc.data() });
+      });
+      renderTeacherList();
+      updateTotalCount();
+      console.log("Teachers loaded from Firebase:", teachers.length);
+    } catch (error) {
+      console.error("Error loading teachers:", error);
+      showMessage("Gagal memuat data guru dari Firebase.", "error");
+    }
+  }
+
+  async function loadAllStudents() {
+    try {
+      const querySnapshot = await getDocs(studentsCollection);
+      students = [];
+      querySnapshot.forEach((doc) => {
+        students.push({ id: doc.id, ...doc.data() });
+      });
+    } catch (error) {
+      console.error("Error loading students:", error);
+    }
+  }
+
+  // ==================== TEACHER CRUD ====================
+  async function addTeacherToFirebase(fullname, icNumber, teacherClass, year) {
+    try {
+      const q = query(teachersCollection, where("icNumber", "==", icNumber));
+      const querySnapshot = await getDocs(q);
+      
+      if (!querySnapshot.empty) {
+        const existing = querySnapshot.docs[0];
+        return { success: false, message: `No. IC ${icNumber} sudah wujud untuk ${existing.data().fullname}` };
+      }
+      
+      const newTeacher = {
+        fullname: fullname.trim(),
+        icNumber: icNumber.trim(),
+        teacherClass: teacherClass.trim() || "-",
+        year: year.trim() || "2026",
+        createdAt: new Date().toISOString()
+      };
+      
+      const docRef = await addDoc(teachersCollection, newTeacher);
+      teachers.push({ id: docRef.id, ...newTeacher });
+      
+      renderTeacherList();
+      updateTotalCount();
+      showMessage(`✅ Guru ${fullname} berjaya didaftarkan!`, "success");
+      return { success: true };
+    } catch (error) {
+      console.error("Error adding teacher:", error);
+      return { success: false, message: "Ralat Firebase: " + error.message };
+    }
+  }
+
+  async function deleteTeacherFromFirebase(id, teacherName) {
+    if (!confirm(`Padam guru "${teacherName}"?`)) return;
+    
+    try {
+      await deleteDoc(doc(db, "teachers", id));
+      teachers = teachers.filter(t => t.id !== id);
+      renderTeacherList();
+      updateTotalCount();
+      showMessage("Guru berjaya dipadam.", "success");
+    } catch (error) {
+      console.error("Error deleting teacher:", error);
+      showMessage("Gagal memadam guru: " + error.message, "error");
+    }
+  }
+
+  async function editTeacherFullInFirebase(id, newFullname, newIcNumber, newTeacherClass, newYear) {
+    try {
+      if (newIcNumber) {
+        const q = query(teachersCollection, where("icNumber", "==", newIcNumber));
+        const querySnapshot = await getDocs(q);
+        let icExists = false;
+        querySnapshot.forEach((docSnap) => {
+          if (docSnap.id !== id) icExists = true;
+        });
+        if (icExists) {
+          showMessage(`❌ No. IC ${newIcNumber} sudah wujud untuk guru lain!`, "error");
+          return false;
+        }
+      }
+      
+      const teacherRef = doc(db, "teachers", id);
+      const updateData = {};
+      if (newFullname) updateData.fullname = newFullname.trim();
+      if (newIcNumber) updateData.icNumber = newIcNumber.trim();
+      if (newTeacherClass !== undefined) updateData.teacherClass = newTeacherClass.trim() || "-";
+      if (newYear !== undefined) updateData.year = newYear.trim() || "2026";
+      
+      await updateDoc(teacherRef, updateData);
+      
+      const teacher = teachers.find(t => t.id === id);
+      if (teacher) {
+        if (newFullname) teacher.fullname = newFullname.trim();
+        if (newIcNumber) teacher.icNumber = newIcNumber.trim();
+        if (newTeacherClass !== undefined) teacher.teacherClass = newTeacherClass.trim() || "-";
+        if (newYear !== undefined) teacher.year = newYear.trim() || "2026";
+      }
+      
+      renderTeacherList();
+      showMessage("✅ Maklumat guru berjaya dikemaskini!", "success");
+      return true;
+    } catch (error) {
+      console.error("Error editing teacher:", error);
+      showMessage("Gagal mengemaskini guru: " + error.message, "error");
+      return false;
+    }
+  }
+
+  async function editStudentFromModal(id, currentName, currentIc, currentClass, currentSession) {
+    const newName = prompt("✏️ Edit Nama Pelajar:", currentName);
+    if (newName === null) return;
+    if (newName.trim() === "") { showMessage("Nama tidak boleh kosong!", "error"); return; }
+    
+    const newIc = prompt("✏️ Edit No. Kad Pengenalan:", currentIc);
+    if (newIc === null) return;
+    if (newIc.trim() === "") { showMessage("No. Kad Pengenalan tidak boleh kosong!", "error"); return; }
+    
+    const newClass = prompt("✏️ Edit Kelas:", currentClass);
+    if (newClass === null) return;
+    
+    const newSession = prompt("✏️ Edit Tahun:", currentSession);
+    if (newSession === null) return;
+    
+    try {
+      const studentRef = doc(db, "students", id);
+      await updateDoc(studentRef, {
+        fullname: newName.trim(),
+        icNumber: newIc.trim(),
+        class: newClass.trim() || "-",
+        session: newSession.trim() || "2026"
+      });
+      
+      const student = students.find(s => s.id === id);
+      if (student) {
+        student.fullname = newName.trim();
+        student.icNumber = newIc.trim();
+        student.class = newClass.trim() || "-";
+        student.session = newSession.trim() || "2026";
+      }
+      
+      showMessage("✅ Pelajar berjaya dikemaskini!", "success");
+      
+      // Refresh modal if open
+      if (currentEditTeacherId) {
+        const teacher = teachers.find(t => t.id === currentEditTeacherId);
+        if (teacher) {
+          const updatedStudents = students.filter(s => s.class === teacher.teacherClass);
+          const listContainer = document.getElementById('classStudentList');
+          if (listContainer) {
+            listContainer.innerHTML = renderStudentListForModal(updatedStudents);
+          }
+        }
+      }
+    } catch (error) {
+      console.error("Error editing student:", error);
+      showMessage("Gagal mengemaskini pelajar: " + error.message, "error");
+    }
+  }
+
+  // ==================== RENDER FUNCTIONS ====================
+  function renderStudentListForModal(classStudents) {
+    if (classStudents.length === 0) {
+      return '<div style="text-align:center;padding:2rem;color:#94a3b8;"><i class="fas fa-user-slash"></i><p>Tiada pelajar dalam kelas ini.</p></div>';
+    }
+    
+    return classStudents.map(student => `
+      <div class="student-item-modal">
+        <div>
+          <div style="font-weight:600;">${escapeHtml(student.fullname)}</div>
+          <div style="font-size:0.7rem;color:#5b6e8c;"><i class="fas fa-id-card"></i> ${escapeHtml(student.icNumber)}</div>
+        </div>
+        <button onclick="window.editStudentFromModal('${student.id}', '${escapeHtml(student.fullname)}', '${escapeHtml(student.icNumber)}', '${escapeHtml(student.class)}', '${student.session}')" style="background:#e0e7ff;border:none;padding:0.3rem 0.8rem;border-radius:2rem;cursor:pointer;color:#4f46e5;">
+          <i class="fas fa-edit"></i> Edit
+        </button>
+      </div>
+    `).join('');
+  }
+
+  function openTeacherDetailDialog(id, teacherName, teacherIc, teacherClass, teacherYear) {
+    currentEditTeacherId = id;
+    const classStudents = students.filter(s => s.class === teacherClass);
+    
+    const modalHtml = `
+      <div id="teacherModal" class="modal">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h2><i class="fas fa-chalkboard-user"></i> Profil Guru</h2>
+            <button class="modal-close" onclick="closeModal()">&times;</button>
+          </div>
+          <div class="modal-body">
+            <div class="edit-section">
+              <h3 style="margin-bottom:1rem;color:#4f46e5;"><i class="fas fa-edit"></i> Edit Maklumat Guru</h3>
+              <div style="margin-bottom:0.8rem;">
+                <label style="display:block;font-weight:600;font-size:0.8rem;">Nama Penuh</label>
+                <input type="text" id="editFullname" value="${escapeHtml(teacherName)}" style="width:100%;padding:0.6rem;border-radius:0.8rem;border:1px solid #e2e8f0;">
+              </div>
+              <div style="margin-bottom:0.8rem;">
+                <label style="display:block;font-weight:600;font-size:0.8rem;">No. Kad Pengenalan</label>
+                <input type="text" id="editIc" value="${escapeHtml(teacherIc)}" style="width:100%;padding:0.6rem;border-radius:0.8rem;border:1px solid #e2e8f0;">
+              </div>
+              <div style="margin-bottom:0.8rem;">
+                <label style="display:block;font-weight:600;font-size:0.8rem;">Kelas / Tingkatan Ajar</label>
+                <input type="text" id="editClass" value="${escapeHtml(teacherClass)}" style="width:100%;padding:0.6rem;border-radius:0.8rem;border:1px solid #e2e8f0;">
+              </div>
+              <div style="margin-bottom:0.8rem;">
+                <label style="display:block;font-weight:600;font-size:0.8rem;">Tahun</label>
+                <input type="text" id="editYear" value="${escapeHtml(teacherYear)}" style="width:100%;padding:0.6rem;border-radius:0.8rem;border:1px solid #e2e8f0;">
+              </div>
+              <button onclick="saveTeacherEdit()" style="width:100%;background:#4f46e5;color:white;padding:0.6rem;border-radius:2rem;border:none;font-weight:600;cursor:pointer;">💾 Simpan Perubahan Guru</button>
+            </div>
+            
+            <div>
+              <h3 style="margin-bottom:1rem;color:#10b981;"><i class="fas fa-users"></i> Senarai Pelajar Kelas ${escapeHtml(teacherClass)}</h3>
+              <div id="classStudentList" class="student-list-modal">
+                ${renderStudentListForModal(classStudents)}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+    
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+  }
+
+  async function saveTeacherEdit() {
+    const newName = document.getElementById('editFullname').value;
+    const newIc = document.getElementById('editIc').value;
+    const newClass = document.getElementById('editClass').value;
+    const newYear = document.getElementById('editYear').value;
+    
+    if (!newName.trim()) { showMessage("Nama tidak boleh kosong!", "error"); return; }
+    if (!newIc.trim()) { showMessage("No. IC tidak boleh kosong!", "error"); return; }
+    
+    await editTeacherFullInFirebase(currentEditTeacherId, newName, newIc, newClass, newYear);
+    closeModal();
+  }
+
+  function renderTeacherList() {
+    const container = document.getElementById('teacherListContainer');
+    
+    if (teachers.length === 0) {
+      container.innerHTML = `<div class="empty-state"><i class="fas fa-user-slash" style="font-size: 2rem;"></i><p>Tiada guru berdaftar.</p></div>`;
+      return;
+    }
+
+    container.innerHTML = teachers.map(teacher => `
+      <div class="teacher-item">
+        <div class="teacher-info">
+          <div class="teacher-name">
+            <i class="fas fa-chalkboard-user" style="color:#4f46e5;"></i>
+            ${escapeHtml(teacher.fullname)}
+            <span class="teacher-badge"><i class="fas fa-id-card"></i> ${escapeHtml(teacher.icNumber)}</span>
+          </div>
+          <div class="teacher-detail">
+            <i class="fas fa-school"></i> Mengajar Kelas: ${escapeHtml(teacher.teacherClass)} &nbsp;|&nbsp;
+            <i class="fas fa-calendar"></i> Tahun: ${teacher.year}
+          </div>
+        </div>
+        <div>
+          <button class="btn-edit-full" onclick="openTeacherDetailDialog('${teacher.id}', '${escapeHtml(teacher.fullname)}', '${escapeHtml(teacher.icNumber)}', '${escapeHtml(teacher.teacherClass)}', '${teacher.year}')">
+            <i class="fas fa-edit"></i> Edit & Lihat Pelajar
+          </button>
+          <button class="btn-delete" onclick="deleteTeacherFromFirebase('${teacher.id}', '${escapeHtml(teacher.fullname)}')">
+            <i class="fas fa-trash-alt"></i> Hapus
+          </button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function updateTotalCount() {
+    document.getElementById('totalTeachers').innerText = teachers.length;
+  }
+
+  // ==================== EVENT LISTENERS ====================
+  const addForm = document.getElementById('addTeacherForm');
+  addForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const fullname = document.getElementById('fullname').value;
+    const icNumber = document.getElementById('icNumber').value;
+    const teacherClass = document.getElementById('teacherClass').value;
+    const year = document.getElementById('year').value;
+    
+    if (!fullname.trim()) { alert("Sila masukkan Nama Penuh."); return; }
+    if (!icNumber.trim()) { alert("Sila masukkan No. Kad Pengenalan."); return; }
+    
+    const result = await addTeacherToFirebase(fullname, icNumber, teacherClass, year);
+    if (result.success) {
+      addForm.reset();
+      document.getElementById('year').value = '2026';
+    } else {
+      showMessage(`❌ Gagal: ${result.message}`, "error");
+    }
+  });
+
+  // Make functions global for onclick
+  window.openTeacherDetailDialog = openTeacherDetailDialog;
+  window.deleteTeacherFromFirebase = deleteTeacherFromFirebase;
+  window.saveTeacherEdit = saveTeacherEdit;
+  window.closeModal = closeModal;
+  window.editStudentFromModal = editStudentFromModal;
+
+  // Initialize
+  await loadAllStudents();
+  await loadTeachers();
+</script>
+</body>
+</html>

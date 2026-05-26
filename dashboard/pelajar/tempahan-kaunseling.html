@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Tempahan Kaunseling | E-MindCare SEMSIRA</title>
+  <!-- Fonts & Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <!-- FullCalendar -->
+  <link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/main.min.css' rel='stylesheet' />
+  <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/main.min.js'></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: linear-gradient(135deg, #e0e7ff 0%, #f3e8ff 100%);
+      min-height: 100vh;
+      padding: 1rem;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    /* header */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 2px solid rgba(79, 70, 229, 0.2);
+    }
+    .logo-area {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+    }
+    .logo-icon {
+      background: linear-gradient(145deg, #4f46e5, #7c3aed);
+      width: 45px;
+      height: 45px;
+      border-radius: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .logo-icon i {
+      font-size: 1.5rem;
+      color: white;
+    }
+    .logo-text h1 {
+      font-size: 1.3rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #1e293b, #4f46e5);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    .logo-text p {
+      font-size: 0.65rem;
+      color: #5b6e8c;
+    }
+    .back-btn {
+      background: #eef2ff;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 40px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.8rem;
+      color: #4f46e5;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: 0.2s;
+    }
+    .back-btn:hover {
+      background: #4f46e5;
+      color: white;
+    }
+
+    /* two columns */
+    .two-columns {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 1.5rem;
+    }
+
+    /* card style */
+    .card {
+      background: white;
+      border-radius: 1.2rem;
+      padding: 1.2rem;
+      box-shadow: 0 4px 12px -8px rgba(0, 0, 0, 0.08);
+      border: 1px solid rgba(79, 70, 229, 0.1);
+    }
+    .card h2 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      color: #1f2a44;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-left: 3px solid #4f46e5;
+      padding-left: 10px;
+    }
+
+    /* FullCalendar styling */
+    .fc {
+      max-width: 100%;
+      background: white;
+      border-radius: 1rem;
+      overflow: hidden;
+    }
+    .fc-day-today {
+      background: #eef2ff !important;
+    }
+    .fc-daygrid-day-number {
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+    .fc-event {
+      background: #fee2e2 !important;
+      border-color: #dc2626 !important;
+      color: #991b1b !important;
+      font-size: 0.7rem;
+      cursor: default !important;
+      white-space: normal !important;
+      overflow: visible !important;
+    }
+    .fc-daygrid-day-events {
+      min-height: 30px;
+    }
+    .disabled-date-cell {
+      background-color: #fee2e2 !important;
+      opacity: 0.7;
+    }
+    .calendar-note {
+      margin-top: 0.8rem;
+      padding: 0.6rem;
+      background: #f1f5f9;
+      border-radius: 0.8rem;
+      font-size: 0.7rem;
+      text-align: center;
+    }
+    .calendar-note i {
+      color: #dc2626;
+    }
+
+    /* form styling */
+    .form-group {
+      margin-bottom: 0.8rem;
+    }
+    .form-group label {
+      display: block;
+      font-weight: 600;
+      font-size: 0.75rem;
+      color: #1f2a44;
+      margin-bottom: 0.3rem;
+    }
+    .form-group label i {
+      margin-right: 4px;
+      color: #4f46e5;
+    }
+    .form-group input, .form-group textarea, .form-group select {
+      width: 100%;
+      padding: 0.6rem 0.8rem;
+      font-size: 0.85rem;
+      font-family: inherit;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 0.8rem;
+      background: white;
+      transition: all 0.2s;
+      outline: none;
+    }
+    .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
+      border-color: #4f46e5;
+      box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.1);
+    }
+    .form-group textarea {
+      resize: vertical;
+      min-height: 60px;
+    }
+    .radio-group {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .radio-group label {
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      font-weight: normal;
+      font-size: 0.8rem;
+      cursor: pointer;
+    }
+    .btn-submit {
+      background: linear-gradient(95deg, #4f46e5, #7c3aed);
+      border: none;
+      padding: 0.7rem;
+      border-radius: 2rem;
+      font-weight: 600;
+      font-size: 0.85rem;
+      color: white;
+      cursor: pointer;
+      width: 100%;
+      transition: 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .btn-submit:hover {
+      transform: translateY(-2px);
+      background: linear-gradient(95deg, #4338ca, #6d28d9);
+    }
+    .btn-submit:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    .btn-edit, .btn-delete {
+      padding: 0.2rem 0.6rem;
+      border-radius: 1.5rem;
+      cursor: pointer;
+      font-size: 0.65rem;
+      font-weight: 600;
+      border: none;
+      margin-left: 0.3rem;
+    }
+    .btn-edit {
+      background: #e0e7ff;
+      color: #4f46e5;
+    }
+    .btn-edit:hover {
+      background: #c7d2fe;
+    }
+    .btn-delete {
+      background: #fee2e2;
+      color: #dc2626;
+    }
+    .btn-delete:hover {
+      background: #fecaca;
+    }
+
+    /* status card */
+    .status-card {
+      background: #f8fafc;
+      border-radius: 0.8rem;
+      padding: 0.8rem;
+      margin-bottom: 0.8rem;
+    }
+    .status-badge {
+      display: inline-block;
+      padding: 0.2rem 0.8rem;
+      border-radius: 2rem;
+      font-size: 0.7rem;
+      font-weight: 600;
+    }
+    .status-pending { background: #fef3c7; color: #d97706; }
+    .status-approved { background: #dcfce7; color: #166534; }
+    .status-rejected { background: #fee2e2; color: #dc2626; }
+    .status-postponed { background: #e0e7ff; color: #4f46e5; }
+    
+    .appointment-info {
+      margin-top: 0.5rem;
+      padding-top: 0.5rem;
+      border-top: 1px solid #e2e8f0;
+      font-size: 0.75rem;
+    }
+
+    .appointments-list {
+      max-height: 450px;
+      overflow-y: auto;
+    }
+
+    /* modal */
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+    .modal-content {
+      max-width: 500px;
+      width: 100%;
+      background: white;
+      border-radius: 1.5rem;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    .modal-header {
+      padding: 1rem;
+      border-bottom: 1px solid #e2e8f0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .modal-header h3 {
+      font-size: 1.2rem;
+      color: #1e293b;
+    }
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: #94a3b8;
+    }
+    .modal-body {
+      padding: 1rem;
+    }
+    .selected-date-display {
+      margin-top: 0.5rem;
+      padding: 0.5rem;
+      background: #eef2ff;
+      border-radius: 0.8rem;
+      text-align: center;
+      font-weight: 600;
+      color: #4f46e5;
+    }
+
+    @media (max-width: 900px) {
+      .two-columns {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+      }
+      body {
+        padding: 0.8rem;
+      }
+      .fc-daygrid-day-number {
+        font-size: 0.7rem;
+      }
+      .fc-event {
+        font-size: 0.6rem;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div class="logo-area">
+      <div class="logo-icon"><i class="fas fa-calendar-check"></i></div>
+      <div class="logo-text">
+        <h1>Tempahan Kaunseling</h1>
+        <p>Buat temujanji dengan kaunselor sekolah</p>
+      </div>
+    </div>
+    <a href="dashboard-pelajar.html" class="back-btn"><i class="fas fa-arrow-left"></i> Kembali</a>
+  </div>
+
+  <div class="two-columns">
+    <!-- Left Column: Calendar -->
+    <div class="card">
+      <h2><i class="fas fa-calendar-alt"></i> Pilih Tarikh Temujanji</h2>
+      <div id="calendar"></div>
+      <div class="selected-date-display" id="selectedDateDisplay">
+        <i class="fas fa-calendar-day"></i> Tarikh dipilih: <span id="selectedDateText">Belum pilih</span>
+      </div>
+      <div class="calendar-note">
+        <i class="fas fa-info-circle"></i> Tarikh bertanda <span style="color:#dc2626;">🔴 merah</span> adalah cuti/sekolah tutup - tidak boleh dipilih.
+      </div>
+    </div>
+
+    <!-- Right Column: Form -->
+    <div class="card">
+      <h2><i class="fas fa-file-alt"></i> Maklumat Permohonan</h2>
+      <form id="appointmentForm">
+        <div class="form-group">
+          <label><i class="fas fa-calendar-day"></i> Tarikh Dipilih</label>
+          <input type="text" id="selectedDateInput" readonly placeholder="Belum pilih tarikh" style="background:#f8fafc; font-weight:600;">
+        </div>
+        <div class="form-group">
+          <label><i class="fas fa-chalkboard-user"></i> Pilih Kaunselor</label>
+          <select id="counselor" required>
+            <option value="">-- Pilih Kaunselor --</option>
+            <option value="Cikgu Akhmar">👨‍🏫 Cikgu Akhmar</option>
+            <option value="Cikgu Zalina">👩‍🏫 Cikgu Zalina</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label><i class="fas fa-share-alt"></i> Perkara yang ingin dikongsikan</label>
+          <textarea id="topic" placeholder="Ceritakan secara ringkas perkara yang ingin anda bincangkan..." required></textarea>
+        </div>
+        <div class="form-group">
+          <label><i class="fas fa-heart"></i> Bagaimana perasaan anda kebelakangan ini?</label>
+          <textarea id="feelings" placeholder="Contoh: Saya berasa tertekan dengan pelajaran, rasa sunyi, dsb..." required></textarea>
+        </div>
+        <div class="form-group">
+          <label><i class="fas fa-clock"></i> Adakah anda ingin berjumpa dengan kaunselor dengan segera?</label>
+          <div class="radio-group">
+            <label><input type="radio" name="urgent" value="ya" required> Ya, perlu segera</label>
+            <label><input type="radio" name="urgent" value="tidak"> Tidak, ikut jadual</label>
+          </div>
+        </div>
+        <button type="submit" class="btn-submit" id="submitBtn"><i class="fas fa-paper-plane"></i> Hantar Permohonan</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Status Section -->
+  <div class="card" style="margin-top: 1rem;">
+    <h2><i class="fas fa-history"></i> Senarai Permohonan Saya</h2>
+    <div id="statusContainer" class="appointments-list">
+      <p style="text-align:center; padding:1rem; color:#94a3b8;"><i class="fas fa-spinner fa-pulse"></i> Memuatkan...</p>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+  // Import Firebase SDK
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+  import { getFirestore, collection, addDoc, getDocs, deleteDoc, updateDoc, doc, query, where, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+  
+  // Firebase configuration
+  const firebaseConfig = {
+    apiKey: "AIzaSyCfu7XC8pXtpDyQ-9Cjdg4AobA-EVEwWcc",
+    authDomain: "e-mindcare.firebaseapp.com",
+    projectId: "e-mindcare",
+    storageBucket: "e-mindcare.firebasestorage.app",
+    messagingSenderId: "1021883944936",
+    appId: "1:1021883944936:web:39c75a0c98d19a37afde5d",
+    measurementId: "G-3CJVKWGEXV"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const appointmentsCollection = collection(db, "appointments");
+  const holidaysCollection = collection(db, "holidays");
+
+  // Get student info
+  const studentName = sessionStorage.getItem('studentName') || 'Pelajar';
+  const studentIC = sessionStorage.getItem('studentIC') || '';
+  
+  if (!studentIC || studentIC === '') {
+    alert("Sila login terlebih dahulu.");
+    window.location.href = "../dashboard/page-pelajar.html";
+  }
+
+  // ==================== HOLIDAYS DATA ====================
+  let holidays = []; // { date, name }
+  let selectedDate = null;
+
+  async function loadHolidays() {
+    try {
+      const querySnapshot = await getDocs(holidaysCollection);
+      holidays = [];
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        holidays.push({
+          date: data.date,
+          name: data.name || "Cuti"
+        });
+      });
+      initCalendar();
+    } catch (error) {
+      console.error("Error loading holidays:", error);
+      initCalendar();
+    }
+  }
+
+  // ==================== FULL CALENDAR ====================
+  let calendar = null;
+  
+  function initCalendar() {
+    const calendarEl = document.getElementById('calendar');
+    if (calendar) {
+      calendar.destroy();
+    }
+    
+    // Prepare events for holidays
+    const holidayEvents = holidays.map(h => ({
+      title: `🔴 ${h.name}`,
+      start: h.date,
+      display: 'background',
+      backgroundColor: '#fee2e2',
+      borderColor: '#dc2626',
+      classNames: ['holiday-event']
+    }));
+    
+    calendar = new FullCalendar.Calendar(calendarEl, {
+      initialView: 'dayGridMonth',
+      locale: 'ms',
+      height: 'auto',
+      headerToolbar: {
+        left: 'prev',
+        center: 'title',
+        right: 'next'
+      },
+      buttonText: {
+        prev: '◀',
+        next: '▶'
+      },
+      events: holidayEvents,
+      eventDidMount: function(info) {
+        // Add tooltip for holiday name
+        if (info.event.title.includes('🔴')) {
+          info.el.style.cursor = 'not-allowed';
+          info.el.style.opacity = '0.8';
+        }
+      },
+      dateClick: function(info) {
+        const clickedDate = info.dateStr;
+        const isHoliday = holidays.some(h => h.date === clickedDate);
+        
+        if (isHoliday) {
+          const holiday = holidays.find(h => h.date === clickedDate);
+          alert(`❌ Tarikh ${clickedDate} adalah cuti:\n${holiday.name}\nSila pilih tarikh lain.`);
+          return;
+        }
+        
+        // Check if date is in the past
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const selected = new Date(clickedDate);
+        
+        if (selected < today) {
+          alert("❌ Anda tidak boleh memilih tarikh yang telah berlalu.");
+          return;
+        }
+        
+        // Select date
+        selectedDate = clickedDate;
+        document.getElementById('selectedDateText').innerText = selectedDate;
+        document.getElementById('selectedDateInput').value = selectedDate;
+        document.getElementById('selectedDateInput').style.color = '#4f46e5';
+        document.getElementById('selectedDateInput').style.fontWeight = '600';
+        
+        // Highlight selected date in calendar
+        if (calendar) {
+          calendar.unselect();
+          calendar.select(selectedDate);
+        }
+      },
+      dayCellDidMount: function(info) {
+        const dateStr = info.date.toISOString().split('T')[0];
+        const isHoliday = holidays.some(h => h.date === dateStr);
+        if (isHoliday) {
+          info.el.style.backgroundColor = '#fee2e2';
+          info.el.style.opacity = '0.7';
+        }
+      }
+    });
+    
+    calendar.render();
+  }
+
+  // ==================== LOAD APPOINTMENTS ====================
+  let currentAppointments = [];
+
+  async function loadAppointments() {
+    const container = document.getElementById('statusContainer');
+    try {
+      const q = query(appointmentsCollection, where("studentIC", "==", studentIC), orderBy("createdAt", "desc"));
+      const querySnapshot = await getDocs(q);
+      currentAppointments = [];
+      
+      if (querySnapshot.empty) {
+        container.innerHTML = `<p style="text-align:center; padding:1rem; color:#94a3b8;"><i class="fas fa-inbox"></i> Tiada permohonan tempahan.</p>`;
+        return;
+      }
+      
+      let html = '';
+      querySnapshot.forEach((doc) => {
+        const data = { id: doc.id, ...doc.data() };
+        currentAppointments.push(data);
+        
+        const status = data.status || 'pending';
+        let statusClass = '', statusText = '';
+        switch(status) {
+          case 'pending': statusClass = 'status-pending'; statusText = '⏳ Dalam Semakan'; break;
+          case 'approved': statusClass = 'status-approved'; statusText = '✅ Diluluskan'; break;
+          case 'rejected': statusClass = 'status-rejected'; statusText = '❌ Ditolak'; break;
+          case 'postponed': statusClass = 'status-postponed'; statusText = '🔄 Ditangguhkan'; break;
+        }
+        
+        html += `
+          <div class="status-card" data-id="${data.id}">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem;">
+              <span class="status-badge ${statusClass}">${statusText}</span>
+              <span style="font-size:0.65rem; color:#6c7289;"><i class="fas fa-calendar"></i> ${data.requestedDate}</span>
+            </div>
+            <div style="margin-top:0.5rem;">
+              <p><strong>👨‍🏫 Kaunselor:</strong> ${escapeHtml(data.counselor || 'Belum ditetapkan')}</p>
+              <p><strong>📝 Perkara:</strong> ${escapeHtml(data.topic || '-')}</p>
+              <p><strong>💭 Perasaan:</strong> ${escapeHtml(data.feelings || '-')}</p>
+              <p><strong>⚡ Segera:</strong> ${data.urgent === 'ya' ? 'Ya, perlu segera' : 'Tidak, ikut jadual'}</p>
+            </div>
+        `;
+        
+        if (status === 'approved' && data.appointmentDate) {
+          html += `<div class="appointment-info" style="background:#dcfce7;">
+            <i class="fas fa-calendar-check"></i> <strong>Tarikh:</strong> ${data.appointmentDate}<br>
+            <i class="fas fa-clock"></i> <strong>Masa:</strong> ${data.appointmentTime || 'Akan dimaklumkan'}<br>
+            <i class="fas fa-map-marker-alt"></i> <strong>Tempat:</strong> Bilik Kaunseling
+          </div>`;
+        } else if (status === 'rejected' && data.reason) {
+          html += `<div class="appointment-info" style="background:#fee2e2;">
+            <i class="fas fa-comment"></i> <strong>Mesej:</strong> ${escapeHtml(data.reason)}<br>
+            <i class="fas fa-redo-alt"></i> Sila buat permohonan baru.
+          </div>`;
+        } else if (status === 'postponed' && data.newDate) {
+          html += `<div class="appointment-info" style="background:#e0e7ff;">
+            <i class="fas fa-calendar-week"></i> <strong>Cadangan Tarikh:</strong> ${data.newDate}<br>
+            <i class="fas fa-comment"></i> <strong>Mesej:</strong> ${escapeHtml(data.message || 'Permohonan ditangguhkan ke tarikh tersebut.')}
+          </div>`;
+        }
+        
+        // Only show edit/delete buttons for pending status
+        if (status === 'pending') {
+          html += `<div style="text-align:right; margin-top:0.5rem;">
+            <button class="btn-edit" onclick="window.openEditModal('${data.id}')"><i class="fas fa-edit"></i> Edit</button>
+            <button class="btn-delete" onclick="window.deleteAppointment('${data.id}')"><i class="fas fa-trash-alt"></i> Hapus</button>
+          </div>`;
+        }
+        
+        html += `</div>`;
+      });
+      container.innerHTML = html;
+    } catch (error) {
+      console.error("Error loading appointments:", error);
+      container.innerHTML = `<p style="text-align:center; padding:1rem; color:#dc2626;">Ralat memuat data.</p>`;
+    }
+  }
+
+  // ==================== DELETE ====================
+  window.deleteAppointment = async function(id) {
+    if (confirm("Adakah anda pasti mahu memadam permohonan ini?")) {
+      try {
+        await deleteDoc(doc(db, "appointments", id));
+        await loadAppointments();
+        alert("✅ Permohonan berjaya dipadam.");
+      } catch (error) {
+        console.error("Error deleting:", error);
+        alert("❌ Gagal memadam permohonan.");
+      }
+    }
+  };
+
+  // ==================== EDIT MODAL ====================
+  window.openEditModal = function(id) {
+    const appointment = currentAppointments.find(a => a.id === id);
+    if (!appointment) return;
+    
+    const modalHtml = `
+      <div id="editModal" class="modal">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h3><i class="fas fa-edit"></i> Edit Permohonan</h3>
+            <button class="modal-close" onclick="closeEditModal()">&times;</button>
+          </div>
+          <div class="modal-body">
+            <form id="editForm">
+              <div class="form-group">
+                <label><i class="fas fa-calendar-day"></i> Tarikh Temujanji</label>
+                <input type="date" id="editDate" value="${appointment.requestedDate}" style="width:100%; padding:0.6rem; border-radius:0.8rem; border:1px solid #e2e8f0;">
+              </div>
+              <div class="form-group">
+                <label><i class="fas fa-chalkboard-user"></i> Kaunselor</label>
+                <select id="editCounselor" style="width:100%; padding:0.6rem; border-radius:0.8rem; border:1px solid #e2e8f0;">
+                  <option value="">-- Pilih Kaunselor --</option>
+                  <option value="Cikgu Akhmar" ${appointment.counselor === 'Cikgu Akhmar' ? 'selected' : ''}>👨‍🏫 Cikgu Akhmar</option>
+                  <option value="Cikgu Zalina" ${appointment.counselor === 'Cikgu Zalina' ? 'selected' : ''}>👩‍🏫 Cikgu Zalina</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label><i class="fas fa-share-alt"></i> Perkara dikongsikan</label>
+                <textarea id="editTopic" style="width:100%; padding:0.6rem; border-radius:0.8rem; border:1px solid #e2e8f0; min-height:60px;">${escapeHtml(appointment.topic || '')}</textarea>
+              </div>
+              <div class="form-group">
+                <label><i class="fas fa-heart"></i> Perasaan</label>
+                <textarea id="editFeelings" style="width:100%; padding:0.6rem; border-radius:0.8rem; border:1px solid #e2e8f0; min-height:60px;">${escapeHtml(appointment.feelings || '')}</textarea>
+              </div>
+              <div class="form-group">
+                <label><i class="fas fa-clock"></i> Keperluan Segera</label>
+                <div class="radio-group">
+                  <label><input type="radio" name="editUrgent" value="ya" ${appointment.urgent === 'ya' ? 'checked' : ''}> Ya, perlu segera</label>
+                  <label><input type="radio" name="editUrgent" value="tidak" ${appointment.urgent === 'tidak' ? 'checked' : ''}> Tidak, ikut jadual</label>
+                </div>
+              </div>
+              <button type="submit" class="btn-submit" style="margin-top:0.5rem;"><i class="fas fa-save"></i> Simpan Perubahan</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    `;
+    
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+    
+    document.getElementById('editForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const updatedDate = document.getElementById('editDate').value;
+      const updatedCounselor = document.getElementById('editCounselor').value;
+      const updatedTopic = document.getElementById('editTopic').value;
+      const updatedFeelings = document.getElementById('editFeelings').value;
+      const updatedUrgent = document.querySelector('input[name="editUrgent"]:checked')?.value;
+      
+      if (!updatedDate) {
+        alert("Sila pilih tarikh yang sah.");
+        return;
+      }
+      if (!updatedCounselor) {
+        alert("Sila pilih kaunselor.");
+        return;
+      }
+      
+      // Check if new date is a holiday
+      const isHoliday = holidays.some(h => h.date === updatedDate);
+      if (isHoliday) {
+        alert("❌ Tarikh yang dipilih adalah cuti. Sila pilih tarikh lain.");
+        return;
+      }
+      
+      try {
+        const appointmentRef = doc(db, "appointments", id);
+        await updateDoc(appointmentRef, {
+          requestedDate: updatedDate,
+          counselor: updatedCounselor,
+          topic: updatedTopic,
+          feelings: updatedFeelings,
+          urgent: updatedUrgent,
+          updatedAt: new Date().toISOString()
+        });
+        closeEditModal();
+        await loadAppointments();
+        alert("✅ Permohonan berjaya dikemaskini!");
+      } catch (error) {
+        console.error("Error updating:", error);
+        alert("❌ Gagal mengemaskini permohonan.");
+      }
+    });
+  };
+  
+  window.closeEditModal = function() {
+    const modal = document.getElementById('editModal');
+    if (modal) modal.remove();
+  };
+
+  // ==================== SUBMIT APPOINTMENT ====================
+  const form = document.getElementById('appointmentForm');
+  const submitBtn = document.getElementById('submitBtn');
+  
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const selectedDateValue = document.getElementById('selectedDateInput').value;
+    const counselor = document.getElementById('counselor').value;
+    const topic = document.getElementById('topic').value.trim();
+    const feelings = document.getElementById('feelings').value.trim();
+    const urgent = document.querySelector('input[name="urgent"]:checked')?.value;
+    
+    if (!selectedDateValue || selectedDateValue === 'Belum pilih tarikh') {
+      alert("Sila pilih tarikh temujanji dari kalendar.");
+      return;
+    }
+    if (!counselor) {
+      alert("Sila pilih kaunselor.");
+      return;
+    }
+    if (!topic) {
+      alert("Sila masukkan perkara yang ingin dikongsikan.");
+      return;
+    }
+    if (!feelings) {
+      alert("Sila terangkan perasaan anda.");
+      return;
+    }
+    if (!urgent) {
+      alert("Sila pilih sama ada perlu segera atau tidak.");
+      return;
+    }
+    
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Menghantar...';
+    
+    try {
+      const newAppointment = {
+        studentName: studentName,
+        studentIC: studentIC,
+        requestedDate: selectedDateValue,
+        counselor: counselor,
+        topic: topic,
+        feelings: feelings,
+        urgent: urgent,
+        status: 'pending',
+        createdAt: new Date().toISOString()
+      };
+      
+      await addDoc(appointmentsCollection, newAppointment);
+      alert("✅ Permohonan temujanji berjaya dihantar!");
+      form.reset();
+      document.getElementById('selectedDateInput').value = 'Belum pilih tarikh';
+      document.getElementById('selectedDateText').innerText = 'Belum pilih';
+      selectedDate = null;
+      if (calendar) {
+        calendar.unselect();
+      }
+      await loadAppointments();
+    } catch (error) {
+      console.error("Error:", error);
+      alert("❌ Ralat semasa menghantar.");
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Hantar Permohonan';
+    }
+  });
+
+  function escapeHtml(str) {
+    if (!str) return '';
+    return str.replace(/[&<>]/g, function(m) {
+      if (m === '&') return '&amp;';
+      if (m === '<') return '&lt;';
+      if (m === '>') return '&gt;';
+      return m;
+    });
+  }
+
+  // Initialize
+  await loadHolidays();
+  await loadAppointments();
+</script>
+
+<!-- NOTA PENTING UNTUK KAUNSELOR:
+     ============================================================
+     CARA MENETAPKAN TARIKH CUTI:
+     
+     Kaunselor perlu tambah dokumen ke collection "holidays" di Firebase:
+     
+     {
+       "date": "2026-01-01",
+       "name": "Tahun Baru"
+     }
+     
+     Tarikh cuti akan:
+     - Dipaparkan dengan tulisan merah "🔴 [nama cuti]"
+     - Tidak boleh dipilih oleh pelajar
+     - Berwarna merah muda pada kalendar
+     
+     Contoh tarikh cuti:
+     - "2026-01-01" - "Tahun Baru"
+     - "2026-01-26" - "Hari Wilayah"
+     - "2026-02-01" - "Cuti Sekolah"
+     - "2026-02-17" - "Hari Raya"
+    

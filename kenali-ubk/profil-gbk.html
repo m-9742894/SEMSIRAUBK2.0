@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profil GBK | UBK SEMSIRA</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Quicksand:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --neon-blue: #00f2fe;
+            --neon-purple: #bc4efd;
+            --neon-gold: #fbc02d;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            /* Background Deep Blue Liquid */
+            background: radial-gradient(circle at top, #001f3f, #000428);
+            background-attachment: fixed; /* Latar belakang kekal bila scroll */
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-family: 'Quicksand', sans-serif;
+            overflow-y: auto; /* Membenarkan scroll ke bawah */
+            overflow-x: hidden;
+            perspective: 1500px;
+            padding: 60px 20px;
+        }
+
+        /* Lighting Effect Background */
+        .ambient-glow {
+            position: fixed; /* Kekal di skrin */
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(0, 242, 254, 0.1) 0%, transparent 70%);
+            z-index: 1;
+            filter: blur(50px);
+            pointer-events: none;
+        }
+
+        header {
+            text-align: center;
+            z-index: 10;
+            margin-bottom: 50px;
+        }
+
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            color: white;
+            font-size: 2.5rem;
+            letter-spacing: 5px;
+            text-shadow: 0 0 20px var(--neon-blue);
+            line-height: 1.2;
+        }
+
+        .menu-container {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+            z-index: 10;
+            width: 100%;
+            max-width: 550px;
+            position: relative;
+        }
+
+        /* 3D Crystal Button Style */
+        .crystal-btn {
+            position: relative;
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 25px;
+            border-radius: 25px;
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transform-style: preserve-3d;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+        }
+
+        .crystal-btn:hover {
+            transform: translateZ(20px) scale(1.02);
+            background: rgba(255, 255, 255, 0.15);
+            border-color: var(--neon-blue);
+            box-shadow: 0 15px 40px rgba(0, 242, 254, 0.3);
+        }
+
+        .btn-icon {
+            font-size: 45px;
+            margin-right: 20px;
+            flex-shrink: 0; /* Ikon takkan mengecil */
+            filter: drop-shadow(0 0 10px white);
+        }
+
+        .btn-content {
+            text-align: left;
+        }
+
+        .btn-content h3 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+            color: var(--neon-blue);
+        }
+
+        .btn-content p {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            line-height: 1.4;
+        }
+
+        /* Back Button */
+        .btn-back {
+            margin-top: 50px;
+            padding-bottom: 20px;
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 0.9rem;
+            letter-spacing: 2px;
+            opacity: 0.7;
+            transition: 0.3s;
+            z-index: 10;
+        }
+
+        .btn-back:hover {
+            opacity: 1;
+            color: var(--neon-purple);
+            text-shadow: 0 0 10px var(--neon-purple);
+        }
+
+        /* Mobile View Fix */
+        @media (max-width: 600px) {
+            h1 { font-size: 1.8rem; }
+            .crystal-btn { padding: 20px; }
+            .btn-icon { font-size: 35px; }
+            .btn-content h3 { font-size: 0.95rem; }
+            .btn-content p { font-size: 0.8rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="ambient-glow" id="mouseGlow"></div>
+
+    <header>
+        <h1>PROFIL GBK</h1>
+        <div style="width: 80px; height: 3px; background: var(--neon-blue); margin: 15px auto; box-shadow: 0 0 10px var(--neon-blue);"></div>
+    </header>
+
+    <div class="menu-container">
+        <a href="carta-organisasi.html" class="crystal-btn">
+            <div class="btn-icon">📊</div>
+            <div class="btn-content">
+                <h3>Carta Organisasi</h3>
+                <p>Mengenali struktur kepimpinan dan pengurusan UBK SEMSIRA.</p>
+            </div>
+        </a>
+
+        <a href="visi-misi.html" class="crystal-btn" style="border-color: var(--neon-purple);">
+            <div class="btn-icon">🎯</div>
+            <div class="btn-content">
+                <h3 style="color: var(--neon-purple);">Visi, Misi & Objektif</h3>
+                <p>Hala tuju, matlamat murni dan falsafah perkhidmatan kami.</p>
+            </div>
+        </a>
+
+        <a href="fungsi-perkhidmatan.html" class="crystal-btn" style="border-color: var(--neon-gold);">
+            <div class="btn-icon">🛠️</div>
+            <div class="btn-content">
+                <h3 style="color: var(--neon-gold);">Fungsi Perkhidmatan</h3>
+                <p>Tugas utama dan skop tanggungjawab GBK terhadap murid.</p>
+            </div>
+        </a>
+    </div>
+
+    <a href="kenali-ubk.html" class="btn-back">← KEMBALI KE KENALI KAMI</a>
+
+    <script>
+        const glow = document.getElementById('mouseGlow');
+        const btns = document.querySelectorAll('.crystal-btn');
+
+        // Mouse light follow
+        document.addEventListener('mousemove', (e) => {
+            glow.style.left = (e.clientX - 250) + 'px';
+            glow.style.top = (e.clientY - 250) + 'px';
+
+            // Subtle Tilt Effect
+            let xAxis = (window.innerWidth / 2 - e.clientX) / 70;
+            let yAxis = (window.innerHeight / 2 - e.clientY) / 70;
+            
+            btns.forEach(btn => {
+                btn.style.transform = `rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
+            });
+        });
+    </script>
+</body>
+</html>

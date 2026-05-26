@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visi & Misi | UBK SEMSIRA</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Quicksand:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --vision-glow: #ffd700;
+            --mission-glow: #00f2fe;
+            --philosophy-glow: #bc4efd;
+            --objective-glow: #00e676;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: radial-gradient(circle at center, #001f3f, #000000);
+            background-attachment: fixed;
+            color: white;
+            font-family: 'Quicksand', sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 60px 20px;
+            perspective: 2000px;
+        }
+
+        /* Lighting Background */
+        .bg-light {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at var(--x, 50%) var(--y, 50%), rgba(0, 242, 254, 0.1) 0%, transparent 50%);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.5rem;
+            text-align: center;
+            margin-bottom: 50px;
+            text-shadow: 0 0 15px var(--mission-glow);
+            letter-spacing: 3px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+        }
+
+        /* 3D Glass Card Base */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 30px;
+            padding: 40px;
+            transition: all 0.4s ease;
+            transform-style: preserve-3d;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+            position: relative;
+        }
+
+        .glass-panel:hover {
+            transform: translateZ(20px) rotateX(2deg);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .panel-header {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-weight: 700;
+        }
+
+        /* Visi Style */
+        .visi-card { border-left: 6px solid var(--vision-glow); }
+        .visi-card h2 { color: var(--vision-glow); }
+        .visi-quote { font-style: italic; font-size: 1.3rem; text-align: center; line-height: 1.6; color: #fff9c4; }
+
+        /* Misi Style */
+        .misi-card { border-left: 6px solid var(--mission-glow); }
+        .misi-card h2 { color: var(--mission-glow); }
+
+        /* Falsafah Style */
+        .falsafah-card { border-left: 6px solid var(--philosophy-glow); }
+        .falsafah-card h2 { color: var(--philosophy-glow); }
+        .falsafah-text { font-size: 1.05rem; line-height: 1.8; text-align: justify; font-weight: 300; }
+
+        /* Objektif Style */
+        .objektif-card { border-left: 6px solid var(--objective-glow); }
+        .objektif-card h2 { color: var(--objective-glow); }
+        .objektif-list {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            list-style: none;
+        }
+        .objektif-list li {
+            background: rgba(255,255,255,0.03);
+            padding: 12px 20px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: 0.3s;
+        }
+        .objektif-list li:hover { background: rgba(0, 230, 118, 0.1); transform: translateX(10px); }
+        .objektif-list li::before { content: '✦'; color: var(--objective-glow); }
+
+        .btn-back {
+            margin-top: 60px;
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            padding: 12px 30px;
+            border: 2px solid var(--mission-glow);
+            border-radius: 50px;
+            transition: 0.3s;
+            box-shadow: 0 0 15px rgba(0, 242, 254, 0.2);
+        }
+        .btn-back:hover {
+            background: var(--mission-glow);
+            color: black;
+            box-shadow: 0 0 30px var(--mission-glow);
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            h1 { font-size: 1.6rem; }
+            .glass-panel { padding: 25px; }
+            .visi-quote { font-size: 1.1rem; }
+            .falsafah-text { font-size: 0.95rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="bg-light" id="glow"></div>
+
+    <h1>VISI, MISI & HALA TUJU</h1>
+
+    <div class="container">
+        
+        <div class="glass-panel visi-card">
+            <div class="panel-header">
+                <span>👁️</span> <h2>VISI</h2>
+            </div>
+            <div class="visi-quote">
+                "Melahirkan murid yang seimbang dari segi emosi, rohani, intelek dan sosial melalui perkhidmatan bimbingan dan kaunseling yang berkualiti, berkesan dan berterusan."
+            </div>
+        </div>
+
+        <div class="glass-panel misi-card">
+            <div class="panel-header">
+                <span>🚀</span> <h2>MISI</h2>
+            </div>
+            <p style="line-height: 1.8; font-size: 1.1rem;">
+                Menyediakan perkhidmatan bimbingan dan kaunseling yang profesional, sistematik dan berkesan bagi membantu murid berkembang secara menyeluruh dari aspek akademik, sahsiah, emosi dan kerjaya selaras dengan Falsafah Pendidikan Kebangsaan.
+            </p>
+        </div>
+
+        <div class="glass-panel falsafah-card">
+            <div class="panel-header">
+                <span>⚖️</span> <h2>FALSAFAH PERKHIDMATAN</h2>
+            </div>
+            <div class="falsafah-text">
+                <p style="margin-bottom: 15px;">Perkhidmatan Bimbingan dan Kaunseling Sekolah berteraskan kepercayaan bahawa setiap murid mempunyai potensi diri yang unik serta kebolehan untuk berkembang secara menyeluruh dari segi intelek, emosi, rohani dan sosial. Oleh itu, perkhidmatan ini diwujudkan bagi membantu murid mengenal diri, membuat pilihan yang bijak, menangani cabaran kehidupan dan membentuk sahsiah yang seimbang.</p>
+                <p style="margin-bottom: 15px;">Perkhidmatan bimbingan dan kaunseling juga menekankan prinsip pencegahan, perkembangan dan pemulihan, dilaksanakan secara terancang, sistematik dan beretika, serta bersifat rahsia dan profesional. Ia berperanan menyokong usaha sekolah dalam melahirkan murid yang berdisiplin, berdaya tahan, berakhlak mulia dan mampu menyesuaikan diri dengan perubahan diri serta persekitaran.</p>
+                <p>Selaras dengan Falsafah Pendidikan Kebangsaan, perkhidmatan ini berhasrat membantu melahirkan insan yang seimbang dan harmonis, mampu menyumbang secara positif kepada keluarga, masyarakat dan negara.</p>
+            </div>
+        </div>
+
+        <div class="glass-panel objektif-card">
+            <div class="panel-header">
+                <span>🎯</span> <h2>OBJEKTIF</h2>
+            </div>
+            <ul class="objektif-list">
+                <li>Membina konsep kendiri yang positif</li>
+                <li>Mengurus emosi, tekanan dan konflik dengan berkesan</li>
+                <li>Menyokong pencapaian akademik & mengenal pasti gaya pembelajaran</li>
+                <li>Menangani masalah pembelajaran dan motivasi</li>
+                <li>Membimbing perkembangan sosial dan tingkah laku</li>
+                <li>Memupuk kemahiran komunikasi dan perhubungan interpersonal</li>
+                <li>Mengurangkan masalah disiplin dan salah laku</li>
+                <li>Memberi pendedahan kepada bidang kerjaya dan pendidikan lanjutan</li>
+                <li>Membantu murid membuat keputusan dan menyelesaikan masalah</li>
+                <li>Tingkatkan kemahiran berfikir secara rasional dan bertanggungjawab</li>
+                <li>Menyediakan perkhidmatan kaunseling yang profesional dan beretika</li>
+                <li>Menjamin kerahsiaan dan kebajikan murid</li>
+                <li>Menyokong kesejahteraan mental dan pencegahan masalah sosial</li>
+                <li>Mengesan awal isu seperti tekanan, buli, dan risiko sosial</li>
+            </ul>
+        </div>
+
+    </div>
+
+    <a href="profil-gbk.html" class="btn-back">← KEMBALI</a>
+
+    <script>
+        // Efek pencahayaan mengikut mouse
+        const glow = document.getElementById('glow');
+        document.addEventListener('mousemove', (e) => {
+            const x = (e.clientX / window.innerWidth) * 100;
+            const y = (e.clientY / window.innerHeight) * 100;
+            glow.style.setProperty('--x', `${x}%`);
+            glow.style.setProperty('--y', `${y}%`);
+        });
+
+        // Efek Tilt sikit pada kad profil bila mouse move
+        if (window.innerWidth > 768) {
+            const panels = document.querySelectorAll('.glass-panel');
+            document.addEventListener('mousemove', (e) => {
+                let xAxis = (window.innerWidth / 2 - e.clientX) / 80;
+                let yAxis = (window.innerHeight / 2 - e.clientY) / 80;
+                panels.forEach(panel => {
+                    panel.style.transform = `rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
+                });
+            });
+        }
+    </script>
+</body>
+</html>

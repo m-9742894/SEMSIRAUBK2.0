@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>List Pelajar Kelas Saya | E-MindCare SEMSIRA</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: linear-gradient(135deg, #e8f0fe 0%, #dfe7f5 100%); min-height: 100vh; padding: 20px; }
+        
+        .container { max-width: 1200px; margin: 0 auto; }
+        
+        /* Header */
+        .header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 2px solid rgba(37,99,235,0.2); }
+        .logo-area { display: flex; align-items: center; gap: 1rem; }
+        .logo-icon { background: linear-gradient(145deg, #2563eb, #7c3aed); width: 50px; height: 50px; border-radius: 28px; display: flex; align-items: center; justify-content: center; }
+        .logo-icon i { font-size: 1.8rem; color: white; }
+        .logo-text h1 { font-size: 1.5rem; font-weight: 800; background: linear-gradient(135deg, #1e293b, #2563eb); -webkit-background-clip: text; background-clip: text; color: transparent; }
+        .back-btn { background: #eef2ff; border: none; padding: 0.6rem 1.2rem; border-radius: 40px; cursor: pointer; font-weight: 600; color: #2563eb; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; }
+        .back-btn:hover { background: #2563eb; color: white; }
+        
+        /* Class Info */
+        .class-info { background: white; border-radius: 1.2rem; padding: 1rem 1.5rem; margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .class-info h2 { font-size: 1.3rem; color: #1e293b; }
+        .class-info h2 i { color: #2563eb; margin-right: 8px; }
+        .student-count { background: #e0e7ff; padding: 0.3rem 1rem; border-radius: 40px; font-weight: 600; color: #2563eb; }
+        
+        /* Stats */
+        .stats { background: white; border-radius: 1rem; padding: 1rem; margin-bottom: 1.5rem; display: flex; gap: 1rem; flex-wrap: wrap; }
+        .stat-card { flex: 1; text-align: center; padding: 0.8rem; background: #f8fafc; border-radius: 1rem; }
+        .stat-card i { font-size: 1.5rem; color: #2563eb; }
+        .stat-card .number { font-size: 1.8rem; font-weight: 800; color: #1e293b; }
+        .stat-card .label { font-size: 0.7rem; color: #5b6e8c; }
+        
+        /* Add Button */
+        .btn-add { background: linear-gradient(95deg, #10b981, #059669); color: white; border: none; padding: 0.7rem 1.2rem; border-radius: 40px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; margin-bottom: 1rem; }
+        .btn-add:hover { transform: translateY(-2px); }
+        
+        /* Search Bar */
+        .search-bar { margin-bottom: 1.5rem; display: flex; gap: 1rem; flex-wrap: wrap; }
+        .search-bar input { flex: 1; padding: 0.8rem 1rem; border: 1.5px solid #e2e8f0; border-radius: 2rem; font-family: inherit; outline: none; }
+        .search-bar input:focus { border-color: #2563eb; }
+        
+        /* Student Table */
+        .student-table { background: white; border-radius: 1.2rem; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; padding: 1rem; background: #f8fafc; color: #1e293b; font-weight: 600; border-bottom: 1px solid #e2e8f0; }
+        td { padding: 0.8rem 1rem; border-bottom: 1px solid #e2e8f0; }
+        .student-name { cursor: pointer; color: #2563eb; font-weight: 600; }
+        .student-name:hover { text-decoration: underline; }
+        .action-buttons { display: flex; gap: 0.5rem; }
+        .btn-edit, .btn-delete { padding: 0.3rem 0.8rem; border-radius: 40px; font-size: 0.7rem; font-weight: 600; cursor: pointer; border: none; }
+        .btn-edit { background: #e0e7ff; color: #2563eb; }
+        .btn-edit:hover { background: #c7d2fe; }
+        .btn-delete { background: #fee2e2; color: #dc2626; }
+        .btn-delete:hover { background: #fecaca; }
+        
+        .empty-state { text-align: center; padding: 3rem; color: #94a3b8; }
+        
+        /* Modal */
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2000; display: flex; align-items: center; justify-content: center; padding: 20px; }
+        .modal-content { max-width: 450px; width: 100%; background: white; border-radius: 1.5rem; }
+        .modal-header { padding: 1rem; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; }
+        .modal-header h3 { color: #1e293b; }
+        .modal-close { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #94a3b8; }
+        .modal-body { padding: 1rem; }
+        .form-group { margin-bottom: 1rem; }
+        .form-group label { display: block; font-weight: 600; font-size: 0.8rem; margin-bottom: 0.4rem; color: #1e293b; }
+        .form-group input, .form-group select { width: 100%; padding: 0.7rem; border: 1.5px solid #e2e8f0; border-radius: 0.8rem; font-family: inherit; outline: none; }
+        .form-group input:focus { border-color: #2563eb; }
+        .modal-btn { width: 100%; padding: 0.8rem; background: #2563eb; color: white; border: none; border-radius: 2rem; font-weight: 600; cursor: pointer; margin-top: 0.5rem; }
+        
+        .alert { padding: 12px; border-radius: 12px; margin-bottom: 15px; font-size: 0.8rem; display: none; }
+        .alert.success { background: #dcfce7; color: #166534; display: block; }
+        .alert.error { background: #fee2e2; color: #dc2626; display: block; }
+        
+        @media (max-width: 700px) {
+            .student-table { overflow-x: auto; }
+            table { min-width: 500px; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <div class="logo-area">
+            <div class="logo-icon"><i class="fas fa-users"></i></div>
+            <div class="logo-text">
+                <h1>List Pelajar Kelas Saya</h1>
+            </div>
+        </div>
+        <a href="dashboard-guru.html" class="back-btn"><i class="fas fa-arrow-left"></i> Kembali ke Dashboard</a>
+    </div>
+    
+    <div id="alertMessage" class="alert"></div>
+    
+    <div class="class-info">
+        <h2><i class="fas fa-chalkboard"></i> <span id="teacherClassName">-</span></h2>
+        <div class="student-count"><i class="fas fa-users"></i> <span id="studentCount">0</span> Pelajar</div>
+    </div>
+    
+    <div class="stats">
+        <div class="stat-card"><i class="fas fa-user-graduate"></i><div class="number" id="totalStudents">0</div><div class="label">Jumlah Pelajar</div></div>
+        <div class="stat-card"><i class="fas fa-star"></i><div class="number" id="totalMerit">0</div><div class="label">Jumlah Merit</div></div>
+        <div class="stat-card"><i class="fas fa-calendar"></i><div class="number" id="sessionYear">-</div><div class="label">Tahun/Sesi</div></div>
+    </div>
+    
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1rem;">
+        <button class="btn-add" id="addStudentBtn"><i class="fas fa-plus"></i> Tambah Pelajar Baru</button>
+    </div>
+    
+    <div class="search-bar">
+        <input type="text" id="searchInput" placeholder="🔍 Cari nama atau No. Kad Pengenalan...">
+    </div>
+    
+    <div class="student-table">
+        <div id="tableContainer">
+            <div class="empty-state"><i class="fas fa-spinner fa-pulse"></i> Memuatkan...</div>
+        </div>
+    </div>
+</div>
+
+<!-- Add/Edit Modal -->
+<div id="studentModal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="modalTitle"><i class="fas fa-user-plus"></i> Tambah Pelajar</h3>
+            <button class="modal-close" onclick="closeModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <form id="studentForm">
+                <input type="hidden" id="studentId">
+                <div class="form-group">
+                    <label><i class="fas fa-user"></i> Nama Penuh</label>
+                    <input type="text" id="fullname" placeholder="cth: Ahmad bin Abdullah" required>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-id-card"></i> Nombor Kad Pengenalan</label>
+                    <input type="text" id="icNumber" placeholder="cth: 050101-01-1234" required>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-school"></i> Kelas</label>
+                    <input type="text" id="className" placeholder="Kelas" readonly style="background:#f1f5f9;">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-calendar"></i> Tahun/Sesi</label>
+                    <input type="text" id="session" placeholder="Tahun" readonly style="background:#f1f5f9;">
+                </div>
+                <button type="submit" class="modal-btn"><i class="fas fa-save"></i> Simpan</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, collection, addDoc, getDocs, deleteDoc, updateDoc, doc, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    
+    const firebaseConfig = {
+        apiKey: "AIzaSyCfu7XC8pXtpDyQ-9Cjdg4AobA-EVEwWcc",
+        authDomain: "e-mindcare.firebaseapp.com",
+        projectId: "e-mindcare",
+        storageBucket: "e-mindcare.firebasestorage.app",
+        messagingSenderId: "1021883944936",
+        appId: "1:1021883944936:web:39c75a0c98d19a37afde5d",
+        measurementId: "G-3CJVKWGEXV"
+    };
+    
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const studentsCollection = collection(db, "students");
+    
+    // Get teacher info from sessionStorage
+    const teacherName = sessionStorage.getItem('teacherName') || 'Guru';
+    const teacherClass = sessionStorage.getItem('teacherClass') || '';
+    const teacherYear = sessionStorage.getItem('teacherYear') || '2026';
+    
+    document.getElementById('teacherClassName').innerText = teacherClass || 'Kelas belum ditetapkan';
+    document.getElementById('sessionYear').innerText = teacherYear;
+    
+    let studentsList = [];
+    let searchTerm = '';
+    
+    function showAlert(msg, type) {
+        const alertDiv = document.getElementById('alertMessage');
+        alertDiv.textContent = msg;
+        alertDiv.className = `alert ${type}`;
+        setTimeout(() => { alertDiv.style.display = 'none'; }, 3000);
+    }
+    
+    async function loadStudents() {
+        const container = document.getElementById('tableContainer');
+        try {
+            const q = query(studentsCollection, where("class", "==", teacherClass), where("session", "==", teacherYear));
+            const snapshot = await getDocs(q);
+            studentsList = [];
+            snapshot.forEach(doc => studentsList.push({ id: doc.id, ...doc.data() }));
+            
+            document.getElementById('totalStudents').innerText = studentsList.length;
+            document.getElementById('studentCount').innerText = studentsList.length;
+            
+            // Calculate total merit (placeholder - akan sambung dengan collection merit nanti)
+            document.getElementById('totalMerit').innerText = studentsList.length * 5; // Contoh sementara
+            
+            renderTable();
+        } catch(e) {
+            console.error(e);
+            container.innerHTML = '<div class="empty-state"><p style="color:#dc2626;">Ralat memuat data. Sila refresh.</p></div>';
+        }
+    }
+    
+    function renderTable() {
+        const container = document.getElementById('tableContainer');
+        let filtered = studentsList;
+        if (searchTerm) {
+            const term = searchTerm.toLowerCase();
+            filtered = studentsList.filter(s => s.fullname.toLowerCase().includes(term) || s.icNumber.includes(term));
+        }
+        
+        if (filtered.length === 0) {
+            container.innerHTML = '<div class="empty-state"><i class="fas fa-user-slash"></i><p>Tiada pelajar ditemui.</p></div>';
+            return;
+        }
+        
+        let html = `
+            <table>
+                <thead>
+                    <tr>
+                        <th>Bil</th>
+                        <th>Nama Pelajar</th>
+                        <th>No. Kad Pengenalan</th>
+                        <th>Tindakan</th>
+                    </tr>
+                </thead>
+                <tbody>
+        `;
+        
+        filtered.forEach((student, index) => {
+            html += `
+                <tr>
+                    <td>${index + 1}</td>
+                    <td class="student-name" onclick="viewProfile('${student.id}')">${escapeHtml(student.fullname)}</td>
+                    <td>${escapeHtml(student.icNumber)}</td>
+                    <td class="action-buttons">
+                        <button class="btn-edit" onclick="openEditModal('${student.id}', '${escapeHtml(student.fullname)}', '${escapeHtml(student.icNumber)}')"><i class="fas fa-edit"></i> Edit</button>
+                        <button class="btn-delete" onclick="deleteStudent('${student.id}', '${escapeHtml(student.fullname)}')"><i class="fas fa-trash"></i> Hapus</button>
+                    </td>
+                </tr>
+            `;
+        });
+        
+        html += `</tbody></table>`;
+        container.innerHTML = html;
+    }
+    
+    // View Profile - redirect ke page profil pelajar (akan dibuat kemudian)
+    window.viewProfile = function(studentId) {
+        // Simpan studentId ke sessionStorage untuk page profil
+        sessionStorage.setItem('viewStudentId', studentId);
+        // Redirect ke page profil pelajar (page lain akan dibuat)
+        window.location.href = `profil-pelajar.html?id=${studentId}`;
+        // Sementara ini alert dulu
+        // alert("Halaman profil pelajar akan dibina selepas ini. ID: " + studentId);
+    };
+    
+    // Open Add Modal
+    document.getElementById('addStudentBtn').addEventListener('click', () => {
+        document.getElementById('modalTitle').innerHTML = '<i class="fas fa-user-plus"></i> Tambah Pelajar Baru';
+        document.getElementById('studentId').value = '';
+        document.getElementById('fullname').value = '';
+        document.getElementById('icNumber').value = '';
+        document.getElementById('className').value = teacherClass;
+        document.getElementById('session').value = teacherYear;
+        document.getElementById('studentModal').style.display = 'flex';
+    });
+    
+    // Open Edit Modal
+    window.openEditModal = function(id, fullname, icNumber) {
+        document.getElementById('modalTitle').innerHTML = '<i class="fas fa-edit"></i> Edit Maklumat Pelajar';
+        document.getElementById('studentId').value = id;
+        document.getElementById('fullname').value = fullname;
+        document.getElementById('icNumber').value = icNumber;
+        document.getElementById('className').value = teacherClass;
+        document.getElementById('session').value = teacherYear;
+        document.getElementById('studentModal').style.display = 'flex';
+    };
+    
+    window.closeModal = function() {
+        document.getElementById('studentModal').style.display = 'none';
+    };
+    
+    // Save student (Add or Edit)
+    document.getElementById('studentForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const id = document.getElementById('studentId').value;
+        const fullname = document.getElementById('fullname').value.trim();
+        const icNumber = document.getElementById('icNumber').value.trim();
+        
+        if (!fullname) { showAlert('Sila masukkan nama penuh', 'error'); return; }
+        if (!icNumber) { showAlert('Sila masukkan No. Kad Pengenalan', 'error'); return; }
+        
+        const studentData = {
+            fullname: fullname,
+            icNumber: icNumber,
+            class: teacherClass,
+            session: teacherYear,
+            updatedAt: new Date().toISOString()
+        };
+        
+        try {
+            if (id) {
+                // Update existing student
+                await updateDoc(doc(db, "students", id), studentData);
+                showAlert('✅ Maklumat pelajar berjaya dikemaskini!', 'success');
+            } else {
+                // Check if IC already exists
+                const q = query(studentsCollection, where("icNumber", "==", icNumber));
+                const snapshot = await getDocs(q);
+                if (!snapshot.empty) {
+                    showAlert('❌ No. Kad Pengenalan sudah wujud untuk pelajar lain!', 'error');
+                    return;
+                }
+                studentData.createdAt = new Date().toISOString();
+                await addDoc(studentsCollection, studentData);
+                showAlert('✅ Pelajar baru berjaya ditambah!', 'success');
+            }
+            closeModal();
+            await loadStudents();
+        } catch(e) {
+            console.error(e);
+            showAlert('❌ Gagal menyimpan data. Sila cuba lagi.', 'error');
+        }
+    });
+    
+    // Delete student
+    window.deleteStudent = async function(id, name) {
+        if (confirm(`Adakah anda pasti mahu memadam pelajar "${name}"?`)) {
+            try {
+                await deleteDoc(doc(db, "students", id));
+                showAlert('✅ Pelajar berjaya dipadam!', 'success');
+                await loadStudents();
+            } catch(e) {
+                console.error(e);
+                showAlert('❌ Gagal memadam pelajar.', 'error');
+            }
+        }
+    };
+    
+    // Search functionality
+    document.getElementById('searchInput').addEventListener('input', (e) => {
+        searchTerm = e.target.value;
+        renderTable();
+    });
+    
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, m => m==='&'?'&amp;':m==='<'?'&lt;':'&gt;');
+    }
+    
+    // Initialize
+    loadStudents();
+</script>
+</body>
+</html>

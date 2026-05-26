@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Statistik Murid | E-MindCare SEMSIRA</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: linear-gradient(135deg, #f0f4ff 0%, #e9eef6 100%); min-height: 100vh; padding: 20px; }
+        .container { max-width: 1400px; margin: 0 auto; }
+        
+        .header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 2px solid rgba(79,70,229,0.2); }
+        .logo-area { display: flex; align-items: center; gap: 1rem; }
+        .logo-icon { background: linear-gradient(145deg, #4f46e5, #7c3aed); width: 50px; height: 50px; border-radius: 28px; display: flex; align-items: center; justify-content: center; }
+        .logo-icon i { font-size: 1.8rem; color: white; }
+        .logo-text h1 { font-size: 1.5rem; font-weight: 800; background: linear-gradient(135deg, #1e293b, #4f46e5); -webkit-background-clip: text; background-clip: text; color: transparent; }
+        .back-btn { background: #eef2ff; border: none; padding: 0.6rem 1.2rem; border-radius: 40px; cursor: pointer; font-weight: 600; color: #4f46e5; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; }
+        .back-btn:hover { background: #4f46e5; color: white; }
+        
+        .page-title { margin-bottom: 1.5rem; }
+        .page-title h2 { font-size: 1.5rem; color: #1e293b; }
+        
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(500px, 1fr)); gap: 1.5rem; margin-bottom: 1.5rem; }
+        .stats-card { background: white; border-radius: 1.2rem; padding: 1.2rem; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .stats-card h3 { font-size: 1.1rem; margin-bottom: 1rem; color: #1e293b; display: flex; align-items: center; gap: 8px; }
+        .stats-card h3 i { color: #4f46e5; }
+        
+        .rank-list { max-height: 300px; overflow-y: auto; }
+        .rank-item { display: flex; justify-content: space-between; align-items: center; padding: 0.8rem; border-bottom: 1px solid #e2e8f0; }
+        .rank-name { font-weight: 600; color: #1e293b; }
+        .rank-count { font-weight: 700; }
+        .rank-count.negative { color: #dc2626; }
+        .rank-count.positive { color: #10b981; }
+        
+        .filter-group { margin-bottom: 1rem; display: flex; gap: 1rem; flex-wrap: wrap; align-items: center; }
+        .filter-group select { padding: 0.6rem 1rem; border: 1.5px solid #e2e8f0; border-radius: 2rem; font-family: inherit; outline: none; background: white; }
+        .filter-group select:focus { border-color: #4f46e5; }
+        
+        .chart-container { margin-top: 1rem; position: relative; height: 300px; width: 100%; }
+        canvas { max-height: 250px; width: 100% !important; }
+        
+        .empty-state { text-align: center; padding: 2rem; color: #94a3b8; }
+        
+        @media (max-width: 900px) { .stats-grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <div class="logo-area"><div class="logo-icon"><i class="fas fa-chart-line"></i></div><div class="logo-text"><h1>Statistik & Analisis Murid</h1></div></div>
+        <a href="keseluruhan-murid.html" class="back-btn"><i class="fas fa-arrow-left"></i> Kembali</a>
+    </div>
+    
+    <!-- Top Rankings (Top 5 sahaja) -->
+    <div class="stats-grid">
+        <div class="stats-card"><h3><i class="fas fa-exclamation-triangle"></i> Top 5 Kesalahan Terbanyak</h3><div id="topNegativeList" class="rank-list"><p class="empty-state">Memuatkan...</p></div></div>
+        <div class="stats-card"><h3><i class="fas fa-heart"></i> Top 5 Kebaikan Terbanyak</h3><div id="topPositiveList" class="rank-list"><p class="empty-state">Memuatkan...</p></div></div>
+    </div>
+    
+    <!-- Analysis by Class -->
+    <div class="stats-grid">
+        <div class="stats-card"><h3><i class="fas fa-school"></i> Analisis Kesalahan Mengikut Kelas</h3><div class="filter-group"><select id="classNegativeSelect"><option value="">Pilih Kelas</option></select></div><div class="chart-container"><canvas id="classNegativeChart"></canvas></div></div>
+        <div class="stats-card"><h3><i class="fas fa-school"></i> Analisis Kebaikan Mengikut Kelas</h3><div class="filter-group"><select id="classPositiveSelect"><option value="">Pilih Kelas</option></select></div><div class="chart-container"><canvas id="classPositiveChart"></canvas></div></div>
+    </div>
+    
+    <!-- Analysis by Form/Tingkatan -->
+    <div class="stats-grid">
+        <div class="stats-card"><h3><i class="fas fa-layer-group"></i> Analisis Kesalahan Mengikut Tingkatan</h3><div class="filter-group"><select id="formNegativeSelect"><option value="">Pilih Tingkatan</option></select></div><div class="chart-container"><canvas id="formNegativeChart"></canvas></div></div>
+        <div class="stats-card"><h3><i class="fas fa-layer-group"></i> Analisis Kebaikan Mengikut Tingkatan</h3><div class="filter-group"><select id="formPositiveSelect"><option value="">Pilih Tingkatan</option></select></div><div class="chart-container"><canvas id="formPositiveChart"></canvas></div></div>
+    </div>
+    
+    <!-- Overall School Analysis -->
+    <div class="stats-grid">
+        <div class="stats-card"><h3><i class="fas fa-chart-simple"></i> Analisis Kesalahan Keseluruhan Sekolah</h3><div class="chart-container"><canvas id="overallNegativeChart"></canvas></div></div>
+        <div class="stats-card"><h3><i class="fas fa-chart-simple"></i> Analisis Kebaikan Keseluruhan Sekolah</h3><div class="chart-container"><canvas id="overallPositiveChart"></canvas></div></div>
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    
+    const firebaseConfig = {
+        apiKey: "AIzaSyCfu7XC8pXtpDyQ-9Cjdg4AobA-EVEwWcc",
+        authDomain: "e-mindcare.firebaseapp.com",
+        projectId: "e-mindcare",
+        storageBucket: "e-mindcare.firebasestorage.app",
+        messagingSenderId: "1021883944936",
+        appId: "1:1021883944936:web:39c75a0c98d19a37afde5d",
+        measurementId: "G-3CJVKWGEXV"
+    };
+    
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const studentsCollection = collection(db, "students");
+    const meritCollection = collection(db, "merit_records");
+    
+    let allStudents = [];
+    let allMeritRecords = [];
+    let allClasses = [];
+    let allForms = [];
+    
+    // Chart instances
+    let charts = {
+        classNegative: null, classPositive: null,
+        formNegative: null, formPositive: null,
+        overallNegative: null, overallPositive: null
+    };
+    
+    async function loadData() {
+        const studentsSnap = await getDocs(studentsCollection);
+        allStudents = []; studentsSnap.forEach(doc => allStudents.push({ id: doc.id, ...doc.data() }));
+        
+        const meritSnap = await getDocs(meritCollection);
+        allMeritRecords = []; meritSnap.forEach(doc => allMeritRecords.push({ id: doc.id, ...doc.data() }));
+        
+        // Get unique classes
+        allClasses = [...new Set(allStudents.map(s => s.class).filter(c => c && c !== '-'))].sort();
+        // Get unique forms (extract number from class name)
+        allForms = [...new Set(allStudents.map(s => {
+            const match = s.class ? s.class.match(/\d+/) : null;
+            return match ? match[0] : null;
+        }).filter(f => f))].sort((a,b) => parseInt(a) - parseInt(b));
+        
+        populateSelects();
+        loadTopRankings();
+        loadOverallAnalysis();
+    }
+    
+    function populateSelects() {
+        const classNeg = document.getElementById('classNegativeSelect');
+        const classPos = document.getElementById('classPositiveSelect');
+        const formNeg = document.getElementById('formNegativeSelect');
+        const formPos = document.getElementById('formPositiveSelect');
+        
+        classNeg.innerHTML = '<option value="">Pilih Kelas</option>' + allClasses.map(c => `<option value="${c}">${c}</option>`).join('');
+        classPos.innerHTML = '<option value="">Pilih Kelas</option>' + allClasses.map(c => `<option value="${c}">${c}</option>`).join('');
+        formNeg.innerHTML = '<option value="">Pilih Tingkatan</option>' + allForms.map(f => `<option value="${f}">Tingkatan ${f}</option>`).join('');
+        formPos.innerHTML = '<option value="">Pilih Tingkatan</option>' + allForms.map(f => `<option value="${f}">Tingkatan ${f}</option>`).join('');
+        
+        classNeg.addEventListener('change', () => loadClassAnalysis('negative', classNeg.value));
+        classPos.addEventListener('change', () => loadClassAnalysis('positive', classPos.value));
+        formNeg.addEventListener('change', () => loadFormAnalysis('negative', formNeg.value));
+        formPos.addEventListener('change', () => loadFormAnalysis('positive', formPos.value));
+    }
+    
+    function loadTopRankings() {
+        // Count records per student (Top 5 sahaja)
+        const negativeCount = {};
+        const positiveCount = {};
+        
+        allMeritRecords.forEach(r => {
+            if (r.type === 'negative') negativeCount[r.studentId] = (negativeCount[r.studentId] || 0) + 1;
+            else if (r.type === 'positive') positiveCount[r.studentId] = (positiveCount[r.studentId] || 0) + 1;
+        });
+        
+        const studentMap = {};
+        allStudents.forEach(s => studentMap[s.id] = s);
+        
+        // Top 5 negative
+        const topNegative = Object.entries(negativeCount)
+            .map(([id, count]) => ({ id, name: studentMap[id]?.fullname || 'Unknown', count }))
+            .sort((a,b) => b.count - a.count)
+            .slice(0, 5);
+        
+        // Top 5 positive
+        const topPositive = Object.entries(positiveCount)
+            .map(([id, count]) => ({ id, name: studentMap[id]?.fullname || 'Unknown', count }))
+            .sort((a,b) => b.count - a.count)
+            .slice(0, 5);
+        
+        const negContainer = document.getElementById('topNegativeList');
+        const posContainer = document.getElementById('topPositiveList');
+        
+        negContainer.innerHTML = topNegative.length ? topNegative.map((s,i) => `<div class="rank-item"><span class="rank-name">${i+1}. ${escapeHtml(s.name)}</span><span class="rank-count negative">${s.count} kesalahan</span></div>`).join('') : '<p class="empty-state">Tiada data kesalahan</p>';
+        posContainer.innerHTML = topPositive.length ? topPositive.map((s,i) => `<div class="rank-item"><span class="rank-name">${i+1}. ${escapeHtml(s.name)}</span><span class="rank-count positive">${s.count} kebaikan</span></div>`).join('') : '<p class="empty-state">Tiada data kebaikan</p>';
+    }
+    
+    function loadClassAnalysis(type, className) {
+        if (!className) {
+            if (charts[`class${type==='negative'?'Negative':'Positive'}`]) {
+                charts[`class${type==='negative'?'Negative':'Positive'}`].destroy();
+                charts[`class${type==='negative'?'Negative':'Positive'}`] = null;
+            }
+            return;
+        }
+        
+        const studentsInClass = allStudents.filter(s => s.class === className).map(s => s.id);
+        const records = allMeritRecords.filter(r => r.type === type && studentsInClass.includes(r.studentId));
+        
+        // Group by date (month-year)
+        const dateMap = {};
+        records.forEach(r => {
+            const date = r.createdAt.split('T')[0];
+            const monthYear = date.substring(0, 7); // YYYY-MM
+            dateMap[monthYear] = (dateMap[monthYear] || 0) + (r.points ? Math.abs(r.points) : 1);
+        });
+        
+        const sorted = Object.entries(dateMap).sort((a,b) => a[0].localeCompare(b[0]));
+        const labels = sorted.map(d => d[0]);
+        const data = sorted.map(d => d[1]);
+        
+        const canvasId = type === 'negative' ? 'classNegativeChart' : 'classPositiveChart';
+        const chartKey = type === 'negative' ? 'classNegative' : 'classPositive';
+        const color = type === 'negative' ? 'rgb(220, 38, 38)' : 'rgb(16, 185, 129)';
+        const bgColor = type === 'negative' ? 'rgba(220, 38, 38, 0.5)' : 'rgba(16, 185, 129, 0.5)';
+        
+        updateChart(chartKey, canvasId, labels, data, color, bgColor, `Jumlah ${type === 'negative' ? 'Kesalahan' : 'Kebaikan'}`);
+    }
+    
+    function loadFormAnalysis(type, form) {
+        if (!form) {
+            if (charts[`form${type==='negative'?'Negative':'Positive'}`]) {
+                charts[`form${type==='negative'?'Negative':'Positive'}`].destroy();
+                charts[`form${type==='negative'?'Negative':'Positive'}`] = null;
+            }
+            return;
+        }
+        
+        const studentsInForm = allStudents.filter(s => s.class && s.class.includes(form)).map(s => s.id);
+        const records = allMeritRecords.filter(r => r.type === type && studentsInForm.includes(r.studentId));
+        
+        const dateMap = {};
+        records.forEach(r => {
+            const date = r.createdAt.split('T')[0];
+            const monthYear = date.substring(0, 7);
+            dateMap[monthYear] = (dateMap[monthYear] || 0) + (r.points ? Math.abs(r.points) : 1);
+        });
+        
+        const sorted = Object.entries(dateMap).sort((a,b) => a[0].localeCompare(b[0]));
+        const labels = sorted.map(d => d[0]);
+        const data = sorted.map(d => d[1]);
+        
+        const canvasId = type === 'negative' ? 'formNegativeChart' : 'formPositiveChart';
+        const chartKey = type === 'negative' ? 'formNegative' : 'formPositive';
+        const color = type === 'negative' ? 'rgb(220, 38, 38)' : 'rgb(16, 185, 129)';
+        const bgColor = type === 'negative' ? 'rgba(220, 38, 38, 0.5)' : 'rgba(16, 185, 129, 0.5)';
+        
+        updateChart(chartKey, canvasId, labels, data, color, bgColor, `Jumlah ${type === 'negative' ? 'Kesalahan' : 'Kebaikan'}`);
+    }
+    
+    function loadOverallAnalysis() {
+        const negativeRecords = allMeritRecords.filter(r => r.type === 'negative');
+        const positiveRecords = allMeritRecords.filter(r => r.type === 'positive');
+        
+        const negativeMap = {};
+        const positiveMap = {};
+        
+        negativeRecords.forEach(r => {
+            const date = r.createdAt.split('T')[0];
+            const monthYear = date.substring(0, 7);
+            negativeMap[monthYear] = (negativeMap[monthYear] || 0) + (r.points ? Math.abs(r.points) : 1);
+        });
+        
+        positiveRecords.forEach(r => {
+            const date = r.createdAt.split('T')[0];
+            const monthYear = date.substring(0, 7);
+            positiveMap[monthYear] = (positiveMap[monthYear] || 0) + (r.points || 1);
+        });
+        
+        const negativeSorted = Object.entries(negativeMap).sort((a,b) => a[0].localeCompare(b[0]));
+        const positiveSorted = Object.entries(positiveMap).sort((a,b) => a[0].localeCompare(b[0]));
+        
+        updateChart('overallNegative', 'overallNegativeChart', negativeSorted.map(d => d[0]), negativeSorted.map(d => d[1]), 'rgb(220, 38, 38)', 'rgba(220, 38, 38, 0.5)', 'Jumlah Kesalahan');
+        updateChart('overallPositive', 'overallPositiveChart', positiveSorted.map(d => d[0]), positiveSorted.map(d => d[1]), 'rgb(16, 185, 129)', 'rgba(16, 185, 129, 0.5)', 'Jumlah Kebaikan');
+    }
+    
+    function updateChart(chartKey, canvasId, labels, data, borderColor, backgroundColor, label) {
+        const canvas = document.getElementById(canvasId);
+        if (!canvas) return;
+        
+        // Destroy existing chart if exists
+        if (charts[chartKey]) {
+            charts[chartKey].destroy();
+            charts[chartKey] = null;
+        }
+        
+        if (labels.length === 0) {
+            // Show empty state in canvas parent
+            const parent = canvas.parentElement;
+            const emptyMsg = parent.querySelector('.chart-empty-message');
+            if (!emptyMsg) {
+                const msg = document.createElement('div');
+                msg.className = 'empty-state chart-empty-message';
+                msg.innerHTML = '<p>Tiada data untuk dipaparkan</p>';
+                msg.style.position = 'absolute';
+                msg.style.top = '50%';
+                msg.style.left = '50%';
+                msg.style.transform = 'translate(-50%, -50%)';
+                msg.style.width = '100%';
+                msg.style.textAlign = 'center';
+                parent.style.position = 'relative';
+                parent.appendChild(msg);
+            }
+            return;
+        }
+        
+        // Remove empty message if exists
+        const parent = canvas.parentElement;
+        const emptyMsg = parent.querySelector('.chart-empty-message');
+        if (emptyMsg) emptyMsg.remove();
+        
+        const ctx = canvas.getContext('2d');
+        charts[chartKey] = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: label,
+                    data: data,
+                    backgroundColor: backgroundColor,
+                    borderColor: borderColor,
+                    borderWidth: 1,
+                    borderRadius: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: { position: 'top' },
+                    tooltip: { callbacks: { label: (context) => `${context.raw} markah` } }
+                },
+                scales: {
+                    y: { beginAtZero: true, title: { display: true, text: 'Jumlah Markah' } },
+                    x: { title: { display: true, text: 'Bulan/Tahun' } }
+                }
+            }
+        });
+    }
+    
+    function escapeHtml(s) { if(!s) return ''; return s.replace(/[&<>]/g, m => m==='&'?'&amp;':m==='<'?'&lt;':'&gt;'); }
+    
+    loadData();
+</script>
+</body>
+</html>

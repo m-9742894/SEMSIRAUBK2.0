@@ -344,7 +344,7 @@
         return false;
       }
       
-      // ✅ Login berjaya - simpan data ke sessionStorage (format yang betul untuk dashboard guru)
+      // ✅ Login berjaya - simpan data ke sessionStorage
       sessionStorage.setItem('teacherId', teacherData.id);
       sessionStorage.setItem('teacherName', teacherData.fullname);
       sessionStorage.setItem('teacherIC', teacherData.icNumber);
@@ -352,7 +352,9 @@
       sessionStorage.setItem('teacherYear', teacherData.year || '2026');
       sessionStorage.setItem('teacherLoginTime', new Date().toISOString());
       
-      // ✅ Redirect ke dashboard guru (folder guru di root)
+      // ✅ Redirect ke dashboard guru - PATH YANG BETUL
+      // Dari dashboard/page-guru.html ke guru/dashboard-guru.html
+      // Naik satu folder (..) ke root, kemudian masuk folder guru
       window.location.href = "../guru/dashboard-guru.html";
       return true;
       
@@ -397,7 +399,7 @@
 
 <!-- NOTA PENTING:
      ============================================================
-     STRUKTUR FOLDER YANG DIPERLUKAN:
+     STRUKTUR FOLDER YANG BETUL:
      ============================================================
      
      root folder/
@@ -408,7 +410,13 @@
      │   └── page-guru.html (FAIL INI)
      │
      └── guru/
-         └── dashboard-guru.html (PERLU DICIPTA)
+         └── dashboard-guru.html (FAIL DASHBOARD)
+     
+     ============================================================
+     PATH REDIRECT: "../guru/dashboard-guru.html"
+     ============================================================
+     - ".." = naik satu folder ke root
+     - "guru/dashboard-guru.html" = masuk folder guru dan cari fail dashboard
      
      ============================================================
      STRUKTUR FIRESTORE COLLECTION 'teachers':
@@ -420,16 +428,6 @@
        "year": "2026",
        "createdAt": "2026-01-15T10:30:00.000Z"
      }
-     
-     ============================================================
-     DATA YANG DISIMPAN KE SESSIONSTORAGE:
-     ============================================================
-     - teacherId
-     - teacherName
-     - teacherIC
-     - teacherClass
-     - teacherYear
-     - teacherLoginTime
 -->
 </body>
 </html>

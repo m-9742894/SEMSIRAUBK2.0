@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Keseluruhan Guru | E-MindCare SEMSIRA</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: linear-gradient(135deg, #f0f4ff 0%, #e9eef6 100%); min-height: 100vh; padding: 20px; }
+        
+        .container { max-width: 1400px; margin: 0 auto; }
+        
+        /* Header */
+        .header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 2px solid rgba(79,70,229,0.2); }
+        .logo-area { display: flex; align-items: center; gap: 1rem; }
+        .logo-icon { background: linear-gradient(145deg, #4f46e5, #7c3aed); width: 50px; height: 50px; border-radius: 28px; display: flex; align-items: center; justify-content: center; }
+        .logo-icon i { font-size: 1.8rem; color: white; }
+        .logo-text h1 { font-size: 1.5rem; font-weight: 800; background: linear-gradient(135deg, #1e293b, #4f46e5); -webkit-background-clip: text; background-clip: text; color: transparent; }
+        .back-btn { background: #eef2ff; border: none; padding: 0.6rem 1.2rem; border-radius: 40px; cursor: pointer; font-weight: 600; color: #4f46e5; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; }
+        .back-btn:hover { background: #4f46e5; color: white; }
+        
+        /* Stats */
+        .stats { background: white; border-radius: 1rem; padding: 1rem 1.5rem; margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
+        .stats h2 { font-size: 1.2rem; color: #1e293b; }
+        .stats h2 i { color: #4f46e5; margin-right: 8px; }
+        .total-badge { background: #e0e7ff; padding: 0.3rem 1rem; border-radius: 40px; font-weight: 600; color: #4f46e5; }
+        
+        /* Search Bar */
+        .search-bar { margin-bottom: 2rem; position: relative; }
+        .search-bar input { width: 100%; max-width: 400px; padding: 0.8rem 1rem; border: 1.5px solid #e2e8f0; border-radius: 2rem; font-family: inherit; outline: none; }
+        .search-bar input:focus { border-color: #4f46e5; }
+        
+        /* Suggestions */
+        .suggestions { position: absolute; top: 100%; left: 0; background: white; border: 1px solid #e2e8f0; border-radius: 1rem; max-height: 250px; overflow-y: auto; z-index: 100; width: 400px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); display: none; }
+        .suggestion-item { padding: 0.8rem 1rem; cursor: pointer; border-bottom: 1px solid #e2e8f0; }
+        .suggestion-item:hover { background: #eef2ff; }
+        .suggestion-name { font-weight: 600; color: #1e293b; }
+        .suggestion-ic { font-size: 0.7rem; color: #5b6e8c; }
+        
+        /* Teacher Grid - Card Style */
+        .teacher-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.5rem; }
+        
+        .teacher-card {
+            background: white;
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 20px -8px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(79, 70, 229, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        .teacher-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 35px -12px rgba(79, 70, 229, 0.2);
+            border-color: rgba(79, 70, 229, 0.3);
+        }
+        .teacher-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #4f46e5, #7c3aed);
+            border-radius: 1.5rem 1.5rem 0 0;
+        }
+        
+        .teacher-avatar {
+            background: linear-gradient(145deg, #eef2ff, #ffffff);
+            width: 70px;
+            height: 70px;
+            border-radius: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
+        .teacher-avatar i {
+            font-size: 2.2rem;
+            color: #4f46e5;
+        }
+        
+        .teacher-name-card {
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: #1e293b;
+            margin-bottom: 0.5rem;
+        }
+        
+        .teacher-info-card {
+            margin: 0.8rem 0;
+            padding: 0.5rem 0;
+            border-top: 1px solid #e2e8f0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .info-row-card {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 0.5rem 0;
+            font-size: 0.85rem;
+            color: #5b6e8c;
+        }
+        .info-row-card i {
+            width: 22px;
+            color: #4f46e5;
+        }
+        .info-row-card strong {
+            color: #1e293b;
+        }
+        
+        .teacher-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #eef2ff;
+            padding: 0.3rem 0.8rem;
+            border-radius: 40px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: #4f46e5;
+            margin-top: 0.5rem;
+        }
+        
+        .empty-state { text-align: center; padding: 3rem; color: #94a3b8; }
+        
+        /* Modal */
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2000; display: flex; align-items: center; justify-content: center; padding: 20px; }
+        .modal-content { max-width: 700px; width: 100%; background: white; border-radius: 1.5rem; max-height: 85vh; overflow-y: auto; }
+        .modal-header { padding: 1.2rem; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; background: white; border-radius: 1.5rem 1.5rem 0 0; }
+        .modal-header h3 { color: #1e293b; }
+        .modal-close { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #94a3b8; }
+        .modal-body { padding: 1.2rem; }
+        
+        .profile-section { background: linear-gradient(135deg, #4f46e5, #7c3aed); color: white; border-radius: 1rem; padding: 1.2rem; margin-bottom: 1.5rem; }
+        .profile-grid { display: flex; flex-wrap: wrap; gap: 1rem; }
+        .profile-grid p { margin: 0.3rem 0; display: flex; align-items: center; gap: 8px; }
+        
+        .student-list-modal { list-style: none; max-height: 350px; overflow-y: auto; }
+        .student-item-modal { background: #f8fafc; border-radius: 0.8rem; padding: 0.8rem; margin-bottom: 0.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; }
+        .student-name-modal { font-weight: 600; color: #1e293b; }
+        .student-ic-modal { font-size: 0.7rem; color: #5b6e8c; margin-top: 2px; }
+        .student-badge { background: #e0e7ff; padding: 0.2rem 0.6rem; border-radius: 20px; font-size: 0.7rem; font-weight: 600; color: #4f46e5; }
+        
+        .alert { padding: 12px; border-radius: 12px; margin-bottom: 15px; font-size: 0.8rem; display: none; }
+        .alert.success { background: #dcfce7; color: #166534; display: block; }
+        .alert.error { background: #fee2e2; color: #dc2626; display: block; }
+        
+        @media (max-width: 700px) {
+            .teacher-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <div class="logo-area">
+            <div class="logo-icon"><i class="fas fa-user-tie"></i></div>
+            <div class="logo-text"><h1>Keseluruhan Guru</h1></div>
+        </div>
+        <a href="dashboard-kaunselor.html" class="back-btn"><i class="fas fa-arrow-left"></i> Kembali ke Dashboard</a>
+    </div>
+    
+    <div id="alertMessage" class="alert"></div>
+    
+    <div class="stats">
+        <h2><i class="fas fa-chalkboard-user"></i> Senarai Guru</h2>
+        <div class="total-badge"><i class="fas fa-users"></i> <span id="totalTeachers">0</span> Guru</div>
+    </div>
+    
+    <div class="search-bar">
+        <input type="text" id="searchInput" placeholder="🔍 Cari nama atau No. Kad Pengenalan...">
+        <div id="suggestions" class="suggestions"></div>
+    </div>
+    
+    <div id="teachersContainer" class="teacher-grid">
+        <div class="empty-state"><i class="fas fa-spinner fa-pulse"></i> Memuatkan...</div>
+    </div>
+</div>
+
+<!-- Modal for Teacher Details -->
+<div id="teacherModal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3><i class="fas fa-chalkboard-user"></i> Profil Guru & Pelajar</h3>
+            <button class="modal-close" onclick="closeModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div id="teacherProfile" class="profile-section">
+                <h4><i class="fas fa-user"></i> Maklumat Guru</h4>
+                <div class="profile-grid">
+                    <div>
+                        <p><i class="fas fa-user"></i> <strong>Nama:</strong> <span id="teacherName">-</span></p>
+                        <p><i class="fas fa-id-card"></i> <strong>No. IC:</strong> <span id="teacherIC">-</span></p>
+                    </div>
+                    <div>
+                        <p><i class="fas fa-school"></i> <strong>Mengajar Kelas:</strong> <span id="teacherClass">-</span></p>
+                        <p><i class="fas fa-calendar"></i> <strong>Tahun:</strong> <span id="teacherYear">-</span></p>
+                    </div>
+                </div>
+            </div>
+            <h4 style="margin-bottom: 1rem;"><i class="fas fa-users"></i> Senarai Pelajar Dalam Kelas</h4>
+            <div id="studentListContainer" class="student-list-modal">
+                <p style="text-align:center; color:#94a3b8;">Memuatkan...</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    
+    const firebaseConfig = {
+        apiKey: "AIzaSyCfu7XC8pXtpDyQ-9Cjdg4AobA-EVEwWcc",
+        authDomain: "e-mindcare.firebaseapp.com",
+        projectId: "e-mindcare",
+        storageBucket: "e-mindcare.firebasestorage.app",
+        messagingSenderId: "1021883944936",
+        appId: "1:1021883944936:web:39c75a0c98d19a37afde5d",
+        measurementId: "G-3CJVKWGEXV"
+    };
+    
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const teachersCollection = collection(db, "teachers");
+    const studentsCollection = collection(db, "students");
+    
+    let allTeachers = [];
+    let allStudents = [];
+    let searchTerm = '';
+    
+    function showAlert(msg, type) {
+        const alertDiv = document.getElementById('alertMessage');
+        alertDiv.textContent = msg;
+        alertDiv.className = `alert ${type}`;
+        setTimeout(() => { alertDiv.style.display = 'none'; }, 3000);
+    }
+    
+    async function loadAllData() {
+        try {
+            const teachersSnap = await getDocs(teachersCollection);
+            allTeachers = [];
+            teachersSnap.forEach(doc => allTeachers.push({ id: doc.id, ...doc.data() }));
+            
+            const studentsSnap = await getDocs(studentsCollection);
+            allStudents = [];
+            studentsSnap.forEach(doc => allStudents.push({ id: doc.id, ...doc.data() }));
+            
+            document.getElementById('totalTeachers').innerText = allTeachers.length;
+            renderTeachers();
+        } catch(e) {
+            console.error(e);
+            showAlert('Ralat memuat data', 'error');
+        }
+    }
+    
+    function renderTeachers() {
+        const container = document.getElementById('teachersContainer');
+        let filtered = allTeachers;
+        if (searchTerm) {
+            const term = searchTerm.toLowerCase();
+            filtered = filtered.filter(t => t.fullname.toLowerCase().includes(term) || t.icNumber.includes(term));
+        }
+        
+        if (filtered.length === 0) {
+            container.innerHTML = '<div class="empty-state"><i class="fas fa-user-slash"></i><p>Tiada guru ditemui.</p></div>';
+            return;
+        }
+        
+        let html = '';
+        for (const teacher of filtered) {
+            html += `
+                <div class="teacher-card" onclick="viewTeacherDetail('${teacher.id}')">
+                    <div class="teacher-avatar">
+                        <i class="fas fa-chalkboard-user"></i>
+                    </div>
+                    <div class="teacher-name-card">${escapeHtml(teacher.fullname)}</div>
+                    <div class="teacher-info-card">
+                        <div class="info-row-card">
+                            <i class="fas fa-id-card"></i>
+                            <span><strong>No. IC:</strong> ${escapeHtml(teacher.icNumber)}</span>
+                        </div>
+                        <div class="info-row-card">
+                            <i class="fas fa-school"></i>
+                            <span><strong>Mengajar Kelas:</strong> ${escapeHtml(teacher.teacherClass || '-')}</span>
+                        </div>
+                        <div class="info-row-card">
+                            <i class="fas fa-calendar"></i>
+                            <span><strong>Tahun:</strong> ${escapeHtml(teacher.year || '-')}</span>
+                        </div>
+                    </div>
+                    <div class="teacher-badge">
+                        <i class="fas fa-users"></i> Pelajar: ${getStudentCountInClass(teacher.teacherClass)} orang
+                    </div>
+                </div>
+            `;
+        }
+        container.innerHTML = html;
+    }
+    
+    function getStudentCountInClass(className) {
+        if (!className || className === '-') return 0;
+        return allStudents.filter(s => s.class === className).length;
+    }
+    
+    window.viewTeacherDetail = async function(teacherId) {
+        const teacher = allTeachers.find(t => t.id === teacherId);
+        if (!teacher) return;
+        
+        document.getElementById('teacherName').innerHTML = `<i class="fas fa-user"></i> ${escapeHtml(teacher.fullname)}`;
+        document.getElementById('teacherIC').innerText = teacher.icNumber || '-';
+        document.getElementById('teacherClass').innerText = teacher.teacherClass || '-';
+        document.getElementById('teacherYear').innerText = teacher.year || '-';
+        
+        const teacherClass = teacher.teacherClass;
+        let studentsInClass = [];
+        
+        if (teacherClass && teacherClass !== '-') {
+            studentsInClass = allStudents.filter(s => s.class === teacherClass);
+        }
+        
+        const studentContainer = document.getElementById('studentListContainer');
+        if (studentsInClass.length === 0) {
+            studentContainer.innerHTML = '<p style="text-align:center; color:#94a3b8;">Tiada pelajar dalam kelas ini</p>';
+        } else {
+            let html = '';
+            for (const student of studentsInClass) {
+                html += `
+                    <div class="student-item-modal">
+                        <div>
+                            <div class="student-name-modal">${escapeHtml(student.fullname)}</div>
+                            <div class="student-ic-modal"><i class="fas fa-id-card"></i> ${escapeHtml(student.icNumber)}</div>
+                        </div>
+                        <div class="student-badge">${escapeHtml(student.class)}</div>
+                    </div>
+                `;
+            }
+            studentContainer.innerHTML = html;
+        }
+        
+        document.getElementById('teacherModal').style.display = 'flex';
+    };
+    
+    window.closeModal = function() {
+        document.getElementById('teacherModal').style.display = 'none';
+    };
+    
+    // Search with suggestions
+    const searchInput = document.getElementById('searchInput');
+    const suggestionsDiv = document.getElementById('suggestions');
+    
+    searchInput.addEventListener('input', (e) => {
+        const query = e.target.value.toLowerCase().trim();
+        searchTerm = query;
+        renderTeachers();
+        
+        if (query.length < 2) {
+            suggestionsDiv.style.display = 'none';
+            return;
+        }
+        
+        const filtered = allTeachers.filter(t => 
+            t.fullname.toLowerCase().includes(query) || 
+            t.icNumber.includes(query)
+        ).slice(0, 8);
+        
+        if (filtered.length === 0) {
+            suggestionsDiv.style.display = 'none';
+            return;
+        }
+        
+        suggestionsDiv.innerHTML = filtered.map(t => `
+            <div class="suggestion-item" onclick="selectTeacher('${t.id}', '${escapeHtml(t.fullname)}')">
+                <div class="suggestion-name">${escapeHtml(t.fullname)}</div>
+                <div class="suggestion-ic"><i class="fas fa-id-card"></i> ${escapeHtml(t.icNumber)} | Kelas: ${escapeHtml(t.teacherClass || '-')}</div>
+            </div>
+        `).join('');
+        suggestionsDiv.style.display = 'block';
+    });
+    
+    window.selectTeacher = function(id, name) {
+        searchInput.value = name;
+        suggestionsDiv.style.display = 'none';
+        searchTerm = name;
+        renderTeachers();
+    };
+    
+    document.addEventListener('click', (e) => {
+        if (!searchInput.contains(e.target) && !suggestionsDiv.contains(e.target)) {
+            suggestionsDiv.style.display = 'none';
+        }
+    });
+    
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, m => m==='&'?'&amp;':m==='<'?'&lt;':'&gt;');
+    }
+    
+    loadAllData();
+</script>
+</body>
+</html>

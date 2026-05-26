@@ -211,7 +211,7 @@
   <div class="orb orb2"></div>
 </div>
 
-<div class="login-container" data-aos="fade-up">
+<div class="login-container">
   <div class="login-header">
     <div class="login-icon">
       <i class="fas fa-graduation-cap"></i>
@@ -230,13 +230,13 @@
       <input type="text" class="input-field" id="icNumber" placeholder="cth: 050101-01-1234" required autocomplete="off">
     </div>
     
-    <button type="submit" class="login-btn" id="submitBtn">
+    <button type="submit" class="login-btn">
       <span>Masuk ke Dashboard</span> <i class="fas fa-arrow-right"></i>
     </button>
   </form>
 
   <div class="back-link">
-    <a href="index.html"><i class="fas fa-arrow-left"></i> Kembali ke Laman Utama</a>
+    <a href="../index.html"><i class="fas fa-arrow-left"></i> Kembali ke Laman Utama</a>
   </div>
   <div class="info-note">
     <i class="fas fa-shield-alt"></i> Data anda dilindungi. Sesi ini hanya untuk pelajar SMK Syed Sirajuddin.
@@ -247,19 +247,14 @@
 <script>
   AOS.init({ once: true, duration: 600 });
 
-  // Fungsi redirect ke dashboard pelajar (page kosong buat sementara waktu)
   function redirectToDashboard(fullname, icNumber) {
-    // Simpan nama sementara jika perlu (boleh guna localStorage atau sessionStorage)
-    // Nanti dashboard boleh ambil data ini
     sessionStorage.setItem('studentName', fullname);
     sessionStorage.setItem('studentIC', icNumber);
     
-    // Redirect ke page dashboard pelajar (page kosong - "dashboard-pelajar.html")
-    // Anda boleh tukar kepada fail yang dikehendaki nanti.
-    window.location.href = "dashboard-pelajar.html";
+    // ✅ PERUBAHAN: redirect ke folder pelajar/dashboard-pelajar.html
+    window.location.href = "pelajar/dashboard-pelajar.html";
   }
 
-  // Validation ringkas (tidak kosong)
   const form = document.getElementById('loginForm');
   const fullnameInput = document.getElementById('fullname');
   const icInput = document.getElementById('icNumber');
@@ -282,26 +277,15 @@
       return;
     }
     
-    // Validation mudah untuk format IC (contoh: 6 digit - 2 digit - 4 digit, atau ringkas)
-    // Optional: bukan validation ketat, hanya pastikan tiada aksara pelik.
     const icPattern = /^[0-9]{2}[0-9]{4}-[0-9]{2}-[0-9]{4}$|^[0-9]{12}$/;
     if (!icPattern.test(icNumber) && icNumber.length < 6) {
-      // warning tapi masih benarkan? tapi lebih baik hint.
       if(!confirm("Nombor Kad Pengenalan tidak mengikut format biasa (cth: 050101-01-1234). Teruskan?")) {
         return;
       }
     }
     
-    // Jika semua ok, redirect ke dashboard kosong
     redirectToDashboard(fullname, icNumber);
   });
 </script>
-
-<!-- NOTA: Halaman "dashboard-pelajar.html" belum dibuat. 
-     Apabila pelajar login, sistem akan redirect ke page tersebut.
-     Anda boleh cipta dashboard-pelajar.html kemudian dan sambung dengan kod yang diperlukan.
-     Sementara itu, jika fail belum wujud, pelayar akan papar ralat 404.
-     Disarankan untuk membuat dahulu dashboard-pelajar.html kosong sebagai placeholder.
--->
 </body>
 </html>

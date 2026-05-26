@@ -330,7 +330,7 @@
       <div class="menu-btn">Urus Akaun Guru <i class="fas fa-arrow-right"></i></div>
     </div>
 
-    <!-- 5. TEMPAHAN KAUNSELING (TAMBAHAN BARU) -->
+    <!-- 5. TEMPAHAN KAUNSELING -->
     <div class="menu-card" data-menu="tempahan-kaunseling">
       <div class="menu-icon"><i class="fas fa-calendar-check"></i></div>
       <h3>Tempahan Kaunseling</h3>
@@ -347,6 +347,7 @@
 <script>
   // ============================================================
   // FUNGSI MEMBUKA HALAMAN MENGIKUT MENU
+  // SEMUA FAIL BERADA DALAM FOLDER YANG SAMA (kaunselor/)
   // ============================================================
   function openMenuPage(menuType) {
     let targetUrl = '';
@@ -362,6 +363,7 @@
         targetUrl = 'akaun-pelajar.html';
         break;
       case 'akaun-guru':
+        // ✅ ARAH KE akaun-guru.html dalam FOLDER YANG SAMA (kaunselor/)
         targetUrl = 'akaun-guru.html';
         break;
       case 'tempahan-kaunseling':

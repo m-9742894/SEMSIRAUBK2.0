@@ -68,7 +68,7 @@
 
     /* main container */
     .dashboard-container {
-      max-width: 1300px;
+      max-width: 1400px;
       margin: 0 auto;
       padding: 2rem 2rem 3rem;
       position: relative;
@@ -155,7 +155,7 @@
       background: linear-gradient(105deg, #4f46e5, #7c3aed);
       border-radius: 1.8rem;
       padding: 1.8rem 2rem;
-      margin-bottom: 2.5rem;
+      margin-bottom: 2rem;
       color: white;
       box-shadow: 0 15px 30px -12px rgba(79,70,229,0.3);
     }
@@ -169,38 +169,38 @@
       font-size: 0.9rem;
     }
 
-    /* menu grid - responsive 5 cards */
+    /* menu grid - responsive 8 cards */
     .menu-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
-      gap: 2rem;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
       margin-top: 1rem;
     }
     .menu-card {
       background: white;
-      border-radius: 1.8rem;
-      padding: 2rem 1.5rem;
+      border-radius: 1.5rem;
+      padding: 1.5rem 1rem;
       transition: all 0.35s ease;
       cursor: pointer;
-      box-shadow: 0 12px 28px -10px rgba(0, 0, 0, 0.08);
+      box-shadow: 0 8px 16px -8px rgba(0, 0, 0, 0.08);
       border: 1px solid rgba(79, 70, 229, 0.1);
       text-align: center;
     }
     .menu-card:hover {
-      transform: translateY(-10px);
-      box-shadow: 0 25px 40px -16px rgba(79, 70, 229, 0.25);
+      transform: translateY(-6px);
+      box-shadow: 0 20px 30px -12px rgba(79, 70, 229, 0.2);
       border-color: rgba(79, 70, 229, 0.3);
     }
     .menu-icon {
-      width: 80px;
-      height: 80px;
+      width: 70px;
+      height: 70px;
       background: linear-gradient(145deg, #eef2ff, #ffffff);
-      margin: 0 auto 1rem;
+      margin: 0 auto 0.8rem;
       display: flex;
       align-items: center;
       justify-content: center;
-      border-radius: 32px;
-      font-size: 2.5rem;
+      border-radius: 28px;
+      font-size: 2rem;
       color: #4f46e5;
       transition: 0.2s;
     }
@@ -209,38 +209,60 @@
       color: white;
     }
     .menu-card h3 {
-      font-size: 1.35rem;
+      font-size: 1.2rem;
       font-weight: 700;
-      margin: 0.8rem 0 0.5rem;
+      margin: 0.5rem 0 0.3rem;
       color: #1f2a44;
     }
     .menu-desc {
-      font-size: 0.8rem;
+      font-size: 0.7rem;
       color: #6c7289;
-      margin-bottom: 1rem;
+      margin-bottom: 0.8rem;
       line-height: 1.4;
     }
     .menu-btn {
       display: inline-flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
       background: #f1f5f9;
-      padding: 0.5rem 1.5rem;
+      padding: 0.4rem 1.2rem;
       border-radius: 40px;
       font-weight: 600;
-      font-size: 0.8rem;
+      font-size: 0.75rem;
       color: #4f46e5;
       transition: 0.2s;
     }
     .menu-card:hover .menu-btn {
       background: #4f46e5;
       color: white;
-      gap: 12px;
+      gap: 10px;
+    }
+
+    /* section divider */
+    .section-divider {
+      margin: 2rem 0 1rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .section-divider h3 {
+      font-size: 1.2rem;
+      color: #1e293b;
+      background: white;
+      padding: 0.3rem 1rem;
+      border-radius: 40px;
+      display: inline-block;
+    }
+    .section-divider hr {
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, #cbd5e1, transparent);
+      border: none;
     }
 
     /* footer */
     .footer {
-      margin-top: 4rem;
+      margin-top: 3rem;
       text-align: center;
       padding-top: 1.5rem;
       border-top: 1px solid rgba(0,0,0,0.05);
@@ -248,7 +270,7 @@
       font-size: 0.75rem;
     }
 
-    @media (max-width: 700px) {
+    @media (max-width: 800px) {
       .dashboard-container {
         padding: 1rem;
       }
@@ -293,10 +315,15 @@
   <!-- Welcome Banner -->
   <div class="welcome-banner">
     <h2><i class="fas fa-hand-sparkles"></i> Selamat kembali, Kaunselor!</h2>
-    <p>Urus data pelajar, guru, keputusan ujian, merit & tempahan kaunseling.</p>
+    <p>Urus data pelajar, guru, kelas & tempahan kaunseling dengan lebih efisien.</p>
   </div>
 
-  <!-- Menu Grid (5 menu) -->
+  <!-- ==================== SECTION 1: URUSAN UTAMA ==================== -->
+  <div class="section-divider">
+    <h3><i class="fas fa-cog"></i> Urusan Utama</h3>
+    <hr>
+  </div>
+
   <div class="menu-grid">
     <!-- 1. KEPUTUSAN UJIAN INVENTORI -->
     <div class="menu-card" data-menu="keputusan-ujian">
@@ -322,12 +349,12 @@
       <div class="menu-btn">Urus Akaun <i class="fas fa-arrow-right"></i></div>
     </div>
 
-    <!-- 4. AKAUN GURU - REDIRECT KE akaun-guru.html (FOLDER SAMA) -->
+    <!-- 4. AKAUN GURU -->
     <div class="menu-card" data-menu="akaun-guru">
       <div class="menu-icon"><i class="fas fa-chalkboard-user"></i></div>
       <h3>Akaun Guru</h3>
       <div class="menu-desc">Urus profil guru, akses sistem & maklumat peribadi guru.</div>
-      <div class="menu-btn">Urus Akaun Guru <i class="fas fa-arrow-right"></i></div>
+      <div class="menu-btn">Urus Akaun <i class="fas fa-arrow-right"></i></div>
     </div>
 
     <!-- 5. TEMPAHAN KAUNSELING -->
@@ -336,6 +363,38 @@
       <h3>Tempahan Kaunseling</h3>
       <div class="menu-desc">Urus temujanji pelajar, semak & sahkan tempahan sesi kaunseling.</div>
       <div class="menu-btn">Urus Tempahan <i class="fas fa-arrow-right"></i></div>
+    </div>
+  </div>
+
+  <!-- ==================== SECTION 2: KESELURUHAN DATA ==================== -->
+  <div class="section-divider">
+    <h3><i class="fas fa-database"></i> Keseluruhan Data</h3>
+    <hr>
+  </div>
+
+  <div class="menu-grid">
+    <!-- 6. KESELURUHAN GURU (BARU) -->
+    <div class="menu-card" data-menu="keseluruhan-guru">
+      <div class="menu-icon"><i class="fas fa-user-tie"></i></div>
+      <h3>Keseluruhan Guru</h3>
+      <div class="menu-desc">Lihat senarai keseluruhan guru yang berdaftar di sekolah.</div>
+      <div class="menu-btn">Lihat Semua <i class="fas fa-arrow-right"></i></div>
+    </div>
+
+    <!-- 7. KESELURUHAN MURID (BARU) -->
+    <div class="menu-card" data-menu="keseluruhan-murid">
+      <div class="menu-icon"><i class="fas fa-user-graduate"></i></div>
+      <h3>Keseluruhan Murid</h3>
+      <div class="menu-desc">Lihat senarai keseluruhan murid yang berdaftar di sekolah.</div>
+      <div class="menu-btn">Lihat Semua <i class="fas fa-arrow-right"></i></div>
+    </div>
+
+    <!-- 8. KESELURUHAN KELAS (BARU) -->
+    <div class="menu-card" data-menu="keseluruhan-kelas">
+      <div class="menu-icon"><i class="fas fa-building"></i></div>
+      <h3>Keseluruhan Kelas</h3>
+      <div class="menu-desc">Lihat senarai keseluruhan kelas yang ada di sekolah.</div>
+      <div class="menu-btn">Lihat Semua <i class="fas fa-arrow-right"></i></div>
     </div>
   </div>
 
@@ -353,6 +412,7 @@
     let targetUrl = '';
 
     switch(menuType) {
+      // Urusan Utama
       case 'keputusan-ujian':
         targetUrl = 'keputusan-ujian.html';
         break;
@@ -363,12 +423,23 @@
         targetUrl = 'akaun-pelajar.html';
         break;
       case 'akaun-guru':
-        // ✅ ARAH KE akaun-guru.html dalam FOLDER YANG SAMA (kaunselor/)
         targetUrl = 'akaun-guru.html';
         break;
       case 'tempahan-kaunseling':
         targetUrl = 'tempahan-kaunseling.html';
         break;
+      
+      // Keseluruhan Data (BARU)
+      case 'keseluruhan-guru':
+        targetUrl = 'keseluruhan-guru.html';
+        break;
+      case 'keseluruhan-murid':
+        targetUrl = 'keseluruhan-murid.html';
+        break;
+      case 'keseluruhan-kelas':
+        targetUrl = 'keseluruhan-kelas.html';
+        break;
+      
       default:
         return;
     }

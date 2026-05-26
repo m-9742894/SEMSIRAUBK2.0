@@ -169,7 +169,7 @@
       font-size: 0.9rem;
     }
 
-    /* menu grid - responsive 8 cards */
+    /* menu grid - responsive 9 cards */
     .menu-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -315,7 +315,7 @@
   <!-- Welcome Banner -->
   <div class="welcome-banner">
     <h2><i class="fas fa-hand-sparkles"></i> Selamat kembali, Kaunselor!</h2>
-    <p>Urus data pelajar, guru, kelas & tempahan kaunseling dengan lebih efisien.</p>
+    <p>Urus data pelajar, guru, kelas, merit & tempahan kaunseling dengan lebih efisien.</p>
   </div>
 
   <!-- ==================== SECTION 1: URUSAN UTAMA ==================== -->
@@ -337,19 +337,27 @@
     <div class="menu-card" data-menu="mata-merit">
       <div class="menu-icon"><i class="fas fa-star"></i></div>
       <h3>Mata Merit Pelajar</h3>
-      <div class="menu-desc">Semak, tambah & urus rekod merit kokurikulum dan sahsiah pelajar.</div>
-      <div class="menu-btn">Urus Merit <i class="fas fa-arrow-right"></i></div>
+      <div class="menu-desc">Semak rekod merit kokurikulum dan sahsiah pelajar.</div>
+      <div class="menu-btn">Lihat Merit <i class="fas fa-arrow-right"></i></div>
     </div>
 
-    <!-- 3. AKAUN PELAJAR -->
+    <!-- 3. DAFTAR MERIT PELAJAR (BARU) -->
+    <div class="menu-card" data-menu="daftar-merit">
+      <div class="menu-icon"><i class="fas fa-plus-circle"></i></div>
+      <h3>Daftar Merit Pelajar</h3>
+      <div class="menu-desc">Tambah rekod merit untuk pelajar.</div>
+      <div class="menu-btn">Daftar Merit <i class="fas fa-arrow-right"></i></div>
+    </div>
+
+    <!-- 4. AKAUN PELAJAR -->
     <div class="menu-card" data-menu="akaun-pelajar">
       <div class="menu-icon"><i class="fas fa-users"></i></div>
       <h3>Akaun Pelajar</h3>
-      <div class="menu-desc">Kelola profil pelajar, kata laluan & maklumat peribadi.</div>
+      <div class="menu-desc">Kelola profil pelajar & maklumat peribadi.</div>
       <div class="menu-btn">Urus Akaun <i class="fas fa-arrow-right"></i></div>
     </div>
 
-    <!-- 4. AKAUN GURU -->
+    <!-- 5. AKAUN GURU -->
     <div class="menu-card" data-menu="akaun-guru">
       <div class="menu-icon"><i class="fas fa-chalkboard-user"></i></div>
       <h3>Akaun Guru</h3>
@@ -357,7 +365,7 @@
       <div class="menu-btn">Urus Akaun <i class="fas fa-arrow-right"></i></div>
     </div>
 
-    <!-- 5. TEMPAHAN KAUNSELING -->
+    <!-- 6. TEMPAHAN KAUNSELING -->
     <div class="menu-card" data-menu="tempahan-kaunseling">
       <div class="menu-icon"><i class="fas fa-calendar-check"></i></div>
       <h3>Tempahan Kaunseling</h3>
@@ -373,7 +381,7 @@
   </div>
 
   <div class="menu-grid">
-    <!-- 6. KESELURUHAN GURU (BARU) -->
+    <!-- 7. KESELURUHAN GURU -->
     <div class="menu-card" data-menu="keseluruhan-guru">
       <div class="menu-icon"><i class="fas fa-user-tie"></i></div>
       <h3>Keseluruhan Guru</h3>
@@ -381,7 +389,7 @@
       <div class="menu-btn">Lihat Semua <i class="fas fa-arrow-right"></i></div>
     </div>
 
-    <!-- 7. KESELURUHAN MURID (BARU) -->
+    <!-- 8. KESELURUHAN MURID -->
     <div class="menu-card" data-menu="keseluruhan-murid">
       <div class="menu-icon"><i class="fas fa-user-graduate"></i></div>
       <h3>Keseluruhan Murid</h3>
@@ -389,7 +397,7 @@
       <div class="menu-btn">Lihat Semua <i class="fas fa-arrow-right"></i></div>
     </div>
 
-    <!-- 8. KESELURUHAN KELAS (BARU) -->
+    <!-- 9. KESELURUHAN KELAS -->
     <div class="menu-card" data-menu="keseluruhan-kelas">
       <div class="menu-icon"><i class="fas fa-building"></i></div>
       <h3>Keseluruhan Kelas</h3>
@@ -419,6 +427,9 @@
       case 'mata-merit':
         targetUrl = 'mata-merit.html';
         break;
+      case 'daftar-merit':
+        targetUrl = 'daftar-merit.html';
+        break;
       case 'akaun-pelajar':
         targetUrl = 'akaun-pelajar.html';
         break;
@@ -429,7 +440,7 @@
         targetUrl = 'tempahan-kaunseling.html';
         break;
       
-      // Keseluruhan Data (BARU)
+      // Keseluruhan Data
       case 'keseluruhan-guru':
         targetUrl = 'keseluruhan-guru.html';
         break;

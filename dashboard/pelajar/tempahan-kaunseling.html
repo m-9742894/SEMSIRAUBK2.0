@@ -12,42 +12,51 @@
     
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: linear-gradient(135deg, #e0e7ff 0%, #f3e8ff 100%); min-height: 100vh; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: linear-gradient(135deg, #e0e7ff 0%, #f3e8ff 100%); min-height: 100vh; padding: 20px; }
         
-        .navbar { background: white; box-shadow: 0 2px 10px rgba(0,0,0,0.1); padding: 15px 0; position: sticky; top: 0; z-index: 1000; }
-        .nav-container { max-width: 1300px; margin: 0 auto; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; }
-        .logo { display: flex; align-items: center; gap: 12px; }
-        .logo-icon { background: linear-gradient(145deg, #4f46e5, #7c3aed); width: 45px; height: 45px; border-radius: 28px; display: flex; align-items: center; justify-content: center; }
-        .logo-icon i { font-size: 1.5rem; color: white; }
-        .logo h1 { font-size: 1.2rem; color: #1e293b; }
-        .logo p { font-size: 0.7rem; color: #5b6e8c; }
+        .container { max-width: 1400px; margin: 0 auto; }
+        
+        /* Header */
+        .header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 2px solid rgba(79,70,229,0.2); }
+        .logo-area { display: flex; align-items: center; gap: 1rem; }
+        .logo-icon { background: linear-gradient(145deg, #4f46e5, #7c3aed); width: 50px; height: 50px; border-radius: 28px; display: flex; align-items: center; justify-content: center; }
+        .logo-icon i { font-size: 1.8rem; color: white; }
+        .logo-text h1 { font-size: 1.5rem; font-weight: 800; background: linear-gradient(135deg, #1e293b, #4f46e5); -webkit-background-clip: text; background-clip: text; color: transparent; }
+        .back-btn { background: #eef2ff; border: none; padding: 0.6rem 1.2rem; border-radius: 40px; cursor: pointer; font-weight: 600; color: #4f46e5; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; }
         .user-profile { display: flex; align-items: center; gap: 12px; background: #f1f5f9; padding: 8px 18px; border-radius: 50px; }
-        .user-profile i { color: #4f46e5; font-size: 18px; }
-        .user-profile span { font-weight: 600; color: #1e293b; }
+        .user-profile span { font-weight: 600; }
         .btn-logout { background: #fee2e2; border: none; color: #dc2626; padding: 6px 12px; border-radius: 40px; cursor: pointer; font-weight: 600; font-size: 0.7rem; }
-        .back-btn { background: #eef2ff; border: none; padding: 0.5rem 1.2rem; border-radius: 40px; cursor: pointer; font-weight: 600; color: #4f46e5; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; }
-        .back-btn:hover { background: #4f46e5; color: white; }
-        .page-header { background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); color: white; padding: 30px 20px; text-align: center; margin-bottom: 30px; }
+        
+        /* Page Header */
+        .page-header { background: linear-gradient(135deg, #4f46e5, #7c3aed); color: white; padding: 30px 20px; text-align: center; border-radius: 24px; margin-bottom: 30px; }
         .page-header h1 { font-size: 1.8rem; margin-bottom: 8px; }
-        .booking-container { max-width: 1300px; margin: 0 auto; padding: 0 20px 50px; display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
-        .calendar-section, .booking-list-section { background: white; border-radius: 1.5rem; padding: 1.5rem; box-shadow: 0 8px 20px -8px rgba(0,0,0,0.08); }
-        .calendar-section h3, .booking-list-section h3 { font-size: 1.2rem; color: #1e293b; margin-bottom: 1rem; }
-        .fc-day-disabled { background: #fee2e2 !important; opacity: 0.6; cursor: not-allowed !important; }
-        .legend { margin-top: 20px; padding-top: 15px; border-top: 1px solid #e2e8f0; display: flex; gap: 20px; flex-wrap: wrap; }
-        .legend-item { display: flex; align-items: center; gap: 8px; font-size: 0.7rem; }
+        
+        /* Two Columns */
+        .two-columns { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
+        @media (max-width: 900px) { .two-columns { grid-template-columns: 1fr; } }
+        
+        /* Cards */
+        .card { background: white; border-radius: 1.5rem; padding: 1.5rem; box-shadow: 0 8px 20px -8px rgba(0,0,0,0.08); }
+        .card h3 { font-size: 1.2rem; color: #1e293b; margin-bottom: 1rem; display: flex; align-items: center; gap: 10px; }
+        .card h3 i { color: #4f46e5; }
+        
+        /* Calendar */
+        .fc-day-disabled { background: #fee2e2 !important; cursor: not-allowed !important; }
+        .legend { margin-top: 20px; display: flex; gap: 20px; flex-wrap: wrap; font-size: 0.7rem; }
         .legend-color { width: 18px; height: 18px; border-radius: 4px; }
         .legend-color.holiday { background: #fee2e2; border: 1px solid #dc2626; }
         .legend-color.available { background: #28a745; }
-        .time-slots { margin-top: 20px; padding-top: 15px; border-top: 1px solid #e2e8f0; }
-        .selected-info { background: #eef2ff; padding: 12px; border-radius: 12px; margin-bottom: 15px; }
+        
+        /* Form */
         .form-group { margin-bottom: 1rem; }
         .form-group label { display: block; font-weight: 600; font-size: 0.8rem; margin-bottom: 0.4rem; color: #1e293b; }
         .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 0.7rem; border: 1.5px solid #e2e8f0; border-radius: 0.8rem; font-family: inherit; outline: none; }
-        .form-group input:focus, .form-group textarea:focus, .form-group select:focus { border-color: #4f46e5; }
-        .radio-group { display: flex; gap: 1rem; align-items: center; }
-        .radio-group label { display: flex; align-items: center; gap: 0.5rem; font-weight: normal; cursor: pointer; }
-        .btn-book { width: 100%; padding: 12px; background: linear-gradient(95deg, #4f46e5, #7c3aed); color: white; border: none; border-radius: 40px; font-weight: 600; cursor: pointer; margin-top: 15px; }
-        .btn-book:hover { transform: translateY(-2px); }
+        .radio-group { display: flex; gap: 1rem; }
+        .btn-submit { width: 100%; padding: 12px; background: linear-gradient(95deg, #4f46e5, #7c3aed); color: white; border: none; border-radius: 40px; font-weight: 600; cursor: pointer; margin-top: 10px; }
+        .btn-submit:hover { transform: translateY(-2px); }
+        
+        /* Booking List */
+        .booking-list { max-height: 600px; overflow-y: auto; }
         .booking-item { background: #f8fafc; border-radius: 1rem; padding: 1rem; margin-bottom: 1rem; border: 1px solid #e2e8f0; }
         .booking-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-bottom: 8px; }
         .booking-date { font-weight: 700; color: #1e293b; }
@@ -56,467 +65,327 @@
         .status-approved { background: #dcfce7; color: #166534; }
         .status-rejected { background: #fee2e2; color: #dc2626; }
         .status-postponed { background: #e0e7ff; color: #4f46e5; }
-        .booking-details { font-size: 0.8rem; color: #5b6e8c; margin: 8px 0; line-height: 1.5; }
+        .booking-detail { font-size: 0.8rem; color: #5b6e8c; margin: 6px 0; display: flex; align-items: flex-start; gap: 8px; }
+        .booking-detail i { width: 18px; color: #4f46e5; margin-top: 2px; }
         .booking-message { background: #f1f5f9; border-radius: 0.8rem; padding: 10px; margin-top: 8px; font-size: 0.75rem; }
-        .btn-edit, .btn-delete { padding: 6px 14px; border-radius: 40px; font-size: 0.7rem; font-weight: 600; cursor: pointer; border: none; margin-right: 8px; }
+        .btn-edit, .btn-delete { padding: 5px 12px; border-radius: 40px; font-size: 0.7rem; font-weight: 600; cursor: pointer; border: none; margin-right: 6px; }
         .btn-edit { background: #e0e7ff; color: #4f46e5; }
         .btn-delete { background: #fee2e2; color: #dc2626; }
-        .empty-booking { text-align: center; padding: 40px; color: #94a3b8; }
+        .empty-state { text-align: center; padding: 40px; color: #94a3b8; }
         .alert { padding: 12px; border-radius: 12px; margin-bottom: 15px; font-size: 0.8rem; display: none; }
-        .alert.error { background: #fee2e2; color: #dc2626; display: block; }
         .alert.success { background: #dcfce7; color: #166534; display: block; }
-        @media (max-width: 900px) { .booking-container { grid-template-columns: 1fr; } }
+        .alert.error { background: #fee2e2; color: #dc2626; display: block; }
+        
+        /* Modal */
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2000; display: flex; align-items: center; justify-content: center; padding: 20px; }
+        .modal-content { max-width: 500px; width: 100%; background: white; border-radius: 1.5rem; }
+        .modal-header { padding: 1rem; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; }
+        .modal-body { padding: 1rem; }
+        .modal-btn { width: 100%; padding: 0.8rem; background: #4f46e5; color: white; border: none; border-radius: 2rem; font-weight: 600; cursor: pointer; margin-top: 1rem; }
     </style>
 </head>
 <body>
-    <nav class="navbar">
-        <div class="nav-container">
-            <div class="logo">
-                <div class="logo-icon"><i class="fas fa-calendar-check"></i></div>
-                <div><h1>E-MindCare SEMSIRA</h1><p>Tempahan Kaunseling</p></div>
-            </div>
-            <div style="display: flex; gap: 1rem; align-items: center;">
-                <a href="dashboard-pelajar.html" class="back-btn"><i class="fas fa-arrow-left"></i> Kembali</a>
-                <div class="user-profile">
-                    <i class="fas fa-user-circle"></i>
-                    <span id="userNameDisplay">Pelajar</span>
-                    <button class="btn-logout" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Log Keluar</button>
-                </div>
-            </div>
+<div class="container">
+    <div class="header">
+        <div class="logo-area">
+            <div class="logo-icon"><i class="fas fa-calendar-check"></i></div>
+            <div class="logo-text"><h1>E-MindCare SEMSIRA</h1></div>
         </div>
-    </nav>
-    
-    <div class="page-header">
-        <h1><i class="fas fa-calendar-check"></i> Tempahan Kaunseling</h1>
-        <p>Pilih tarikh, kaunselor dan buat temujanji</p>
+        <div style="display: flex; gap: 1rem; align-items: center;">
+            <a href="dashboard-pelajar.html" class="back-btn"><i class="fas fa-arrow-left"></i> Kembali</a>
+            <div class="user-profile"><i class="fas fa-user-circle"></i><span id="userNameDisplay">Pelajar</span><button class="btn-logout" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Log Keluar</button></div>
+        </div>
     </div>
     
-    <div class="booking-container">
-        <div class="calendar-section">
+    <div class="page-header"><h1><i class="fas fa-calendar-check"></i> Tempahan Kaunseling</h1><p>Pilih tarikh, kaunselor dan buat temujanji</p></div>
+    
+    <div class="two-columns">
+        <!-- Left: Calendar -->
+        <div class="card">
             <h3><i class="fas fa-calendar-alt"></i> Kalendar Tempahan</h3>
             <div id="alertMessage" class="alert"></div>
             <div id="calendar"></div>
             <div class="legend">
                 <div class="legend-item"><div class="legend-color holiday"></div><span>Cuti / Hari Tutup</span></div>
-                <div class="legend-item"><div class="legend-color available" style="background: #28a745;"></div><span>Tarikh Boleh Tempah</span></div>
+                <div class="legend-item"><div class="legend-color available" style="background:#28a745;"></div><span>Tarikh Boleh Tempah</span></div>
             </div>
-            <div id="formSection" style="display: none;">
-                <div class="time-slots">
-                    <h4><i class="fas fa-clock"></i> Maklumat Temujanji:</h4>
-                    <div class="selected-info"><p><strong>Tarikh Dipilih:</strong> <span id="selectedDateDisplay"></span></p></div>
-                    <div class="form-group">
-                        <label><i class="fas fa-user-tie"></i> Pilih Kaunselor</label>
-                        <select id="counselorSelect">
-                            <option value="">-- Pilih Kaunselor --</option>
-                            <option value="Cikgu Akhmar">Cikgu Akhmar</option>
-                            <option value="Cikgu Zalina">Cikgu Zalina</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label><i class="fas fa-share-alt"></i> Perkara yang ingin dikongsikan</label>
-                        <textarea id="topic" rows="3" placeholder="Ceritakan secara ringkas perkara yang ingin anda bincangkan..."></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label><i class="fas fa-heart"></i> Bagaimana perasaan anda kebelakangan ini?</label>
-                        <textarea id="feelings" rows="2" placeholder="Contoh: Saya berasa tertekan dengan pelajaran..."></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label><i class="fas fa-clock"></i> Adakah anda ingin berjumpa dengan segera?</label>
-                        <div class="radio-group">
-                            <label><input type="radio" name="urgent" value="ya"> Ya, perlu segera</label>
-                            <label><input type="radio" name="urgent" value="tidak"> Tidak, ikut jadual</label>
-                        </div>
-                    </div>
-                    <button class="btn-book" id="bookBtn"><i class="fas fa-paper-plane"></i> Hantar Permohonan</button>
+            
+            <div id="formSection" style="display: none; margin-top: 20px;">
+                <div style="background:#eef2ff; padding:12px; border-radius:12px; margin-bottom:15px;">
+                    <p><strong>Tarikh Dipilih:</strong> <span id="selectedDateDisplay"></span></p>
                 </div>
+                <div class="form-group">
+                    <label><i class="fas fa-user-tie"></i> Pilih Kaunselor</label>
+                    <select id="counselorSelect">
+                        <option value="">-- Pilih Kaunselor --</option>
+                        <option value="Cikgu Akhmar">Cikgu Akhmar</option>
+                        <option value="Cikgu Zalina">Cikgu Zalina</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-share-alt"></i> Perkara yang ingin dikongsikan</label>
+                    <textarea id="topic" rows="3" placeholder="Ceritakan secara ringkas..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-heart"></i> Bagaimana perasaan anda kebelakangan ini?</label>
+                    <textarea id="feelings" rows="2" placeholder="Contoh: Saya berasa tertekan..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-clock"></i> Perlu berjumpa dengan segera?</label>
+                    <div class="radio-group"><label><input type="radio" name="urgent" value="ya"> Ya</label><label><input type="radio" name="urgent" value="tidak"> Tidak</label></div>
+                </div>
+                <button class="btn-submit" id="bookBtn"><i class="fas fa-paper-plane"></i> Hantar Permohonan</button>
             </div>
         </div>
         
-        <div class="booking-list-section">
+        <!-- Right: Booking List -->
+        <div class="card">
             <h3><i class="fas fa-list-alt"></i> Senarai Permohonan Saya</h3>
-            <div id="bookingList">
-                <div class="empty-booking"><i class="fas fa-spinner fa-pulse"></i> Memuatkan...</div>
+            <div id="bookingListContainer" class="booking-list">
+                <div class="empty-state"><i class="fas fa-spinner fa-pulse"></i> Memuatkan...</div>
             </div>
         </div>
     </div>
+</div>
+
+<!-- Edit Modal -->
+<div id="editModal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <div class="modal-header"><h3><i class="fas fa-edit"></i> Edit Permohonan</h3><button onclick="closeEditModal()" style="background:none;border:none;font-size:1.5rem;cursor:pointer;">&times;</button></div>
+        <div class="modal-body">
+            <form id="editForm">
+                <input type="hidden" id="editId">
+                <div class="form-group"><label>Kaunselor</label><select id="editCounselor" required><option value="Cikgu Akhmar">Cikgu Akhmar</option><option value="Cikgu Zalina">Cikgu Zalina</option></select></div>
+                <div class="form-group"><label>Perkara dikongsi</label><textarea id="editTopic" rows="3" required></textarea></div>
+                <div class="form-group"><label>Perasaan</label><textarea id="editFeelings" rows="2" required></textarea></div>
+                <div class="form-group"><label>Perlu segera?</label><div class="radio-group"><label><input type="radio" name="editUrgent" value="ya"> Ya</label><label><input type="radio" name="editUrgent" value="tidak"> Tidak</label></div></div>
+                <button type="submit" class="modal-btn"><i class="fas fa-save"></i> Simpan Perubahan</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, collection, addDoc, getDocs, deleteDoc, updateDoc, doc, query, where, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
     
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, getDocs, deleteDoc, updateDoc, doc, query, where, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-        
-        const firebaseConfig = {
-            apiKey: "AIzaSyCfu7XC8pXtpDyQ-9Cjdg4AobA-EVEwWcc",
-            authDomain: "e-mindcare.firebaseapp.com",
-            projectId: "e-mindcare",
-            storageBucket: "e-mindcare.firebasestorage.app",
-            messagingSenderId: "1021883944936",
-            appId: "1:1021883944936:web:39c75a0c98d19a37afde5d",
-            measurementId: "G-3CJVKWGEXV"
-        };
-        
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-        const appointmentsCollection = collection(db, "appointments");
-        const holidaysCollection = collection(db, "holidays");
-        
-        // Get student info from sessionStorage
-        const studentName = sessionStorage.getItem('studentName') || 'Pelajar';
-        const studentIC = sessionStorage.getItem('studentIC') || '';
-        document.getElementById('userNameDisplay').innerText = studentName;
-        
-        console.log("Student IC:", studentIC);
-        console.log("Student Name:", studentName);
-        
-        let calendar = null;
-        let selectedDate = null;
-        let holidays = [];
-        
-        // Load holidays from Firebase
-        async function loadHolidays() {
-            try {
-                const querySnapshot = await getDocs(holidaysCollection);
-                holidays = [];
-                querySnapshot.forEach((doc) => {
-                    holidays.push(doc.data().date);
-                });
-                console.log("Holidays loaded:", holidays);
-                if (calendar) calendar.refetchEvents();
-            } catch (error) { 
-                console.error("Error loading holidays:", error);
+    const firebaseConfig = {
+        apiKey: "AIzaSyCfu7XC8pXtpDyQ-9Cjdg4AobA-EVEwWcc",
+        authDomain: "e-mindcare.firebaseapp.com",
+        projectId: "e-mindcare",
+        storageBucket: "e-mindcare.firebasestorage.app",
+        messagingSenderId: "1021883944936",
+        appId: "1:1021883944936:web:39c75a0c98d19a37afde5d",
+        measurementId: "G-3CJVKWGEXV"
+    };
+    
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const appointmentsCollection = collection(db, "appointments");
+    const holidaysCollection = collection(db, "holidays");
+    
+    const studentName = sessionStorage.getItem('studentName') || 'Pelajar';
+    const studentIC = sessionStorage.getItem('studentIC') || '';
+    document.getElementById('userNameDisplay').innerText = studentName;
+    
+    console.log("Student IC:", studentIC, "Student Name:", studentName);
+    
+    let calendar = null;
+    let selectedDate = null;
+    let holidays = [];
+    let myBookings = [];
+    
+    // Load holidays
+    async function loadHolidays() {
+        try {
+            const snapshot = await getDocs(holidaysCollection);
+            holidays = [];
+            snapshot.forEach(doc => holidays.push(doc.data().date));
+        } catch(e) { console.error(e); }
+    }
+    
+    function isHoliday(dateStr) { return holidays.includes(dateStr); }
+    
+    // Load my bookings
+    async function loadMyBookings() {
+        const container = document.getElementById('bookingListContainer');
+        try {
+            const q = query(appointmentsCollection, where("studentIC", "==", studentIC), orderBy("createdAt", "desc"));
+            const snapshot = await getDocs(q);
+            myBookings = [];
+            snapshot.forEach(doc => myBookings.push({ id: doc.id, ...doc.data() }));
+            
+            console.log("My bookings:", myBookings);
+            
+            if (myBookings.length === 0) {
+                container.innerHTML = '<div class="empty-state"><i class="fas fa-calendar-times"></i><p>Tiada permohonan lagi</p><p style="font-size:12px;">Klik pada tarikh di kalendar untuk membuat permohonan</p></div>';
+                return;
             }
-        }
-        
-        function isDateHoliday(dateStr) { 
-            return holidays.includes(dateStr); 
-        }
-        
-        // Initialize calendar
-        function initCalendar() {
-            const calendarEl = document.getElementById('calendar');
-            calendar = new FullCalendar.Calendar(calendarEl, {
-                initialView: 'dayGridMonth',
-                headerToolbar: { left: 'prev,next today', center: 'title', right: 'dayGridMonth' },
-                height: 'auto',
-                firstDay: 1,
-                locale: 'ms',
-                buttonText: { today: 'Hari Ini', month: 'Bulan' },
-                dayCellDidMount: function(info) {
-                    const year = info.date.getFullYear();
-                    const month = String(info.date.getMonth() + 1).padStart(2, '0');
-                    const day = String(info.date.getDate()).padStart(2, '0');
-                    const dateStr = `${year}-${month}-${day}`;
-                    
-                    if (isDateHoliday(dateStr)) {
-                        info.el.classList.add('fc-day-disabled');
-                        info.el.style.backgroundColor = '#fee2e2';
-                        info.el.style.cursor = 'not-allowed';
-                    }
-                    
-                    const today = new Date();
-                    today.setHours(0, 0, 0, 0);
-                    if (info.date < today) {
-                        info.el.classList.add('fc-day-disabled');
-                        info.el.style.backgroundColor = '#f5f5f5';
-                    }
-                },
-                dateClick: function(info) {
-                    const year = info.date.getFullYear();
-                    const month = String(info.date.getMonth() + 1).padStart(2, '0');
-                    const day = String(info.date.getDate()).padStart(2, '0');
-                    const dateStr = `${year}-${month}-${day}`;
-                    
-                    const today = new Date();
-                    today.setHours(0, 0, 0, 0);
-                    
-                    if (isDateHoliday(dateStr) || info.date < today) {
-                        showAlert('Tarikh ini tidak boleh dipilih (Cuti/Telah Berlalu)', 'error');
-                        return;
-                    }
-                    
-                    selectedDate = dateStr;
-                    document.getElementById('selectedDateDisplay').innerHTML = formatDate(selectedDate);
-                    document.getElementById('formSection').style.display = 'block';
-                    document.getElementById('alertMessage').style.display = 'none';
-                    
-                    // Highlight selected date
-                    if (calendar) {
-                        calendar.getEvents().forEach(event => {
-                            if (event.title === 'Selected') event.remove();
-                        });
-                        calendar.addEvent({
-                            title: 'Selected',
-                            start: dateStr,
-                            display: 'background',
-                            backgroundColor: '#4f46e5',
-                            opacity: 0.3
-                        });
-                    }
+            
+            let html = '';
+            for (const b of myBookings) {
+                let statusClass = 'status-pending';
+                let statusText = '⏳ Dalam Semakan';
+                if (b.status === 'approved') { statusClass = 'status-approved'; statusText = '✅ Diluluskan'; }
+                else if (b.status === 'rejected') { statusClass = 'status-rejected'; statusText = '❌ Ditolak'; }
+                else if (b.status === 'postponed') { statusClass = 'status-postponed'; statusText = '🔄 Ditangguhkan'; }
+                
+                html += `<div class="booking-item">
+                    <div class="booking-header">
+                        <span class="booking-date"><i class="fas fa-calendar"></i> ${formatDate(b.requestedDate)}</span>
+                        <span class="status-badge ${statusClass}">${statusText}</span>
+                    </div>
+                    <div class="booking-detail"><i class="fas fa-user-tie"></i> <strong>Kaunselor:</strong> ${escapeHtml(b.counselor || '-')}</div>
+                    <div class="booking-detail"><i class="fas fa-share-alt"></i> <strong>Perkara:</strong> ${escapeHtml(b.topic || '-')}</div>
+                    <div class="booking-detail"><i class="fas fa-heart"></i> <strong>Perasaan:</strong> ${escapeHtml(b.feelings || '-')}</div>
+                    <div class="booking-detail"><i class="fas fa-clock"></i> <strong>Perlu segera:</strong> ${b.urgent === 'ya' ? 'Ya' : 'Tidak'}</div>`;
+                
+                if (b.status === 'approved' && b.appointmentDate) {
+                    html += `<div class="booking-message" style="background:#dcfce7;"><i class="fas fa-calendar-check"></i> <strong>Temujanji:</strong> ${formatDate(b.appointmentDate)} ${b.appointmentTime ? `⏰ ${b.appointmentTime}` : ''}<br>📍 ${b.location || 'Bilik Kaunseling'}</div>`;
+                } else if (b.status === 'postponed' && b.newDate) {
+                    html += `<div class="booking-message" style="background:#e0e7ff;"><i class="fas fa-clock"></i> <strong>Ditangguhkan ke:</strong> ${formatDate(b.newDate)}<br>💬 ${escapeHtml(b.message || 'Sila buat permohonan baru')}</div>`;
+                } else if (b.status === 'rejected' && b.reason) {
+                    html += `<div class="booking-message" style="background:#fee2e2;"><i class="fas fa-times-circle"></i> <strong>Sebab Ditolak:</strong> ${escapeHtml(b.reason)}</div>`;
                 }
+                
+                if (b.status === 'pending') {
+                    html += `<div style="margin-top:10px;"><button class="btn-edit" onclick="openEditModal('${b.id}')"><i class="fas fa-edit"></i> Edit</button>
+                    <button class="btn-delete" onclick="deleteBooking('${b.id}')"><i class="fas fa-trash"></i> Hapus</button></div>`;
+                }
+                html += `</div>`;
+            }
+            container.innerHTML = html;
+        } catch(e) {
+            console.error("Error loading bookings:", e);
+            container.innerHTML = '<div class="empty-state"><p style="color:#dc2626;">Ralat memuat data. Sila refresh.</p></div>';
+        }
+    }
+    
+    // Create booking
+    async function createBooking() {
+        const counselor = document.getElementById('counselorSelect').value;
+        const topic = document.getElementById('topic').value.trim();
+        const feelings = document.getElementById('feelings').value.trim();
+        const urgent = document.querySelector('input[name="urgent"]:checked')?.value;
+        
+        if (!selectedDate) { showAlert('Pilih tarikh', 'error'); return; }
+        if (!counselor) { showAlert('Pilih kaunselor', 'error'); return; }
+        if (!topic) { showAlert('Isi perkara dikongsi', 'error'); return; }
+        if (!feelings) { showAlert('Isi perasaan anda', 'error'); return; }
+        if (!urgent) { showAlert('Pilih perlu segera atau tidak', 'error'); return; }
+        
+        const btn = document.getElementById('bookBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Menghantar...';
+        
+        try {
+            await addDoc(appointmentsCollection, {
+                studentName, studentIC, requestedDate: selectedDate,
+                counselor, topic, feelings, urgent,
+                status: 'pending', createdAt: new Date().toISOString()
             });
-            calendar.render();
+            showAlert('✅ Permohonan berjaya dihantar!', 'success');
+            
+            // Reset form
+            document.getElementById('counselorSelect').value = '';
+            document.getElementById('topic').value = '';
+            document.getElementById('feelings').value = '';
+            document.querySelectorAll('input[name="urgent"]').forEach(r => r.checked = false);
+            document.getElementById('formSection').style.display = 'none';
+            if (calendar) calendar.getEvents().forEach(e => { if(e.title === 'Selected') e.remove(); });
+            selectedDate = null;
+            await loadMyBookings();
+        } catch(e) {
+            console.error(e);
+            showAlert('❌ Gagal hantar permohonan', 'error');
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-paper-plane"></i> Hantar Permohonan';
         }
-        
-        // Load all bookings for this student
-        async function loadBookings() {
-            const container = document.getElementById('bookingList');
+    }
+    
+    // Edit booking
+    window.openEditModal = function(id) {
+        const booking = myBookings.find(b => b.id === id);
+        if (!booking) return;
+        document.getElementById('editId').value = id;
+        document.getElementById('editCounselor').value = booking.counselor || '';
+        document.getElementById('editTopic').value = booking.topic || '';
+        document.getElementById('editFeelings').value = booking.feelings || '';
+        if (booking.urgent === 'ya') document.querySelector('input[name="editUrgent"][value="ya"]').checked = true;
+        else document.querySelector('input[name="editUrgent"][value="tidak"]').checked = true;
+        document.getElementById('editModal').style.display = 'flex';
+    };
+    
+    window.closeEditModal = function() { document.getElementById('editModal').style.display = 'none'; };
+    
+    document.getElementById('editForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const id = document.getElementById('editId').value;
+        const counselor = document.getElementById('editCounselor').value;
+        const topic = document.getElementById('editTopic').value;
+        const feelings = document.getElementById('editFeelings').value;
+        const urgent = document.querySelector('input[name="editUrgent"]:checked')?.value;
+        try {
+            await updateDoc(doc(db, "appointments", id), { counselor, topic, feelings, urgent, updatedAt: new Date().toISOString() });
+            showAlert('✅ Permohonan dikemaskini!', 'success');
+            closeEditModal();
+            await loadMyBookings();
+        } catch(e) { showAlert('❌ Gagal kemaskini', 'error'); }
+    });
+    
+    // Delete booking
+    window.deleteBooking = async function(id) {
+        if (confirm('Padam permohonan ini?')) {
             try {
-                const q = query(appointmentsCollection, where("studentIC", "==", studentIC), orderBy("createdAt", "desc"));
-                const querySnapshot = await getDocs(q);
-                
-                console.log("Bookings found:", querySnapshot.size);
-                
-                if (querySnapshot.empty) {
-                    container.innerHTML = '<div class="empty-booking"><i class="fas fa-calendar-times" style="font-size: 40px; margin-bottom: 15px;"></i><p>Tiada permohonan lagi</p><p style="font-size: 12px;">Klik pada tarikh di kalendar untuk membuat permohonan</p></div>';
-                    return;
-                }
-                
-                let html = '';
-                querySnapshot.forEach((docSnap) => {
-                    const data = docSnap.data();
-                    const id = docSnap.id;
-                    
-                    console.log("Booking data:", data);
-                    
-                    let statusClass = 'status-pending';
-                    let statusText = '⏳ Dalam Semakan';
-                    
-                    if (data.status === 'approved') {
-                        statusClass = 'status-approved';
-                        statusText = '✅ Diluluskan';
-                    } else if (data.status === 'rejected') {
-                        statusClass = 'status-rejected';
-                        statusText = '❌ Ditolak';
-                    } else if (data.status === 'postponed') {
-                        statusClass = 'status-postponed';
-                        statusText = '🔄 Ditangguhkan';
-                    }
-                    
-                    html += `
-                        <div class="booking-item">
-                            <div class="booking-header">
-                                <span class="booking-date"><i class="fas fa-calendar"></i> ${formatDate(data.requestedDate)}</span>
-                                <span class="status-badge ${statusClass}">${statusText}</span>
-                            </div>
-                            <div class="booking-details">
-                                <div><i class="fas fa-user-tie"></i> <strong>Kaunselor:</strong> ${escapeHtml(data.counselor || 'Belum ditetapkan')}</div>
-                                <div><i class="fas fa-share-alt"></i> <strong>Perkara dikongsi:</strong> ${escapeHtml(data.topic || '-')}</div>
-                                <div><i class="fas fa-heart"></i> <strong>Perasaan:</strong> ${escapeHtml(data.feelings || '-')}</div>
-                                <div><i class="fas fa-clock"></i> <strong>Perlu segera:</strong> ${data.urgent === 'ya' ? 'Ya' : 'Tidak'}</div>
-                            </div>
-                    `;
-                    
-                    // Show additional info based on status
-                    if (data.status === 'approved' && data.appointmentDate) {
-                        html += `
-                            <div class="booking-message" style="background:#dcfce7;">
-                                <i class="fas fa-calendar-check"></i> <strong>Temujanji Dijadualkan:</strong><br>
-                                📅 Tarikh: ${formatDate(data.appointmentDate)}<br>
-                                ⏰ Masa: ${data.appointmentTime || 'Akan dimaklumkan'}<br>
-                                📍 Tempat: ${data.location || 'Bilik Kaunseling'}
-                            </div>
-                        `;
-                    } else if (data.status === 'postponed' && data.newDate) {
-                        html += `
-                            <div class="booking-message" style="background:#e0e7ff;">
-                                <i class="fas fa-clock"></i> <strong>Permohonan Ditangguhkan:</strong><br>
-                                📅 Cadangan Tarikh Baru: ${formatDate(data.newDate)}<br>
-                                💬 Mesej: ${escapeHtml(data.message || 'Permohonan anda ditangguhkan ke tarikh tersebut. Sila sahkan.')}
-                            </div>
-                            <button class="btn-edit" onclick="scrollToCalendar()" style="width:100%; margin-top:8px; background:#4f46e5; color:white;"><i class="fas fa-calendar-plus"></i> Buat Permohonan Baru</button>
-                        `;
-                    } else if (data.status === 'rejected') {
-                        html += `
-                            <div class="booking-message" style="background:#fee2e2;">
-                                <i class="fas fa-times-circle"></i> <strong>Permohonan Ditolak:</strong><br>
-                                💬 Sebab: ${escapeHtml(data.reason || 'Permohonan tidak dapat diproses.')}<br>
-                                <i class="fas fa-redo-alt"></i> Sila buat permohonan baru.
-                            </div>
-                            <button class="btn-edit" onclick="scrollToCalendar()" style="width:100%; margin-top:8px; background:#4f46e5; color:white;"><i class="fas fa-calendar-plus"></i> Buat Permohonan Baru</button>
-                        `;
-                    } else {
-                        html += `
-                            <div class="booking-message" style="background:#fef3c7;">
-                                <i class="fas fa-hourglass-half"></i> Permohonan sedang diproses oleh kaunselor. Sila tunggu pengesahan.
-                            </div>
-                        `;
-                    }
-                    
-                    // Only show edit/delete for pending appointments
-                    if (data.status === 'pending') {
-                        html += `
-                            <div style="margin-top: 12px;">
-                                <button class="btn-edit" onclick="editBooking('${id}', '${escapeHtml(data.counselor || '')}', '${escapeHtml(data.topic || '')}', '${escapeHtml(data.feelings || '')}', '${data.urgent || ''}')">
-                                    <i class="fas fa-edit"></i> Edit
-                                </button>
-                                <button class="btn-delete" onclick="deleteBooking('${id}')">
-                                    <i class="fas fa-trash"></i> Hapus
-                                </button>
-                            </div>
-                        `;
-                    }
-                    
-                    html += `</div>`;
-                });
-                
-                container.innerHTML = html;
-            } catch (error) {
-                console.error("Error loading bookings:", error);
-                container.innerHTML = '<div class="empty-booking"><p style="color:#dc2626;">Ralat memuat data. Sila refresh halaman.</p></div>';
+                await deleteDoc(doc(db, "appointments", id));
+                showAlert('Permohonan dipadam', 'success');
+                await loadMyBookings();
+            } catch(e) { showAlert('Gagal padam', 'error'); }
+        }
+    };
+    
+    // Calendar
+    function initCalendar() {
+        const el = document.getElementById('calendar');
+        calendar = new FullCalendar.Calendar(el, {
+            initialView: 'dayGridMonth', headerToolbar: { left: 'prev,next', center: 'title', right: 'dayGridMonth' },
+            height: 'auto', firstDay: 1, locale: 'ms',
+            dayCellDidMount: function(info) {
+                const y=info.date.getFullYear(), m=String(info.date.getMonth()+1).padStart(2,'0'), d=String(info.date.getDate()).padStart(2,'0');
+                const ds=`${y}-${m}-${d}`;
+                if(isHoliday(ds)) { info.el.classList.add('fc-day-disabled'); info.el.style.backgroundColor='#fee2e2'; }
+                const today=new Date(); today.setHours(0,0,0,0);
+                if(info.date < today) { info.el.classList.add('fc-day-disabled'); info.el.style.backgroundColor='#f5f5f5'; }
+            },
+            dateClick: function(info) {
+                const y=info.date.getFullYear(), m=String(info.date.getMonth()+1).padStart(2,'0'), d=String(info.date.getDate()).padStart(2,'0');
+                const ds=`${y}-${m}-${d}`;
+                const today=new Date(); today.setHours(0,0,0,0);
+                if(isHoliday(ds) || info.date < today) { showAlert('Tarikh ini tidak boleh dipilih','error'); return; }
+                selectedDate = ds;
+                document.getElementById('selectedDateDisplay').innerHTML = formatDate(selectedDate);
+                document.getElementById('formSection').style.display = 'block';
+                if(calendar) { calendar.getEvents().forEach(e=>{ if(e.title==='Selected') e.remove(); });
+                calendar.addEvent({ title:'Selected', start:ds, display:'background', backgroundColor:'#4f46e5', opacity:0.3 }); }
             }
-        }
-        
-        // Create new booking
-        async function createBooking() {
-            const counselor = document.getElementById('counselorSelect').value;
-            const topic = document.getElementById('topic').value.trim();
-            const feelings = document.getElementById('feelings').value.trim();
-            const urgent = document.querySelector('input[name="urgent"]:checked')?.value;
-            
-            if (!selectedDate) { showAlert('Sila pilih tarikh terlebih dahulu!', 'error'); return; }
-            if (!counselor) { showAlert('Sila pilih kaunselor!', 'error'); return; }
-            if (!topic) { showAlert('Sila masukkan perkara yang ingin dikongsikan!', 'error'); return; }
-            if (!feelings) { showAlert('Sila terangkan perasaan anda!', 'error'); return; }
-            if (!urgent) { showAlert('Sila pilih sama ada perlu segera atau tidak!', 'error'); return; }
-            
-            const bookBtn = document.getElementById('bookBtn');
-            bookBtn.disabled = true;
-            bookBtn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Menghantar...';
-            
-            try {
-                const newAppointment = {
-                    studentName: studentName,
-                    studentIC: studentIC,
-                    requestedDate: selectedDate,
-                    counselor: counselor,
-                    topic: topic,
-                    feelings: feelings,
-                    urgent: urgent,
-                    status: 'pending',
-                    createdAt: new Date().toISOString()
-                };
-                
-                console.log("Saving appointment:", newAppointment);
-                
-                await addDoc(appointmentsCollection, newAppointment);
-                
-                showAlert('✅ Permohonan berjaya dihantar! Kaunselor akan menyemak dan maklumkan status.', 'success');
-                
-                // Reset form
-                document.getElementById('counselorSelect').value = '';
-                document.getElementById('topic').value = '';
-                document.getElementById('feelings').value = '';
-                document.querySelectorAll('input[name="urgent"]').forEach(r => r.checked = false);
-                document.getElementById('formSection').style.display = 'none';
-                
-                // Remove calendar highlight
-                if (calendar) {
-                    calendar.getEvents().forEach(event => {
-                        if (event.title === 'Selected') event.remove();
-                    });
-                }
-                
-                // Reload bookings list
-                await loadBookings();
-                selectedDate = null;
-                
-            } catch (error) {
-                console.error("Error creating booking:", error);
-                showAlert('❌ Gagal menghantar permohonan. Sila cuba lagi. Error: ' + error.message, 'error');
-            } finally {
-                bookBtn.disabled = false;
-                bookBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Hantar Permohonan';
-            }
-        }
-        
-        // Edit booking
-        window.editBooking = async function(id, oldCounselor, oldTopic, oldFeelings, oldUrgent) {
-            const newCounselor = prompt("Edit Kaunselor (Cikgu Akhmar / Cikgu Zalina):", oldCounselor);
-            if (newCounselor === null) return;
-            
-            const newTopic = prompt("Edit Perkara yang ingin dikongsikan:", oldTopic);
-            if (newTopic === null) return;
-            
-            const newFeelings = prompt("Edit Perasaan anda kebelakangan ini:", oldFeelings);
-            if (newFeelings === null) return;
-            
-            const newUrgent = confirm("Adakah anda perlu berjumpa dengan segera?\nOK = Ya, Batal = Tidak") ? "ya" : "tidak";
-            
-            try {
-                await updateDoc(doc(db, "appointments", id), {
-                    counselor: newCounselor,
-                    topic: newTopic,
-                    feelings: newFeelings,
-                    urgent: newUrgent,
-                    updatedAt: new Date().toISOString()
-                });
-                showAlert("✅ Permohonan berjaya dikemaskini!", "success");
-                await loadBookings();
-            } catch (error) {
-                console.error("Error updating booking:", error);
-                showAlert("❌ Gagal mengemaskini permohonan.", "error");
-            }
-        };
-        
-        // Delete booking
-        window.deleteBooking = async function(id) {
-            if (confirm("Adakah anda pasti mahu membatalkan permohonan ini?")) {
-                try {
-                    await deleteDoc(doc(db, "appointments", id));
-                    showAlert("Permohonan berjaya dibatalkan!", "success");
-                    await loadBookings();
-                } catch (error) {
-                    console.error("Error deleting booking:", error);
-                    showAlert("❌ Gagal membatalkan permohonan.", "error");
-                }
-            }
-        };
-        
-        // Scroll to calendar
-        window.scrollToCalendar = function() {
-            document.querySelector('.calendar-section').scrollIntoView({ behavior: 'smooth' });
-        };
-        
-        // Helper functions
-        function formatDate(dateStr) {
-            const date = new Date(dateStr);
-            return date.toLocaleDateString('ms-MY', { day: 'numeric', month: 'long', year: 'numeric' });
-        }
-        
-        function escapeHtml(str) {
-            if (!str) return '';
-            return str.replace(/[&<>]/g, function(m) {
-                if (m === '&') return '&amp;';
-                if (m === '<') return '&lt;';
-                if (m === '>') return '&gt;';
-                return m;
-            });
-        }
-        
-        function showAlert(message, type) {
-            const alertDiv = document.getElementById('alertMessage');
-            alertDiv.textContent = message;
-            alertDiv.className = `alert ${type}`;
-            setTimeout(() => {
-                alertDiv.style.display = 'none';
-            }, 4000);
-        }
-        
-        window.logout = function() {
-            sessionStorage.clear();
-            window.location.href = '../index.html';
-        };
-        
-        // Event listeners
-        document.getElementById('bookBtn').addEventListener('click', createBooking);
-        
-        // Initialize
-        async function init() {
-            await loadHolidays();
-            initCalendar();
-            await loadBookings();
-        }
-        
-        init();
-    </script>
+        });
+        calendar.render();
+    }
+    
+    function formatDate(ds) { if(!ds) return '-'; const d=new Date(ds); return d.toLocaleDateString('ms-MY',{day:'numeric',month:'long',year:'numeric'}); }
+    function escapeHtml(s) { if(!s) return ''; return s.replace(/[&<>]/g, m=> m==='&'?'&amp;':m==='<'?'&lt;':'&gt;'); }
+    function showAlert(msg, type) { const a=document.getElementById('alertMessage'); a.textContent=msg; a.className=`alert ${type}`; setTimeout(()=>{ a.style.display='none'; },4000); }
+    window.logout = function() { sessionStorage.clear(); window.location.href='../index.html'; };
+    
+    document.getElementById('bookBtn').addEventListener('click', createBooking);
+    
+    async function init() {
+        await loadHolidays();
+        initCalendar();
+        await loadMyBookings();
+    }
+    init();
+</script>
 </body>
 </html>

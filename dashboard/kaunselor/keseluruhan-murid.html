@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Keseluruhan Murid | E-MindCare SEMSIRA</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: linear-gradient(135deg, #f0f4ff 0%, #e9eef6 100%); min-height: 100vh; padding: 20px; }
+        
+        .container { max-width: 1400px; margin: 0 auto; }
+        
+        /* Header */
+        .header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 2px solid rgba(79,70,229,0.2); }
+        .logo-area { display: flex; align-items: center; gap: 1rem; }
+        .logo-icon { background: linear-gradient(145deg, #4f46e5, #7c3aed); width: 50px; height: 50px; border-radius: 28px; display: flex; align-items: center; justify-content: center; }
+        .logo-icon i { font-size: 1.8rem; color: white; }
+        .logo-text h1 { font-size: 1.5rem; font-weight: 800; background: linear-gradient(135deg, #1e293b, #4f46e5); -webkit-background-clip: text; background-clip: text; color: transparent; }
+        .back-btn { background: #eef2ff; border: none; padding: 0.6rem 1.2rem; border-radius: 40px; cursor: pointer; font-weight: 600; color: #4f46e5; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; }
+        .back-btn:hover { background: #4f46e5; color: white; }
+        
+        /* Stats Button */
+        .stats-btn { background: linear-gradient(95deg, #10b981, #059669); color: white; border: none; padding: 0.7rem 1.5rem; border-radius: 40px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; margin-bottom: 1rem; }
+        .stats-btn:hover { transform: translateY(-2px); }
+        
+        /* Filter Bar */
+        .filter-bar { background: white; border-radius: 1rem; padding: 1rem; margin-bottom: 1.5rem; display: flex; gap: 1rem; flex-wrap: wrap; align-items: center; }
+        .filter-bar input { flex: 2; padding: 0.8rem; border: 1.5px solid #e2e8f0; border-radius: 2rem; font-family: inherit; outline: none; }
+        .filter-bar select { flex: 1; padding: 0.8rem; border: 1.5px solid #e2e8f0; border-radius: 2rem; font-family: inherit; outline: none; }
+        .filter-bar input:focus, .filter-bar select:focus { border-color: #4f46e5; }
+        
+        /* Student Table */
+        .student-table { background: white; border-radius: 1.2rem; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; padding: 1rem; background: #f8fafc; color: #1e293b; font-weight: 600; border-bottom: 1px solid #e2e8f0; }
+        td { padding: 0.8rem 1rem; border-bottom: 1px solid #e2e8f0; }
+        .student-name { cursor: pointer; color: #4f46e5; font-weight: 600; }
+        .student-name:hover { text-decoration: underline; }
+        .empty-state { text-align: center; padding: 3rem; color: #94a3b8; }
+        
+        /* Modal */
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2000; display: flex; align-items: center; justify-content: center; padding: 20px; }
+        .modal-content { max-width: 700px; width: 100%; background: white; border-radius: 1.5rem; max-height: 85vh; overflow-y: auto; }
+        .modal-header { padding: 1.2rem; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; background: white; }
+        .modal-close { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #94a3b8; }
+        .modal-body { padding: 1.2rem; }
+        
+        .profile-section { background: linear-gradient(135deg, #4f46e5, #7c3aed); color: white; border-radius: 1rem; padding: 1.2rem; margin-bottom: 1.5rem; }
+        .profile-grid { display: flex; flex-wrap: wrap; gap: 1rem; }
+        .profile-grid p { margin: 0.3rem 0; display: flex; align-items: center; gap: 8px; }
+        
+        .total-merit-display { background: #f1f5f9; border-radius: 1rem; padding: 1rem; text-align: center; margin-bottom: 1.5rem; }
+        .total-merit-display .big-number { font-size: 2rem; font-weight: 800; color: #4f46e5; }
+        
+        .merit-record { background: #f8fafc; border-radius: 1rem; padding: 1rem; margin-bottom: 0.8rem; border-left: 4px solid; }
+        .merit-record-positive { border-left-color: #10b981; }
+        .merit-record-negative { border-left-color: #dc2626; }
+        .record-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-bottom: 0.5rem; }
+        .record-points { font-weight: 700; font-size: 1.1rem; }
+        .record-points.positive { color: #10b981; }
+        .record-points.negative { color: #dc2626; }
+        .record-description { font-size: 0.85rem; color: #5b6e8c; margin: 0.5rem 0; }
+        .record-meta { font-size: 0.7rem; color: #94a3b8; display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 0.5rem; }
+        
+        .alert { padding: 12px; border-radius: 12px; margin-bottom: 15px; font-size: 0.8rem; display: none; }
+        .alert.success { background: #dcfce7; color: #166534; display: block; }
+        .alert.error { background: #fee2e2; color: #dc2626; display: block; }
+        
+        @media (max-width: 700px) {
+            .student-table { overflow-x: auto; }
+            table { min-width: 500px; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <div class="logo-area">
+            <div class="logo-icon"><i class="fas fa-user-graduate"></i></div>
+            <div class="logo-text"><h1>Keseluruhan Murid</h1></div>
+        </div>
+        <a href="dashboard-kaunselor.html" class="back-btn"><i class="fas fa-arrow-left"></i> Kembali ke Dashboard</a>
+    </div>
+    
+    <div id="alertMessage" class="alert"></div>
+    
+    <!-- Stats Button -->
+    <button class="stats-btn" id="statsBtn"><i class="fas fa-chart-line"></i> Lihat Statistik & Analisis</button>
+    
+    <!-- Filter Bar -->
+    <div class="filter-bar">
+        <input type="text" id="searchInput" placeholder="🔍 Cari nama atau No. Kad Pengenalan...">
+        <select id="classFilter">
+            <option value="">Semua Kelas</option>
+        </select>
+    </div>
+    
+    <!-- Student Table -->
+    <div class="student-table">
+        <div id="tableContainer">
+            <div class="empty-state"><i class="fas fa-spinner fa-pulse"></i> Memuatkan...</div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for Student Merit Details -->
+<div id="meritModal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3><i class="fas fa-star"></i> Rekod Merit Pelajar</h3>
+            <button class="modal-close" onclick="closeMeritModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div id="modalProfile" class="profile-section">
+                <h4><i class="fas fa-user-graduate"></i> Profil Pelajar</h4>
+                <div class="profile-grid">
+                    <div><p><i class="fas fa-user"></i> <strong>Nama:</strong> <span id="modalName">-</span></p><p><i class="fas fa-id-card"></i> <strong>No. IC:</strong> <span id="modalIC">-</span></p></div>
+                    <div><p><i class="fas fa-school"></i> <strong>Kelas:</strong> <span id="modalClass">-</span></p><p><i class="fas fa-calendar"></i> <strong>Tahun:</strong> <span id="modalSession">-</span></p></div>
+                </div>
+            </div>
+            <div class="total-merit-display"><div class="big-number" id="modalTotalMerit">0</div><div>Jumlah Mata Merit</div></div>
+            <h4 style="margin-bottom: 1rem;"><i class="fas fa-list-alt"></i> Senarai Transaksi Merit</h4>
+            <div id="modalMeritList"><p style="text-align:center;">Memuatkan...</p></div>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, collection, getDocs, query, where, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    
+    const firebaseConfig = {
+        apiKey: "AIzaSyCfu7XC8pXtpDyQ-9Cjdg4AobA-EVEwWcc",
+        authDomain: "e-mindcare.firebaseapp.com",
+        projectId: "e-mindcare",
+        storageBucket: "e-mindcare.firebasestorage.app",
+        messagingSenderId: "1021883944936",
+        appId: "1:1021883944936:web:39c75a0c98d19a37afde5d",
+        measurementId: "G-3CJVKWGEXV"
+    };
+    
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const studentsCollection = collection(db, "students");
+    const meritCollection = collection(db, "merit_records");
+    
+    let allStudents = [];
+    let allMeritRecords = [];
+    let searchTerm = '';
+    let classFilter = '';
+    
+    function showAlert(msg, type) {
+        const alertDiv = document.getElementById('alertMessage');
+        alertDiv.textContent = msg;
+        alertDiv.className = `alert ${type}`;
+        setTimeout(() => { alertDiv.style.display = 'none'; }, 3000);
+    }
+    
+    async function loadAllData() {
+        try {
+            const studentsSnap = await getDocs(studentsCollection);
+            allStudents = [];
+            studentsSnap.forEach(doc => allStudents.push({ id: doc.id, ...doc.data() }));
+            
+            const meritSnap = await getDocs(meritCollection);
+            allMeritRecords = [];
+            meritSnap.forEach(doc => allMeritRecords.push({ id: doc.id, ...doc.data() }));
+            
+            // Populate class filter
+            const classes = [...new Set(allStudents.map(s => s.class).filter(c => c && c !== '-'))].sort();
+            const classSelect = document.getElementById('classFilter');
+            classSelect.innerHTML = '<option value="">Semua Kelas</option>' + classes.map(c => `<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`).join('');
+            
+            renderTable();
+        } catch(e) { console.error(e); showAlert('Ralat memuat data', 'error'); }
+    }
+    
+    function getStudentTotalMerit(studentId) {
+        return allMeritRecords.filter(r => r.studentId === studentId).reduce((sum, r) => sum + (r.points || 0), 0);
+    }
+    
+    function renderTable() {
+        const container = document.getElementById('tableContainer');
+        let filtered = allStudents;
+        if (searchTerm) {
+            const term = searchTerm.toLowerCase();
+            filtered = filtered.filter(s => s.fullname.toLowerCase().includes(term) || s.icNumber.includes(term));
+        }
+        if (classFilter) {
+            filtered = filtered.filter(s => s.class === classFilter);
+        }
+        
+        if (filtered.length === 0) {
+            container.innerHTML = '<div class="empty-state"><i class="fas fa-user-slash"></i><p>Tiada pelajar ditemui.</p></div>';
+            return;
+        }
+        
+        let html = `<table><thead><tr><th>Bil</th><th>Nama Pelajar</th><th>No. Kad Pengenalan</th><th>Kelas</th><th>Jumlah Merit</th></tr></thead><tbody>`;
+        filtered.forEach((student, index) => {
+            const total = getStudentTotalMerit(student.id);
+            html += `<tr><td>${index+1}</td><td class="student-name" onclick="viewStudentMerit('${student.id}')">${escapeHtml(student.fullname)}</td><td>${escapeHtml(student.icNumber)}</td><td>${escapeHtml(student.class || '-')}</td><td class="${total>=0?'merit-positive':'merit-negative'}" style="font-weight:700;${total>=0?'color:#10b981':'color:#dc2626'}">${total}</td></tr>`;
+        });
+        html += `</tbody><table>`;
+        container.innerHTML = html;
+    }
+    
+    window.viewStudentMerit = async function(studentId) {
+        const student = allStudents.find(s => s.id === studentId);
+        if (!student) return;
+        
+        document.getElementById('modalName').innerText = student.fullname;
+        document.getElementById('modalIC').innerText = student.icNumber;
+        document.getElementById('modalClass').innerText = student.class || '-';
+        document.getElementById('modalSession').innerText = student.session || '-';
+        
+        const total = getStudentTotalMerit(studentId);
+        document.getElementById('modalTotalMerit').innerText = total;
+        document.getElementById('modalTotalMerit').style.color = total >= 0 ? '#10b981' : '#dc2626';
+        
+        const records = allMeritRecords.filter(r => r.studentId === studentId).sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
+        const listContainer = document.getElementById('modalMeritList');
+        
+        if (records.length === 0) {
+            listContainer.innerHTML = '<p style="text-align:center; color:#94a3b8;">Tiada rekod merit</p>';
+        } else {
+            let html = '';
+            for (const r of records) {
+                const isPositive = r.type === 'positive';
+                html += `<div class="merit-record merit-record-${isPositive ? 'positive' : 'negative'}">
+                    <div class="record-header"><span class="record-type ${isPositive ? 'positive' : 'negative'}">${isPositive ? '<i class="fas fa-heart"></i> Kebaikan' : '<i class="fas fa-exclamation-triangle"></i> Kesalahan'}${r.level ? ` (${r.level})` : ''}</span>
+                    <span class="record-points ${isPositive ? 'positive' : 'negative'}">${isPositive ? '+' : ''}${r.points} markah</span></div>
+                    <div class="record-description">${escapeHtml(r.description)}</div>
+                    <div class="record-meta"><span><i class="fas fa-calendar"></i> ${formatDate(r.createdAt)}</span><span><i class="fas fa-user-check"></i> Didaftar oleh: ${escapeHtml(r.createdBy || '-')}</span></div>
+                </div>`;
+            }
+            listContainer.innerHTML = html;
+        }
+        document.getElementById('meritModal').style.display = 'flex';
+    };
+    
+    window.closeMeritModal = () => document.getElementById('meritModal').style.display = 'none';
+    
+    document.getElementById('searchInput').addEventListener('input', (e) => { searchTerm = e.target.value; renderTable(); });
+    document.getElementById('classFilter').addEventListener('change', (e) => { classFilter = e.target.value; renderTable(); });
+    document.getElementById('statsBtn').addEventListener('click', () => { window.location.href = 'statistik-murid.html'; });
+    
+    function formatDate(ds) { if(!ds) return '-'; try { return new Date(ds).toLocaleDateString('ms-MY'); } catch(e) { return ds; } }
+    function escapeHtml(s) { if(!s) return ''; return s.replace(/[&<>]/g, m => m==='&'?'&amp;':m==='<'?'&lt;':'&gt;'); }
+    
+    loadAllData();
+</script>
+</body>
+</html>

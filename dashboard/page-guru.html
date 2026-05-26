@@ -326,7 +326,7 @@
       const querySnapshot = await getDocs(q);
       
       if (querySnapshot.empty) {
-        alert("❌ Akaun tidak ditemui! Sila pastikan No. Kad Pengenalan anda telah didaftarkan.");
+        alert("❌ Akaun tidak ditemui! Sila pastikan No. Kad Pengenalan anda telah didaftarkan oleh kaunselor.");
         hideLoading();
         return false;
       }
@@ -344,15 +344,15 @@
         return false;
       }
       
-      // Login berjaya - simpan data ke sessionStorage
+      // ✅ Login berjaya - simpan data ke sessionStorage (format yang betul untuk dashboard guru)
       sessionStorage.setItem('teacherId', teacherData.id);
       sessionStorage.setItem('teacherName', teacherData.fullname);
       sessionStorage.setItem('teacherIC', teacherData.icNumber);
-      sessionStorage.setItem('teacherClass', teacherData.class || '-');
-      sessionStorage.setItem('teacherSubject', teacherData.subject || '-');
+      sessionStorage.setItem('teacherClass', teacherData.teacherClass || '-');
+      sessionStorage.setItem('teacherYear', teacherData.year || '2026');
       sessionStorage.setItem('teacherLoginTime', new Date().toISOString());
       
-      // Redirect ke dashboard guru
+      // ✅ Redirect ke dashboard guru (folder guru di root)
       window.location.href = "../guru/dashboard-guru.html";
       return true;
       
@@ -382,7 +382,7 @@
       return;
     }
     
-    // Optional: validation format IC
+    // Validation format IC
     const icPattern = /^[0-9]{2}[0-9]{4}-[0-9]{2}-[0-9]{4}$|^[0-9]{12}$/;
     if (!icPattern.test(icNumber) && icNumber.length < 6) {
       if(!confirm("Nombor Kad Pengenalan tidak mengikut format biasa (cth: 800101-01-1234). Teruskan?")) {
@@ -396,22 +396,40 @@
 </script>
 
 <!-- NOTA PENTING:
-     Struktur folder yang diperlukan:
+     ============================================================
+     STRUKTUR FOLDER YANG DIPERLUKAN:
+     ============================================================
      
      root folder/
+     │
+     ├── index.html
+     │
      ├── dashboard/
-     │   └── page-guru.html (fail ini)
+     │   └── page-guru.html (FAIL INI)
+     │
      └── guru/
-         └── dashboard-guru.html (perlu dicipta)
+         └── dashboard-guru.html (PERLU DICIPTA)
      
-     Collection 'teachers' perlu diwujudkan di Firestore dengan struktur:
+     ============================================================
+     STRUKTUR FIRESTORE COLLECTION 'teachers':
+     ============================================================
      {
-       fullname: "Puan Sarah binti Abdullah",
-       icNumber: "800101-01-1234",
-       class: "Guru Matematik",
-       subject: "Matematik",
-       createdAt: "2026-01-15T..."
+       "fullname": "Puan Sarah binti Abdullah",
+       "icNumber": "800101-01-1234",
+       "teacherClass": "5 Cemerlang",
+       "year": "2026",
+       "createdAt": "2026-01-15T10:30:00.000Z"
      }
+     
+     ============================================================
+     DATA YANG DISIMPAN KE SESSIONSTORAGE:
+     ============================================================
+     - teacherId
+     - teacherName
+     - teacherIC
+     - teacherClass
+     - teacherYear
+     - teacherLoginTime
 -->
 </body>
 </html>

@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mood Check-In | UBK SEMSIRA</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Quicksand:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --glow-community: #ff007b;
+            --glow-counselor: #00d2ff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: radial-gradient(circle at center, #0a192f, #000000);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start; /* Ubah ke flex-start supaya boleh skrol dengan natural */
+            font-family: 'Quicksand', sans-serif;
+            color: white;
+            /* Membolehkan skrol jika kandungan lebih tinggi dari skrin */
+            overflow-y: auto; 
+            overflow-x: hidden;
+            padding: 40px 20px;
+            position: relative;
+        }
+
+        /* --- ANIMASI BACKGROUND ENERGETIK --- */
+        .mood-bg {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(255, 0, 123, 0.15), transparent 40%),
+                radial-gradient(circle at 80% 70%, rgba(0, 210, 255, 0.15), transparent 40%);
+            z-index: -1;
+            filter: blur(80px);
+            animation: pulse 10s infinite alternate;
+        }
+
+        .particles {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .particle {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            opacity: 0.3;
+            animation: moveUp 5s linear infinite;
+        }
+
+        @keyframes moveUp {
+            0% { transform: translateY(100vh) scale(0); opacity: 0; }
+            50% { opacity: 0.6; }
+            100% { transform: translateY(-10vh) scale(1.5); opacity: 0; }
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.5; transform: scale(1); }
+            100% { opacity: 0.8; transform: scale(1.1); }
+        }
+
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(1.5rem, 5vw, 2.2rem);
+            text-align: center;
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+        }
+
+        p.subtitle {
+            text-align: center;
+            opacity: 0.7;
+            margin-bottom: 50px;
+            font-size: 0.9rem;
+        }
+
+        .card-container {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+            perspective: 1000px;
+            width: 100%;
+            max-width: 900px;
+            /* Memastikan container ada ruang bawah */
+            padding-bottom: 20px; 
+        }
+
+        .mood-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 30px;
+            padding: 40px 30px;
+            width: 380px;
+            text-decoration: none;
+            color: white;
+            text-align: center;
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            animation: float 6s infinite ease-in-out;
+            position: relative;
+        }
+
+        .mood-card:nth-child(2) {
+            animation-delay: 2s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        /* Efek Hover diperbaiki supaya tidak lari di mobile */
+        @media (min-width: 1024px) {
+            .mood-card:hover {
+                transform: translateY(-15px) scale(1.03) rotateX(5deg);
+                background: rgba(255, 255, 255, 0.1);
+            }
+        }
+
+        .icon-circle {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .community:hover {
+            border-color: var(--glow-community);
+            box-shadow: 0 0 30px rgba(255, 0, 123, 0.3);
+        }
+        .community .icon-circle {
+            background: rgba(255, 0, 123, 0.15);
+            border: 2px solid var(--glow-community);
+            box-shadow: 0 0 20px var(--glow-community);
+        }
+
+        .counselor:hover {
+            border-color: var(--glow-counselor);
+            box-shadow: 0 0 30px rgba(0, 210, 255, 0.3);
+        }
+        .counselor .icon-circle {
+            background: rgba(0, 210, 255, 0.15);
+            border: 2px solid var(--glow-counselor);
+            box-shadow: 0 0 20px var(--glow-counselor);
+        }
+
+        h2 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            letter-spacing: 1px;
+        }
+
+        .desc {
+            font-size: 0.9rem;
+            line-height: 1.6;
+            opacity: 0.8;
+            font-weight: 400;
+        }
+
+        .btn-back {
+            margin-top: 40px;
+            margin-bottom: 20px; /* Jarak bawah tambahan untuk mobile */
+            color: rgba(255,255,255,0.5);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: bold;
+            letter-spacing: 1px;
+            padding: 10px 20px;
+            border-radius: 50px;
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: 0.3s;
+        }
+
+        .btn-back:hover {
+            color: white;
+            background: rgba(255,255,255,0.1);
+        }
+
+        @media (max-width: 600px) {
+            .mood-card {
+                width: 100%;
+                padding: 30px 20px;
+            }
+            .card-container {
+                gap: 20px;
+            }
+            h1 { margin-top: 20px; }
+            .mood-card:hover { transform: none; } /* Matikan tilt di mobile supaya senang tekan */
+        }
+    </style>
+</head>
+<body>
+
+    <div class="mood-bg"></div>
+    <div class="particles" id="particleContainer"></div>
+
+    <h1>MOOD CHECK-IN</h1>
+    <p class="subtitle">Apa yang anda rasakan hari ini? Kami sedia mendengar.</p>
+
+    <div class="card-container">
+        
+        <a href="share-mood-community.html" class="mood-card community">
+            <div class="icon-circle">🎭</div>
+            <h2>Kongsikan Perasaan Anda</h2>
+            <p class="desc">Kongsi luahan hati anda hari ini bersama semua orang secara awanama. Jangan risau, tiada siapa akan tahu identiti anda.</p>
+        </a>
+
+        <a href="kaunseling-peribadi.html" class="mood-card counselor">
+            <div class="icon-circle">💬</div>
+            <h2>Kongsikan Bersama Kaunselor</h2>
+            <p class="desc">Dapatkan khidmat bimbingan dan kaunseling secara peribadi bersama kaunselor SMK Syed Sirajuddin yang bertauliah.</p>
+        </a>
+
+    </div>
+
+    <a href="index.html" class="btn-back">← KEMBALI KE MENU UTAMA</a>
+
+    <script>
+        // Penjana zarah energetik secara automatik
+        const pContainer = document.getElementById('particleContainer');
+        function createParticle() {
+            const p = document.createElement('div');
+            p.className = 'particle';
+            const size = Math.random() * 5 + 2 + 'px';
+            p.style.width = size;
+            p.style.height = size;
+            p.style.left = Math.random() * 100 + 'vw';
+            p.style.animationDuration = Math.random() * 3 + 2 + 's';
+            p.style.backgroundColor = Math.random() > 0.5 ? '#ff007b' : '#00d2ff';
+            pContainer.appendChild(p);
+            setTimeout(() => p.remove(), 5000);
+        }
+        setInterval(createParticle, 200);
+
+        // Efek Tilt Mengikut Mouse (Hanya aktif pada desktop)
+        if (window.innerWidth > 1024) {
+            document.addEventListener('mousemove', (e) => {
+                const cards = document.querySelectorAll('.mood-card');
+                let xAxis = (window.innerWidth / 2 - e.clientX) / 50;
+                let yAxis = (window.innerHeight / 2 - e.clientY) / 50;
+                
+                cards.forEach(card => {
+                    card.style.transform = `rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
+                });
+            });
+        }
+    </script>
+</body>
+</html>

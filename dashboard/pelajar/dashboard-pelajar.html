@@ -342,11 +342,11 @@
       <div class="menu-btn">Mulakan Ujian <i class="fas fa-arrow-right"></i></div>
     </div>
 
-    <!-- 2. MERIT PELAJAR -->
-    <div class="menu-card" data-menu="merit-pelajar">
+    <!-- 2. MATA MERIT (TUKAR DARI MERIT PELAJAR) -->
+    <div class="menu-card" data-menu="mata-merit">
       <div class="menu-icon"><i class="fas fa-star"></i></div>
-      <h3>Merit Pelajar</h3>
-      <div class="menu-desc">Semak rekod merit kokurikulum dan sahsiah diri.</div>
+      <h3>Mata Merit</h3>
+      <div class="menu-desc">Semak rekod mata merit kokurikulum dan sahsiah diri.</div>
       <div class="menu-btn">Lihat Merit <i class="fas fa-arrow-right"></i></div>
     </div>
 
@@ -372,21 +372,8 @@
   // Data pelajar dari sessionStorage
   const studentName = sessionStorage.getItem('studentName') || 'Pelajar';
   const studentIC = sessionStorage.getItem('studentIC') || '-';
-  
-  // Untuk demo, kita boleh dapatkan data dari localStorage juga
-  // Cuba dapatkan maklumat kelas dan sesi dari student_credentials
-  let studentClass = '-';
-  let studentSession = '-';
-  
-  try {
-    const credentials = JSON.parse(localStorage.getItem('student_credentials') || '{}');
-    if (studentIC && credentials[studentIC]) {
-      studentClass = credentials[studentIC].class || '-';
-      studentSession = credentials[studentIC].session || '-';
-    }
-  } catch(e) {
-    console.log("Guna data default");
-  }
+  const studentClass = sessionStorage.getItem('studentClass') || '-';
+  const studentSession = sessionStorage.getItem('studentSession') || '2026';
   
   // Paparkan nama di header
   document.getElementById('studentNameDisplay').innerText = studentName;
@@ -407,8 +394,9 @@
       case 'inventori-psikometrik':
         targetUrl = 'inventori-psikometrik.html';
         break;
-      case 'merit-pelajar':
-        targetUrl = 'merit-pelajar.html';
+      case 'mata-merit':
+        // ✅ TUKAR KE mata-merit.html
+        targetUrl = 'mata-merit.html';
         break;
       case 'tempahan-kaunseling':
         targetUrl = 'tempahan-kaunseling.html';
@@ -417,7 +405,6 @@
         return;
     }
     
-    // Redirect ke page dalam folder yang sama (dashboard/pelajar/)
     window.location.href = targetUrl;
   }
   
@@ -433,21 +420,16 @@
   // Logout button - kembali ke halaman utama
   const logoutBtn = document.getElementById('logoutBtn');
   logoutBtn.addEventListener('click', () => {
-    // Clear session data
-    sessionStorage.removeItem('studentName');
-    sessionStorage.removeItem('studentIC');
-    sessionStorage.removeItem('studentLoginTime');
+    sessionStorage.clear();
     window.location.href = '../../index.html';
   });
 </script>
 
 <!-- NOTA PENTING:
-     Fail-fail yang perlu dicipta dalam folder yang sama (dashboard/pelajar/):
+     Fail-fail yang perlu dicipta dalam folder yang sama (pelajar/):
      1. inventori-psikometrik.html
-     2. merit-pelajar.html
+     2. mata-merit.html
      3. tempahan-kaunseling.html
-     
-     Setiap fail di atas boleh diisi dengan kandungan asas seperti di bawah.
 -->
 </body>
 </html>

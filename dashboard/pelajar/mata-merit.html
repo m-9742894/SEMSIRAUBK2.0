@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Mata Merit Saya | E-MindCare SEMSIRA</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: linear-gradient(135deg, #e0e7ff 0%, #f3e8ff 100%); min-height: 100vh; padding: 20px; }
+        
+        .container { max-width: 1000px; margin: 0 auto; }
+        
+        /* Header */
+        .header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 2px solid rgba(79,70,229,0.2); }
+        .logo-area { display: flex; align-items: center; gap: 1rem; }
+        .logo-icon { background: linear-gradient(145deg, #4f46e5, #7c3aed); width: 50px; height: 50px; border-radius: 28px; display: flex; align-items: center; justify-content: center; }
+        .logo-icon i { font-size: 1.8rem; color: white; }
+        .logo-text h1 { font-size: 1.5rem; font-weight: 800; background: linear-gradient(135deg, #1e293b, #4f46e5); -webkit-background-clip: text; background-clip: text; color: transparent; }
+        .back-btn { background: #eef2ff; border: none; padding: 0.6rem 1.2rem; border-radius: 40px; cursor: pointer; font-weight: 600; color: #4f46e5; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; }
+        .back-btn:hover { background: #4f46e5; color: white; }
+        
+        /* Profile Card */
+        .profile-card {
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            color: white;
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+        .profile-avatar {
+            background: rgba(255,255,255,0.2);
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .profile-avatar i { font-size: 3rem; color: white; }
+        .profile-info h3 { font-size: 1.3rem; font-weight: 700; margin-bottom: 0.3rem; }
+        .profile-info p { font-size: 0.85rem; opacity: 0.9; margin: 0.2rem 0; display: flex; align-items: center; gap: 8px; }
+        
+        /* Merit Total Card */
+        .merit-total-card {
+            background: white;
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            box-shadow: 0 8px 20px -8px rgba(0,0,0,0.08);
+            border: 1px solid rgba(79,70,229,0.1);
+        }
+        .merit-total-card h4 { font-size: 0.9rem; color: #5b6e8c; margin-bottom: 0.5rem; }
+        .merit-total-card .total-points { font-size: 3rem; font-weight: 800; }
+        .merit-total-card .positive { color: #10b981; }
+        .merit-total-card .negative { color: #dc2626; }
+        
+        /* Stats Row */
+        .stats-row {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+        .stat-box {
+            flex: 1;
+            background: white;
+            border-radius: 1rem;
+            padding: 1rem;
+            text-align: center;
+            border: 1px solid rgba(79,70,229,0.1);
+        }
+        .stat-box i { font-size: 1.5rem; margin-bottom: 0.3rem; display: block; }
+        .stat-box .stat-number { font-size: 1.5rem; font-weight: 700; color: #1e293b; }
+        .stat-box .stat-label { font-size: 0.7rem; color: #5b6e8c; }
+        .stat-box.positive i { color: #10b981; }
+        .stat-box.negative i { color: #dc2626; }
+        
+        /* Records Section */
+        .records-section {
+            background: white;
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            box-shadow: 0 8px 20px -8px rgba(0,0,0,0.08);
+            border: 1px solid rgba(79,70,229,0.1);
+        }
+        .records-section h3 {
+            font-size: 1.2rem;
+            color: #1e293b;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .records-section h3 i { color: #4f46e5; }
+        
+        /* Merit Record Item */
+        .merit-record {
+            background: #f8fafc;
+            border-radius: 1rem;
+            padding: 1rem;
+            margin-bottom: 0.8rem;
+            border-left: 4px solid;
+            transition: 0.2s;
+        }
+        .merit-record-positive { border-left-color: #10b981; }
+        .merit-record-negative { border-left-color: #dc2626; }
+        
+        .record-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 0.5rem;
+        }
+        .record-type {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 0.2rem 0.8rem;
+            border-radius: 40px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+        .record-type.positive { background: #dcfce7; color: #166534; }
+        .record-type.negative { background: #fee2e2; color: #dc2626; }
+        
+        .record-points {
+            font-weight: 700;
+            font-size: 1rem;
+        }
+        .record-points.positive { color: #10b981; }
+        .record-points.negative { color: #dc2626; }
+        
+        .record-description {
+            font-size: 0.85rem;
+            color: #1e293b;
+            margin: 0.5rem 0;
+            line-height: 1.5;
+        }
+        
+        .record-meta {
+            font-size: 0.7rem;
+            color: #94a3b8;
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-top: 0.5rem;
+        }
+        .record-meta i { margin-right: 3px; }
+        
+        .empty-state {
+            text-align: center;
+            padding: 2rem;
+            color: #94a3b8;
+        }
+        
+        .alert { padding: 12px; border-radius: 12px; margin-bottom: 15px; font-size: 0.8rem; display: none; }
+        .alert.success { background: #dcfce7; color: #166534; display: block; }
+        .alert.error { background: #fee2e2; color: #dc2626; display: block; }
+        
+        @media (max-width: 700px) {
+            .stats-row { flex-direction: column; }
+            .profile-card { flex-direction: column; text-align: center; }
+            .profile-info p { justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <div class="logo-area">
+            <div class="logo-icon"><i class="fas fa-star"></i></div>
+            <div class="logo-text"><h1>Mata Merit Saya</h1></div>
+        </div>
+        <a href="dashboard-pelajar.html" class="back-btn"><i class="fas fa-arrow-left"></i> Kembali ke Dashboard</a>
+    </div>
+    
+    <div id="alertMessage" class="alert"></div>
+    
+    <!-- Profile Card -->
+    <div id="profileCard" class="profile-card">
+        <div class="profile-avatar">
+            <i class="fas fa-user-graduate"></i>
+        </div>
+        <div class="profile-info">
+            <h3 id="studentName">-</h3>
+            <p><i class="fas fa-id-card"></i> No. Kad Pengenalan: <span id="studentIC">-</span></p>
+            <p><i class="fas fa-school"></i> Kelas: <span id="studentClass">-</span> | <i class="fas fa-calendar"></i> Tahun: <span id="studentSession">-</span></p>
+        </div>
+    </div>
+    
+    <!-- Merit Total Card -->
+    <div class="merit-total-card">
+        <h4><i class="fas fa-star"></i> Jumlah Mata Merit Anda</h4>
+        <div class="total-points" id="totalMerit">0</div>
+    </div>
+    
+    <!-- Stats Row -->
+    <div class="stats-row">
+        <div class="stat-box positive">
+            <i class="fas fa-heart"></i>
+            <div class="stat-number" id="positiveCount">0</div>
+            <div class="stat-label">Kebaikan</div>
+        </div>
+        <div class="stat-box negative">
+            <i class="fas fa-exclamation-triangle"></i>
+            <div class="stat-number" id="negativeCount">0</div>
+            <div class="stat-label">Kesalahan</div>
+        </div>
+        <div class="stat-box">
+            <i class="fas fa-calendar-alt"></i>
+            <div class="stat-number" id="totalRecords">0</div>
+            <div class="stat-label">Jumlah Rekod</div>
+        </div>
+    </div>
+    
+    <!-- Records Section -->
+    <div class="records-section">
+        <h3><i class="fas fa-list-alt"></i> Senarai Transaksi Merit</h3>
+        <div id="recordsContainer">
+            <div class="empty-state"><i class="fas fa-spinner fa-pulse"></i> Memuatkan...</div>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, collection, getDocs, query, where, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    
+    const firebaseConfig = {
+        apiKey: "AIzaSyCfu7XC8pXtpDyQ-9Cjdg4AobA-EVEwWcc",
+        authDomain: "e-mindcare.firebaseapp.com",
+        projectId: "e-mindcare",
+        storageBucket: "e-mindcare.firebasestorage.app",
+        messagingSenderId: "1021883944936",
+        appId: "1:1021883944936:web:39c75a0c98d19a37afde5d",
+        measurementId: "G-3CJVKWGEXV"
+    };
+    
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const studentsCollection = collection(db, "students");
+    const meritCollection = collection(db, "merit_records");
+    
+    // Get student info from sessionStorage
+    const studentName = sessionStorage.getItem('studentName') || 'Pelajar';
+    const studentIC = sessionStorage.getItem('studentIC') || '';
+    const studentClass = sessionStorage.getItem('studentClass') || '-';
+    const studentSession = sessionStorage.getItem('studentSession') || '2026';
+    
+    // Display student profile
+    document.getElementById('studentName').innerText = studentName;
+    document.getElementById('studentIC').innerText = studentIC;
+    document.getElementById('studentClass').innerText = studentClass;
+    document.getElementById('studentSession').innerText = studentSession;
+    
+    let studentId = null;
+    let allMeritRecords = [];
+    
+    async function getStudentId() {
+        try {
+            const q = query(studentsCollection, where("icNumber", "==", studentIC));
+            const snapshot = await getDocs(q);
+            if (!snapshot.empty) {
+                snapshot.forEach(doc => {
+                    studentId = doc.id;
+                });
+                console.log("Student ID found:", studentId);
+                return true;
+            } else {
+                console.log("Student not found in database");
+                return false;
+            }
+        } catch(e) {
+            console.error("Error getting student ID:", e);
+            return false;
+        }
+    }
+    
+    async function loadMeritRecords() {
+        const container = document.getElementById('recordsContainer');
+        if (!studentId) {
+            container.innerHTML = '<div class="empty-state"><i class="fas fa-user-slash"></i><p>Data pelajar tidak ditemui</p></div>';
+            return;
+        }
+        
+        try {
+            const q = query(meritCollection, where("studentId", "==", studentId), orderBy("createdAt", "desc"));
+            const snapshot = await getDocs(q);
+            allMeritRecords = [];
+            snapshot.forEach(doc => allMeritRecords.push({ id: doc.id, ...doc.data() }));
+            
+            // Calculate total merit
+            const total = allMeritRecords.reduce((sum, r) => sum + (r.points || 0), 0);
+            const totalElement = document.getElementById('totalMerit');
+            totalElement.innerText = total;
+            totalElement.className = total >= 0 ? 'positive' : 'negative';
+            
+            // Calculate stats
+            const positiveCount = allMeritRecords.filter(r => r.type === 'positive').length;
+            const negativeCount = allMeritRecords.filter(r => r.type === 'negative').length;
+            document.getElementById('positiveCount').innerText = positiveCount;
+            document.getElementById('negativeCount').innerText = negativeCount;
+            document.getElementById('totalRecords').innerText = allMeritRecords.length;
+            
+            if (allMeritRecords.length === 0) {
+                container.innerHTML = '<div class="empty-state"><i class="fas fa-star"></i><p>Tiada rekod merit lagi</p><p style="font-size:12px;">Teruskan melakukan kebaikan untuk mendapat merit!</p></div>';
+                return;
+            }
+            
+            let html = '';
+            for (const record of allMeritRecords) {
+                const isPositive = record.type === 'positive';
+                const typeClass = isPositive ? 'positive' : 'negative';
+                const typeIcon = isPositive ? '<i class="fas fa-heart"></i>' : '<i class="fas fa-exclamation-triangle"></i>';
+                const typeText = isPositive ? 'Kebaikan' : 'Kesalahan';
+                const pointSymbol = isPositive ? '+' : '';
+                const pointClass = isPositive ? 'positive' : 'negative';
+                
+                // Determine level text for kesalahan
+                let levelText = '';
+                if (!isPositive && record.level) {
+                    const levelMap = {
+                        'ringan': 'Ringan',
+                        'sederhana': 'Sederhana',
+                        'berat': 'Berat'
+                    };
+                    levelText = `<span style="font-size:0.7rem; color:#5b6e8c;"> (${levelMap[record.level] || record.level})</span>`;
+                }
+                
+                html += `
+                    <div class="merit-record merit-record-${typeClass}">
+                        <div class="record-header">
+                            <span class="record-type ${typeClass}">${typeIcon} ${typeText}${levelText}</span>
+                            <span class="record-points ${pointClass}">${pointSymbol}${record.points} markah</span>
+                        </div>
+                        <div class="record-description">
+                            ${escapeHtml(record.description)}
+                        </div>
+                        <div class="record-meta">
+                            <span><i class="fas fa-calendar"></i> ${formatDate(record.createdAt)}</span>
+                            <span><i class="fas fa-user-check"></i> Didaftar oleh: ${escapeHtml(record.createdBy || 'Guru')}</span>
+                        </div>
+                    </div>
+                `;
+            }
+            container.innerHTML = html;
+        } catch(e) {
+            console.error("Error loading merit records:", e);
+            container.innerHTML = '<div class="empty-state"><p style="color:#dc2626;">Ralat memuat data. Sila refresh.</p></div>';
+        }
+    }
+    
+    function formatDate(dateStr) {
+        if (!dateStr) return '-';
+        const date = new Date(dateStr);
+        return date.toLocaleDateString('ms-MY', { day: 'numeric', month: 'long', year: 'numeric' });
+    }
+    
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, m => m==='&'?'&amp;':m==='<'?'&lt;':'&gt;');
+    }
+    
+    async function init() {
+        await getStudentId();
+        await loadMeritRecords();
+    }
+    
+    init();
+</script>
+
+<!-- NOTA PENTING:
+     Halaman ini akan memaparkan:
+     1. Profil pelajar (Nama, IC, Kelas, Tahun)
+     2. Jumlah mata merit semasa
+     3. Statistik (bilangan kebaikan & kesalahan)
+     4. Senarai transaksi merit dengan detail:
+        - Jenis (Kebaikan/Kesalahan)
+        - Mata merit ditambah/ditolak
+        - Keterangan/penyataan
+        - Tarikh
+        - Siapa yang mendaftar
+-->
+</body>
+</html>

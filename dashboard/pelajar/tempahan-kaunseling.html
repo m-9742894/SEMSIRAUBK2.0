@@ -26,22 +26,6 @@
         .user-profile span { font-weight: 600; }
         .btn-logout { background: #fee2e2; border: none; color: #dc2626; padding: 6px 12px; border-radius: 40px; cursor: pointer; font-weight: 600; font-size: 0.7rem; }
         
-        /* Admin Panel for Holidays */
-        .admin-panel { background: white; border-radius: 1.5rem; padding: 1.5rem; margin-bottom: 2rem; box-shadow: 0 8px 20px -8px rgba(0,0,0,0.08); }
-        .admin-panel h3 { font-size: 1.2rem; color: #1e293b; margin-bottom: 1rem; display: flex; align-items: center; gap: 10px; }
-        .admin-panel h3 i { color: #4f46e5; }
-        .admin-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; }
-        .holiday-section { background: #f8fafc; border-radius: 1rem; padding: 1rem; }
-        .holiday-section h4 { font-size: 1rem; margin-bottom: 1rem; color: #1e293b; }
-        .weekly-checkbox { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.8rem; }
-        .weekly-checkbox label { cursor: pointer; }
-        .btn-holiday { background: #4f46e5; color: white; border: none; padding: 0.5rem 1rem; border-radius: 2rem; font-weight: 600; cursor: pointer; margin-top: 0.5rem; }
-        .btn-holiday-secondary { background: #e2e8f0; color: #1e293b; }
-        .extra-holiday-item { background: white; border-radius: 0.8rem; padding: 0.5rem; margin-bottom: 0.5rem; display: flex; justify-content: space-between; align-items: center; }
-        .extra-holiday-item span { font-size: 0.8rem; }
-        .delete-holiday { background: #fee2e2; color: #dc2626; border: none; padding: 0.2rem 0.6rem; border-radius: 1rem; cursor: pointer; font-size: 0.7rem; }
-        .small-text { font-size: 0.7rem; color: #5b6e8c; margin-top: 0.3rem; }
-        
         .page-header { background: linear-gradient(135deg, #4f46e5, #7c3aed); color: white; padding: 30px 20px; text-align: center; border-radius: 24px; margin-bottom: 30px; }
         .page-header h1 { font-size: 1.8rem; margin-bottom: 8px; }
         
@@ -93,10 +77,6 @@
         .modal-header { padding: 1rem; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; }
         .modal-body { padding: 1rem; }
         .modal-btn { width: 100%; padding: 0.8rem; background: #4f46e5; color: white; border: none; border-radius: 2rem; font-weight: 600; cursor: pointer; margin-top: 1rem; }
-        
-        @media (max-width: 700px) {
-            .admin-grid { grid-template-columns: 1fr; }
-        }
     </style>
 </head>
 <body>
@@ -109,46 +89,6 @@
         <div style="display: flex; gap: 1rem; align-items: center;">
             <a href="dashboard-pelajar.html" class="back-btn"><i class="fas fa-arrow-left"></i> Kembali</a>
             <div class="user-profile"><i class="fas fa-user-circle"></i><span id="userNameDisplay">Pelajar</span><button class="btn-logout" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Log Keluar</button></div>
-        </div>
-    </div>
-    
-    <!-- ADMIN PANEL UNTUK TETAPAN CUTI (HANYA KAUNSELOR BOLEH LIHAT) -->
-    <div id="adminPanel" class="admin-panel" style="display: none;">
-        <h3><i class="fas fa-calendar-times"></i> Panel Kawalan Cuti (Kaunselor Sahaja)</h3>
-        <div class="admin-grid">
-            <!-- Cuti Mingguan -->
-            <div class="holiday-section">
-                <h4><i class="fas fa-calendar-week"></i> Cuti Mingguan</h4>
-                <div id="weeklyHolidaysContainer">
-                    <div class="weekly-checkbox"><input type="checkbox" id="weeklySun" value="0"> <label>Ahad (Hari Cuti Mingguan)</label></div>
-                    <div class="weekly-checkbox"><input type="checkbox" id="weeklyMon" value="1"> <label>Isnin</label></div>
-                    <div class="weekly-checkbox"><input type="checkbox" id="weeklyTue" value="2"> <label>Selasa</label></div>
-                    <div class="weekly-checkbox"><input type="checkbox" id="weeklyWed" value="3"> <label>Rabu</label></div>
-                    <div class="weekly-checkbox"><input type="checkbox" id="weeklyThu" value="4"> <label>Khamis</label></div>
-                    <div class="weekly-checkbox"><input type="checkbox" id="weeklyFri" value="5"> <label>Jumaat</label></div>
-                    <div class="weekly-checkbox"><input type="checkbox" id="weeklySat" value="6"> <label>Sabtu (Hari Cuti Mingguan)</label></div>
-                </div>
-                <button class="btn-holiday" id="saveWeeklyBtn"><i class="fas fa-save"></i> Simpan Cuti Mingguan</button>
-                <div class="small-text"><i class="fas fa-info-circle"></i> Hari yang dipilih akan menjadi cuti tetap setiap minggu.</div>
-            </div>
-            
-            <!-- Cuti Tambahan (Tarikh Tertentu) -->
-            <div class="holiday-section">
-                <h4><i class="fas fa-plus-circle"></i> Cuti Tambahan</h4>
-                <div class="form-group" style="margin-bottom: 0.5rem;">
-                    <input type="date" id="extraHolidayDate" style="width: 100%; padding: 0.5rem;">
-                </div>
-                <div class="form-group" style="margin-bottom: 0.5rem;">
-                    <input type="text" id="extraHolidayName" placeholder="Nama Cuti (cth: Tahun Baru, Deepavali)" style="width: 100%; padding: 0.5rem;">
-                </div>
-                <button class="btn-holiday" id="addExtraHolidayBtn"><i class="fas fa-plus"></i> Tambah Cuti</button>
-                <div style="margin-top: 1rem;">
-                    <h5 style="font-size: 0.8rem; margin-bottom: 0.5rem;">Senarai Cuti Tambahan:</h5>
-                    <div id="extraHolidaysList" style="max-height: 200px; overflow-y: auto;">
-                        <p class="small-text">Loading...</p>
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
     
@@ -239,13 +179,14 @@
     
     const studentName = sessionStorage.getItem('studentName') || 'Pelajar';
     const studentIC = sessionStorage.getItem('studentIC') || '';
-    const isCounselor = sessionStorage.getItem('teacherId') !== null; // Simple check
     document.getElementById('userNameDisplay').innerText = studentName;
+    
+    console.log("Student IC:", studentIC);
     
     let calendar = null;
     let selectedDate = null;
-    let weeklyHolidays = []; // Store day indices (0-6, 0=Sunday)
-    let extraHolidays = []; // Store {date, name}
+    let weeklyHolidays = [];
+    let extraHolidays = [];
     let myBookings = [];
     
     // ==================== LOAD HOLIDAYS ====================
@@ -254,8 +195,7 @@
             const snapshot = await getDocs(weeklyHolidaysCollection);
             weeklyHolidays = [];
             snapshot.forEach(doc => {
-                const data = doc.data();
-                if (data.day !== undefined) weeklyHolidays.push(data.day);
+                if (doc.data().day !== undefined) weeklyHolidays.push(doc.data().day);
             });
             console.log("Weekly holidays:", weeklyHolidays);
         } catch(e) { console.error(e); }
@@ -266,10 +206,9 @@
             const snapshot = await getDocs(extraHolidaysCollection);
             extraHolidays = [];
             snapshot.forEach(doc => {
-                extraHolidays.push({ id: doc.id, ...doc.data() });
+                extraHolidays.push(doc.data().date);
             });
             console.log("Extra holidays:", extraHolidays);
-            renderExtraHolidaysList();
         } catch(e) { console.error(e); }
     }
     
@@ -278,89 +217,15 @@
     }
     
     function isExtraHoliday(dateStr) {
-        return extraHolidays.some(h => h.date === dateStr);
+        return extraHolidays.includes(dateStr);
     }
     
     function isDateHoliday(dateStr, dayOfWeek) {
         return isWeeklyHoliday(dayOfWeek) || isExtraHoliday(dateStr);
     }
     
-    // ==================== ADMIN UI ====================
-    function renderExtraHolidaysList() {
-        const container = document.getElementById('extraHolidaysList');
-        if (extraHolidays.length === 0) {
-            container.innerHTML = '<p class="small-text">Tiada cuti tambahan. Klik "Tambah Cuti" untuk menetapkan.</p>';
-            return;
-        }
-        let html = '';
-        extraHolidays.forEach(h => {
-            html += `<div class="extra-holiday-item">
-                        <span><strong>${h.date}</strong> - ${h.name || 'Cuti'}</span>
-                        <button class="delete-holiday" onclick="deleteExtraHoliday('${h.id}')"><i class="fas fa-trash"></i></button>
-                    </div>`;
-        });
-        container.innerHTML = html;
-    }
-    
-    window.deleteExtraHoliday = async function(id) {
-        if (confirm('Padam cuti ini?')) {
-            try {
-                await deleteDoc(doc(db, "extraHolidays", id));
-                await loadExtraHolidays();
-                if (calendar) calendar.refetchEvents();
-                showAlert('Cuti berjaya dipadam', 'success');
-            } catch(e) { console.error(e); showAlert('Gagal memadam cuti', 'error'); }
-        }
-    };
-    
-    async function saveWeeklyHolidays() {
-        // Delete all existing
-        const snapshot = await getDocs(weeklyHolidaysCollection);
-        for (const docSnap of snapshot.docs) {
-            await deleteDoc(doc(db, "weeklyHolidays", docSnap.id));
-        }
-        // Add selected
-        const checkboxes = ['weeklySun', 'weeklyMon', 'weeklyTue', 'weeklyWed', 'weeklyThu', 'weeklyFri', 'weeklySat'];
-        const days = [0, 1, 2, 3, 4, 5, 6];
-        for (let i = 0; i < checkboxes.length; i++) {
-            const cb = document.getElementById(checkboxes[i]);
-            if (cb && cb.checked) {
-                await addDoc(weeklyHolidaysCollection, { day: days[i] });
-            }
-        }
-        await loadWeeklyHolidays();
-        if (calendar) calendar.refetchEvents();
-        showAlert('Cuti mingguan berjaya disimpan!', 'success');
-    }
-    
-    async function addExtraHoliday() {
-        const date = document.getElementById('extraHolidayDate').value;
-        const name = document.getElementById('extraHolidayName').value.trim();
-        if (!date) { showAlert('Sila pilih tarikh', 'error'); return; }
-        await addDoc(extraHolidaysCollection, { date: date, name: name || 'Cuti', createdAt: new Date().toISOString() });
-        document.getElementById('extraHolidayDate').value = '';
-        document.getElementById('extraHolidayName').value = '';
-        await loadExtraHolidays();
-        if (calendar) calendar.refetchEvents();
-        showAlert('Cuti tambahan berjaya ditambah!', 'success');
-    }
-    
-    function updateWeeklyCheckboxes() {
-        document.getElementById('weeklySun').checked = weeklyHolidays.includes(0);
-        document.getElementById('weeklyMon').checked = weeklyHolidays.includes(1);
-        document.getElementById('weeklyTue').checked = weeklyHolidays.includes(2);
-        document.getElementById('weeklyWed').checked = weeklyHolidays.includes(3);
-        document.getElementById('weeklyThu').checked = weeklyHolidays.includes(4);
-        document.getElementById('weeklyFri').checked = weeklyHolidays.includes(5);
-        document.getElementById('weeklySat').checked = weeklyHolidays.includes(6);
-    }
-    
-    // Show admin panel only for counselor
-    if (isCounselor) {
-        document.getElementById('adminPanel').style.display = 'block';
-    }
-    
-    // ==================== LOAD MY BOOKINGS ====================
+    // ==================== LOAD MY BOOKINGS FROM FIREBASE ====================
+    // Menggunakan collection "appointments" yang SAMA dengan kaunselor
     async function loadMyBookings() {
         const container = document.getElementById('bookingListContainer');
         try {
@@ -368,6 +233,8 @@
             const snapshot = await getDocs(q);
             myBookings = [];
             snapshot.forEach(doc => myBookings.push({ id: doc.id, ...doc.data() }));
+            
+            console.log("My bookings count:", myBookings.length);
             
             if (myBookings.length === 0) {
                 container.innerHTML = '<div class="empty-state"><i class="fas fa-calendar-times"></i><p>Tiada permohonan lagi</p><p style="font-size:12px;">Klik pada tarikh di kalendar untuk membuat permohonan</p></div>';
@@ -378,37 +245,66 @@
             for (const b of myBookings) {
                 let statusClass = 'status-pending';
                 let statusText = '⏳ Dalam Semakan';
-                if (b.status === 'approved') { statusClass = 'status-approved'; statusText = '✅ Diluluskan'; }
-                else if (b.status === 'rejected') { statusClass = 'status-rejected'; statusText = '❌ Ditolak'; }
-                else if (b.status === 'postponed') { statusClass = 'status-postponed'; statusText = '🔄 Ditangguhkan'; }
+                if (b.status === 'approved') { 
+                    statusClass = 'status-approved'; 
+                    statusText = '✅ Diluluskan'; 
+                } else if (b.status === 'rejected') { 
+                    statusClass = 'status-rejected'; 
+                    statusText = '❌ Ditolak'; 
+                } else if (b.status === 'postponed') { 
+                    statusClass = 'status-postponed'; 
+                    statusText = '🔄 Ditangguhkan'; 
+                }
                 
                 html += `<div class="booking-item">
-                    <div class="booking-header"><span class="booking-date"><i class="fas fa-calendar"></i> ${formatDate(b.requestedDate)}</span><span class="status-badge ${statusClass}">${statusText}</span></div>
+                    <div class="booking-header">
+                        <span class="booking-date"><i class="fas fa-calendar"></i> ${formatDate(b.requestedDate)}</span>
+                        <span class="status-badge ${statusClass}">${statusText}</span>
+                    </div>
                     <div class="booking-detail"><i class="fas fa-user-tie"></i> <strong>Kaunselor:</strong> ${escapeHtml(b.counselor || '-')}</div>
                     <div class="booking-detail"><i class="fas fa-share-alt"></i> <strong>Perkara:</strong> ${escapeHtml(b.topic || '-')}</div>
                     <div class="booking-detail"><i class="fas fa-heart"></i> <strong>Perasaan:</strong> ${escapeHtml(b.feelings || '-')}</div>
                     <div class="booking-detail"><i class="fas fa-clock"></i> <strong>Perlu segera:</strong> ${b.urgent === 'ya' ? 'Ya' : 'Tidak'}</div>`;
                 
+                // Paparan maklumat tambahan berdasarkan status dari kaunselor
                 if (b.status === 'approved' && b.appointmentDate) {
-                    html += `<div class="booking-message" style="background:#dcfce7;"><i class="fas fa-calendar-check"></i> <strong>Temujanji:</strong> ${formatDate(b.appointmentDate)} ${b.appointmentTime ? `⏰ ${b.appointmentTime}` : ''}<br>📍 ${b.location || 'Bilik Kaunseling'}</div>`;
+                    html += `<div class="booking-message" style="background:#dcfce7;">
+                        <i class="fas fa-calendar-check"></i> <strong>Temujanji Dijadualkan:</strong><br>
+                        📅 ${formatDate(b.appointmentDate)} ${b.appointmentTime ? `⏰ ${b.appointmentTime}` : ''}<br>
+                        📍 ${b.location || 'Bilik Kaunseling'}
+                    </div>`;
                 } else if (b.status === 'postponed' && b.newDate) {
-                    html += `<div class="booking-message" style="background:#e0e7ff;"><i class="fas fa-clock"></i> <strong>Ditangguhkan ke:</strong> ${formatDate(b.newDate)}<br>💬 ${escapeHtml(b.message || 'Sila buat permohonan baru')}</div>
-                    <div style="margin-top:8px;"><button class="btn-edit" onclick="scrollToCalendar()" style="background:#4f46e5; color:white; width:100%;">📅 Buat Permohonan Baru</button></div>`;
+                    html += `<div class="booking-message" style="background:#e0e7ff;">
+                        <i class="fas fa-clock"></i> <strong>Permohonan Ditangguhkan:</strong><br>
+                        📅 Cadangan Tarikh Baru: ${formatDate(b.newDate)}<br>
+                        💬 ${escapeHtml(b.message || 'Sila buat permohonan baru pada tarikh tersebut')}
+                    </div>
+                    <div style="margin-top:8px;"><button class="btn-edit" onclick="scrollToCalendar()" style="background:#4f46e5; color:white; width:100%; border:none; padding:8px; border-radius:40px; cursor:pointer;">📅 Buat Permohonan Baru</button></div>`;
                 } else if (b.status === 'rejected') {
-                    html += `<div class="booking-message" style="background:#fee2e2;"><i class="fas fa-times-circle"></i> <strong>Sebab Ditolak:</strong> ${escapeHtml(b.reason || 'Permohonan tidak dapat diproses.')}</div>
-                    <div style="margin-top:8px;"><button class="btn-edit" onclick="scrollToCalendar()" style="background:#4f46e5; color:white; width:100%;">📅 Buat Permohonan Baru</button></div>`;
+                    html += `<div class="booking-message" style="background:#fee2e2;">
+                        <i class="fas fa-times-circle"></i> <strong>Permohonan Ditolak:</strong><br>
+                        💬 ${escapeHtml(b.reason || 'Permohonan tidak dapat diproses. Sila buat permohonan baru.')}
+                    </div>
+                    <div style="margin-top:8px;"><button class="btn-edit" onclick="scrollToCalendar()" style="background:#4f46e5; color:white; width:100%; border:none; padding:8px; border-radius:40px; cursor:pointer;">📅 Buat Permohonan Baru</button></div>`;
+                } else if (b.status === 'pending') {
+                    html += `<div class="booking-message" style="background:#fef3c7;">
+                        <i class="fas fa-hourglass-half"></i> Permohonan sedang diproses oleh kaunselor. Sila tunggu pengesahan.
+                    </div>`;
                 }
                 
+                // Butang edit dan hapus hanya untuk status pending
                 if (b.status === 'pending') {
-                    html += `<div style="margin-top:10px;"><button class="btn-edit" onclick="openEditModal('${b.id}')"><i class="fas fa-edit"></i> Edit</button>
-                    <button class="btn-delete" onclick="deleteBooking('${b.id}')"><i class="fas fa-trash"></i> Hapus</button></div>`;
+                    html += `<div style="margin-top:10px;">
+                        <button class="btn-edit" onclick="openEditModal('${b.id}')"><i class="fas fa-edit"></i> Edit</button>
+                        <button class="btn-delete" onclick="deleteBooking('${b.id}')"><i class="fas fa-trash"></i> Hapus</button>
+                    </div>`;
                 }
                 html += `</div>`;
             }
             container.innerHTML = html;
         } catch(e) {
-            console.error(e);
-            container.innerHTML = '<div class="empty-state"><p style="color:#dc2626;">Ralat memuat data. Sila refresh.</p></div>';
+            console.error("Error loading bookings:", e);
+            container.innerHTML = '<div class="empty-state"><p style="color:#dc2626;">Ralat memuat data. Sila refresh halaman.</p></div>';
         }
     }
     
@@ -419,11 +315,11 @@
         const feelings = document.getElementById('feelings').value.trim();
         const urgent = document.querySelector('input[name="urgent"]:checked')?.value;
         
-        if (!selectedDate) { showAlert('Pilih tarikh', 'error'); return; }
-        if (!counselor) { showAlert('Pilih kaunselor', 'error'); return; }
-        if (!topic) { showAlert('Isi perkara dikongsi', 'error'); return; }
-        if (!feelings) { showAlert('Isi perasaan anda', 'error'); return; }
-        if (!urgent) { showAlert('Pilih perlu segera atau tidak', 'error'); return; }
+        if (!selectedDate) { showAlert('Sila pilih tarikh terlebih dahulu!', 'error'); return; }
+        if (!counselor) { showAlert('Sila pilih kaunselor!', 'error'); return; }
+        if (!topic) { showAlert('Sila masukkan perkara yang ingin dikongsikan!', 'error'); return; }
+        if (!feelings) { showAlert('Sila terangkan perasaan anda!', 'error'); return; }
+        if (!urgent) { showAlert('Sila pilih sama ada perlu segera atau tidak!', 'error'); return; }
         
         const btn = document.getElementById('bookBtn');
         btn.disabled = true;
@@ -431,30 +327,39 @@
         
         try {
             await addDoc(appointmentsCollection, {
-                studentName, studentIC, requestedDate: selectedDate,
-                counselor, topic, feelings, urgent,
-                status: 'pending', createdAt: new Date().toISOString()
+                studentName: studentName,
+                studentIC: studentIC,
+                requestedDate: selectedDate,
+                counselor: counselor,
+                topic: topic,
+                feelings: feelings,
+                urgent: urgent,
+                status: 'pending',
+                createdAt: new Date().toISOString()
             });
-            showAlert('✅ Permohonan berjaya dihantar!', 'success');
+            showAlert('✅ Permohonan berjaya dihantar! Kaunselor akan menyemak.', 'success');
             
+            // Reset form
             document.getElementById('counselorSelect').value = '';
             document.getElementById('topic').value = '';
             document.getElementById('feelings').value = '';
             document.querySelectorAll('input[name="urgent"]').forEach(r => r.checked = false);
             document.getElementById('formSection').style.display = 'none';
-            if (calendar) { calendar.getEvents().forEach(e => { if(e.title === 'Selected') e.remove(); }); }
+            if (calendar) {
+                calendar.getEvents().forEach(e => { if(e.title === 'Selected') e.remove(); });
+            }
             selectedDate = null;
             await loadMyBookings();
         } catch(e) {
-            console.error(e);
-            showAlert('❌ Gagal hantar permohonan', 'error');
+            console.error("Error creating booking:", e);
+            showAlert('❌ Gagal menghantar permohonan. Sila cuba lagi.', 'error');
         } finally {
             btn.disabled = false;
             btn.innerHTML = '<i class="fas fa-paper-plane"></i> Hantar Permohonan';
         }
     }
     
-    // ==================== EDIT/DELETE ====================
+    // ==================== EDIT BOOKING ====================
     window.openEditModal = function(id) {
         const booking = myBookings.find(b => b.id === id);
         if (!booking) return;
@@ -462,12 +367,17 @@
         document.getElementById('editCounselor').value = booking.counselor || '';
         document.getElementById('editTopic').value = booking.topic || '';
         document.getElementById('editFeelings').value = booking.feelings || '';
-        if (booking.urgent === 'ya') document.querySelector('input[name="editUrgent"][value="ya"]').checked = true;
-        else document.querySelector('input[name="editUrgent"][value="tidak"]').checked = true;
+        if (booking.urgent === 'ya') {
+            document.querySelector('input[name="editUrgent"][value="ya"]').checked = true;
+        } else {
+            document.querySelector('input[name="editUrgent"][value="tidak"]').checked = true;
+        }
         document.getElementById('editModal').style.display = 'flex';
     };
     
-    window.closeEditModal = function() { document.getElementById('editModal').style.display = 'none'; };
+    window.closeEditModal = function() { 
+        document.getElementById('editModal').style.display = 'none'; 
+    };
     
     document.getElementById('editForm').addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -477,24 +387,36 @@
         const feelings = document.getElementById('editFeelings').value;
         const urgent = document.querySelector('input[name="editUrgent"]:checked')?.value;
         try {
-            await updateDoc(doc(db, "appointments", id), { counselor, topic, feelings, urgent, updatedAt: new Date().toISOString() });
-            showAlert('✅ Permohonan dikemaskini!', 'success');
+            await updateDoc(doc(db, "appointments", id), { 
+                counselor, topic, feelings, urgent, 
+                updatedAt: new Date().toISOString() 
+            });
+            showAlert('✅ Permohonan berjaya dikemaskini!', 'success');
             closeEditModal();
             await loadMyBookings();
-        } catch(e) { showAlert('❌ Gagal kemaskini', 'error'); }
+        } catch(e) { 
+            console.error(e);
+            showAlert('❌ Gagal mengemaskini permohonan', 'error'); 
+        }
     });
     
+    // ==================== DELETE BOOKING ====================
     window.deleteBooking = async function(id) {
-        if (confirm('Padam permohonan ini?')) {
+        if (confirm('Adakah anda pasti mahu membatalkan permohonan ini?')) {
             try {
                 await deleteDoc(doc(db, "appointments", id));
-                showAlert('Permohonan dipadam', 'success');
+                showAlert('Permohonan berjaya dibatalkan', 'success');
                 await loadMyBookings();
-            } catch(e) { showAlert('Gagal padam', 'error'); }
+            } catch(e) { 
+                console.error(e);
+                showAlert('Gagal membatalkan permohonan', 'error'); 
+            }
         }
     };
     
-    window.scrollToCalendar = function() { document.querySelector('.card').scrollIntoView({ behavior: 'smooth' }); };
+    window.scrollToCalendar = function() {
+        document.querySelector('.card').scrollIntoView({ behavior: 'smooth' });
+    };
     
     // ==================== CALENDAR ====================
     function initCalendar() {
@@ -502,7 +424,9 @@
         calendar = new FullCalendar.Calendar(el, {
             initialView: 'dayGridMonth',
             headerToolbar: { left: 'prev,next', center: 'title', right: 'dayGridMonth' },
-            height: 'auto', firstDay: 1, locale: 'ms',
+            height: 'auto',
+            firstDay: 1,
+            locale: 'ms',
             dayCellDidMount: function(info) {
                 const y = info.date.getFullYear();
                 const m = String(info.date.getMonth() + 1).padStart(2, '0');
@@ -517,7 +441,8 @@
                     info.el.title = 'Cuti - Bengkel Tutup';
                 }
                 
-                const today = new Date(); today.setHours(0,0,0,0);
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
                 if (info.date < today) {
                     info.el.classList.add('fc-day-disabled');
                     info.el.style.backgroundColor = '#f5f5f5';
@@ -529,45 +454,69 @@
                 const d = String(info.date.getDate()).padStart(2, '0');
                 const dateStr = `${y}-${m}-${d}`;
                 const dayOfWeek = info.date.getDay();
-                const today = new Date(); today.setHours(0,0,0,0);
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
                 
                 if (isDateHoliday(dateStr, dayOfWeek)) {
                     showAlert('Tarikh ini adalah CUTI. Sila pilih tarikh lain.', 'error');
                     return;
                 }
                 if (info.date < today) {
-                    showAlert('Tarikh sudah berlalu.', 'error');
+                    showAlert('Tarikh sudah berlalu. Sila pilih tarikh akan datang.', 'error');
                     return;
                 }
                 
                 selectedDate = dateStr;
                 document.getElementById('selectedDateDisplay').innerHTML = formatDate(selectedDate);
                 document.getElementById('formSection').style.display = 'block';
+                
                 if (calendar) {
                     calendar.getEvents().forEach(e => { if(e.title === 'Selected') e.remove(); });
-                    calendar.addEvent({ title: 'Selected', start: dateStr, display: 'background', backgroundColor: '#4f46e5', opacity: 0.3 });
+                    calendar.addEvent({ 
+                        title: 'Selected', 
+                        start: dateStr, 
+                        display: 'background', 
+                        backgroundColor: '#4f46e5', 
+                        opacity: 0.3 
+                    });
                 }
             }
         });
         calendar.render();
     }
     
-    function formatDate(ds) { if(!ds) return '-'; const d = new Date(ds); return d.toLocaleDateString('ms-MY',{day:'numeric',month:'long',year:'numeric'}); }
-    function escapeHtml(s) { if(!s) return ''; return s.replace(/[&<>]/g, m => m==='&'?'&amp;':m==='<'?'&lt;':'&gt;'); }
-    function showAlert(msg, type) { const a = document.getElementById('alertMessage'); a.textContent = msg; a.className = `alert ${type}`; setTimeout(()=>{ a.style.display='none'; },4000); }
-    window.logout = function() { sessionStorage.clear(); window.location.href='../index.html'; };
+    function formatDate(ds) { 
+        if(!ds) return '-'; 
+        const d = new Date(ds); 
+        return d.toLocaleDateString('ms-MY', { day: 'numeric', month: 'long', year: 'numeric' }); 
+    }
+    
+    function escapeHtml(s) { 
+        if(!s) return ''; 
+        return s.replace(/[&<>]/g, m => m==='&'?'&amp;':m==='<'?'&lt;':'&gt;'); 
+    }
+    
+    function showAlert(msg, type) { 
+        const a = document.getElementById('alertMessage'); 
+        a.textContent = msg; 
+        a.className = `alert ${type}`; 
+        setTimeout(() => { a.style.display = 'none'; }, 4000); 
+    }
+    
+    window.logout = function() { 
+        sessionStorage.clear(); 
+        window.location.href = '../index.html'; 
+    };
     
     document.getElementById('bookBtn').addEventListener('click', createBooking);
-    document.getElementById('saveWeeklyBtn').addEventListener('click', saveWeeklyHolidays);
-    document.getElementById('addExtraHolidayBtn').addEventListener('click', addExtraHoliday);
     
     async function init() {
         await loadWeeklyHolidays();
         await loadExtraHolidays();
-        updateWeeklyCheckboxes();
         initCalendar();
         await loadMyBookings();
     }
+    
     init();
 </script>
 </body>

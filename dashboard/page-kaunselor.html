@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Login Kaunselor | E-MindCare SEMSIRA</title>
+  <!-- Fonts & Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4c1d95 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* animated orbs */
+    .bg-orb {
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      z-index: 0;
+      overflow: hidden;
+    }
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(100px);
+      opacity: 0.3;
+      animation: floatAnim 25s infinite alternate ease-in-out;
+    }
+    .orb1 {
+      width: 550px;
+      height: 550px;
+      background: #a78bfa;
+      top: -200px;
+      left: -150px;
+    }
+    .orb2 {
+      width: 600px;
+      height: 600px;
+      background: #f472b6;
+      bottom: -200px;
+      right: -180px;
+      animation-duration: 30s;
+    }
+    .orb3 {
+      width: 400px;
+      height: 400px;
+      background: #38bdf8;
+      top: 50%;
+      left: 70%;
+      animation-duration: 22s;
+    }
+    @keyframes floatAnim {
+      0% { transform: translate(0,0) scale(1); }
+      100% { transform: translate(40px, -40px) scale(1.2); }
+    }
+
+    /* login card */
+    .login-card {
+      max-width: 500px;
+      width: 100%;
+      background: rgba(255, 255, 255, 0.96);
+      backdrop-filter: blur(16px);
+      border-radius: 2rem;
+      padding: 2rem 2rem 2.2rem;
+      box-shadow: 0 35px 55px -20px rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      position: relative;
+      z-index: 10;
+      transition: transform 0.3s;
+    }
+
+    .login-header {
+      text-align: center;
+      margin-bottom: 1.8rem;
+    }
+    .icon-badge {
+      background: linear-gradient(145deg, #4f46e5, #7c3aed);
+      width: 80px;
+      height: 80px;
+      border-radius: 35px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1rem;
+      box-shadow: 0 15px 25px -8px rgba(79, 70, 229, 0.5);
+    }
+    .icon-badge i {
+      font-size: 2.8rem;
+      color: white;
+    }
+    h1 {
+      font-size: 1.9rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #1e1b4b, #5b21b6);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      letter-spacing: -0.3px;
+    }
+    .sub-text {
+      font-size: 0.8rem;
+      color: #6c6f8c;
+      margin-top: 6px;
+    }
+
+    /* form */
+    .input-group {
+      margin-bottom: 1.5rem;
+    }
+    .input-group label {
+      display: block;
+      font-weight: 600;
+      font-size: 0.85rem;
+      color: #1f2a44;
+      margin-bottom: 0.5rem;
+    }
+    .input-group label i {
+      margin-right: 8px;
+      color: #4f46e5;
+    }
+    .input-field {
+      width: 100%;
+      padding: 0.9rem 1rem;
+      font-size: 0.95rem;
+      font-family: inherit;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 1.2rem;
+      background: white;
+      transition: all 0.2s;
+      outline: none;
+    }
+    .input-field:focus {
+      border-color: #4f46e5;
+      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+    }
+
+    /* login button */
+    .login-btn {
+      width: 100%;
+      background: linear-gradient(95deg, #4f46e5, #7c3aed);
+      border: none;
+      padding: 0.9rem;
+      border-radius: 3rem;
+      font-weight: 700;
+      font-size: 1rem;
+      color: white;
+      cursor: pointer;
+      transition: all 0.25s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 0.5rem;
+      box-shadow: 0 8px 18px rgba(79, 70, 229, 0.35);
+    }
+    .login-btn:hover {
+      transform: translateY(-2px);
+      background: linear-gradient(95deg, #4338ca, #6d28d9);
+      box-shadow: 0 12px 24px rgba(79, 70, 229, 0.45);
+    }
+
+    .back-link {
+      text-align: center;
+      margin-top: 1.8rem;
+    }
+    .back-link a {
+      text-decoration: none;
+      color: #4f46e5;
+      font-weight: 600;
+      font-size: 0.85rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: 0.2s;
+    }
+    .back-link a:hover {
+      gap: 10px;
+      color: #7c3aed;
+    }
+
+    .info-note {
+      background: #f1f5f9;
+      border-radius: 1rem;
+      padding: 0.7rem;
+      margin-top: 1.5rem;
+      text-align: center;
+      font-size: 0.7rem;
+      color: #4b5563;
+    }
+
+    @media (max-width: 500px) {
+      .login-card {
+        padding: 1.5rem;
+      }
+      h1 {
+        font-size: 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="bg-orb">
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+  <div class="orb orb3"></div>
+</div>
+
+<div class="login-card" data-aos="fade-up">
+  <div class="login-header">
+    <div class="icon-badge">
+      <i class="fas fa-user-shield"></i>
+    </div>
+    <h1>Login Kaunselor</h1>
+    <div class="sub-text">Unit Bimbingan & Kaunseling • SMK Syed Sirajuddin</div>
+  </div>
+
+  <form id="kaunselorLoginForm">
+    <div class="input-group">
+      <label><i class="fas fa-key"></i> Kod Keselamatan</label>
+      <input type="password" class="input-field" id="securityCode" placeholder="Masukkan Kod Keselamatan" autocomplete="off">
+    </div>
+    <div class="input-group">
+      <label><i class="fas fa-lock"></i> Kata Kunci</label>
+      <input type="password" class="input-field" id="password" placeholder="Masukkan Kata Kunci" autocomplete="off">
+    </div>
+    
+    <button type="submit" class="login-btn">
+      <span>Log Masuk</span> <i class="fas fa-arrow-right"></i>
+    </button>
+  </form>
+
+  <div class="back-link">
+    <a href="index.html"><i class="fas fa-arrow-left"></i> Kembali ke Laman Utama</a>
+  </div>
+  <div class="info-note">
+    <i class="fas fa-shield-alt"></i> Akses terhad untuk kaunselor sekolah sahaja.
+  </div>
+</div>
+
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+  AOS.init({ once: true, duration: 600 });
+
+  // Kod dan kata kunci yang sah
+  const VALID_SECURITY_CODE = "REE0062@SEMSIRAKAUNSELOR";
+  const VALID_PASSWORD = "UBKSEMSIRA@1969";
+
+  const form = document.getElementById('kaunselorLoginForm');
+  const securityInput = document.getElementById('securityCode');
+  const passInput = document.getElementById('password');
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+
+    const enteredCode = securityInput.value.trim();
+    const enteredPass = passInput.value.trim();
+
+    // Semak sama ada kosong
+    if (enteredCode === "") {
+      alert("Sila masukkan Kod Keselamatan.");
+      securityInput.focus();
+      return;
+    }
+    if (enteredPass === "") {
+      alert("Sila masukkan Kata Kunci.");
+      passInput.focus();
+      return;
+    }
+
+    // Semak kesesuaian kod dan kata kunci
+    if (enteredCode === VALID_SECURITY_CODE && enteredPass === VALID_PASSWORD) {
+      // Login berjaya - redirect ke page dashboard kaunselor (kosong)
+      // Anda boleh tukar nama fail dashboard di sini
+      window.location.href = "dashboard-kaunselor.html";
+    } else {
+      // Login gagal
+      alert("Kod Keselamatan atau Kata Kunci yang anda masukkan adalah SALAH. Sila cuba lagi.");
+      securityInput.value = "";
+      passInput.value = "";
+      securityInput.focus();
+    }
+  });
+</script>
+
+<!-- NOTA PENTING:
+     Halaman "dashboard-kaunselor.html" belum dibuat.
+     Selepas login berjaya, sistem akan redirect ke page tersebut.
+     
+     Anda boleh cipta dashboard-kaunselor.html kemudian dan sambung dengan kod yang diperlukan.
+     
+     Sementara ini, jika fail belum wujud, pelayar akan papar ralat 404.
+     Disarankan untuk membuat dashboard-kaunselor.html kosong sebagai placeholder dahulu.
+-->
+</body>
+</html>

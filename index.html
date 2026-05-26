@@ -109,7 +109,6 @@
       transition: all 0.2s;
     }
 
-    /* EMPTY SLOT FOR PNG LOGO — kosong sepenuhnya untuk upload di GitHub */
     .logo-empty-slot {
       width: 56px;
       height: 56px;
@@ -429,11 +428,8 @@
   <!-- Header dengan slot logo KOSONG (tiada icon, tiada button upload) -->
   <div class="header" data-aos="fade-down" data-aos-duration="800">
     <div class="logo-wrapper">
-      <img src="LOGO SEMSIRA.png" alt="LOGO SEMSIRA" style="width: 80px; height: auto;">
-      <!-- RUANG KOSONG UNTUK LOGO PNG (di GitHub nanti boleh letak gambar) -->
       <div class="logo-empty-slot" id="logoEmptySlot">
-        <!-- Biarkan kosong sepenuhnya tanpa apa-apa icon atau teks -->
-        <!-- Pengguna akan tambah <img> melalui GitHub atau terus di HTML nanti -->
+        <!-- Ruang kosong untuk logo PNG - anda boleh tambah <img src="LOGO SEMSIRA.png"> di sini nanti -->
       </div>
       <div class="logo-text">
         <h2>E-MindCare SEMSIRA</h2>
@@ -465,39 +461,38 @@
     </div>
   </div>
 
-  <!-- Butang login ke page kosong (GUEST, PELAJAR, GURU, KAUNSELOR) -->
+  <!-- Butang login ke page berasingan (GUEST, PELAJAR, GURU, KAUNSELOR) -->
   <div class="access-panel" data-aos="fade-up" data-aos-delay="250">
     <div class="section-label">
       <span><i class="fas fa-sign-in-alt"></i> Akses Sistem</span>
     </div>
-    <a href="portal-utama.html" class="access-card-link" style="text-decoration: none; color: inherit;">
-      <div class="access-card" data-role="guest">
+    <div class="card-grid">
+      <!-- 1. GUEST -> Terus ke portal-utama.html (sudah sedia ada) -->
+      <div class="access-card" data-role="guest" data-url="portal-utama.html">
         <div class="card-icon"><i class="fas fa-user-friends"></i></div>
         <h3>GUEST</h3>
         <p>Terokai sebagai tetamu</p>
         <div class="btn-enter"><span>Masuk</span> <i class="fas fa-arrow-right"></i></div>
       </div>
-    </a>
-    
       
-      <!-- 2. LOGIN PELAJAR (baru) -->
-      <div class="access-card" data-role="pelajar">
+      <!-- 2. LOGIN PELAJAR -> redirect ke page kosong pelajar -->
+      <div class="access-card" data-role="pelajar" data-url="page-pelajar.html">
         <div class="card-icon"><i class="fas fa-graduation-cap"></i></div>
         <h3>LOGIN PELAJAR</h3>
         <p>Akses ruang pelajar</p>
         <div class="btn-enter"><span>Masuk</span> <i class="fas fa-arrow-right"></i></div>
       </div>
       
-      <!-- 3. LOGIN GURU -->
-      <div class="access-card" data-role="guru">
+      <!-- 3. LOGIN GURU -> redirect ke page kosong guru -->
+      <div class="access-card" data-role="guru" data-url="page-guru.html">
         <div class="card-icon"><i class="fas fa-chalkboard-user"></i></div>
         <h3>LOGIN GURU</h3>
         <p>Akses profesional guru</p>
         <div class="btn-enter"><span>Masuk</span> <i class="fas fa-arrow-right"></i></div>
       </div>
       
-      <!-- 4. LOGIN KAUNSELOR -->
-      <div class="access-card" data-role="kaunselor">
+      <!-- 4. LOGIN KAUNSELOR -> redirect ke page kosong kaunselor -->
+      <div class="access-card" data-role="kaunselor" data-url="page-kaunselor.html">
         <div class="card-icon"><i class="fas fa-user-graduate"></i></div>
         <h3>LOGIN KAUNSELOR</h3>
         <p>Panel kaunseling sekolah</p>
@@ -525,191 +520,52 @@
     easing: 'ease-out-sine'
   });
 
-  // FUNGSI MEMBUKA PAGE KOSONG (siap untuk sambung HTML lain nanti)
-  // Setiap butang akan membuka tab/window baru dengan halaman kosong yang minimal dan bersih
-  function openEmptyDestinationPage(roleType) {
-    let pageTitle = '';
-    let roleDisplay = '';
-    let iconHint = '';
-    
-    switch(roleType) {
-      case 'guest':
-        pageTitle = 'Dashboard Guest - E-MindCare SEMSIRA (Kosong)';
-        roleDisplay = 'RUANG TETAMU';
-        iconHint = 'fa-user-friends';
-        break;
-      case 'pelajar':
-        pageTitle = 'Dashboard Pelajar - E-MindCare SEMSIRA (Kosong)';
-        roleDisplay = 'PORTAL PELAJAR';
-        iconHint = 'fa-graduation-cap';
-        break;
-      case 'guru':
-        pageTitle = 'Dashboard Guru - E-MindCare SEMSIRA (Kosong)';
-        roleDisplay = 'PORTAL GURU';
-        iconHint = 'fa-chalkboard-user';
-        break;
-      case 'kaunselor':
-        pageTitle = 'Dashboard Kaunselor - E-MindCare SEMSIRA (Kosong)';
-        roleDisplay = 'PORTAL KAUNSELOR';
-        iconHint = 'fa-user-graduate';
-        break;
-      default:
-        pageTitle = 'Dashboard - E-MindCare (Kosong)';
-        roleDisplay = 'RUANG AKSES';
-        iconHint = 'fa-cube';
-    }
-    
-    const newWin = window.open();
-    if (!newWin) {
-      alert("Sila benarkan pop-up / buka tab baru untuk mengakses halaman.");
-      return;
-    }
-    
-    // Dokumen HTML kosong yang kemas dan sedia untuk diisi dengan kod selanjutnya
-    newWin.document.write(`
-      <!DOCTYPE html>
-      <html lang="ms">
-      <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>${pageTitle}</title>
-        <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;500;600;700;800&display=swap" rel="stylesheet">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-        <style>
-          * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-          }
-          body {
-            font-family: 'Inter', sans-serif;
-            background: linear-gradient(125deg, #f6f9fc 0%, #eef2fa 100%);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 2rem;
-          }
-          .empty-core {
-            max-width: 720px;
-            width: 100%;
-            background: rgba(255, 255, 255, 0.94);
-            backdrop-filter: blur(8px);
-            border-radius: 2rem;
-            padding: 2.5rem 2rem;
-            text-align: center;
-            box-shadow: 0 30px 45px -20px rgba(0, 0, 0, 0.2);
-            border: 1px solid rgba(255,255,245,0.9);
-          }
-          .role-tag {
-            background: #4f46e5;
-            color: white;
-            display: inline-block;
-            padding: 0.3rem 1.2rem;
-            border-radius: 40px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            letter-spacing: 0.4px;
-            margin-bottom: 1.4rem;
-          }
-          h2 {
-            font-size: 1.9rem;
-            font-weight: 700;
-            background: linear-gradient(145deg, #1e293b, #3b2b6b);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            margin-bottom: 0.75rem;
-          }
-          .empty-message {
-            background: #f8fafc;
-            border-radius: 1.5rem;
-            padding: 1.8rem;
-            margin: 1.8rem 0;
-            border: 2px dashed #cbd5e1;
-          }
-          .empty-message i {
-            font-size: 2.5rem;
-            color: #818cf8;
-            margin-bottom: 0.8rem;
-          }
-          p {
-            color: #334155;
-            line-height: 1.5;
-          }
-          button {
-            background: #4f46e5;
-            border: none;
-            color: white;
-            font-weight: 600;
-            padding: 0.7rem 2rem;
-            border-radius: 50px;
-            cursor: pointer;
-            margin-top: 1rem;
-            transition: 0.2s;
-          }
-          button:hover {
-            background: #4338ca;
-            transform: scale(0.97);
-          }
-          .hint {
-            font-size: 0.7rem;
-            color: #64748b;
-            margin-top: 1rem;
-          }
-          @media (max-width: 550px) {
-            .empty-core { padding: 1.5rem; }
-            h2 { font-size: 1.4rem; }
-          }
-        </style>
-      </head>
-      <body>
-        <div class="empty-core">
-          <div class="role-tag"><i class="fas ${iconHint}"></i> ${roleDisplay}</div>
-          <i class="fas fa-cube" style="font-size: 2.8rem; color:#8b5cf6; margin-bottom: 0.3rem;"></i>
-          <h2>Halaman Kosong (Sandbox)</h2>
-          <div class="empty-message">
-            <i class="fas fa-code"></i>
-            <p><strong>Ruang pembangunan untuk sambungan HTML seterusnya.</strong></p>
-            <p style="margin-top: 12px;">Anda boleh menampal sebarang kod, sistem, borang, atau paparan lengkap di sini.<br>
-            Halaman ini disediakan sebagai asas kosong yang boleh diisi mengikut keperluan modul <strong>${roleDisplay}</strong>.</p>
-            <hr style="margin: 1rem; border-color: #e2e8f0;">
-            <p><i class="fas fa-edit"></i> Gantikan kandungan ini dengan HTML penuh sistem anda.</p>
-          </div>
-          <button onclick="window.close()"><i class="fas fa-times"></i> Tutup & Kembali</button>
-          <div class="hint">
-            <i class="fas fa-info-circle"></i> Tiada fungsi tersembunyi — halaman ini sedia untuk disunting.
-          </div>
-        </div>
-        <script>
-          // Biarkan kosong, hanya untuk persediaan developer
-          console.log("Empty page for ${roleType} — ready for further HTML integration.");
-        <\/script>
-      </body>
-      </html>
-    `);
-    newWin.document.close();
-  }
+  // ============================================================
+  // SETIAP BUTANG AKAN DIRECT KE PAGE HTML YANG BERLAINAN
+  // (BUKAN about:blank / popup kosong)
+  // ============================================================
   
-  // Pasang event listener untuk keempat-empat kad akses
-  const roleCards = document.querySelectorAll('.access-card');
-  roleCards.forEach(card => {
+  // Dapatkan semua kad akses
+  const accessCards = document.querySelectorAll('.access-card');
+  
+  accessCards.forEach(card => {
     card.addEventListener('click', (e) => {
+      // Hentikan event bubbling
+      e.stopPropagation();
+      
+      // Dapatkan URL dari attribute data-url
+      const targetUrl = card.getAttribute('data-url');
       const role = card.getAttribute('data-role');
-      if (role === 'guest') {
-        openEmptyDestinationPage('guest');
-      } else if (role === 'pelajar') {
-        openEmptyDestinationPage('pelajar');
-      } else if (role === 'guru') {
-        openEmptyDestinationPage('guru');
-      } else if (role === 'kaunselor') {
-        openEmptyDestinationPage('kaunselor');
+      
+      if (targetUrl) {
+        // Jika URL wujud, redirect ke halaman tersebut
+        window.location.href = targetUrl;
+      } else {
+        // Fallback: jika tiada data-url, beri amaran (tidak sepatutnya berlaku)
+        console.warn(`Tiada URL untuk role: ${role}`);
+        alert("Halaman destinasi belum disediakan. Sila pastikan fail HTML wujud.");
       }
     });
   });
   
-  // Tiada sebarang fungsi upload atau icon default pada ruang logo — benar-benar kosong.
-  // Jika pengguna mahu menambah logo di GitHub, cari div dengan id "logoEmptySlot" dan masukkan <img src="logo.png">.
+  // Nota: Untuk memastikan semua halaman berfungsi, sila cipta fail berikut dalam direktori yang sama:
+  // 1. portal-utama.html   (Guest / Portal Utama - sudah pun anda ada dari sebelumnya)
+  // 2. page-pelajar.html   (Halaman kosong untuk pelajar - boleh diisi kemudian)
+  // 3. page-guru.html      (Halaman kosong untuk guru)
+  // 4. page-kaunselor.html (Halaman kosong untuk kaunselor)
+  //
+  // Contoh kandungan asas untuk fail kosong (page-pelajar.html, page-guru.html, page-kaunselor.html):
+  /*
+  <!DOCTYPE html>
+  <html>
+  <head><meta charset="UTF-8"><title>Halaman [Role]</title></head>
+  <body style="font-family: sans-serif; text-align: center; padding: 3rem;">
+    <h1>Halaman [Role]</h1>
+    <p>Kandungan akan ditambah kemudian.</p>
+    <a href="index.html">Kembali ke Laman Utama</a>
+  </body>
+  </html>
+  */
 </script>
 </body>
 </html>

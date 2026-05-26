@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Latar Belakang | UBK SEMSIRA 3D</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,700&family=Quicksand:wght@300;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --glow-color: #00f2fe;
+            --accent-color: #4facfe;
+            --pink-glow: #ff0080;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: radial-gradient(circle at top right, #1e3c72, #2a5298, #000428);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Quicksand', sans-serif;
+            overflow-x: hidden;
+            perspective: 2000px;
+            color: white;
+            padding: 60px 20px;
+        }
+
+        /* Lighting Effect mengikut mouse */
+        #cursor-light {
+            position: fixed;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(79, 172, 254, 0.15) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 1;
+            transform: translate(-50%, -50%);
+        }
+
+        .glass-scroll {
+            position: relative;
+            z-index: 10;
+            background: rgba(255, 255, 255, 0.07);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 40px;
+            padding: 60px 50px;
+            max-width: 1000px;
+            width: 100%;
+            transform: rotateX(5deg);
+            box-shadow: -20px 20px 50px rgba(0,0,0,0.5);
+            transition: transform 0.3s ease;
+        }
+
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 3rem;
+            text-align: center;
+            margin-bottom: 30px;
+            background: linear-gradient(to right, #fff, #81d4fa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 10px 20px rgba(0,0,0,0.3);
+        }
+
+        .intro-quote {
+            font-style: italic;
+            font-size: 1.3rem;
+            text-align: center;
+            color: #b3e5fc;
+            margin-bottom: 40px;
+            padding: 25px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            line-height: 1.6;
+            text-shadow: 0 0 15px rgba(0, 242, 254, 0.5);
+        }
+
+        .main-text {
+            line-height: 2;
+            font-size: 1.15rem;
+            text-align: justify;
+            font-weight: 300;
+        }
+
+        .highlight {
+            color: #ffd180;
+            font-weight: 700;
+            text-shadow: 0 0 8px rgba(255, 209, 128, 0.4);
+        }
+
+        /* 4 Fokus Utama - Grid Ikon Cantik */
+        .fokus-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 25px;
+            margin: 40px 0;
+        }
+
+        .fokus-card {
+            background: rgba(255,255,255,0.1);
+            padding: 30px;
+            border-radius: 30px;
+            border: 1px solid rgba(255,255,255,0.1);
+            text-align: center;
+            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .fokus-card:hover {
+            transform: translateY(-15px) scale(1.05);
+            background: rgba(255,255,255,0.15);
+            border-color: var(--glow-color);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+        }
+
+        .fokus-icon {
+            font-size: 55px;
+            margin-bottom: 15px;
+            display: block;
+            filter: drop-shadow(0 0 10px rgba(255,255,255,0.6));
+            animation: iconFloat 3s infinite ease-in-out;
+        }
+
+        @keyframes iconFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .fokus-card strong {
+            display: block;
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            color: var(--glow-color);
+        }
+
+        .conclusion {
+            margin-top: 40px;
+            padding: 30px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 30px;
+            text-align: center;
+            border-left: 5px solid var(--pink-glow);
+        }
+
+        .btn-back {
+            display: inline-block;
+            margin-top: 50px;
+            padding: 15px 45px;
+            background: linear-gradient(45deg, var(--accent-color), var(--glow-color));
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            box-shadow: 0 10px 20px rgba(0, 242, 254, 0.3);
+            transition: 0.3s;
+        }
+
+        .btn-back:hover {
+            transform: scale(1.1);
+            box-shadow: 0 15px 30px rgba(0, 242, 254, 0.5);
+        }
+
+        @media (max-width: 768px) {
+            .glass-scroll { padding: 30px; transform: none !important; }
+            h1 { font-size: 2.2rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="cursor-light"></div>
+
+    <div class="glass-scroll">
+        <h1>LATAR BELAKANG</h1>
+        
+        <p class="intro-quote">
+            "Setiap sekolah ada nadinya, dan di SMK Syed Sirajuddin, Unit Bimbingan dan Kaunseling adalah tempat di mana setiap degup jantung murid didengari."
+        </p>
+
+        <div class="main-text">
+            <p>
+                <span class="highlight">Satu Destinasi, Seribu Harapan.</span> Ditubuhkan dengan matlamat untuk menjadi sistem sokongan terbaik buat warga SMK Syed Sirajuddin, UBK kami bukan sekadar sebuah bilik di blok bangunan. Ia adalah sebuah <span class="highlight">"Ruang Teduh"</span>. Di sini, kami percaya bahawa kecemerlangan akademik haruslah seiring dengan kesihatan emosi yang stabil.
+            </p>
+
+            <p style="margin-top: 25px; text-align: center;">
+                <span class="highlight">Konsep Kami: Empati & Profesionalisme.</span> Bertemakan kasih sayang dan keterbukaan, kami di UBK SMK Syed Sirajuddin komited untuk membantu murid dalam empat fokus utama:
+            </p>
+
+            <div class="fokus-grid">
+                <div class="fokus-card">
+                    <span class="fokus-icon">💎</span>
+                    <strong>Pembangunan Diri & Disiplin</strong>
+                    <p style="font-size: 0.9rem;">Membentuk sahsiah yang terpuji.</p>
+                </div>
+                <div class="fokus-card">
+                    <span class="fokus-icon">🚀</span>
+                    <strong>Kerjaya</strong>
+                    <p style="font-size: 0.9rem;">Membuka jalan dan impian ke menara gading.</p>
+                </div>
+                <div class="fokus-card">
+                    <span class="fokus-icon">🧩</span>
+                    <strong>Psikometrik</strong>
+                    <p style="font-size: 0.9rem;">Mengenali potensi diri yang tersembunyi.</p>
+                </div>
+                <div class="fokus-card">
+                    <span class="fokus-icon">🌈</span>
+                    <strong>Minda Sihat</strong>
+                    <p style="font-size: 0.9rem;">Menjaga kesejahteraan mental dalam menghadapi cabaran remaja.</p>
+                </div>
+            </div>
+
+            <p>
+                <span class="highlight">Kenapa Kami Ada?</span> Kerana kami tahu, menjadi remaja di zaman ini tidak mudah. Kadangkala, beban yang dipikul terasa berat seperti beg sekolah yang sarat. UBK SMK Syed Sirajuddin hadir sebagai rakan yang memegang lilin ketika anda berada dalam kegelapan.
+            </p>
+
+            <p style="margin-top: 20px;">
+                Sama ada anda datang untuk berkongsi kejayaan, atau mencari kekuatan dalam kegagalan, pintu kami di SMK Syed Sirajuddin sentiasa terbuka.
+            </p>
+
+            <div class="conclusion">
+                <h2 style="font-family: 'Playfair Display', serif; font-size: 1.8rem;">
+                    "Di SMK Syed Sirajuddin, kami tidak hanya membentuk pelajar yang bijak, tetapi insan yang bahagia."
+                </h2>
+            </div>
+        </div>
+
+        <div style="text-align: center;">
+            <a href="kenali-ubk.html" class="btn-back">← KEMBALI</a>
+        </div>
+    </div>
+
+    <script>
+        // Efek cahaya mengikut cursor
+        const light = document.getElementById('cursor-light');
+        document.addEventListener('mousemove', (e) => {
+            light.style.left = e.clientX + 'px';
+            light.style.top = e.clientY + 'px';
+        });
+
+        // Efek senget 3D pada card
+        const card = document.querySelector('.glass-scroll');
+        document.addEventListener('mousemove', (e) => {
+            let xAxis = (window.innerWidth / 2 - e.clientX) / 80;
+            let yAxis = (window.innerHeight / 2 - e.clientY) / 80;
+            card.style.transform = `rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
+        });
+    </script>
+</body>
+</html>

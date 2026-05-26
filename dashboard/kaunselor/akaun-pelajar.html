@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Akaun Pelajar | Dashboard Kaunselor</title>
+  <!-- Fonts & Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <!-- Firebase SDK -->
+  <script type="module">
+    // Import Firebase SDK
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    
+    // Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyCfu7XC8pXtpDyQ-9Cjdg4AobA-EVEwWcc",
+      authDomain: "e-mindcare.firebaseapp.com",
+      projectId: "e-mindcare",
+      storageBucket: "e-mindcare.firebasestorage.app",
+      messagingSenderId: "1021883944936",
+      appId: "1:1021883944936:web:39c75a0c98d19a37afde5d",
+      measurementId: "G-3CJVKWGEXV"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const studentsCollection = collection(db, "students");
+
+    // ==================== GLOBAL FUNCTIONS ====================
+    window.students = [];
+    
+    // Load students from Firestore
+    window.loadStudents = async function() {
+      try {
+        const querySnapshot = await getDocs(studentsCollection);
+        window.students = [];
+        querySnapshot.forEach((doc) => {
+          window.students.push({
+            id: doc.id,
+            ...doc.data()
+          });
+        });
+        window.updateClassFilter();
+        window.renderStudentList();
+        window.updateTotalCount();
+        console.log("Students loaded from Firebase:", window.students.length);
+      } catch (error) {
+        console.error("Error loading students:", error);
+        window.showMessage("Gagal memuat data dari Firebase. Sila semak sambungan internet.", "error");
+      }
+    };
+
+    // Add student to Firestore
+    window.addStudentToFirebase = async function(fullname, icNumber, className, session) {
+      try {
+        // Check if IC already exists
+        const q = query(studentsCollection, where("icNumber", "==", icNumber));
+        const querySnapshot = await getDocs(q);
+        
+        if (!querySnapshot.empty) {
+          const existing = querySnapshot.docs[0];
+          return { success: false, message: `No. IC ${icNumber} sudah wujud untuk ${existing.data().fullname}` };
+        }
+        
+        const newStudent = {
+          fullname: fullname.trim(),
+          icNumber: icNumber.trim(),
+          class: className.trim() || "-",
+          session: session.trim() || "2026",
+          createdAt: new Date().toISOString()
+        };
+        
+        const docRef = await addDoc(studentsCollection, newStudent);
+        window.students.push({
+          id: docRef.id,
+          ...newStudent
+        });
+        
+        // Save credentials for login
+        await window.saveStudentCredentials();
+        
+        window.renderStudentList();
+        window.updateTotalCount();
+        window.updateClassFilter();
+        
+        return { success: true, student: newStudent };
+      } catch (error) {
+        console.error("Error adding student:", error);
+        return { success: false, message: "Ralat Firebase: " + error.message };
+      }
+    };
+
+    // Delete student from Firestore
+    window.deleteStudentFromFirebase = async function(id) {
+      if (!confirm("Padam pelajar ini? Pelajar tidak akan dapat login lagi.")) return;
+      
+      try {
+        await deleteDoc(doc(db, "students", id));
+        window.students = window.students.filter(s => s.id !== id);
+        await window.saveStudentCredentials();
+        window.renderStudentList();
+        window.updateTotalCount();
+        window.updateClassFilter();
+        window.showMessage("Pelajar berjaya dipadam.", "success");
+      } catch (error) {
+        console.error("Error deleting student:", error);
+        window.showMessage("Gagal memadam pelajar: " + error.message, "error");
+      }
+    };
+
+    // Edit student in Firestore
+    window.editStudentInFirebase = async function(id, newClass, newSession) {
+      try {
+        const studentRef = doc(db, "students", id);
+        await updateDoc(studentRef, {
+          class: newClass,
+          session: newSession
+        });
+        
+        const student = window.students.find(s => s.id === id);
+        if (student) {
+          student.class = newClass;
+          student.session = newSession;
+        }
+        
+        await window.saveStudentCredentials();
+        window.renderStudentList();
+        window.updateClassFilter();
+        window.showMessage("Maklumat pelajar dikemaskini.", "success");
+      } catch (error) {
+        console.error("Error editing student:", error);
+        window.showMessage("Gagal mengemaskini pelajar: " + error.message, "error");
+      }
+    };
+
+    // Save all student credentials to localStorage for login page
+    window.saveStudentCredentials = async function() {
+      const credentials = {};
+      window.students.forEach(s => {
+        credentials[s.icNumber] = {
+          id: s.id,
+          name: s.fullname,
+          ic: s.icNumber,
+          class: s.class,
+          session: s.session
+        };
+      });
+      localStorage.setItem('student_credentials', JSON.stringify(credentials));
+    };
+
+    // ==================== UI FUNCTIONS ====================
+    window.updateClassFilter = function() {
+      const classes = [...new Set(window.students.map(s => s.class).filter(c => c && c !== "-"))];
+      const select = document.getElementById('filterClass');
+      if (select) {
+        select.innerHTML = '<option value="">Semua Kelas/Tingkatan</option>' + 
+          classes.map(c => `<option value="${window.escapeHtml(c)}">${window.escapeHtml(c)}</option>`).join('');
+      }
+    };
+
+    let currentFilterClass = "";
+    let currentSearch = "";
+
+    window.getFilteredStudents = function() {
+      let filtered = [...window.students];
+      if (currentFilterClass) {
+        filtered = filtered.filter(s => s.class === currentFilterClass);
+      }
+      if (currentSearch) {
+        const search = currentSearch.toLowerCase();
+        filtered = filtered.filter(s => 
+          s.fullname.toLowerCase().includes(search) || 
+          s.icNumber.toLowerCase().includes(search)
+        );
+      }
+      return filtered;
+    };
+
+    window.renderStudentList = function() {
+      const filtered = window.getFilteredStudents();
+      const container = document.getElementById('studentListContainer');
+      
+      if (filtered.length === 0) {
+        container.innerHTML = `<div class="empty-state"><i class="fas fa-user-slash" style="font-size: 2rem;"></i><p>Tiada pelajar ditemui.</p></div>`;
+        return;
+      }
+
+      container.innerHTML = filtered.map(student => `
+        <div class="student-item">
+          <div class="student-info">
+            <div class="student-name">
+              <i class="fas fa-user-circle" style="color:#4f46e5;"></i>
+              ${window.escapeHtml(student.fullname)}
+              <span class="student-badge"><i class="fas fa-id-card"></i> ${window.escapeHtml(student.icNumber)}</span>
+            </div>
+            <div class="student-detail">
+              <i class="fas fa-school"></i> Kelas: ${window.escapeHtml(student.class)} &nbsp;|&nbsp;
+              <i class="fas fa-calendar"></i> Tahun: ${student.session}
+            </div>
+          </div>
+          <div>
+            <button class="btn-edit" onclick="window.openEditDialog('${student.id}', '${window.escapeHtml(student.class)}', '${student.session}')">
+              <i class="fas fa-edit"></i> Edit
+            </button>
+            <button class="btn-delete" onclick="window.deleteStudentFromFirebase('${student.id}')">
+              <i class="fas fa-trash-alt"></i> Hapus
+            </button>
+          </div>
+        </div>
+      `).join('');
+    };
+
+    window.openEditDialog = function(id, currentClass, currentSession) {
+      const newClass = prompt("Edit Kelas/Tingkatan:", currentClass);
+      if (newClass !== null) {
+        const newSession = prompt("Edit Tahun/Sesi:", currentSession);
+        if (newSession !== null) {
+          window.editStudentInFirebase(id, newClass, newSession);
+        }
+      }
+    };
+
+    window.updateTotalCount = function() {
+      document.getElementById('totalStudents').innerText = window.students.length;
+    };
+
+    window.escapeHtml = function(str) {
+      if (!str) return '';
+      return str.replace(/[&<>]/g, function(m) {
+        if (m === '&') return '&amp;';
+        if (m === '<') return '&lt;';
+        if (m === '>') return '&gt;';
+        return m;
+      });
+    };
+
+    window.showMessage = function(msg, type) {
+      const msgDiv = document.getElementById('successMsg');
+      msgDiv.textContent = msg;
+      msgDiv.style.backgroundColor = type === 'success' ? '#dcfce7' : '#fee2e2';
+      msgDiv.style.color = type === 'success' ? '#166534' : '#991b1b';
+      msgDiv.style.display = 'block';
+      setTimeout(() => { msgDiv.style.display = 'none'; }, 3000);
+    };
+
+    // Single registration
+    const singleForm = document.getElementById('addStudentForm');
+    if (singleForm) {
+      singleForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const fullname = document.getElementById('fullname').value;
+        const icNumber = document.getElementById('icNumber').value;
+        const className = document.getElementById('class').value;
+        const session = document.getElementById('session').value;
+        
+        if (!fullname.trim()) { alert("Sila masukkan Nama Penuh."); return; }
+        if (!icNumber.trim()) { alert("Sila masukkan No. Kad Pengenalan."); return; }
+        
+        const result = await window.addStudentToFirebase(fullname, icNumber, className, session);
+        if (result.success) {
+          singleForm.reset();
+          document.getElementById('session').value = '2026';
+          window.showMessage(`✅ Pelajar ${fullname} berjaya didaftarkan ke Firebase! Kini boleh login di page-pelajar.html`, "success");
+        } else {
+          window.showMessage(`❌ Gagal: ${result.message}`, "error");
+        }
+      });
+    }
+
+    // Bulk registration
+    const bulkForm = document.getElementById('bulkForm');
+    if (bulkForm) {
+      bulkForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const bulkData = document.getElementById('bulkData').value;
+        const lines = bulkData.split(/\r?\n/);
+        let successCount = 0;
+        let failCount = 0;
+        
+        for (let line of lines) {
+          line = line.trim();
+          if (line === "") continue;
+          const parts = line.split('|');
+          if (parts.length < 2) {
+            failCount++;
+            continue;
+          }
+          const fullname = parts[0].trim();
+          const icNumber = parts[1].trim();
+          const className = parts[2] ? parts[2].trim() : "";
+          const session = parts[3] ? parts[3].trim() : "2026";
+          
+          if (!fullname || !icNumber) {
+            failCount++;
+            continue;
+          }
+          
+          const result = await window.addStudentToFirebase(fullname, icNumber, className, session);
+          if (result.success) {
+            successCount++;
+          } else {
+            failCount++;
+          }
+        }
+        
+        if (successCount > 0) {
+          window.showMessage(`✅ Berjaya daftar ${successCount} pelajar ke Firebase. Gagal: ${failCount}`, "success");
+        } else {
+          window.showMessage(`❌ Tiada pelajar berjaya didaftarkan. Sila semak format.`, "error");
+        }
+        bulkForm.reset();
+      });
+    }
+
+    // Filter event listeners
+    document.getElementById('filterClass')?.addEventListener('change', (e) => {
+      currentFilterClass = e.target.value;
+      window.renderStudentList();
+    });
+    document.getElementById('searchInput')?.addEventListener('input', (e) => {
+      currentSearch = e.target.value;
+      window.renderStudentList();
+    });
+
+    // Tab switching
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    const singleTab = document.getElementById('singleTab');
+    const bulkTab = document.getElementById('bulkTab');
+    
+    tabBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        tabBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        if (btn.dataset.tab === 'single') {
+          singleTab.style.display = 'block';
+          bulkTab.style.display = 'none';
+        } else {
+          singleTab.style.display = 'none';
+          bulkTab.style.display = 'block';
+        }
+      });
+    });
+
+    // Load initial data
+    window.loadStudents();
+  </script>
+  
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: linear-gradient(135deg, #f0f4ff 0%, #e9eef6 100%);
+      min-height: 100vh;
+      padding: 2rem;
+    }
+    .container { max-width: 1600px; margin: 0 auto; }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 2rem;
+      padding-bottom: 1rem;
+      border-bottom: 2px solid rgba(79, 70, 229, 0.2);
+    }
+    .logo-area { display: flex; align-items: center; gap: 1rem; }
+    .logo-icon {
+      background: linear-gradient(145deg, #4f46e5, #7c3aed);
+      width: 50px;
+      height: 50px;
+      border-radius: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .logo-icon i { font-size: 1.8rem; color: white; }
+    .logo-text h1 {
+      font-size: 1.5rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #1e293b, #4f46e5);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    .logo-text p { font-size: 0.7rem; color: #5b6e8c; }
+    .back-btn {
+      background: #eef2ff;
+      border: none;
+      padding: 0.6rem 1.2rem;
+      border-radius: 40px;
+      cursor: pointer;
+      font-weight: 600;
+      color: #4f46e5;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: 0.2s;
+    }
+    .back-btn:hover { background: #4f46e5; color: white; }
+    .stats {
+      background: white;
+      border-radius: 1.2rem;
+      padding: 1rem 1.5rem;
+      margin-bottom: 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    .stats-left span { font-weight: 800; color: #4f46e5; font-size: 1.3rem; }
+    .filter-group { display: flex; gap: 1rem; flex-wrap: wrap; }
+    .filter-group input, .filter-group select {
+      padding: 0.5rem 1rem;
+      border: 1px solid #e2e8f0;
+      border-radius: 2rem;
+      font-family: inherit;
+      outline: none;
+    }
+    .filter-group input:focus, .filter-group select:focus { border-color: #4f46e5; }
+    .search-box { display: flex; gap: 0.5rem; }
+    .search-box input { width: 250px; }
+    .tabs { display: flex; gap: 1rem; margin-bottom: 1.5rem; }
+    .tab-btn {
+      background: #e2e8f0;
+      border: none;
+      padding: 0.6rem 1.5rem;
+      border-radius: 2rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .tab-btn.active { background: #4f46e5; color: white; }
+    .card {
+      background: white;
+      border-radius: 1.5rem;
+      padding: 1.5rem;
+      box-shadow: 0 8px 20px -8px rgba(0, 0, 0, 0.08);
+      border: 1px solid rgba(79, 70, 229, 0.1);
+    }
+    .card h2 {
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-bottom: 1.2rem;
+      color: #1f2a44;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-left: 4px solid #4f46e5;
+      padding-left: 12px;
+    }
+    .form-group { margin-bottom: 1.2rem; }
+    .form-group label {
+      display: block;
+      font-weight: 600;
+      font-size: 0.8rem;
+      color: #1f2a44;
+      margin-bottom: 0.4rem;
+    }
+    .form-group label i { margin-right: 6px; color: #4f46e5; }
+    .form-group input, .form-group textarea {
+      width: 100%;
+      padding: 0.8rem 1rem;
+      font-size: 0.9rem;
+      font-family: inherit;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 1rem;
+      background: white;
+      transition: all 0.2s;
+      outline: none;
+    }
+    .form-group input:focus, .form-group textarea:focus {
+      border-color: #4f46e5;
+      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+    }
+    .form-group textarea { resize: vertical; min-height: 150px; }
+    .btn-submit {
+      background: linear-gradient(95deg, #4f46e5, #7c3aed);
+      border: none;
+      padding: 0.8rem;
+      border-radius: 2rem;
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: white;
+      cursor: pointer;
+      width: 100%;
+      transition: 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .btn-submit:hover { transform: translateY(-2px); background: linear-gradient(95deg, #4338ca, #6d28d9); }
+    .btn-delete {
+      background: #fee2e2;
+      color: #dc2626;
+      border: none;
+      padding: 0.4rem 0.8rem;
+      border-radius: 2rem;
+      cursor: pointer;
+      font-size: 0.7rem;
+      font-weight: 600;
+      transition: 0.2s;
+    }
+    .btn-delete:hover { background: #fecaca; }
+    .btn-edit {
+      background: #e0e7ff;
+      color: #4f46e5;
+      border: none;
+      padding: 0.4rem 0.8rem;
+      border-radius: 2rem;
+      cursor: pointer;
+      font-size: 0.7rem;
+      font-weight: 600;
+      margin-right: 0.5rem;
+      transition: 0.2s;
+    }
+    .btn-edit:hover { background: #c7d2fe; }
+    .student-list { max-height: 550px; overflow-y: auto; }
+    .student-item {
+      background: #f8fafc;
+      border-radius: 1rem;
+      padding: 0.8rem 1rem;
+      margin-bottom: 0.8rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      transition: 0.2s;
+    }
+    .student-item:hover { background: #f1f5f9; }
+    .student-info { flex: 1; }
+    .student-name {
+      font-weight: 700;
+      color: #1e293b;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .student-detail { font-size: 0.75rem; color: #5b6e8c; margin-top: 4px; }
+    .student-badge {
+      background: #e0e7ff;
+      padding: 0.2rem 0.6rem;
+      border-radius: 20px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: #4f46e5;
+    }
+    .empty-state { text-align: center; padding: 2rem; color: #94a3b8; }
+    .help-text { font-size: 0.7rem; color: #6c7289; margin-top: 0.3rem; }
+    .success-msg {
+      background: #dcfce7;
+      color: #166534;
+      padding: 0.5rem 1rem;
+      border-radius: 2rem;
+      font-size: 0.8rem;
+      margin-bottom: 1rem;
+      display: none;
+    }
+    @media (max-width: 900px) {
+      body { padding: 1rem; }
+      .stats { flex-direction: column; align-items: stretch; }
+      .search-box input { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div class="logo-area">
+      <div class="logo-icon"><i class="fas fa-users"></i></div>
+      <div class="logo-text">
+        <h1>Akaun Pelajar</h1>
+        <p>Urus data profil pelajar • Firebase Cloud</p>
+      </div>
+    </div>
+    <a href="dashboard-kaunselor.html" class="back-btn"><i class="fas fa-arrow-left"></i> Kembali ke Dashboard</a>
+  </div>
+
+  <div class="stats">
+    <div class="stats-left"><i class="fas fa-user-graduate"></i> Jumlah Pelajar: <span id="totalStudents">0</span></div>
+    <div class="filter-group">
+      <select id="filterClass"><option value="">Semua Kelas/Tingkatan</option></select>
+      <div class="search-box">
+        <input type="text" id="searchInput" placeholder="Cari Nama atau No. IC...">
+        <i class="fas fa-search" style="align-self: center; color: #94a3b8;"></i>
+      </div>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="single">📝 Daftar Seorang</button>
+    <button class="tab-btn" data-tab="bulk">📋 Daftar Beramai-ramai</button>
+  </div>
+
+  <div id="successMsg" class="success-msg"></div>
+
+  <div id="singleTab" class="card">
+    <h2><i class="fas fa-user-plus"></i> Daftar Pelajar Baru</h2>
+    <form id="addStudentForm">
+      <div class="form-group">
+        <label><i class="fas fa-user"></i> Nama Penuh</label>
+        <input type="text" id="fullname" placeholder="cth: Ahmad bin Abdullah" required>
+      </div>
+      <div class="form-group">
+        <label><i class="fas fa-id-card"></i> Nombor Kad Pengenalan</label>
+        <input type="text" id="icNumber" placeholder="cth: 050101-01-1234" required>
+      </div>
+      <div class="form-group">
+        <label><i class="fas fa-school"></i> Kelas / Tingkatan</label>
+        <input type="text" id="class" placeholder="cth: 5 Cemerlang, Tingkatan 4 Amanah">
+      </div>
+      <div class="form-group">
+        <label><i class="fas fa-calendar"></i> Tahun / Sesi</label>
+        <input type="text" id="session" placeholder="cth: 2024, 2025, 2026" value="2026">
+      </div>
+      <button type="submit" class="btn-submit"><i class="fas fa-cloud-upload-alt"></i> Daftar ke Firebase</button>
+    </form>
+  </div>
+
+  <div id="bulkTab" class="card" style="display: none;">
+    <h2><i class="fas fa-layer-group"></i> Daftar Berbilang Pelajar Sekaligus</h2>
+    <form id="bulkForm">
+      <div class="form-group">
+        <label><i class="fas fa-list"></i> Senarai Pelajar (satu baris = seorang)</label>
+        <textarea id="bulkData" placeholder='Contoh format:
+Ahmad bin Abdullah|050101-01-1234|5 Cemerlang|2026
+Nurul Aisyah binti Mohd|060202-02-5678|4 Amanah|2026
+Muhammad Danish bin Rosli|070303-03-9012|3 Bestari|2025'></textarea>
+        <div class="help-text"><i class="fas fa-info-circle"></i> Format: Nama Penuh | No. Kad Pengenalan | Kelas | Tahun<br>Gunakan simbol <strong>|</strong> (pipe) sebagai pemisah. Setiap baris adalah seorang pelajar.</div>
+      </div>
+      <button type="submit" class="btn-submit"><i class="fas fa-cloud-upload-alt"></i> Daftar Semua ke Firebase</button>
+    </form>
+  </div>
+
+  <div class="card" style="margin-top: 1.5rem;">
+    <h2><i class="fas fa-list"></i> Senarai Pelajar Berdaftar (Firebase)</h2>
+    <div id="studentListContainer" class="student-list">
+      <div class="empty-state"><i class="fas fa-spinner fa-pulse"></i> Memuat data dari Firebase...</div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

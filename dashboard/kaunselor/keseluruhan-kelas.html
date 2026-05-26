@@ -14,7 +14,6 @@
         
         .container { max-width: 1400px; margin: 0 auto; }
         
-        /* Header */
         .header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 2px solid rgba(79,70,229,0.2); }
         .logo-area { display: flex; align-items: center; gap: 1rem; }
         .logo-icon { background: linear-gradient(145deg, #4f46e5, #7c3aed); width: 50px; height: 50px; border-radius: 28px; display: flex; align-items: center; justify-content: center; }
@@ -23,18 +22,15 @@
         .back-btn { background: #eef2ff; border: none; padding: 0.6rem 1.2rem; border-radius: 40px; cursor: pointer; font-weight: 600; color: #4f46e5; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; }
         .back-btn:hover { background: #4f46e5; color: white; }
         
-        /* Stats */
         .stats { background: white; border-radius: 1rem; padding: 1rem 1.5rem; margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
         .stats h2 { font-size: 1.2rem; color: #1e293b; }
         .stats h2 i { color: #4f46e5; margin-right: 8px; }
         .total-badge { background: #e0e7ff; padding: 0.3rem 1rem; border-radius: 40px; font-weight: 600; color: #4f46e5; }
         
-        /* Search Bar */
         .search-bar { margin-bottom: 2rem; }
         .search-bar input { width: 100%; max-width: 400px; padding: 0.8rem 1rem; border: 1.5px solid #e2e8f0; border-radius: 2rem; font-family: inherit; outline: none; }
         .search-bar input:focus { border-color: #4f46e5; }
         
-        /* Gallery Grid */
         .classes-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.5rem; }
         
         .class-card {
@@ -73,10 +69,7 @@
             align-items: center;
             gap: 8px;
         }
-        .class-name i {
-            color: #4f46e5;
-            font-size: 1.3rem;
-        }
+        .class-name i { color: #4f46e5; font-size: 1.3rem; }
         
         .class-info {
             margin: 1rem 0;
@@ -92,13 +85,8 @@
             font-size: 0.85rem;
             color: #5b6e8c;
         }
-        .info-row i {
-            width: 22px;
-            color: #4f46e5;
-        }
-        .info-row strong {
-            color: #1e293b;
-        }
+        .info-row i { width: 22px; color: #4f46e5; }
+        .info-row strong { color: #1e293b; }
         
         .student-count {
             display: inline-flex;
@@ -113,13 +101,9 @@
             margin-top: 0.5rem;
         }
         
-        .empty-state {
-            text-align: center;
-            padding: 3rem;
-            color: #94a3b8;
-        }
+        .empty-state { text-align: center; padding: 3rem; color: #94a3b8; }
         
-        /* Modal */
+        /* Modal for Class Details */
         .modal {
             position: fixed;
             top: 0;
@@ -152,26 +136,11 @@
             background: white;
             border-radius: 1.5rem 1.5rem 0 0;
         }
-        .modal-header h3 {
-            color: #1e293b;
-            font-size: 1.3rem;
-        }
-        .modal-header h3 i {
-            color: #4f46e5;
-            margin-right: 8px;
-        }
-        .modal-close {
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
-            color: #94a3b8;
-        }
-        .modal-body {
-            padding: 1.2rem;
-        }
+        .modal-header h3 { color: #1e293b; font-size: 1.3rem; }
+        .modal-header h3 i { color: #4f46e5; margin-right: 8px; }
+        .modal-close { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #94a3b8; }
+        .modal-body { padding: 1.2rem; }
         
-        /* Teacher Info in Modal */
         .teacher-info-modal {
             background: #f8fafc;
             border-radius: 1rem;
@@ -191,23 +160,11 @@
             align-items: center;
             justify-content: center;
         }
-        .teacher-avatar i {
-            font-size: 1.5rem;
-            color: white;
-        }
-        .teacher-details h4 {
-            font-size: 1rem;
-            color: #1e293b;
-        }
-        .teacher-details p {
-            font-size: 0.8rem;
-            color: #5b6e8c;
-        }
+        .teacher-avatar i { font-size: 1.5rem; color: white; }
+        .teacher-details h4 { font-size: 1rem; color: #1e293b; }
+        .teacher-details p { font-size: 0.8rem; color: #5b6e8c; }
         
-        /* Student List */
-        .student-list-modal {
-            list-style: none;
-        }
+        .student-list-modal { list-style: none; }
         .student-item-modal {
             background: #f8fafc;
             border-radius: 0.8rem;
@@ -219,25 +176,69 @@
             cursor: pointer;
             transition: 0.2s;
         }
-        .student-item-modal:hover {
-            background: #eef2ff;
+        .student-item-modal:hover { background: #eef2ff; }
+        .student-name-modal { font-weight: 600; color: #1e293b; }
+        .student-ic-modal { font-size: 0.7rem; color: #5b6e8c; margin-top: 2px; }
+        .view-merit-btn { background: none; border: none; color: #4f46e5; cursor: pointer; font-size: 0.8rem; }
+        
+        /* Merit Modal (sama seperti mata-merit.html) */
+        .merit-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 2001;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
         }
-        .student-name-modal {
-            font-weight: 600;
-            color: #1e293b;
+        .merit-modal-content {
+            max-width: 700px;
+            width: 100%;
+            background: white;
+            border-radius: 1.5rem;
+            max-height: 85vh;
+            overflow-y: auto;
         }
-        .student-ic-modal {
-            font-size: 0.7rem;
-            color: #5b6e8c;
-            margin-top: 2px;
+        .merit-modal-header {
+            padding: 1.2rem;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            background: white;
+            border-radius: 1.5rem 1.5rem 0 0;
         }
-        .view-merit-btn {
-            background: none;
-            border: none;
-            color: #4f46e5;
-            cursor: pointer;
-            font-size: 0.8rem;
-        }
+        .merit-modal-close { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #94a3b8; }
+        
+        .profile-section { background: linear-gradient(135deg, #4f46e5, #7c3aed); color: white; border-radius: 1rem; padding: 1.2rem; margin-bottom: 1.5rem; }
+        .profile-section h4 { margin-bottom: 0.8rem; opacity: 0.9; }
+        .profile-grid { display: flex; flex-wrap: wrap; gap: 1rem; }
+        .profile-grid p { margin: 0.3rem 0; display: flex; align-items: center; gap: 8px; }
+        
+        .total-merit-display { background: #f1f5f9; border-radius: 1rem; padding: 1rem; text-align: center; margin-bottom: 1.5rem; }
+        .total-merit-display .big-number { font-size: 2rem; font-weight: 800; color: #4f46e5; }
+        
+        .merit-record { background: #f8fafc; border-radius: 1rem; padding: 1rem; margin-bottom: 0.8rem; border-left: 4px solid; }
+        .merit-record-positive { border-left-color: #10b981; }
+        .merit-record-negative { border-left-color: #dc2626; }
+        .record-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-bottom: 0.5rem; }
+        .record-points { font-weight: 700; font-size: 1.1rem; }
+        .record-description { font-size: 0.85rem; color: #5b6e8c; margin: 0.5rem 0; }
+        .record-meta { font-size: 0.7rem; color: #94a3b8; display: flex; gap: 1rem; flex-wrap: wrap; }
+        .record-actions { margin-top: 0.5rem; display: flex; gap: 0.5rem; }
+        .btn-edit-record { background: #e0e7ff; color: #4f46e5; border: none; padding: 0.2rem 0.8rem; border-radius: 40px; cursor: pointer; font-size: 0.7rem; }
+        .btn-delete-record { background: #fee2e2; color: #dc2626; border: none; padding: 0.2rem 0.8rem; border-radius: 40px; cursor: pointer; font-size: 0.7rem; }
+        
+        .form-group { margin-bottom: 1rem; }
+        .form-group label { display: block; font-weight: 600; font-size: 0.8rem; margin-bottom: 0.4rem; color: #1e293b; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 0.7rem; border: 1.5px solid #e2e8f0; border-radius: 0.8rem; font-family: inherit; outline: none; }
+        .modal-btn { width: 100%; padding: 0.8rem; background: #4f46e5; color: white; border: none; border-radius: 2rem; font-weight: 600; cursor: pointer; margin-top: 0.5rem; }
         
         .alert { padding: 12px; border-radius: 12px; margin-bottom: 15px; font-size: 0.8rem; display: none; }
         .alert.success { background: #dcfce7; color: #166534; display: block; }
@@ -301,9 +302,79 @@
     </div>
 </div>
 
+<!-- Merit Modal (sama seperti mata-merit.html) -->
+<div id="meritModal" class="merit-modal" style="display: none;">
+    <div class="merit-modal-content">
+        <div class="merit-modal-header">
+            <h3><i class="fas fa-star"></i> Rekod Merit Pelajar</h3>
+            <button class="merit-modal-close" onclick="closeMeritModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div id="meritProfile" class="profile-section">
+                <h4><i class="fas fa-user-graduate"></i> Profil Pelajar</h4>
+                <div class="profile-grid">
+                    <div>
+                        <p><i class="fas fa-user"></i> <strong>Nama:</strong> <span id="meritName">-</span></p>
+                        <p><i class="fas fa-id-card"></i> <strong>No. IC:</strong> <span id="meritIC">-</span></p>
+                    </div>
+                    <div>
+                        <p><i class="fas fa-school"></i> <strong>Kelas:</strong> <span id="meritClass">-</span></p>
+                        <p><i class="fas fa-calendar"></i> <strong>Tahun:</strong> <span id="meritSession">-</span></p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="total-merit-display">
+                <div class="big-number" id="meritTotal">0</div>
+                <div>Jumlah Mata Merit</div>
+            </div>
+            
+            <h4 style="margin-bottom: 1rem;"><i class="fas fa-list-alt"></i> Senarai Transaksi Merit</h4>
+            <div id="meritListContainer">
+                <p style="text-align:center; color:#94a3b8;">Memuatkan...</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Record Modal -->
+<div id="editRecordModal" class="merit-modal" style="display: none;">
+    <div class="merit-modal-content" style="max-width: 500px;">
+        <div class="merit-modal-header">
+            <h3><i class="fas fa-edit"></i> Edit Rekod Merit</h3>
+            <button class="merit-modal-close" onclick="closeEditRecordModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <form id="editRecordForm">
+                <input type="hidden" id="editRecordId">
+                <div class="form-group">
+                    <label>Keterangan</label>
+                    <textarea id="editDescription" rows="3" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Jenis</label>
+                    <select id="editType">
+                        <option value="positive">Kebaikan (+5)</option>
+                        <option value="negative">Kesalahan</option>
+                    </select>
+                </div>
+                <div id="editLevelGroup" style="display: none;">
+                    <label>Tahap Kesalahan</label>
+                    <select id="editLevel">
+                        <option value="ringan">Ringan (-2)</option>
+                        <option value="sederhana">Sederhana (-5)</option>
+                        <option value="berat">Berat (-10)</option>
+                    </select>
+                </div>
+                <button type="submit" class="modal-btn">Simpan Perubahan</button>
+            </form>
+        </div>
+    </div>
+</div>
+
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, collection, getDocs, deleteDoc, updateDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
     
     const firebaseConfig = {
         apiKey: "AIzaSyCfu7XC8pXtpDyQ-9Cjdg4AobA-EVEwWcc",
@@ -319,9 +390,12 @@
     const db = getFirestore(app);
     const studentsCollection = collection(db, "students");
     const teachersCollection = collection(db, "teachers");
+    const meritCollection = collection(db, "merit_records");
     
     let allClasses = [];
+    let allMeritRecords = [];
     let searchTerm = '';
+    let currentStudentId = null;
     
     function showAlert(msg, type) {
         const alertDiv = document.getElementById('alertMessage');
@@ -330,13 +404,24 @@
         setTimeout(() => { alertDiv.style.display = 'none'; }, 3000);
     }
     
+    async function loadAllMeritRecords() {
+        try {
+            const snapshot = await getDocs(meritCollection);
+            allMeritRecords = [];
+            snapshot.forEach(doc => allMeritRecords.push({ id: doc.id, ...doc.data() }));
+        } catch(e) { console.error(e); }
+    }
+    
+    function getStudentTotalMerit(studentId) {
+        const records = allMeritRecords.filter(r => r.studentId === studentId);
+        return records.reduce((sum, r) => sum + (r.points || 0), 0);
+    }
+    
     async function loadClasses() {
         try {
-            // Get all students to determine unique classes
             const studentsSnapshot = await getDocs(studentsCollection);
             const teachersSnapshot = await getDocs(teachersCollection);
             
-            // Map teacher by class
             const teacherByClass = {};
             teachersSnapshot.forEach(doc => {
                 const teacher = doc.data();
@@ -349,7 +434,6 @@
                 }
             });
             
-            // Group students by class
             const classMap = new Map();
             studentsSnapshot.forEach(doc => {
                 const student = doc.data();
@@ -371,16 +455,14 @@
                 }
             });
             
-            // Convert to array
             allClasses = Array.from(classMap.values());
             allClasses.sort((a, b) => a.className.localeCompare(b.className));
             
             document.getElementById('totalClasses').innerText = allClasses.length;
             renderClasses();
-            
         } catch(e) {
-            console.error("Error loading classes:", e);
-            document.getElementById('classesContainer').innerHTML = '<div class="empty-state"><p style="color:#dc2626;">Ralat memuat data. Sila refresh.</p></div>';
+            console.error(e);
+            document.getElementById('classesContainer').innerHTML = '<div class="empty-state"><p style="color:#dc2626;">Ralat memuat data</p></div>';
         }
     }
     
@@ -403,30 +485,17 @@
             
             html += `
                 <div class="class-card" onclick="openClassDetail('${escapeHtml(cls.className)}')">
-                    <div class="class-name">
-                        <i class="fas fa-chalkboard"></i> ${escapeHtml(cls.className)}
-                    </div>
+                    <div class="class-name"><i class="fas fa-chalkboard"></i> ${escapeHtml(cls.className)}</div>
                     <div class="class-info">
-                        <div class="info-row">
-                            <i class="fas fa-chalkboard-user"></i>
-                            <span><strong>Guru Kelas:</strong> ${escapeHtml(teacherName)}</span>
-                        </div>
-                        <div class="info-row">
-                            <i class="fas fa-users"></i>
-                            <span><strong>Bilangan Pelajar:</strong> ${studentCount} orang</span>
-                        </div>
+                        <div class="info-row"><i class="fas fa-chalkboard-user"></i><span><strong>Guru Kelas:</strong> ${escapeHtml(teacherName)}</span></div>
+                        <div class="info-row"><i class="fas fa-users"></i><span><strong>Bilangan Pelajar:</strong> ${studentCount} orang</span></div>
                     </div>
-                    <div class="student-count">
-                        <i class="fas fa-user-graduate"></i> ${studentCount} Pelajar
-                    </div>
+                    <div class="student-count"><i class="fas fa-user-graduate"></i> ${studentCount} Pelajar</div>
                 </div>
             `;
         }
         container.innerHTML = html;
     }
-    
-    // Store class data globally for modal access
-    window.classDataMap = {};
     
     window.openClassDetail = async function(className) {
         const classData = allClasses.find(c => c.className === className);
@@ -434,7 +503,6 @@
         
         document.getElementById('modalClassName').innerText = classData.className;
         
-        // Set teacher info
         if (classData.teacher) {
             document.getElementById('teacherName').innerHTML = `<i class="fas fa-user"></i> ${escapeHtml(classData.teacher.name)}`;
             document.getElementById('teacherIC').innerText = classData.teacher.ic || '-';
@@ -443,22 +511,20 @@
             document.getElementById('teacherIC').innerText = '-';
         }
         
-        // Render student list
         const studentContainer = document.getElementById('modalStudentList');
         if (classData.students.length === 0) {
             studentContainer.innerHTML = '<p style="text-align:center; color:#94a3b8;">Tiada pelajar dalam kelas ini</p>';
         } else {
             let studentHtml = '';
             for (const student of classData.students) {
+                const totalMerit = getStudentTotalMerit(student.id);
                 studentHtml += `
-                    <div class="student-item-modal" onclick="viewStudentMerit('${student.id}', '${escapeHtml(student.name)}')">
+                    <div class="student-item-modal" onclick="viewStudentMerit('${student.id}', '${escapeHtml(student.name)}', '${escapeHtml(student.ic)}', '${escapeHtml(classData.className)}', '${student.session}')">
                         <div>
                             <div class="student-name-modal">${escapeHtml(student.name)}</div>
-                            <div class="student-ic-modal"><i class="fas fa-id-card"></i> ${escapeHtml(student.ic)}</div>
+                            <div class="student-ic-modal"><i class="fas fa-id-card"></i> ${escapeHtml(student.ic)} | Merit: ${totalMerit}</div>
                         </div>
-                        <div class="view-merit-btn">
-                            <i class="fas fa-star"></i> Lihat Merit
-                        </div>
+                        <div class="view-merit-btn"><i class="fas fa-star"></i> Lihat Merit</div>
                     </div>
                 `;
             }
@@ -468,22 +534,123 @@
         document.getElementById('classModal').style.display = 'flex';
     };
     
-    // View student merit - redirect to merit page (akan dibina kemudian)
-    window.viewStudentMerit = function(studentId, studentName) {
-        // Simpan data ke sessionStorage untuk page merit
-        sessionStorage.setItem('viewStudentId', studentId);
-        sessionStorage.setItem('viewStudentName', studentName);
-        // Redirect ke page merit pelajar (page akan dibina kemudian)
-        window.location.href = `merit-pelajar.html?id=${studentId}`;
-        // Sementara ini alert dulu
-        // alert("Halaman merit pelajar akan dibina selepas ini. Nama: " + studentName);
+    // View Student Merit (sama seperti mata-merit.html)
+    window.viewStudentMerit = async function(studentId, name, ic, className, session) {
+        currentStudentId = studentId;
+        
+        document.getElementById('meritName').innerText = name;
+        document.getElementById('meritIC').innerText = ic;
+        document.getElementById('meritClass').innerText = className;
+        document.getElementById('meritSession').innerText = session;
+        
+        const total = getStudentTotalMerit(studentId);
+        document.getElementById('meritTotal').innerText = total;
+        document.getElementById('meritTotal').style.color = total >= 0 ? '#10b981' : '#dc2626';
+        
+        const studentRecords = allMeritRecords.filter(r => r.studentId === studentId).sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
+        const listContainer = document.getElementById('meritListContainer');
+        
+        if (studentRecords.length === 0) {
+            listContainer.innerHTML = '<p style="text-align:center; color:#94a3b8;">Tiada rekod merit</p>';
+        } else {
+            let html = '';
+            for (const record of studentRecords) {
+                const isPositive = record.type === 'positive';
+                const pointClass = isPositive ? 'merit-positive' : 'merit-negative';
+                const pointSymbol = isPositive ? '+' : '';
+                const borderClass = isPositive ? 'merit-record-positive' : 'merit-record-negative';
+                const levelText = record.level ? ` (${record.level.toUpperCase()})` : '';
+                
+                html += `
+                    <div class="merit-record ${borderClass}">
+                        <div class="record-header">
+                            <span class="record-points ${pointClass}">${pointSymbol}${record.points} markah</span>
+                            <span style="font-size:0.7rem; color:#94a3b8;">${new Date(record.createdAt).toLocaleDateString('ms-MY')}</span>
+                        </div>
+                        <div class="record-description">${escapeHtml(record.description)}${levelText}</div>
+                        <div class="record-meta">
+                            <span><i class="fas fa-user-check"></i> Didaftar oleh: ${escapeHtml(record.createdBy || 'Guru')}</span>
+                        </div>
+                        <div class="record-actions">
+                            <button class="btn-edit-record" onclick="openEditRecordModal('${record.id}', '${escapeHtml(record.description)}', '${record.type}', '${record.level || ''}')"><i class="fas fa-edit"></i> Edit</button>
+                            <button class="btn-delete-record" onclick="deleteRecord('${record.id}')"><i class="fas fa-trash"></i> Hapus</button>
+                        </div>
+                    </div>
+                `;
+            }
+            listContainer.innerHTML = html;
+        }
+        
+        document.getElementById('meritModal').style.display = 'flex';
     };
     
-    window.closeModal = function() {
-        document.getElementById('classModal').style.display = 'none';
+    // Edit Record Modal
+    window.openEditRecordModal = function(id, description, type, level) {
+        document.getElementById('editRecordId').value = id;
+        document.getElementById('editDescription').value = description;
+        document.getElementById('editType').value = type;
+        
+        const levelGroup = document.getElementById('editLevelGroup');
+        if (type === 'negative') {
+            levelGroup.style.display = 'block';
+            document.getElementById('editLevel').value = level || 'ringan';
+        } else {
+            levelGroup.style.display = 'none';
+        }
+        
+        document.getElementById('editRecordModal').style.display = 'flex';
     };
     
-    // Search functionality
+    document.getElementById('editType').addEventListener('change', (e) => {
+        const levelGroup = document.getElementById('editLevelGroup');
+        levelGroup.style.display = e.target.value === 'negative' ? 'block' : 'none';
+    });
+    
+    document.getElementById('editRecordForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const id = document.getElementById('editRecordId').value;
+        const description = document.getElementById('editDescription').value.trim();
+        const type = document.getElementById('editType').value;
+        
+        if (!description) { showAlert('Sila masukkan keterangan', 'error'); return; }
+        
+        let points = 5;
+        let level = null;
+        if (type === 'negative') {
+            level = document.getElementById('editLevel').value;
+            if (level === 'ringan') points = -2;
+            else if (level === 'sederhana') points = -5;
+            else points = -10;
+        }
+        
+        const updateData = { description, type, points, updatedAt: new Date().toISOString() };
+        if (level) updateData.level = level;
+        
+        try {
+            await updateDoc(doc(db, "merit_records", id), updateData);
+            const recordIndex = allMeritRecords.findIndex(r => r.id === id);
+            if (recordIndex !== -1) allMeritRecords[recordIndex] = { ...allMeritRecords[recordIndex], ...updateData };
+            showAlert('✅ Rekod merit berjaya dikemaskini!', 'success');
+            closeEditRecordModal();
+            if (currentStudentId) await viewStudentMerit(currentStudentId, document.getElementById('meritName').innerText, document.getElementById('meritIC').innerText, document.getElementById('meritClass').innerText, document.getElementById('meritSession').innerText);
+        } catch(e) { showAlert('❌ Gagal mengemaskini rekod', 'error'); }
+    });
+    
+    window.deleteRecord = async function(id) {
+        if (confirm('Adakah anda pasti mahu memadam rekod ini?')) {
+            try {
+                await deleteDoc(doc(db, "merit_records", id));
+                allMeritRecords = allMeritRecords.filter(r => r.id !== id);
+                showAlert('✅ Rekod merit berjaya dipadam', 'success');
+                if (currentStudentId) await viewStudentMerit(currentStudentId, document.getElementById('meritName').innerText, document.getElementById('meritIC').innerText, document.getElementById('meritClass').innerText, document.getElementById('meritSession').innerText);
+            } catch(e) { showAlert('❌ Gagal memadam rekod', 'error'); }
+        }
+    };
+    
+    window.closeModal = () => document.getElementById('classModal').style.display = 'none';
+    window.closeMeritModal = () => document.getElementById('meritModal').style.display = 'none';
+    window.closeEditRecordModal = () => document.getElementById('editRecordModal').style.display = 'none';
+    
     document.getElementById('searchInput').addEventListener('input', (e) => {
         searchTerm = e.target.value;
         renderClasses();
@@ -494,8 +661,11 @@
         return str.replace(/[&<>]/g, m => m==='&'?'&amp;':m==='<'?'&lt;':'&gt;');
     }
     
-    // Initialize
-    loadClasses();
+    async function init() {
+        await loadAllMeritRecords();
+        await loadClasses();
+    }
+    init();
 </script>
 </body>
 </html>

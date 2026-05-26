@@ -227,7 +227,7 @@
     <div class="records-section">
         <h3><i class="fas fa-list-alt"></i> Senarai Transaksi Merit</h3>
         <div id="recordsContainer">
-            <div class="empty-state"><i class="fas fa-spinner fa-pulse"></i> Memuatkan...</div>
+            <div class="empty-state"><i class="fas fa-spinner fa-pulse"></i> Memuatkan data...</div>
         </div>
     </div>
 </div>
@@ -266,6 +266,14 @@
     let studentId = null;
     let allMeritRecords = [];
     
+    function showAlert(msg, type) {
+        const alertDiv = document.getElementById('alertMessage');
+        alertDiv.textContent = msg;
+        alertDiv.className = `alert ${type}`;
+        setTimeout(() => { alertDiv.style.display = 'none'; }, 3000);
+    }
+    
+    // Get student ID from Firestore using IC number
     async function getStudentId() {
         try {
             const q = query(studentsCollection, where("icNumber", "==", studentIC));
@@ -274,30 +282,39 @@
                 snapshot.forEach(doc => {
                     studentId = doc.id;
                 });
-                console.log("Student ID found:", studentId);
+                console.log("Student ID found in Firestore:", studentId);
                 return true;
             } else {
-                console.log("Student not found in database");
+                console.log("Student not found in Firestore database");
+                showAlert("Data pelajar tidak ditemui dalam pangkalan data", "error");
                 return false;
             }
         } catch(e) {
             console.error("Error getting student ID:", e);
+            showAlert("Ralat menyambung ke pangkalan data", "error");
             return false;
         }
     }
     
+    // Load merit records from Firestore
     async function loadMeritRecords() {
         const container = document.getElementById('recordsContainer');
+        
         if (!studentId) {
-            container.innerHTML = '<div class="empty-state"><i class="fas fa-user-slash"></i><p>Data pelajar tidak ditemui</p></div>';
+            container.innerHTML = '<div class="empty-state"><i class="fas fa-user-slash"></i><p>Data pelajar tidak ditemui</p><p>Sila pastikan anda telah login dengan betul</p></div>';
             return;
         }
         
         try {
+            // Query merit records for this student only
             const q = query(meritCollection, where("studentId", "==", studentId), orderBy("createdAt", "desc"));
             const snapshot = await getDocs(q);
             allMeritRecords = [];
-            snapshot.forEach(doc => allMeritRecords.push({ id: doc.id, ...doc.data() }));
+            snapshot.forEach(doc => {
+                allMeritRecords.push({ id: doc.id, ...doc.data() });
+            });
+            
+            console.log(`Found ${allMeritRecords.length} merit records for student`);
             
             // Calculate total merit
             const total = allMeritRecords.reduce((sum, r) => sum + (r.points || 0), 0);
@@ -348,7 +365,7 @@
                         </div>
                         <div class="record-meta">
                             <span><i class="fas fa-calendar"></i> ${formatDate(record.createdAt)}</span>
-                            <span><i class="fas fa-user-check"></i> Didaftar oleh: ${escapeHtml(record.createdBy || 'Guru')}</span>
+                            <span><i class="fas fa-user-check"></i> Didaftar oleh: ${escapeHtml(record.createdBy || 'Guru/Kaunselor')}</span>
                         </div>
                     </div>
                 `;
@@ -356,14 +373,19 @@
             container.innerHTML = html;
         } catch(e) {
             console.error("Error loading merit records:", e);
-            container.innerHTML = '<div class="empty-state"><p style="color:#dc2626;">Ralat memuat data. Sila refresh.</p></div>';
+            container.innerHTML = '<div class="empty-state"><p style="color:#dc2626;">Ralat memuat data. Sila refresh halaman.</p></div>';
+            showAlert("Gagal memuat data merit", "error");
         }
     }
     
     function formatDate(dateStr) {
         if (!dateStr) return '-';
-        const date = new Date(dateStr);
-        return date.toLocaleDateString('ms-MY', { day: 'numeric', month: 'long', year: 'numeric' });
+        try {
+            const date = new Date(dateStr);
+            return date.toLocaleDateString('ms-MY', { day: 'numeric', month: 'long', year: 'numeric' });
+        } catch(e) {
+            return dateStr;
+        }
     }
     
     function escapeHtml(str) {
@@ -372,24 +394,54 @@
     }
     
     async function init() {
-        await getStudentId();
-        await loadMeritRecords();
+        console.log("Initializing Mata Merit page...");
+        console.log("Student IC from session:", studentIC);
+        
+        const success = await getStudentId();
+        if (success) {
+            await loadMeritRecords();
+        } else {
+            document.getElementById('recordsContainer').innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-triangle"></i><p>Gagal mengesan ID pelajar. Sila log masuk semula.</p></div>';
+        }
     }
     
     init();
 </script>
 
 <!-- NOTA PENTING:
-     Halaman ini akan memaparkan:
-     1. Profil pelajar (Nama, IC, Kelas, Tahun)
-     2. Jumlah mata merit semasa
-     3. Statistik (bilangan kebaikan & kesalahan)
-     4. Senarai transaksi merit dengan detail:
-        - Jenis (Kebaikan/Kesalahan)
-        - Mata merit ditambah/ditolak
-        - Keterangan/penyataan
-        - Tarikh
-        - Siapa yang mendaftar
+     ============================================================
+     STRUKTUR FIRESTORE COLLECTIONS:
+     ============================================================
+     
+     1. students:
+        - id (auto)
+        - fullname
+        - icNumber
+        - class
+        - session
+     
+     2. merit_records:
+        - id (auto)
+        - studentId (rujukan kepada students.id)
+        - studentName
+        - studentIC
+        - studentClass
+        - type: "positive" / "negative"
+        - level: "ringan" / "sederhana" / "berat" (untuk kesalahan)
+        - description
+        - points: 5 / -2 / -5 / -10
+        - createdAt
+        - createdBy
+        - createdByIC
+        - createdByRole
+     
+     ============================================================
+     CARA KERJA:
+     ============================================================
+     1. Halaman akan membaca studentIC dari sessionStorage (selepas login)
+     2. Cari studentId dalam collection 'students' menggunakan IC
+     3. Query semua rekod merit dengan studentId yang sama
+     4. Paparkan jumlah merit, statistik, dan senarai transaksi
 -->
 </body>
 </html>

@@ -3,10 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Urus Tempahan & Cuti | E-MindCare SEMSIRA</title>
+    <title>Urus Tempahan Kaunseling | E-MindCare SEMSIRA</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css' rel='stylesheet' />
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js'></script>
     
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -20,63 +22,78 @@
         .logo-icon i { font-size: 1.8rem; color: white; }
         .logo-text h1 { font-size: 1.5rem; font-weight: 800; background: linear-gradient(135deg, #1e293b, #4f46e5); -webkit-background-clip: text; background-clip: text; color: transparent; }
         .back-btn { background: #eef2ff; border: none; padding: 0.6rem 1.2rem; border-radius: 40px; cursor: pointer; font-weight: 600; color: #4f46e5; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; }
-        .back-btn:hover { background: #4f46e5; color: white; }
         
-        .page-header { background: linear-gradient(135deg, #4f46e5, #7c3aed); color: white; padding: 30px 20px; text-align: center; border-radius: 24px; margin-bottom: 30px; }
-        .page-header h1 { font-size: 1.8rem; margin-bottom: 8px; }
+        /* Holiday Management Cards */
+        .holiday-management { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px; }
+        @media (max-width: 900px) { .holiday-management { grid-template-columns: 1fr; } }
         
-        /* Two Columns */
-        .two-columns { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
-        @media (max-width: 900px) { .two-columns { grid-template-columns: 1fr; } }
+        .holiday-card { background: white; border-radius: 1.5rem; padding: 1.5rem; box-shadow: 0 8px 20px -8px rgba(0,0,0,0.08); }
+        .holiday-card h3 { font-size: 1.2rem; color: #1e293b; margin-bottom: 1rem; display: flex; align-items: center; gap: 10px; }
+        .holiday-card h3 i { color: #4f46e5; }
         
-        .card { background: white; border-radius: 1.5rem; padding: 1.5rem; box-shadow: 0 8px 20px -8px rgba(0,0,0,0.08); margin-bottom: 1.5rem; }
-        .card h3 { font-size: 1.2rem; color: #1e293b; margin-bottom: 1rem; display: flex; align-items: center; gap: 10px; border-left: 4px solid #4f46e5; padding-left: 12px; }
-        .card h3 i { color: #4f46e5; }
+        .weekly-holidays { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 15px; }
+        .day-checkbox { display: flex; align-items: center; gap: 8px; background: #f1f5f9; padding: 8px 15px; border-radius: 40px; cursor: pointer; transition: 0.2s; }
+        .day-checkbox input { width: 18px; height: 18px; cursor: pointer; }
+        .day-checkbox label { cursor: pointer; font-weight: 500; }
+        .day-checkbox.selected { background: #e0e7ff; }
         
-        /* Holiday Cards */
-        .holiday-section { background: #f8fafc; border-radius: 1rem; padding: 1rem; margin-bottom: 1rem; }
-        .weekly-holidays { display: flex; gap: 0.8rem; flex-wrap: wrap; margin-bottom: 1rem; }
-        .day-chip { background: #e2e8f0; padding: 8px 16px; border-radius: 40px; font-size: 0.8rem; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 8px; }
-        .day-chip.selected { background: #dc2626; color: white; }
-        .day-chip.selected i { color: white; }
-        .day-chip:hover { transform: scale(1.02); }
+        .btn-save { background: linear-gradient(95deg, #4f46e5, #7c3aed); color: white; border: none; padding: 8px 20px; border-radius: 40px; font-weight: 600; cursor: pointer; margin-top: 10px; }
+        .btn-save:hover { transform: translateY(-1px); }
         
-        /* Form */
-        .form-group { margin-bottom: 1rem; }
-        .form-group label { display: block; font-weight: 600; font-size: 0.8rem; margin-bottom: 0.4rem; color: #1e293b; }
-        .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 0.7rem; border: 1.5px solid #e2e8f0; border-radius: 0.8rem; font-family: inherit; outline: none; }
-        .form-group input:focus, .form-group textarea:focus, .form-group select:focus { border-color: #4f46e5; }
+        .extra-holiday-item { background: #f8fafc; border-radius: 0.8rem; padding: 10px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+        .extra-holiday-date { font-weight: 600; color: #1e293b; }
+        .extra-holiday-name { font-size: 0.8rem; color: #5b6e8c; }
+        .btn-delete-holiday { background: #fee2e2; border: none; padding: 5px 10px; border-radius: 40px; cursor: pointer; color: #dc2626; font-size: 0.7rem; }
         
-        .btn-primary { background: linear-gradient(95deg, #4f46e5, #7c3aed); color: white; border: none; padding: 0.6rem 1rem; border-radius: 2rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; }
-        .btn-secondary { background: #e2e8f0; color: #1e293b; border: none; padding: 0.4rem 0.8rem; border-radius: 2rem; font-weight: 600; cursor: pointer; font-size: 0.7rem; }
-        .btn-danger { background: #fee2e2; color: #dc2626; border: none; padding: 0.4rem 0.8rem; border-radius: 2rem; font-weight: 600; cursor: pointer; font-size: 0.7rem; }
+        .add-holiday-form { display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap; }
+        .add-holiday-form input { flex: 1; padding: 10px; border: 1.5px solid #e2e8f0; border-radius: 0.8rem; font-family: inherit; }
+        .add-holiday-form button { background: #10b981; color: white; border: none; padding: 10px 20px; border-radius: 40px; cursor: pointer; font-weight: 600; }
         
-        .holiday-list { max-height: 300px; overflow-y: auto; }
-        .holiday-item { background: white; border-radius: 0.8rem; padding: 0.8rem; margin-bottom: 0.5rem; display: flex; justify-content: space-between; align-items: center; border: 1px solid #e2e8f0; }
-        .holiday-date { font-weight: 600; color: #1e293b; }
-        .holiday-name { font-size: 0.7rem; color: #5b6e8c; }
+        /* Stats */
+        .stats { display: flex; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+        .stat-card { background: white; border-radius: 1rem; padding: 1rem 1.5rem; flex: 1; min-width: 150px; display: flex; align-items: center; gap: 1rem; }
+        .stat-icon { width: 45px; height: 45px; border-radius: 45px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; }
+        .stat-icon.pending { background: #fef3c7; color: #d97706; }
+        .stat-icon.approved { background: #e0e7ff; color: #4f46e5; }
+        .stat-icon.completed { background: #dcfce7; color: #166534; }
+        .stat-info h4 { font-size: 0.7rem; color: #5b6e8c; }
+        .stat-info .count { font-size: 1.8rem; font-weight: 800; color: #1e293b; }
         
+        /* Tabs */
+        .tabs { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; flex-wrap: wrap; background: white; padding: 0.5rem; border-radius: 1rem; }
+        .tab-btn { flex: 1; padding: 0.8rem 1rem; background: transparent; border: none; border-radius: 0.8rem; font-weight: 600; font-size: 0.9rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .tab-btn.active { background: linear-gradient(95deg, #4f46e5, #7c3aed); color: white; }
+        
+        .bookings-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); gap: 1.5rem; }
+        .booking-card { background: white; border-radius: 1.2rem; padding: 1.2rem; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; }
+        .booking-card:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
+        .card-header { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; margin-bottom: 1rem; padding-bottom: 0.8rem; border-bottom: 1px solid #e2e8f0; }
+        .student-name { font-weight: 700; color: #1e293b; font-size: 1rem; }
+        .student-name i { color: #4f46e5; margin-right: 6px; }
+        .status-badge { padding: 4px 10px; border-radius: 50px; font-size: 0.7rem; font-weight: 600; }
+        .status-pending { background: #fef3c7; color: #d97706; }
+        .status-approved { background: #dcfce7; color: #166534; }
+        .status-postponed { background: #e0e7ff; color: #4f46e5; }
+        .status-rejected { background: #fee2e2; color: #dc2626; }
+        .booking-detail { font-size: 0.8rem; color: #5b6e8c; margin: 0.5rem 0; display: flex; align-items: flex-start; gap: 10px; }
+        .booking-detail i { width: 20px; color: #4f46e5; }
+        .action-buttons { display: flex; gap: 0.8rem; margin-top: 1rem; padding-top: 0.8rem; border-top: 1px solid #e2e8f0; flex-wrap: wrap; }
+        .btn-primary { background: linear-gradient(95deg, #4f46e5, #7c3aed); color: white; border: none; padding: 0.5rem 1rem; border-radius: 2rem; font-weight: 600; font-size: 0.75rem; cursor: pointer; }
+        .btn-success { background: #10b981; color: white; border: none; padding: 0.5rem 1rem; border-radius: 2rem; font-weight: 600; font-size: 0.75rem; cursor: pointer; }
+        .empty-state { text-align: center; padding: 3rem; color: #94a3b8; }
         .alert { padding: 12px; border-radius: 12px; margin-bottom: 15px; font-size: 0.8rem; display: none; }
         .alert.success { background: #dcfce7; color: #166534; display: block; }
         .alert.error { background: #fee2e2; color: #dc2626; display: block; }
-        
-        /* Bookings List */
-        .booking-list { max-height: 500px; overflow-y: auto; }
-        .booking-item { background: #f8fafc; border-radius: 1rem; padding: 1rem; margin-bottom: 1rem; border: 1px solid #e2e8f0; }
-        .booking-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-bottom: 8px; }
-        .status-badge { display: inline-block; padding: 4px 12px; border-radius: 50px; font-size: 0.7rem; font-weight: 600; }
-        .status-pending { background: #fef3c7; color: #d97706; }
-        .status-approved { background: #dcfce7; color: #166534; }
-        .status-rejected { background: #fee2e2; color: #dc2626; }
-        .status-postponed { background: #e0e7ff; color: #4f46e5; }
-        
-        .empty-state { text-align: center; padding: 40px; color: #94a3b8; }
         
         /* Modal */
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2000; display: flex; align-items: center; justify-content: center; padding: 20px; }
         .modal-content { max-width: 500px; width: 100%; background: white; border-radius: 1.5rem; }
         .modal-header { padding: 1rem; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; }
         .modal-body { padding: 1rem; }
+        .form-group { margin-bottom: 1rem; }
+        .form-group label { display: block; font-weight: 600; font-size: 0.8rem; margin-bottom: 0.4rem; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 0.7rem; border: 1.5px solid #e2e8f0; border-radius: 0.8rem; font-family: inherit; }
+        .modal-btn { width: 100%; padding: 0.8rem; background: #4f46e5; color: white; border: none; border-radius: 2rem; font-weight: 600; cursor: pointer; margin-top: 1rem; }
     </style>
 </head>
 <body>
@@ -84,104 +101,81 @@
     <div class="header">
         <div class="logo-area">
             <div class="logo-icon"><i class="fas fa-calendar-check"></i></div>
-            <div class="logo-text"><h1>Urus Tempahan & Cuti</h1></div>
+            <div class="logo-text"><h1>Urus Tempahan Kaunseling</h1></div>
         </div>
         <a href="dashboard-kaunselor.html" class="back-btn"><i class="fas fa-arrow-left"></i> Kembali ke Dashboard</a>
     </div>
     
-    <div class="page-header"><h1><i class="fas fa-calendar-alt"></i> Pengurusan Cuti & Tempahan</h1><p>Tetapkan cuti mingguan, cuti tambahan & urus permohonan pelajar</p></div>
-    
-    <div id="alertMessage" class="alert"></div>
-    
-    <div class="two-columns">
-        <!-- LEFT COLUMN: Holiday Management -->
-        <div>
-            <!-- Cuti Mingguan -->
-            <div class="card">
-                <h3><i class="fas fa-calendar-week"></i> Cuti Mingguan (Setiap minggu)</h3>
-                <div class="holiday-section">
-                    <p style="font-size:0.8rem; margin-bottom:0.8rem; color:#5b6e8c;">Pilih hari yang bengkel TUTUP setiap minggu:</p>
-                    <div class="weekly-holidays" id="weeklyHolidaysContainer">
-                        <!-- Days will be loaded here -->
-                    </div>
-                    <button class="btn-primary" id="saveWeeklyBtn" style="margin-top:0.5rem;"><i class="fas fa-save"></i> Simpan Tetapan</button>
-                </div>
+    <!-- ==================== HOLIDAY MANAGEMENT SECTION (BARU) ==================== -->
+    <div class="holiday-management">
+        <!-- Cuti Umum (Mingguan) -->
+        <div class="holiday-card">
+            <h3><i class="fas fa-calendar-week"></i> Cuti Umum (Mingguan)</h3>
+            <p style="font-size:0.8rem; color:#5b6e8c; margin-bottom:1rem;">Pilih hari yang dijadikan cuti setiap minggu</p>
+            <div class="weekly-holidays" id="weeklyHolidaysContainer">
+                <div class="day-checkbox"><input type="checkbox" value="0"> <label>Ahad</label></div>
+                <div class="day-checkbox"><input type="checkbox" value="1"> <label>Isnin</label></div>
+                <div class="day-checkbox"><input type="checkbox" value="2"> <label>Selasa</label></div>
+                <div class="day-checkbox"><input type="checkbox" value="3"> <label>Rabu</label></div>
+                <div class="day-checkbox"><input type="checkbox" value="4"> <label>Khamis</label></div>
+                <div class="day-checkbox"><input type="checkbox" value="5"> <label>Jumaat</label></div>
+                <div class="day-checkbox"><input type="checkbox" value="6"> <label>Sabtu</label></div>
             </div>
-            
-            <!-- Cuti Tambahan -->
-            <div class="card">
-                <h3><i class="fas fa-plus-circle"></i> Cuti Tambahan (Tarikh Tertentu)</h3>
-                <div class="holiday-section">
-                    <form id="addHolidayForm">
-                        <div class="form-group">
-                            <label><i class="fas fa-calendar-day"></i> Tarikh Cuti</label>
-                            <input type="date" id="holidayDate" required>
-                        </div>
-                        <div class="form-group">
-                            <label><i class="fas fa-tag"></i> Nama Cuti / Sebab</label>
-                            <input type="text" id="holidayName" placeholder="cth: Tahun Baru, Cuti Raya, Hari Wilayah" required>
-                        </div>
-                        <button type="submit" class="btn-primary"><i class="fas fa-plus"></i> Tambah Cuti</button>
-                    </form>
-                </div>
-                
-                <h3 style="margin-top:1rem;"><i class="fas fa-list"></i> Senarai Cuti Tambahan</h3>
-                <div id="extraHolidaysList" class="holiday-list">
-                    <div class="empty-state"><i class="fas fa-spinner fa-pulse"></i> Memuatkan...</div>
-                </div>
-            </div>
+            <button class="btn-save" id="saveWeeklyHolidaysBtn"><i class="fas fa-save"></i> Simpan Cuti Mingguan</button>
         </div>
         
-        <!-- RIGHT COLUMN: Appointments -->
-        <div>
-            <div class="card">
-                <h3><i class="fas fa-inbox"></i> Tempahan Perlu Diurus</h3>
-                <div id="pendingBookingsContainer" class="booking-list">
-                    <div class="empty-state"><i class="fas fa-spinner fa-pulse"></i> Memuatkan...</div>
-                </div>
+        <!-- Cuti Tambahan -->
+        <div class="holiday-card">
+            <h3><i class="fas fa-plus-circle"></i> Cuti Tambahan</h3>
+            <p style="font-size:0.8rem; color:#5b6e8c; margin-bottom:1rem;">Tambah tarikh cuti khas (contoh: Hari Raya, Tahun Baru)</p>
+            <div id="extraHolidaysList" style="margin-bottom: 15px;">
+                <div class="empty-state" style="padding: 20px; font-size:0.8rem;">Tiada cuti tambahan</div>
             </div>
-            
-            <div class="card">
-                <h3><i class="fas fa-history"></i> Semua Tempahan</h3>
-                <div id="allBookingsContainer" class="booking-list">
-                    <div class="empty-state"><i class="fas fa-spinner fa-pulse"></i> Memuatkan...</div>
-                </div>
+            <div class="add-holiday-form">
+                <input type="date" id="newHolidayDate" placeholder="Tarikh">
+                <input type="text" id="newHolidayName" placeholder="Nama Cuti (cth: Tahun Baru)">
+                <button id="addHolidayBtn"><i class="fas fa-plus"></i> Tambah</button>
             </div>
         </div>
     </div>
+    
+    <!-- Stats -->
+    <div class="stats" id="statsContainer">
+        <div class="stat-card"><div class="stat-icon pending"><i class="fas fa-clock"></i></div><div class="stat-info"><h4>Menunggu</h4><div class="count" id="pendingCount">0</div></div></div>
+        <div class="stat-card"><div class="stat-icon approved"><i class="fas fa-check-circle"></i></div><div class="stat-info"><h4>Belum Selesai</h4><div class="count" id="approvedCount">0</div></div></div>
+        <div class="stat-card"><div class="stat-icon completed"><i class="fas fa-check-double"></i></div><div class="stat-info"><h4>Selesai</h4><div class="count" id="completedCount">0</div></div></div>
+    </div>
+    
+    <!-- Tabs -->
+    <div class="tabs">
+        <button class="tab-btn active" data-tab="pending"><i class="fas fa-inbox"></i> Tempahan Masuk</button>
+        <button class="tab-btn" data-tab="active"><i class="fas fa-spinner"></i> Belum Selesai</button>
+        <button class="tab-btn" data-tab="completed"><i class="fas fa-check-circle"></i> Selesai</button>
+    </div>
+    
+    <div id="bookingsContainer" class="bookings-grid">
+        <div class="empty-state"><i class="fas fa-spinner fa-pulse"></i> Memuatkan...</div>
+    </div>
 </div>
 
-<!-- Update Appointment Modal -->
+<!-- Update Modal -->
 <div id="updateModal" class="modal" style="display: none;">
     <div class="modal-content">
-        <div class="modal-header">
-            <h3><i class="fas fa-edit"></i> Kemaskini Permohonan</h3>
-            <button onclick="closeUpdateModal()" style="background:none;border:none;font-size:1.5rem;cursor:pointer;">&times;</button>
-        </div>
+        <div class="modal-header"><h3><i class="fas fa-edit"></i> Kemaskini Permohonan</h3><button onclick="closeModal()" style="background:none;border:none;font-size:1.5rem;cursor:pointer;">&times;</button></div>
         <div class="modal-body">
             <form id="updateForm">
                 <input type="hidden" id="updateId">
-                <div class="form-group">
-                    <label>Status</label>
-                    <select id="statusSelect" required>
-                        <option value="approved">✅ Diterima - Tetapkan Temujanji</option>
-                        <option value="postponed">🔄 Ditangguhkan - Cadangkan Tarikh Baru</option>
-                        <option value="rejected">❌ Ditolak</option>
-                    </select>
-                </div>
-                <div id="approveFields" style="display: none;">
-                    <div class="form-group"><label>Tarikh Temujanji</label><input type="date" id="appointmentDate"></div>
-                    <div class="form-group"><label>Masa Temujanji</label><input type="time" id="appointmentTime"></div>
-                    <div class="form-group"><label>Tempat</label><input type="text" id="location" value="Bilik Kaunseling"></div>
-                </div>
-                <div id="postponeFields" style="display: none;">
-                    <div class="form-group"><label>Cadangan Tarikh Baru</label><input type="date" id="newDate"></div>
-                    <div class="form-group"><label>Mesej kepada Pelajar</label><textarea id="message" rows="2" placeholder="Mesej kepada pelajar..."></textarea></div>
-                </div>
-                <div id="rejectFields" style="display: none;">
-                    <div class="form-group"><label>Sebab Ditolak</label><textarea id="reason" rows="2" required></textarea></div>
-                </div>
-                <button type="submit" class="btn-primary" style="width:100%; margin-top:1rem;"><i class="fas fa-save"></i> Simpan</button>
+                <div class="form-group"><label>Status</label><select id="statusSelect" required>
+                    <option value="approved">✅ Diterima - Tetapkan Temujanji</option>
+                    <option value="postponed">🔄 Ditangguhkan - Cadangkan Tarikh Baru</option>
+                    <option value="rejected">❌ Ditolak</option>
+                </select></div>
+                <div id="dateTimeFields" style="display: none;"><div class="form-group"><label>Tarikh Temujanji</label><input type="date" id="appointmentDate"></div>
+                <div class="form-group"><label>Masa Temujanji</label><input type="time" id="appointmentTime"></div>
+                <div class="form-group"><label>Tempat</label><input type="text" id="location" placeholder="Bilik Kaunseling"></div></div>
+                <div id="postponeFields" style="display: none;"><div class="form-group"><label>Cadangan Tarikh Baru</label><input type="date" id="newDate"></div></div>
+                <div id="rejectFields" style="display: none;"><div class="form-group"><label>Sebab Ditolak</label><textarea id="reason" rows="3" placeholder="Nyatakan sebab permohonan ditolak..."></textarea></div></div>
+                <button type="submit" class="modal-btn"><i class="fas fa-save"></i> Simpan</button>
             </form>
         </div>
     </div>
@@ -207,71 +201,50 @@
     const holidaysCollection = collection(db, "holidays");
     const weeklyHolidaysCollection = collection(db, "weeklyHolidays");
     
-    // Day mapping
-    const dayNames = ['Ahad', 'Isnin', 'Selasa', 'Rabu', 'Khamis', 'Jumaat', 'Sabtu'];
-    const dayNumbers = [0, 1, 2, 3, 4, 5, 6];
-    
+    let allBookings = [];
+    let currentTab = "pending";
     let weeklyHolidays = [];
     let extraHolidays = [];
     
-    // ==================== WEEKLY HOLIDAYS ====================
+    // ==================== HOLIDAY MANAGEMENT FUNCTIONS ====================
     async function loadWeeklyHolidays() {
         try {
             const snapshot = await getDocs(weeklyHolidaysCollection);
             weeklyHolidays = [];
-            snapshot.forEach(doc => {
-                weeklyHolidays.push(doc.data().day);
+            snapshot.forEach(doc => weeklyHolidays.push(doc.data().day));
+            // Update checkboxes
+            document.querySelectorAll('.day-checkbox input').forEach(cb => {
+                cb.checked = weeklyHolidays.includes(parseInt(cb.value));
+                cb.parentElement.classList.toggle('selected', cb.checked);
             });
-            renderWeeklyHolidays();
         } catch(e) { console.error(e); }
     }
     
-    function renderWeeklyHolidays() {
-        const container = document.getElementById('weeklyHolidaysContainer');
-        container.innerHTML = dayNames.map((day, idx) => `
-            <div class="day-chip ${weeklyHolidays.includes(idx) ? 'selected' : ''}" onclick="toggleWeeklyHoliday(${idx})">
-                <i class="fas ${weeklyHolidays.includes(idx) ? 'fa-check-circle' : 'fa-circle'}"></i> ${day}
-            </div>
-        `).join('');
-    }
-    
-    window.toggleWeeklyHoliday = function(day) {
-        if (weeklyHolidays.includes(day)) {
-            weeklyHolidays = weeklyHolidays.filter(d => d !== day);
-        } else {
-            weeklyHolidays.push(day);
-        }
-        renderWeeklyHolidays();
-    };
-    
     async function saveWeeklyHolidays() {
         try {
-            // Delete all existing
+            // Delete existing
             const snapshot = await getDocs(weeklyHolidaysCollection);
             for (const docSnap of snapshot.docs) {
                 await deleteDoc(doc(db, "weeklyHolidays", docSnap.id));
             }
-            // Add new ones
-            for (const day of weeklyHolidays) {
+            // Save new
+            const selected = [];
+            document.querySelectorAll('.day-checkbox input:checked').forEach(cb => {
+                selected.push(parseInt(cb.value));
+            });
+            for (const day of selected) {
                 await addDoc(weeklyHolidaysCollection, { day: day });
             }
-            showAlert('✅ Tetapan cuti mingguan berjaya disimpan!', 'success');
-        } catch(e) { 
-            console.error(e);
-            showAlert('❌ Gagal menyimpan tetapan', 'error');
-        }
+            weeklyHolidays = selected;
+            showAlert('✅ Cuti mingguan berjaya disimpan!', 'success');
+        } catch(e) { showAlert('Gagal menyimpan cuti mingguan', 'error'); }
     }
     
-    document.getElementById('saveWeeklyBtn').addEventListener('click', saveWeeklyHolidays);
-    
-    // ==================== EXTRA HOLIDAYS ====================
     async function loadExtraHolidays() {
         try {
             const snapshot = await getDocs(holidaysCollection);
             extraHolidays = [];
-            snapshot.forEach(doc => {
-                extraHolidays.push({ id: doc.id, date: doc.data().date, name: doc.data().name });
-            });
+            snapshot.forEach(doc => extraHolidays.push({ id: doc.id, ...doc.data() }));
             renderExtraHolidays();
         } catch(e) { console.error(e); }
     }
@@ -279,13 +252,13 @@
     function renderExtraHolidays() {
         const container = document.getElementById('extraHolidaysList');
         if (extraHolidays.length === 0) {
-            container.innerHTML = '<div class="empty-state"><i class="fas fa-calendar-times"></i><p>Tiada cuti tambahan</p></div>';
+            container.innerHTML = '<div class="empty-state" style="padding: 20px; font-size:0.8rem;">Tiada cuti tambahan</div>';
             return;
         }
         container.innerHTML = extraHolidays.map(h => `
-            <div class="holiday-item">
-                <div><span class="holiday-date">${formatDate(h.date)}</span><div class="holiday-name">${escapeHtml(h.name)}</div></div>
-                <button class="btn-danger" onclick="deleteExtraHoliday('${h.id}')"><i class="fas fa-trash"></i> Hapus</button>
+            <div class="extra-holiday-item">
+                <div><span class="extra-holiday-date">${formatDate(h.date)}</span><br><span class="extra-holiday-name">${escapeHtml(h.name || 'Cuti')}</span></div>
+                <button class="btn-delete-holiday" onclick="deleteExtraHoliday('${h.id}')"><i class="fas fa-trash"></i> Hapus</button>
             </div>
         `).join('');
     }
@@ -296,107 +269,107 @@
                 await deleteDoc(doc(db, "holidays", id));
                 await loadExtraHolidays();
                 showAlert('Cuti berjaya dipadam', 'success');
-            } catch(e) { showAlert('Gagal memadam', 'error'); }
+            } catch(e) { showAlert('Gagal memadam cuti', 'error'); }
         }
     };
     
-    document.getElementById('addHolidayForm').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const date = document.getElementById('holidayDate').value;
-        const name = document.getElementById('holidayName').value.trim();
-        if (!date || !name) { showAlert('Sila lengkapkan maklumat', 'error'); return; }
+    async function addExtraHoliday() {
+        const date = document.getElementById('newHolidayDate').value;
+        const name = document.getElementById('newHolidayName').value.trim();
+        if (!date) { showAlert('Sila pilih tarikh', 'error'); return; }
+        if (!name) { showAlert('Sila masukkan nama cuti', 'error'); return; }
         try {
-            await addDoc(holidaysCollection, { date, name, createdAt: new Date().toISOString() });
-            showAlert('✅ Cuti berjaya ditambah!', 'success');
-            document.getElementById('addHolidayForm').reset();
+            await addDoc(holidaysCollection, { date: date, name: name, createdAt: new Date().toISOString() });
+            document.getElementById('newHolidayDate').value = '';
+            document.getElementById('newHolidayName').value = '';
             await loadExtraHolidays();
-        } catch(e) { showAlert('❌ Gagal menambah cuti', 'error'); }
-    });
+            showAlert('✅ Cuti tambahan berjaya ditambah!', 'success');
+        } catch(e) { showAlert('Gagal menambah cuti', 'error'); }
+    }
     
-    // ==================== LOAD BOOKINGS ====================
-    async function loadPendingBookings() {
-        const container = document.getElementById('pendingBookingsContainer');
+    // ==================== BOOKING FUNCTIONS ====================
+    async function loadBookings() {
         try {
-            const q = query(appointmentsCollection, where("status", "==", "pending"), orderBy("createdAt", "desc"));
-            const snapshot = await getDocs(q);
-            if (snapshot.empty) {
-                container.innerHTML = '<div class="empty-state"><i class="fas fa-inbox"></i><p>Tiada tempahan perlu diurus</p></div>';
-                return;
-            }
-            let html = '';
-            snapshot.forEach(doc => {
-                const b = doc.data();
-                html += `
-                    <div class="booking-item">
-                        <div class="booking-header">
-                            <span><strong>${escapeHtml(b.studentName)}</strong></span>
-                            <span class="status-badge status-pending">⏳ Pending</span>
-                        </div>
-                        <div class="booking-detail" style="font-size:0.8rem; margin:5px 0;"><i class="fas fa-calendar"></i> ${formatDate(b.requestedDate)}</div>
-                        <div class="booking-detail" style="font-size:0.8rem;"><i class="fas fa-user-tie"></i> ${escapeHtml(b.counselor || '-')}</div>
-                        <div class="booking-detail" style="font-size:0.8rem;"><i class="fas fa-share-alt"></i> ${escapeHtml(b.topic || '-')}</div>
-                        <button class="btn-primary" style="margin-top:10px; width:100%;" onclick="openUpdateModal('${doc.id}')"><i class="fas fa-edit"></i> Proses Permohonan</button>
-                    </div>
-                `;
-            });
-            container.innerHTML = html;
+            const snapshot = await getDocs(appointmentsCollection);
+            allBookings = [];
+            snapshot.forEach(doc => allBookings.push({ id: doc.id, ...doc.data() }));
+            updateStats();
+            renderBookings();
         } catch(e) { console.error(e); }
     }
     
-    async function loadAllBookings() {
-        const container = document.getElementById('allBookingsContainer');
-        try {
-            const q = query(appointmentsCollection, orderBy("createdAt", "desc"));
-            const snapshot = await getDocs(q);
-            if (snapshot.empty) {
-                container.innerHTML = '<div class="empty-state"><i class="fas fa-calendar-times"></i><p>Tiada tempahan</p></div>';
-                return;
-            }
-            let html = '';
-            snapshot.forEach(doc => {
-                const b = doc.data();
-                let statusClass = 'status-pending', statusText = 'Menunggu';
-                if (b.status === 'approved') { statusClass = 'status-approved'; statusText = 'Diluluskan'; }
-                else if (b.status === 'rejected') { statusClass = 'status-rejected'; statusText = 'Ditolak'; }
-                else if (b.status === 'postponed') { statusClass = 'status-postponed'; statusText = 'Ditangguhkan'; }
-                
-                html += `
-                    <div class="booking-item">
-                        <div class="booking-header">
-                            <span><strong>${escapeHtml(b.studentName)}</strong></span>
-                            <span class="status-badge ${statusClass}">${statusText}</span>
-                        </div>
-                        <div style="font-size:0.75rem;">📅 ${formatDate(b.requestedDate)} | 👤 ${escapeHtml(b.counselor || '-')}</div>
-                        <div style="font-size:0.7rem; color:#5b6e8c;">📝 ${escapeHtml(b.topic || '-')}</div>
-                        ${b.appointmentDate ? `<div style="font-size:0.7rem; color:#166534;">✅ Temujanji: ${formatDate(b.appointmentDate)} ${b.appointmentTime || ''}</div>` : ''}
-                        ${b.reason ? `<div style="font-size:0.7rem; color:#dc2626;">❌ Sebab: ${escapeHtml(b.reason)}</div>` : ''}
-                    </div>
-                `;
-            });
-            container.innerHTML = html;
-        } catch(e) { console.error(e); }
+    function updateStats() {
+        const pending = allBookings.filter(b => b.status === 'pending').length;
+        const active = allBookings.filter(b => (b.status === 'approved' || b.status === 'postponed') && b.completed !== true).length;
+        const completed = allBookings.filter(b => b.status === 'rejected' || b.completed === true).length;
+        document.getElementById('pendingCount').innerText = pending;
+        document.getElementById('approvedCount').innerText = active;
+        document.getElementById('completedCount').innerText = completed;
     }
     
-    // ==================== UPDATE APPOINTMENT ====================
+    function getFilteredBookings() {
+        if (currentTab === "pending") return allBookings.filter(b => b.status === 'pending');
+        if (currentTab === "active") return allBookings.filter(b => (b.status === 'approved' || b.status === 'postponed') && b.completed !== true);
+        return allBookings.filter(b => b.status === 'rejected' || b.completed === true);
+    }
+    
+    function renderBookings() {
+        const container = document.getElementById('bookingsContainer');
+        const filtered = getFilteredBookings();
+        if (filtered.length === 0) { container.innerHTML = `<div class="empty-state"><i class="fas fa-calendar-times"></i><p>Tiada tempahan</p></div>`; return; }
+        
+        container.innerHTML = filtered.map(b => {
+            let statusClass = 'status-pending', statusText = 'Menunggu';
+            if (b.status === 'approved') { statusClass = 'status-approved'; statusText = 'Diluluskan'; }
+            else if (b.status === 'postponed') { statusClass = 'status-postponed'; statusText = 'Ditangguhkan'; }
+            else if (b.status === 'rejected') { statusClass = 'status-rejected'; statusText = 'Ditolak'; }
+            
+            let actionButtons = '';
+            if (b.status === 'pending') {
+                actionButtons = `<button class="btn-primary" onclick="openUpdateModal('${b.id}')"><i class="fas fa-edit"></i> Proses Permohonan</button>`;
+            } else if ((b.status === 'approved' || b.status === 'postponed') && b.completed !== true) {
+                actionButtons = `<button class="btn-success" onclick="markAsCompleted('${b.id}')"><i class="fas fa-check-double"></i> Selesai (Sesi Tamat)</button>`;
+            }
+            
+            return `<div class="booking-card"><div class="card-header"><div class="student-name"><i class="fas fa-user-graduate"></i> ${escapeHtml(b.studentName)}</div><span class="status-badge ${statusClass}">${statusText}</span></div>
+            <div class="booking-detail"><i class="fas fa-calendar"></i> Tarikh Mohon: ${formatDate(b.requestedDate)}</div>
+            <div class="booking-detail"><i class="fas fa-user-tie"></i> Kaunselor: ${escapeHtml(b.counselor || '-')}</div>
+            <div class="booking-detail"><i class="fas fa-share-alt"></i> Perkara: ${escapeHtml(b.topic || '-')}</div>
+            <div class="booking-detail"><i class="fas fa-heart"></i> Perasaan: ${escapeHtml(b.feelings || '-')}</div>
+            <div class="booking-detail"><i class="fas fa-clock"></i> Perlu Segera: ${b.urgent === 'ya' ? 'Ya' : 'Tidak'}</div>
+            ${b.appointmentDate ? `<div class="booking-detail"><i class="fas fa-calendar-check"></i> Temujanji: ${formatDate(b.appointmentDate)} ${b.appointmentTime || ''}</div>` : ''}
+            ${b.newDate ? `<div class="booking-detail"><i class="fas fa-calendar-week"></i> Cadangan Baru: ${formatDate(b.newDate)}</div>` : ''}
+            ${b.reason ? `<div class="booking-detail"><i class="fas fa-comment"></i> Sebab: ${escapeHtml(b.reason)}</div>` : ''}
+            <div class="action-buttons">${actionButtons}</div></div>`;
+        }).join('');
+    }
+    
     window.openUpdateModal = function(id) {
+        const booking = allBookings.find(b => b.id === id);
+        if (!booking) return;
         document.getElementById('updateId').value = id;
         document.getElementById('updateModal').style.display = 'flex';
-        document.getElementById('approveFields').style.display = 'none';
+        document.getElementById('dateTimeFields').style.display = 'none';
         document.getElementById('postponeFields').style.display = 'none';
         document.getElementById('rejectFields').style.display = 'none';
         document.getElementById('statusSelect').value = 'approved';
-        
         document.getElementById('statusSelect').onchange = function() {
             const val = this.value;
-            document.getElementById('approveFields').style.display = val === 'approved' ? 'block' : 'none';
+            document.getElementById('dateTimeFields').style.display = val === 'approved' ? 'block' : 'none';
             document.getElementById('postponeFields').style.display = val === 'postponed' ? 'block' : 'none';
             document.getElementById('rejectFields').style.display = val === 'rejected' ? 'block' : 'none';
         };
         document.getElementById('statusSelect').dispatchEvent(new Event('change'));
     };
     
-    window.closeUpdateModal = function() {
-        document.getElementById('updateModal').style.display = 'none';
+    window.closeModal = function() { document.getElementById('updateModal').style.display = 'none'; };
+    
+    window.markAsCompleted = async function(id) {
+        if (confirm('Tandakan sesi kaunseling ini sebagai SELESAI?')) {
+            await updateDoc(doc(db, "appointments", id), { completed: true, completedAt: new Date().toISOString() });
+            showAlert('✅ Sesi ditandakan sebagai selesai', 'success');
+            await loadBookings();
+        }
     };
     
     document.getElementById('updateForm').addEventListener('submit', async (e) => {
@@ -404,49 +377,48 @@
         const id = document.getElementById('updateId').value;
         const status = document.getElementById('statusSelect').value;
         const updateData = { status, updatedAt: new Date().toISOString() };
-        
         if (status === 'approved') {
             const date = document.getElementById('appointmentDate').value;
-            const time = document.getElementById('appointmentTime').value;
-            const location = document.getElementById('location').value;
             if (!date) { alert('Sila masukkan tarikh temujanji'); return; }
             updateData.appointmentDate = date;
-            updateData.appointmentTime = time;
-            updateData.location = location || 'Bilik Kaunseling';
+            updateData.appointmentTime = document.getElementById('appointmentTime').value;
+            updateData.location = document.getElementById('location').value || 'Bilik Kaunseling';
         } else if (status === 'postponed') {
             const newDate = document.getElementById('newDate').value;
-            const message = document.getElementById('message').value;
             if (!newDate) { alert('Sila masukkan cadangan tarikh baru'); return; }
             updateData.newDate = newDate;
-            updateData.message = message || `Permohonan anda ditangguhkan ke tarikh ${newDate}. Sila buat pengesahan.`;
+            updateData.message = `Permohonan ditangguhkan ke ${formatDate(newDate)}`;
         } else if (status === 'rejected') {
             const reason = document.getElementById('reason').value;
             if (!reason) { alert('Sila masukkan sebab penolakan'); return; }
             updateData.reason = reason;
         }
-        
-        try {
-            await updateDoc(doc(db, "appointments", id), updateData);
-            showAlert('✅ Permohonan berjaya dikemaskini!', 'success');
-            closeUpdateModal();
-            await loadPendingBookings();
-            await loadAllBookings();
-        } catch(e) {
-            console.error(e);
-            showAlert('❌ Gagal mengemaskini', 'error');
-        }
+        await updateDoc(doc(db, "appointments", id), updateData);
+        showAlert('✅ Permohonan dikemaskini', 'success');
+        closeModal();
+        await loadBookings();
     });
     
-    function formatDate(ds) { if(!ds) return '-'; const d=new Date(ds); return d.toLocaleDateString('ms-MY', {day:'numeric',month:'long',year:'numeric'}); }
-    function escapeHtml(s) { if(!s) return ''; return s.replace(/[&<>]/g, m => m==='&'?'&amp;':m==='<'?'&lt;':'&gt;'); }
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentTab = btn.getAttribute('data-tab');
+            renderBookings();
+        });
+    });
     
-    function showAlert(msg, type) { const a=document.getElementById('alertMessage'); a.textContent=msg; a.className=`alert ${type}`; setTimeout(()=>{ a.style.display='none'; },4000); }
+    document.getElementById('saveWeeklyHolidaysBtn').addEventListener('click', saveWeeklyHolidays);
+    document.getElementById('addHolidayBtn').addEventListener('click', addExtraHoliday);
+    
+    function formatDate(ds) { if(!ds) return '-'; const d=new Date(ds); return d.toLocaleDateString('ms-MY',{day:'numeric',month:'long',year:'numeric'}); }
+    function escapeHtml(s) { if(!s) return ''; return s.replace(/[&<>]/g, m=> m==='&'?'&amp;':m==='<'?'&lt;':'&gt;'); }
+    function showAlert(msg, type) { const a=document.getElementById('alertMessage'); if(a){ a.textContent=msg; a.className=`alert ${type}`; setTimeout(()=>{ a.style.display='none'; },3000); } else alert(msg); }
     
     async function init() {
         await loadWeeklyHolidays();
         await loadExtraHolidays();
-        await loadPendingBookings();
-        await loadAllBookings();
+        await loadBookings();
     }
     init();
 </script>

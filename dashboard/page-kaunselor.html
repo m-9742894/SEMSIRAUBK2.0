@@ -222,7 +222,7 @@
   <div class="orb orb3"></div>
 </div>
 
-<div class="login-card" data-aos="fade-up">
+<div class="login-card">
   <div class="login-header">
     <div class="icon-badge">
       <i class="fas fa-user-shield"></i>
@@ -247,17 +247,14 @@
   </form>
 
   <div class="back-link">
-    <a href="index.html"><i class="fas fa-arrow-left"></i> Kembali ke Laman Utama</a>
+    <a href="../index.html"><i class="fas fa-arrow-left"></i> Kembali ke Laman Utama</a>
   </div>
   <div class="info-note">
     <i class="fas fa-shield-alt"></i> Akses terhad untuk kaunselor sekolah sahaja.
   </div>
 </div>
 
-<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
 <script>
-  AOS.init({ once: true, duration: 600 });
-
   // Kod dan kata kunci yang sah
   const VALID_SECURITY_CODE = "REE0062@SEMSIRAKAUNSELOR";
   const VALID_PASSWORD = "UBKSEMSIRA@1969";
@@ -286,9 +283,9 @@
 
     // Semak kesesuaian kod dan kata kunci
     if (enteredCode === VALID_SECURITY_CODE && enteredPass === VALID_PASSWORD) {
-      // Login berjaya - redirect ke page dashboard kaunselor (kosong)
-      // Anda boleh tukar nama fail dashboard di sini
-      window.location.href = "dashboard/kaunselor/dashboard-kaunselor.html";
+      // Login berjaya - redirect ke dashboard kaunselor
+      // Struktur: dashboard/kaunselor/dashboard-kaunselor.html
+      window.location.href = "kaunselor/dashboard-kaunselor.html";
     } else {
       // Login gagal
       alert("Kod Keselamatan atau Kata Kunci yang anda masukkan adalah SALAH. Sila cuba lagi.");
@@ -298,15 +295,5 @@
     }
   });
 </script>
-
-<!-- NOTA PENTING:
-     Halaman "dashboard-kaunselor.html" belum dibuat.
-     Selepas login berjaya, sistem akan redirect ke page tersebut.
-     
-     Anda boleh cipta dashboard-kaunselor.html kemudian dan sambung dengan kod yang diperlukan.
-     
-     Sementara ini, jika fail belum wujud, pelayar akan papar ralat 404.
-     Disarankan untuk membuat dashboard-kaunselor.html kosong sebagai placeholder dahulu.
--->
 </body>
 </html>

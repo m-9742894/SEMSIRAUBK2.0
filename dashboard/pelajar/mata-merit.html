@@ -14,7 +14,6 @@
         
         .container { max-width: 1000px; margin: 0 auto; }
         
-        /* Header */
         .header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 2px solid rgba(79,70,229,0.2); }
         .logo-area { display: flex; align-items: center; gap: 1rem; }
         .logo-icon { background: linear-gradient(145deg, #4f46e5, #7c3aed); width: 50px; height: 50px; border-radius: 28px; display: flex; align-items: center; justify-content: center; }
@@ -23,7 +22,6 @@
         .back-btn { background: #eef2ff; border: none; padding: 0.6rem 1.2rem; border-radius: 40px; cursor: pointer; font-weight: 600; color: #4f46e5; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; }
         .back-btn:hover { background: #4f46e5; color: white; }
         
-        /* Profile Card */
         .profile-card {
             background: linear-gradient(135deg, #4f46e5, #7c3aed);
             color: white;
@@ -48,7 +46,6 @@
         .profile-info h3 { font-size: 1.3rem; font-weight: 700; margin-bottom: 0.3rem; }
         .profile-info p { font-size: 0.85rem; opacity: 0.9; margin: 0.2rem 0; display: flex; align-items: center; gap: 8px; }
         
-        /* Merit Total Card */
         .merit-total-card {
             background: white;
             border-radius: 1.5rem;
@@ -63,7 +60,6 @@
         .merit-total-card .positive { color: #10b981; }
         .merit-total-card .negative { color: #dc2626; }
         
-        /* Stats Row */
         .stats-row {
             display: flex;
             gap: 1rem;
@@ -84,7 +80,6 @@
         .stat-box.positive i { color: #10b981; }
         .stat-box.negative i { color: #dc2626; }
         
-        /* Records Section */
         .records-section {
             background: white;
             border-radius: 1.5rem;
@@ -102,7 +97,6 @@
         }
         .records-section h3 i { color: #4f46e5; }
         
-        /* Merit Record Item */
         .merit-record {
             background: #f8fafc;
             border-radius: 1rem;
@@ -186,7 +180,6 @@
     
     <div id="alertMessage" class="alert"></div>
     
-    <!-- Profile Card -->
     <div id="profileCard" class="profile-card">
         <div class="profile-avatar">
             <i class="fas fa-user-graduate"></i>
@@ -198,13 +191,11 @@
         </div>
     </div>
     
-    <!-- Merit Total Card -->
     <div class="merit-total-card">
         <h4><i class="fas fa-star"></i> Jumlah Mata Merit Anda</h4>
         <div class="total-points" id="totalMerit">0</div>
     </div>
     
-    <!-- Stats Row -->
     <div class="stats-row">
         <div class="stat-box positive">
             <i class="fas fa-heart"></i>
@@ -223,7 +214,6 @@
         </div>
     </div>
     
-    <!-- Records Section -->
     <div class="records-section">
         <h3><i class="fas fa-list-alt"></i> Senarai Transaksi Merit</h3>
         <div id="recordsContainer">
@@ -257,125 +247,168 @@
     const studentClass = sessionStorage.getItem('studentClass') || '-';
     const studentSession = sessionStorage.getItem('studentSession') || '2026';
     
-    // Display student profile
+    // Display student profile immediately
     document.getElementById('studentName').innerText = studentName;
     document.getElementById('studentIC').innerText = studentIC;
     document.getElementById('studentClass').innerText = studentClass;
     document.getElementById('studentSession').innerText = studentSession;
     
-    let studentId = null;
     let allMeritRecords = [];
     
     function showAlert(msg, type) {
         const alertDiv = document.getElementById('alertMessage');
         alertDiv.textContent = msg;
         alertDiv.className = `alert ${type}`;
-        setTimeout(() => { alertDiv.style.display = 'none'; }, 3000);
+        setTimeout(() => { alertDiv.style.display = 'none'; }, 4000);
     }
     
-    // Get student ID from Firestore using IC number
-    async function getStudentId() {
-        try {
-            const q = query(studentsCollection, where("icNumber", "==", studentIC));
-            const snapshot = await getDocs(q);
-            if (!snapshot.empty) {
-                snapshot.forEach(doc => {
-                    studentId = doc.id;
-                });
-                console.log("Student ID found in Firestore:", studentId);
-                return true;
-            } else {
-                console.log("Student not found in Firestore database");
-                showAlert("Data pelajar tidak ditemui dalam pangkalan data", "error");
-                return false;
-            }
-        } catch(e) {
-            console.error("Error getting student ID:", e);
-            showAlert("Ralat menyambung ke pangkalan data", "error");
+    // Method 1: Try to get records by studentIC directly from merit_records
+    async function loadMeritByIC() {
+        console.log("Mencari rekod merit dengan IC:", studentIC);
+        
+        if (!studentIC || studentIC === '-') {
+            console.log("Tiada IC pelajar");
             return false;
         }
-    }
-    
-    // Load merit records from Firestore
-    async function loadMeritRecords() {
-        const container = document.getElementById('recordsContainer');
-        
-        if (!studentId) {
-            container.innerHTML = '<div class="empty-state"><i class="fas fa-user-slash"></i><p>Data pelajar tidak ditemui</p><p>Sila pastikan anda telah login dengan betul</p></div>';
-            return;
-        }
         
         try {
-            // Query merit records for this student only
-            const q = query(meritCollection, where("studentId", "==", studentId), orderBy("createdAt", "desc"));
+            // Query merit_records using studentIC field
+            const q = query(meritCollection, where("studentIC", "==", studentIC), orderBy("createdAt", "desc"));
             const snapshot = await getDocs(q);
-            allMeritRecords = [];
+            
+            console.log("Rekod ditemui (by IC):", snapshot.size);
+            
             snapshot.forEach(doc => {
                 allMeritRecords.push({ id: doc.id, ...doc.data() });
             });
             
-            console.log(`Found ${allMeritRecords.length} merit records for student`);
-            
-            // Calculate total merit
-            const total = allMeritRecords.reduce((sum, r) => sum + (r.points || 0), 0);
-            const totalElement = document.getElementById('totalMerit');
-            totalElement.innerText = total;
-            totalElement.className = total >= 0 ? 'positive' : 'negative';
-            
-            // Calculate stats
-            const positiveCount = allMeritRecords.filter(r => r.type === 'positive').length;
-            const negativeCount = allMeritRecords.filter(r => r.type === 'negative').length;
-            document.getElementById('positiveCount').innerText = positiveCount;
-            document.getElementById('negativeCount').innerText = negativeCount;
-            document.getElementById('totalRecords').innerText = allMeritRecords.length;
-            
-            if (allMeritRecords.length === 0) {
-                container.innerHTML = '<div class="empty-state"><i class="fas fa-star"></i><p>Tiada rekod merit lagi</p><p style="font-size:12px;">Teruskan melakukan kebaikan untuk mendapat merit!</p></div>';
-                return;
-            }
-            
-            let html = '';
-            for (const record of allMeritRecords) {
-                const isPositive = record.type === 'positive';
-                const typeClass = isPositive ? 'positive' : 'negative';
-                const typeIcon = isPositive ? '<i class="fas fa-heart"></i>' : '<i class="fas fa-exclamation-triangle"></i>';
-                const typeText = isPositive ? 'Kebaikan' : 'Kesalahan';
-                const pointSymbol = isPositive ? '+' : '';
-                const pointClass = isPositive ? 'positive' : 'negative';
-                
-                // Determine level text for kesalahan
-                let levelText = '';
-                if (!isPositive && record.level) {
-                    const levelMap = {
-                        'ringan': 'Ringan',
-                        'sederhana': 'Sederhana',
-                        'berat': 'Berat'
-                    };
-                    levelText = `<span style="font-size:0.7rem; color:#5b6e8c;"> (${levelMap[record.level] || record.level})</span>`;
-                }
-                
-                html += `
-                    <div class="merit-record merit-record-${typeClass}">
-                        <div class="record-header">
-                            <span class="record-type ${typeClass}">${typeIcon} ${typeText}${levelText}</span>
-                            <span class="record-points ${pointClass}">${pointSymbol}${record.points} markah</span>
-                        </div>
-                        <div class="record-description">
-                            ${escapeHtml(record.description)}
-                        </div>
-                        <div class="record-meta">
-                            <span><i class="fas fa-calendar"></i> ${formatDate(record.createdAt)}</span>
-                            <span><i class="fas fa-user-check"></i> Didaftar oleh: ${escapeHtml(record.createdBy || 'Guru/Kaunselor')}</span>
-                        </div>
-                    </div>
-                `;
-            }
-            container.innerHTML = html;
+            return allMeritRecords.length > 0;
         } catch(e) {
-            console.error("Error loading merit records:", e);
-            container.innerHTML = '<div class="empty-state"><p style="color:#dc2626;">Ralat memuat data. Sila refresh halaman.</p></div>';
-            showAlert("Gagal memuat data merit", "error");
+            console.error("Error loading by IC:", e);
+            return false;
         }
+    }
+    
+    // Method 2: Try to get student ID and then get records
+    async function loadMeritByStudentId() {
+        console.log("Mencari studentId untuk IC:", studentIC);
+        
+        try {
+            // Find student document using IC
+            const studentQuery = query(studentsCollection, where("icNumber", "==", studentIC));
+            const studentSnapshot = await getDocs(studentQuery);
+            
+            if (studentSnapshot.empty) {
+                console.log("Pelajar tidak ditemui dalam collection students");
+                return false;
+            }
+            
+            let studentId = null;
+            studentSnapshot.forEach(doc => {
+                studentId = doc.id;
+            });
+            
+            console.log("StudentId ditemui:", studentId);
+            
+            // Query merit_records using studentId
+            const meritQuery = query(meritCollection, where("studentId", "==", studentId), orderBy("createdAt", "desc"));
+            const meritSnapshot = await getDocs(meritQuery);
+            
+            console.log("Rekod merit ditemui (by studentId):", meritSnapshot.size);
+            
+            meritSnapshot.forEach(doc => {
+                allMeritRecords.push({ id: doc.id, ...doc.data() });
+            });
+            
+            return allMeritRecords.length > 0;
+        } catch(e) {
+            console.error("Error loading by studentId:", e);
+            return false;
+        }
+    }
+    
+    // Try both methods to get merit records
+    async function loadAllMeritRecords() {
+        const container = document.getElementById('recordsContainer');
+        
+        // Show loading
+        container.innerHTML = '<div class="empty-state"><i class="fas fa-spinner fa-pulse"></i> Memuatkan data merit...</div>';
+        
+        // Reset records array
+        allMeritRecords = [];
+        
+        // Try Method 1: by studentIC
+        let hasRecords = await loadMeritByIC();
+        
+        // If no records found, try Method 2: by studentId
+        if (!hasRecords) {
+            console.log("Tiada rekod menggunakan IC, cuba dengan studentId...");
+            hasRecords = await loadMeritByStudentId();
+        }
+        
+        console.log("Jumlah rekod merit ditemui:", allMeritRecords.length);
+        
+        if (allMeritRecords.length === 0) {
+            container.innerHTML = '<div class="empty-state"><i class="fas fa-star"></i><p>Tiada rekod merit lagi</p><p style="font-size:12px;">Teruskan melakukan kebaikan untuk mendapat merit!</p></div>';
+            
+            // Update totals to zero
+            document.getElementById('totalMerit').innerText = '0';
+            document.getElementById('totalMerit').className = '';
+            document.getElementById('positiveCount').innerText = '0';
+            document.getElementById('negativeCount').innerText = '0';
+            document.getElementById('totalRecords').innerText = '0';
+            return;
+        }
+        
+        // Calculate totals
+        const total = allMeritRecords.reduce((sum, r) => sum + (r.points || 0), 0);
+        const totalElement = document.getElementById('totalMerit');
+        totalElement.innerText = total;
+        totalElement.className = total >= 0 ? 'positive' : 'negative';
+        
+        const positiveCount = allMeritRecords.filter(r => r.type === 'positive').length;
+        const negativeCount = allMeritRecords.filter(r => r.type === 'negative').length;
+        document.getElementById('positiveCount').innerText = positiveCount;
+        document.getElementById('negativeCount').innerText = negativeCount;
+        document.getElementById('totalRecords').innerText = allMeritRecords.length;
+        
+        // Render records
+        let html = '';
+        for (const record of allMeritRecords) {
+            const isPositive = record.type === 'positive';
+            const typeClass = isPositive ? 'positive' : 'negative';
+            const typeIcon = isPositive ? '<i class="fas fa-heart"></i>' : '<i class="fas fa-exclamation-triangle"></i>';
+            const typeText = isPositive ? 'Kebaikan' : 'Kesalahan';
+            const pointSymbol = isPositive ? '+' : '';
+            const pointClass = isPositive ? 'positive' : 'negative';
+            
+            let levelText = '';
+            if (!isPositive && record.level) {
+                const levelMap = {
+                    'ringan': 'Ringan',
+                    'sederhana': 'Sederhana',
+                    'berat': 'Berat'
+                };
+                levelText = `<span style="font-size:0.7rem; color:#5b6e8c;"> (${levelMap[record.level] || record.level})</span>`;
+            }
+            
+            html += `
+                <div class="merit-record merit-record-${typeClass}">
+                    <div class="record-header">
+                        <span class="record-type ${typeClass}">${typeIcon} ${typeText}${levelText}</span>
+                        <span class="record-points ${pointClass}">${pointSymbol}${record.points} markah</span>
+                    </div>
+                    <div class="record-description">
+                        ${escapeHtml(record.description)}
+                    </div>
+                    <div class="record-meta">
+                        <span><i class="fas fa-calendar"></i> ${formatDate(record.createdAt)}</span>
+                        <span><i class="fas fa-user-check"></i> Didaftar oleh: ${escapeHtml(record.createdBy || 'Guru/Kaunselor')}</span>
+                    </div>
+                </div>
+            `;
+        }
+        container.innerHTML = html;
     }
     
     function formatDate(dateStr) {
@@ -393,19 +426,14 @@
         return str.replace(/[&<>]/g, m => m==='&'?'&amp;':m==='<'?'&lt;':'&gt;');
     }
     
-    async function init() {
-        console.log("Initializing Mata Merit page...");
-        console.log("Student IC from session:", studentIC);
-        
-        const success = await getStudentId();
-        if (success) {
-            await loadMeritRecords();
-        } else {
-            document.getElementById('recordsContainer').innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-triangle"></i><p>Gagal mengesan ID pelajar. Sila log masuk semula.</p></div>';
-        }
-    }
+    // Initialize
+    console.log("=== MATA MERIT PELAJAR ===");
+    console.log("Student Name:", studentName);
+    console.log("Student IC:", studentIC);
+    console.log("Student Class:", studentClass);
+    console.log("Student Session:", studentSession);
     
-    init();
+    loadAllMeritRecords();
 </script>
 
 <!-- NOTA PENTING:
@@ -422,26 +450,25 @@
      
      2. merit_records:
         - id (auto)
-        - studentId (rujukan kepada students.id)
+        - studentId (rujukan kepada students.id) ATAU
+        - studentIC (No. Kad Pengenalan pelajar)
         - studentName
-        - studentIC
         - studentClass
         - type: "positive" / "negative"
-        - level: "ringan" / "sederhana" / "berat" (untuk kesalahan)
+        - level: "ringan" / "sederhana" / "berat"
         - description
         - points: 5 / -2 / -5 / -10
         - createdAt
         - createdBy
-        - createdByIC
-        - createdByRole
      
      ============================================================
      CARA KERJA:
      ============================================================
-     1. Halaman akan membaca studentIC dari sessionStorage (selepas login)
-     2. Cari studentId dalam collection 'students' menggunakan IC
-     3. Query semua rekod merit dengan studentId yang sama
-     4. Paparkan jumlah merit, statistik, dan senarai transaksi
+     1. Halaman akan cuba 2 kaedah untuk cari rekod merit:
+        - Kaedah 1: Mencari terus menggunakan studentIC dalam merit_records
+        - Kaedah 2: Mencari studentId dari students, kemudian cari merit_records
+     
+     2. Paparkan semua rekod yang ditemui
 -->
 </body>
 </html>

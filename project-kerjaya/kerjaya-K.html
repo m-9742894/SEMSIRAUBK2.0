@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kerjaya Konvensional - SEMSIRA</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;700&family=Orbitron:wght@500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #0a0b1e;
+            color: white;
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .background {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at center, #2a3b4c 0%, #08090a 100%);
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header-section {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            color: #4ecdc4;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 0 0 15px rgba(78, 205, 196, 0.4);
+        }
+
+        .subtitle {
+            color: #ccc;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .career-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+
+        .career-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(78, 205, 196, 0.2);
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            transition: 0.3s;
+            backdrop-filter: blur(10px);
+            cursor: pointer;
+        }
+
+        .career-card:hover {
+            transform: translateY(-10px);
+            background: rgba(78, 205, 196, 0.15);
+            border-color: #4ecdc4;
+            box-shadow: 0 0 20px rgba(78, 205, 196, 0.4);
+        }
+
+        .career-card i {
+            font-size: 3rem;
+            color: #4ecdc4;
+            margin-bottom: 20px;
+        }
+
+        .career-card h3 {
+            font-family: 'Orbitron', sans-serif;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+            color: #4ecdc4;
+        }
+
+        .career-card p {
+            font-size: 0.9rem;
+            color: #bbb;
+            line-height: 1.5;
+            flex-grow: 1;
+        }
+
+        .click-hint {
+            display: block;
+            margin-top: 15px;
+            font-size: 0.7rem;
+            color: #4ecdc4;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        .back-btn {
+            display: inline-block;
+            margin-top: 50px;
+            padding: 12px 30px;
+            background: transparent;
+            border: 1px solid #4ecdc4;
+            color: #4ecdc4;
+            text-decoration: none;
+            border-radius: 5px;
+            font-family: 'Orbitron', sans-serif;
+            transition: 0.3s;
+        }
+
+        .back-btn:hover {
+            background: #4ecdc4;
+            color: #000;
+        }
+
+        /* MODAL STYLES */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.85);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #0f1123 0%, #0a0b1e 100%);
+            margin: 30px auto;
+            padding: 0;
+            border: 1px solid #4ecdc4;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 1100px;
+            max-height: 85vh;
+            overflow-y: auto;
+            position: relative;
+            animation: modalFadeIn 0.3s;
+        }
+
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .modal-header {
+            background: rgba(78, 205, 196, 0.15);
+            padding: 20px;
+            border-radius: 20px 20px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #4ecdc4;
+        }
+
+        .modal-header h2 {
+            font-family: 'Orbitron', sans-serif;
+            color: #4ecdc4;
+            margin: 0;
+        }
+
+        .close-modal {
+            color: #fff;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .close-modal:hover {
+            color: #4ecdc4;
+        }
+
+        .modal-body {
+            padding: 25px;
+        }
+
+        .diary-btn-modal {
+            background: #4ecdc4;
+            color: #000;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: bold;
+            font-size: 0.8rem;
+            transition: 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            border: none;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+
+        .diary-btn-modal:hover {
+            background: #fff;
+            box-shadow: 0 0 15px #4ecdc4;
+            transform: translateY(-2px);
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .requirement-box {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 15px;
+            border-left: 5px solid #4ecdc4;
+            backdrop-filter: blur(10px);
+        }
+
+        .section-title {
+            font-family: 'Orbitron', sans-serif;
+            color: #4ecdc4;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+        }
+
+        .info-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            border: 1px solid rgba(78, 205, 196, 0.3);
+            padding: 20px;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 700px;
+        }
+
+        th {
+            background: rgba(78, 205, 196, 0.2);
+            color: #4ecdc4;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            padding: 12px;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .uni-name {
+            color: #fff;
+            font-weight: bold;
+        }
+
+        .badge {
+            background: #4ecdc4;
+            color: #000;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 0.65rem;
+            display: inline-block;
+            margin-top: 5px;
+        }
+
+        @media (max-width: 768px) {
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+            .modal-content {
+                margin: 20px auto;
+                width: 95%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="background"></div>
+
+    <div class="container">
+        <div class="header-section">
+            <p class="subtitle">Eksplorasi Kerjaya</p>
+            <h1>UNIT KONVENSIONAL (K)</h1>
+            <p>Pilih kerjaya di bawah untuk melihat syarat UPU & Universiti.</p>
+        </div>
+
+        <div class="career-grid">
+            <!-- 6 KERJAYA DALAM UNIT KONVENSIONAL -->
+            <div class="career-card" onclick="openModal('akauntan')">
+                <i class="fas fa-calculator"></i>
+                <h3>Akauntan / Juruaudit</h3>
+                <p>Mengurus kewangan organisasi, memastikan ketepatan penyata kewangan dan pematuhan undang-undang cukai.</p>
+                <span class="click-hint">KLIK UNTUK INFO UPU</span>
+            </div>
+
+            <div class="career-card" onclick="openModal('kerani')">
+                <i class="fas fa-file-alt"></i>
+                <h3>Pegawai Pentadbiran / Kerani</h3>
+                <p>Mengurus dokumen, menyusun fail, dan memastikan operasi pejabat berjalan dengan lancar.</p>
+                <span class="click-hint">KLIK UNTUK INFO UPU</span>
+            </div>
+
+            <div class="career-card" onclick="openModal('dataentry')">
+                <i class="fas fa-keyboard"></i>
+                <h3>Penganalisis Data / Data Entry</h3>
+                <p>Memasukkan, menyusun, dan menganalisis data digital untuk membantu organisasi membuat keputusan.</p>
+                <span class="click-hint">KLIK UNTUK INFO UPU</span>
+            </div>
+
+            <div class="career-card" onclick="openModal('bank')">
+                <i class="fas fa-building-columns"></i>
+                <h3>Pegawai Bank / Kewangan</h3>
+                <p>Mengurus transaksi kewangan, pinjaman, dan pelaburan untuk pelanggan institusi perbankan.</p>
+                <span class="click-hint">KLIK UNTUK INFO UPU</span>
+            </div>
+
+            <div class="career-card" onclick="openModal('hr')">
+                <i class="fas fa-users"></i>
+                <h3>Pentadbir Sumber Manusia</h3>
+                <p>Mengurus rekod pekerja, gaji, tuntutan, dan memastikan pematuhan prosedur organisasi.</p>
+                <span class="click-hint">KLIK UNTUK INFO UPU</span>
+            </div>
+
+            <div class="career-card" onclick="openModal('sop')">
+                <i class="fas fa-clipboard-list"></i>
+                <h3>Pegawai Pematuhan / SOP</h3>
+                <p>Memastikan organisasi mematuhi prosedur operasi standard dan peraturan yang ditetapkan.</p>
+                <span class="click-hint">KLIK UNTUK INFO UPU</span>
+            </div>
+        </div>
+
+        <div style="text-align: center;">
+            <a href="keputusan.html" class="back-btn"><i class="fas fa-arrow-left"></i> KEMBALI KE KEPUTUSAN</a>
+        </div>
+    </div>
+
+    <!-- MODAL UNTUK AKAUNTAN / JURUAUDIT -->
+    <div id="modalAkauntan" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-calculator"></i> INFO UPU: AKAUNTAN / JURUAUDIT</h2>
+                <span class="close-modal" onclick="closeModal('akauntan')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <button onclick="simpanKeDiari('akauntan')" class="diary-btn-modal"><i class="fas fa-book"></i> CETAK DIARI</button>
+                <div class="info-grid">
+                    <div class="requirement-box">
+                        <h3 class="section-title"><i class="fas fa-id-card"></i> SYARAT AM (WAJIB)</h3>
+                        <p>• Warganegara Malaysia.<br>• Lulus SPM dengan mendapat sekurang-kurangnya <strong>LIMA (5) Kepujian</strong> termasuk Bahasa Melayu.<br>• Lulus Mata Pelajaran <strong>Sejarah</strong> .</p>
+                    </div>
+                    <div class="requirement-box" style="border-left-color: #ffa502;">
+                        <h3 class="section-title" style="color: #ffa502;"><i class="fas fa-chart-line"></i> SYARAT KHAS (SPM)</h3>
+                        <p>• <strong>Matematik:</strong> Minimum Gred A.<br>• <strong>Perdagangan / Ekonomi Asas / Prinsip Perakaunan:</strong> Kelebihan.<br>• <strong>Bahasa Inggeris:</strong> Minimum Gred C.<br>• MUET: Minimum Band 2 .<br>• Program Ijazah Perakaunan: Laluan Asasi/Matrikulasi (1 tahun) kemudian Ijazah (4 tahun).</p>
+                    </div>
+                </div>
+                <div class="info-card">
+                    <p style="margin-bottom: 15px;"><strong>⚠️ Nota Penting:</strong> Perakaunan adalah antara program paling kompetitif. Graduan boleh mengambil peperiksaan profesional (ACCA, CIMA, MICPA) selepas ijazah.</p>
+                    <table>
+                        <thead>
+                            <tr><th>Universiti & Lokasi</th><th>Program Pengajian</th><th>Tempoh</th><th>Yuran (Est. Per Sem)</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><span class="uni-name">Universiti Malaya (UM)</span><br><small>Kuala Lumpur</small></td>
+                                <td>Ijazah Sarjana Muda Perakaunan</span></td>
+                                <td>4 Tahun</span></td>
+                                <td>RM 1,100.00</span></td>
+                             </tr>
+                            <tr>
+                                <td><span class="uni-name">Universiti Kebangsaan Malaysia (UKM)</span><br><small>Bangi, Selangor</small></td>
+                                <td>Ijazah Sarjana Muda Perakaunan</span></td>
+                                <td>4 Tahun</span></td>
+                                <td>RM 1,000.00</span></td>
+                             </tr>
+                            <tr>
+                                <td><span class="uni-name">Universiti Teknologi MARA (UiTM)</span><br><small>Shah Alam</small></td>
+                                <td>Diploma Perakaunan</span></td>
+                                <td>3 Tahun</span></td>
+                                <td>RM 550.00</span></td>
+                             </tr>
+                            <tr>
+                                <td><span class="uni-name">Universiti Utara Malaysia (UUM)</span><br><small>Sintok, Kedah</small></td>
+                                <td>Diploma Perakaunan / Ijazah Perakaunan</span></td>
+                                <td>3-4 Tahun</span></td>
+                                <td>RM 520.00 - RM 700.00</span></td>
+                             </tr>
+                            <tr>
+                                <td><span class="uni-name">Politeknik (Pelbagai Kampus)</span><br><small>Seluruh Malaysia</small></td>
+                                <td>Diploma Perakaunan</span></td>
+                                <td>3 Tahun</span></td>
+                                <td>RM 200.00</span></td>
+                             </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL UNTUK PEGAWAI PENTADBIRAN / KERANI -->
+    <div id="modalKerani" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-file-alt"></i> INFO UPU: PEGAWAI PENTADBIRAN / KERANI</h2>
+                <span class="close-modal" onclick="closeModal('kerani')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <button onclick="simpanKeDiari('kerani')" class="diary-btn-modal"><i class="fas fa-book"></i> CETAK DIARI</button>
+                <div class="info-grid">
+                    <div class="requirement-box">
+                        <h3 class="section-title"><i class="fas fa-id-card"></i> SYARAT AM (WAJIB)</h3>
+                        <p>• Warganegara Malaysia.<br>• Lulus SPM dengan mendapat sekurang-kurangnya <strong>TIGA (3) Kepujian</strong> termasuk Bahasa Melayu.<br>• Lulus Mata Pelajaran <strong>Sejarah</strong> .</p>
+                    </div>
+                    <div class="requirement-box" style="border-left-color: #ff6b6b;">
+                        <h3 class="section-title" style="color: #ff6b6b;"><i class="fas fa-folder-open"></i> SYARAT KHAS (SPM)</h3>
+                        <p>• <strong>Bahasa Melayu:</strong> Minimum Gred C.<br>• <strong>Matematik:</strong> Minimum Gred C.<br>• <strong>Bahasa Inggeris:</strong> Minimum Gred C.<br>• Komputer / Aplikasi Pejabat: Kelebihan.</p>
+                    </div>
+                </div>
+                <div class="info-card">
+                    <table>
+                        <thead>
+                            <tr><th>Universiti & Lokasi</th><th>Program Pengajian</th><th>Tempoh</th><th>Yuran (Est. Per Sem)</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><span class="uni-name">Universiti Teknologi MARA (UiTM)</span><br><small>Pelbagai Kampus</small></td>
+                                <td>Diploma Pentadbiran Pejabat / Diploma Pengurusan</span></td>
+                                <td>3 Tahun</span></td>
+                                <td>RM 550.00</span></td>
+                             </tr>
+                            <tr>
+                                <td><span class="uni-name">Universiti Utara Malaysia (UUM)</span><br><small>Sintok, Kedah</small></td>
+                                <td>Diploma Pengurusan / Diploma Pentadbiran Perniagaan</span></td>
+                                <td>3 Tahun</span></td>
+                                <td>RM 520.00</span></td>
+                             </tr>
+                            <tr>
+                                <td><span class="uni-name">Politeknik (Pelbagai Kampus)</span><br><small>Seluruh Malaysia</small></td>
+                                <td>Diploma Pentadbiran Pejabat</span></td>
+                                <td>3 Tahun</span></td>
+                                <td>RM 200.00</span></td>
+                             </tr>
+                            <tr>
+                                <td><span class="uni-name">Kolej Komuniti (Seluruh Malaysia)</span><br><small>Pelbagai lokasi</small></td>
+                                <td>Sijil Pentadbiran Pejabat</span></td>
+                                <td>1.5 Tahun</span></td>
+                                <td>RM 200.00</span></td>
+                             </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL UNTUK PENGANALISIS DATA / DATA ENTRY -->
+    <div id="modalDataentry" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-keyboard"></i> INFO UPU: PENGANALISIS DATA / DATA ENTRY</h2>
+                <span class="close-modal" onclick="closeModal('dataentry')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <button onclick="simpanKeDiari('dataentry')" class="diary-btn-modal"><i class="fas fa-book"></i> CETAK DIARI</button>
+                <div class="info-grid">
+                    <div class="requirement-box">
+                        <h3 class="section-title"><i class="fas fa-id-card"></i> SYARAT AM (WAJIB)</h3>
+                        <p>• Warganegara Malaysia.<br>• Lulus SPM dengan mendapat sekurang-kurangnya <strong>LIMA (5) Kepujian</strong> termasuk Bahasa Melayu.<br>• Lulus Mata Pelajaran <strong>Sejarah</strong> .</p>
+                    </div>
+                    <div class="requirement-box" style="border-left-color: #1e90ff;">
+                        <h3 class="section-title" style="color: #1e90ff;"><i class="fas fa-database"></i> SYARAT KHAS (SPM)</h3>
+                        <p>• <strong>Matematik:</strong> Minimum Gred C.<br>• <strong>Matematik Tambahan:</strong> Kelebihan.<br>• <strong>Teknologi Maklumat / Sains Komputer:</strong> Kelebihan.<br>• MUET: Minimum Band 2.</p>
+                    </div>
+                </div>
+                <div class="info-card">
+                    </table>
+                        <thead>
+                            <tr><th>Universiti & Lokasi</th><th>Program Pengajian</th><th>Tempoh</th><th>Yuran (Est. Per Sem)</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><span class="uni-name">Universiti Teknologi MARA (UiTM)</span><br><small>Pelbagai Kampus</small></td>
+                                <td>Diploma Sains Komputer (Teknologi Maklumat)</span></td>
+                                <td>3 Tahun</span></td>
+                                <td>RM 550.00</span></td>
+                             </tr>
+                            <tr>
+                                <td><span class="uni-name">Universiti Utara Malaysia (UUM)</span><br><small>Sintok, Kedah</small></td>
+                                <td>Diploma Teknologi Maklumat</span></td>
+                                <td>3 Tahun</span></td>
+                                <td>RM 520.00</span></td>
+                             </tr>
+                            <tr>
+                                <td><span class="uni-name">Universiti Malaysia Pahang (UMPSA)</span><br><small>Pekan, Pahang</small></td>
+                                <td>Diploma Sains Komputer</span></td>
+                                <td>3 Tahun</span></td>
+                                <td>RM 800.00</span></td>
+                             </tr>
+                            <tr>
+                                <td><span class="uni-name">Politeknik (Pelbagai Kampus)</span><br><small>Seluruh Malaysia</small></td>
+                                <td>Diploma Teknologi Maklumat</span></td>
+                                <td>3 Tahun</span></td>
+                                <td>RM 200.00</span></td>
+                             </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL UNTUK PEGAWAI BANK / KEWANGAN -->
+    <div id="modalBank" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-building-columns"></i> INFO UPU: PEGAWAI BANK / KEWANGAN</h2>
+                <span class="close-modal" onclick="closeModal('bank')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <button onclick="simpanKeDiari('bank')" class="diary-btn-modal"><i class="fas fa-book"></i> CETAK DIARI</button>
+                <div class="info-grid">
+                    <div class="requirement-box">
+                        <h3 class="section-title"><i class="fas fa-id-card"></i> SYARAT AM (WAJIB)</h3>
+                        <p>• Warganegara Malaysia.<br>• Lulus SPM dengan mendapat sekurang-kurangnya <strong>LIMA (5) Kepujian</strong> termasuk Bahasa Melayu.<br>• Lulus Mata Pelajaran <strong>Sejarah</strong> .</p>
+                    </div>
+                    <div class="requirement-box" style="border-left-color: #7bed9f;">
+                        <h3 class="section-title" style="color: #7bed9f;"><i class="fas fa-coins"></i> SYARAT KHAS (SPM)</h3>
+                        <p>• <strong>Matematik:</strong> Minimum Gred B.<br>• <strong>Prinsip Perakaunan / Perdagangan / Ekonomi:</strong> Kelebihan.<br>• <strong>Bahasa Inggeris:</strong> Minimum Gred C.<br>• MUET: Minimum Band 2.</p>
+                    </div>
+                </div>
+                <div class="info-card">
+                    <table>
+                        <thead>
+                            <tr><th>Universiti & Lokasi</th><th>Program Pengajian</th><th>Tempoh</th><th>Yuran (Est. Per Sem)</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><span class="uni-name">Universiti Utara Malaysia (UUM)</span><br><small>Sintok, Kedah</small></td>
+                                <td>Diploma Perbankan & Kewangan</span></td>
+                                <td>3 Tahun</span></td>
+                                <td>RM 520.00</span></td>
+                             </tr>
+                            <tr>
+                                <td><span class="uni-name">Universiti Teknologi MARA (UiTM)</span><br><small>Pelbagai Kampus</small></td>
+                                <td>Diploma Perbankan / Diploma Kewangan</span></td>
+                                <td>3 Tahun</span></td>
+                                <td>RM 550.00</span></td>
+                             </tr>
+                            <tr>
+                                <td><span class="uni-name">Universiti Malaya (UM)</span><br><small>Kuala Lumpur</small></td>
+                                <td>Ijazah Sarjana Muda Kewangan (Laluan Asasi/Matrik)</span></td>
+                                <td>4 Tahun</span></td>
+                                <td>RM 1,100.00</span></td>
+                             </tr>
+                            <tr>
+                                <td><span class="uni-name">Politeknik (Pelbagai Kampus)</span><br><small>Seluruh Malaysia</small></td>
+                                <td>Diploma Kewangan & Perbankan</span></td>
+                                <td>3 Tahun</span></td>
+                                <td>RM 200.00</span></td>
+                             </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL UNTUK PENTADBIR SUMBER MANUSIA -->
+    <div id="modalHr" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-users"></i> INFO UPU: PENTADBIR SUMBER MANUSIA</h2>
+                <span class="close-modal" onclick="closeModal('hr')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <button onclick="simpanKeDiari('hr')" class="diary-btn-modal"><i class="fas fa-book"></i> CETAK DIARI</button>
+                <div class="info-grid">
+                    <div class="requirement-box">
+                        <h3 class="section-title"><i class="fas fa-id-card"></i> SYARAT AM (WAJIB)</h3>
+                        <p>• Warganegara Malaysia.<br>• Lulus SPM dengan mendapat sekurang-kurangnya <strong>TIGA (3) Kepujian</strong> termasuk Bahasa Melayu.<br>• Lulus Mata Pelajaran <strong>Sejarah</strong> .</p>
+                    </div>
+                    <div class="requirement-box" style="border-left-color: #c084fc;">
+                        <h3 class="section-title" style="color: #c084fc;"><i class="fas fa-id-badge"></i> SYARAT KHAS (SPM)</h3>
+                        <p>• <strong>Bahasa Melayu:</strong> Minimum Gred C.<br>• <strong>Bahasa Inggeris:</strong> Minimum Gred C.<br>• <strong>Matematik:</strong> Minimum Gred C.<br>• MUET: Minimum Band 2.</p>
+                    </div>
+                </div>
+                <div class="info-card">
+                    <table>
+                        <thead>
+                            <tr><th>Universiti & Lokasi</th><th>Program Pengajian</th><th>Tempoh</th><th>Yuran (Est. Per Sem)</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><span class="uni-name">Universiti Teknologi MARA (UiTM)</span><br><small>Pelbagai Kampus</small></td>
+                                <td>Diploma Pengurusan Sumber Manusia</span></td>
+                                <td>3 Tahun</span></td>
+                                <td>RM 550.00</span></td>
+                             </tr>
+                            <tr>
+                                <td><span class="uni-name">Universiti Utara Malaysia (UUM)</span><br><small>Sintok, Kedah</small></td>
+                                <td>Diploma Pengurusan Sumber Manusia</span></td>
+                                <td>3 Tahun</span></td>
+                                <td>RM 520.00</span></td>
+                             </tr>
+                            <tr>
+                                <td><span class="uni-name">Universiti Malaya (UM)</span><br><small>Kuala Lumpur</small></td>
+                                <td>Ijazah Sarjana Muda Sumber Manusia (Laluan Asasi/Matrik)</span></td>
+                                <td>4 Tahun</span></td>
+                                <td>RM 1,000.00</span></td>
+                             </tr>
+                            <tr>
+                                <td><span class="uni-name">Politeknik (Pelbagai Kampus)</span><br><small>Seluruh Malaysia</small></td>
+                                <td>Diploma Pengurusan Sumber Manusia</span></td>
+                                <td>3 Tahun</span></td>
+                                <td>RM 200.00</span></td>
+                             </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL UNTUK PEGAWAI PEMATUHAN / SOP -->
+    <div id="modalSop" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-clipboard-list"></i> INFO UPU: PEGAWAI PEMATUHAN / SOP</h2>
+                <span class="close-modal" onclick="closeModal('sop')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <button onclick="simpanKeDiari('sop')" class="diary-btn-modal"><i class="fas fa-book"></i> CETAK DIARI</button>
+                <div class="info-grid">
+                    <div class="requirement-box">
+                        <h3 class="section-title"><i class="fas fa-id-card"></i> SYARAT AM (WAJIB)</h3>
+                        <p>• Warganegara Malaysia.<br>• Lulus SPM dengan mendapat sekurang-kurangnya <strong>LIMA (5) Kepujian</strong> termasuk Bahasa Melayu.<br>• Lulus Mata Pelajaran <strong>Sejarah</strong> .</p>
+                    </div>
+                    <div class="requirement-box" style="border-left-color: #ff4757;">
+                        <h3 class="section-title" style="color: #ff4757;"><i class="fas fa-check-double"></i> SYARAT KHAS (SPM)</h3>
+                        <p>• <strong>Bahasa Melayu:</strong> Minimum Gred C.<br>• <strong>Bahasa Inggeris:</strong> Minimum Gred C.<br>• <strong>Matematik:</strong> Minimum Gred C.<br>• MUET: Minimum Band 2.</p>
+                    </div>
+                </div>
+                <div class="info-card">
+                    <p style="margin-bottom: 15px;"><strong>📌 Nota:</strong> Bidang Pematuhan (Compliance) dan Kualiti semakin penting dalam industri perbankan, insurans, farmaseutikal, dan pembuatan. Latar belakang dalam Pengurusan Kualiti, Pentadbiran, atau Undang-Undang adalah asas yang baik.</p>
+                    <table>
+                        <thead>
+                            <tr><th>Universiti & Lokasi</th><th>Program Pengajian</th><th>Tempoh</th><th>Yuran (Est. Per Sem)</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><span class="uni-name">Universiti Teknologi MARA (UiTM)</span><br><small>Shah Alam</small></td>
+                                <td>Diploma Pengurusan Kualiti & Produktiviti</span></td>
+                                <td>3 Tahun</span></td>
+                                <td>RM 550.00</span></td>
+                             </tr>
+                            <tr>
+                                <td><span class="uni-name">Universiti Utara Malaysia (UUM)</span><br><small>Sintok, Kedah</small></td>
+                                <td>Diploma Pentadbiran / Diploma Pengurusan</span></td>
+                                <td>3 Tahun</span></td>
+                                <td>RM 520.00</span></td>
+                             </tr>
+                            <tr>
+                                <td><span class="uni-name">Universiti Malaya (UM)</span><br><small>Kuala Lumpur</small></td>
+                                <td>Ijazah Pentadbiran Perniagaan (Pengurusan)</span></td>
+                                <td>4 Tahun</span></td>
+                                <td>RM 1,100.00</span></td>
+                             </tr>
+                            <tr>
+                                <td><span class="uni-name">Politeknik (Pelbagai Kampus)</span><br><small>Seluruh Malaysia</small></td>
+                                <td>Diploma Pengurusan Kualiti</span></td>
+                                <td>3 Tahun</span></td>
+                                <td>RM 200.00</span></td>
+                             </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Function untuk buka modal
+        function openModal(type) {
+            const modal = document.getElementById(`modal${type.charAt(0).toUpperCase() + type.slice(1)}`);
+            if (modal) modal.style.display = "block";
+            document.body.style.overflow = "hidden";
+        }
+
+        // Function untuk tutup modal
+        function closeModal(type) {
+            const modal = document.getElementById(`modal${type.charAt(0).toUpperCase() + type.slice(1)}`);
+            if (modal) modal.style.display = "none";
+            document.body.style.overflow = "auto";
+        }
+
+        // Tutup modal bila klik luar content
+        window.onclick = function(event) {
+            const modals = document.querySelectorAll('.modal');
+            modals.forEach(modal => {
+                if (event.target === modal) {
+                    modal.style.display = "none";
+                    document.body.style.overflow = "auto";
+                }
+            });
+        }
+
+        // Function simpan ke localStorage dan redirect ke diari.html
+        function simpanKeDiari(jenis) {
+            let data = {};
+
+            switch(jenis) {
+                case 'akauntan':
+                    data = {
+                        nama: "AKAUNTAN / JURUAUDIT",
+                        am: "Warganegara Malaysia. Lulus SPM LIMA (5) Kepujian termasuk BM. Lulus Sejarah.",
+                        khas: "Matematik (A), Perdagangan/Ekonomi/Perakaunan kelebihan, English (C), MUET Band 2.",
+                        universiti: "1. UM: Ijazah Perakaunan<br>2. UKM: Ijazah Perakaunan<br>3. UiTM: Diploma Perakaunan<br>4. UUM: Diploma/Ijazah Perakaunan"
+                    };
+                    break;
+                case 'kerani':
+                    data = {
+                        nama: "PEGAWAI PENTADBIRAN / KERANI",
+                        am: "Warganegara Malaysia. Lulus SPM TIGA (3) Kepujian termasuk BM. Lulus Sejarah.",
+                        khas: "BM (C), Matematik (C), English (C).",
+                        universiti: "1. UiTM: Diploma Pentadbiran Pejabat<br>2. UUM: Diploma Pengurusan<br>3. Politeknik: Diploma Pentadbiran Pejabat"
+                    };
+                    break;
+                case 'dataentry':
+                    data = {
+                        nama: "PENGANALISIS DATA / DATA ENTRY",
+                        am: "Warganegara Malaysia. Lulus SPM LIMA (5) Kepujian termasuk BM. Lulus Sejarah.",
+                        khas: "Matematik (C), IT/Sains Komputer kelebihan, MUET Band 2.",
+                        universiti: "1. UiTM: Diploma Sains Komputer<br>2. UUM: Diploma Teknologi Maklumat<br>3. Politeknik: Diploma Teknologi Maklumat"
+                    };
+                    break;
+                case 'bank':
+                    data = {
+                        nama: "PEGAWAI BANK / KEWANGAN",
+                        am: "Warganegara Malaysia. Lulus SPM LIMA (5) Kepujian termasuk BM. Lulus Sejarah.",
+                        khas: "Matematik (B), Prinsip Perakaunan/Perdagangan kelebihan, English (C), MUET Band 2.",
+                        universiti: "1. UUM: Diploma Perbankan & Kewangan<br>2. UiTM: Diploma Perbankan/Kewangan<br>3. Politeknik: Diploma Kewangan"
+                    };
+                    break;
+                case 'hr':
+                    data = {
+                        nama: "PENTADBIR SUMBER MANUSIA",
+                        am: "Warganegara Malaysia. Lulus SPM TIGA (3) Kepujian termasuk BM. Lulus Sejarah.",
+                        khas: "BM (C), English (C), Matematik (C), MUET Band 2.",
+                        universiti: "1. UiTM: Diploma Pengurusan Sumber Manusia<br>2. UUM: Diploma Pengurusan Sumber Manusia<br>3. Politeknik: Diploma Pengurusan Sumber Manusia"
+                    };
+                    break;
+                case 'sop':
+                    data = {
+                        nama: "PEGAWAI PEMATUHAN / SOP",
+                        am: "Warganegara Malaysia. Lulus SPM LIMA (5) Kepujian termasuk BM. Lulus Sejarah.",
+                        khas: "BM (C), English (C), Matematik (C), MUET Band 2.",
+                        universiti: "1. UiTM: Diploma Pengurusan Kualiti & Produktiviti<br>2. UUM: Diploma Pentadbiran<br>3. Politeknik: Diploma Pengurusan Kualiti"
+                    };
+                    break;
+            }
+
+            localStorage.setItem("pilihanKerjaya", JSON.stringify(data));
+            window.location.href = "diari.html";
+        }
+    </script>
+</body>
+</html>

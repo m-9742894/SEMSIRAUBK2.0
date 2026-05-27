@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hala Tuju - Ujian RIASEK</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #0a0b1e 0%, #0f1123 100%);
+            color: white;
+            min-height: 100vh;
+        }
+
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(15px);
+            border-radius: 30px;
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+            border: 1px solid rgba(0, 210, 255, 0.3);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+        }
+
+        .card h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, #00d2ff, #3a7bd5);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .card p {
+            margin-bottom: 30px;
+            color: #ccc;
+        }
+
+        input {
+            width: 100%;
+            padding: 15px;
+            border-radius: 50px;
+            border: none;
+            background: rgba(255,255,255,0.15);
+            color: white;
+            font-size: 1rem;
+            margin-bottom: 20px;
+            outline: none;
+            text-align: center;
+        }
+
+        input::placeholder {
+            color: rgba(255,255,255,0.5);
+        }
+
+        .btn {
+            background: linear-gradient(90deg, #00d2ff, #3a7bd5);
+            border: none;
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            font-size: 1rem;
+            color: white;
+        }
+
+        .btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(0,210,255,0.5);
+        }
+
+        .quiz-container {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .progress-bar-container {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80%;
+            max-width: 600px;
+            background: rgba(255,255,255,0.1);
+            height: 12px;
+            border-radius: 10px;
+            overflow: hidden;
+            z-index: 100;
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #00d2ff, #3a7bd5);
+            transition: width 0.4s ease;
+        }
+
+        .question-card {
+            background: rgba(255, 255, 255, 0.07);
+            backdrop-filter: blur(12px);
+            border-radius: 30px;
+            padding: 40px 30px;
+            max-width: 650px;
+            width: 100%;
+            text-align: center;
+            border: 1px solid rgba(0,210,255,0.3);
+            transition: 0.3s;
+        }
+
+        .question-text {
+            font-size: 1.6rem;
+            font-weight: 500;
+            margin-bottom: 40px;
+            line-height: 1.4;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .opt-btn {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(0,210,255,0.4);
+            padding: 14px;
+            border-radius: 60px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: 0.2s;
+            color: white;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .opt-btn:hover {
+            background: rgba(0,210,255,0.2);
+            border-color: #00d2ff;
+            transform: translateX(5px);
+        }
+
+        .result-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .result-card {
+            background: rgba(255, 255, 255, 0.07);
+            backdrop-filter: blur(12px);
+            border-radius: 30px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(0,210,255,0.3);
+        }
+
+        .chart-wrapper {
+            position: relative;
+            margin-bottom: 30px;
+        }
+
+        canvas {
+            max-height: 400px;
+            width: 100%;
+        }
+
+        .chart-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .cat-btn {
+            background: rgba(255,255,255,0.12);
+            border: 1px solid rgba(0,210,255,0.4);
+            padding: 10px 20px;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            color: white;
+            font-size: 0.9rem;
+        }
+
+        .cat-btn:hover {
+            background: rgba(0,210,255,0.3);
+            transform: translateY(-2px);
+        }
+
+        .top-category {
+            background: linear-gradient(135deg, #00d2ff20, #3a7bd520);
+            border-radius: 20px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .top-badge {
+            font-size: 3rem;
+            font-weight: bold;
+            background: linear-gradient(90deg, #00d2ff, #3a7bd5);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .sinopsis {
+            background: rgba(0,0,0,0.4);
+            padding: 20px;
+            border-radius: 20px;
+            margin: 20px 0;
+            line-height: 1.8;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        .btn-secondary {
+            background: rgba(255,255,255,0.15);
+            border: 1px solid #00d2ff;
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, #00d2ff, #3a7bd5);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: #888;
+        }
+
+        h2 i, h3 i {
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<!-- PAGE 1: INPUT NAMA -->
+<div id="pageName" class="container">
+    <div class="card">
+        <i class="fas fa-compass" style="font-size: 3rem; color: #00d2ff; margin-bottom: 15px;"></i>
+        <h1>HALA TUJU</h1>
+        <p>Ujian Penjajaran Kerjaya RIASEK</p>
+        <input type="text" id="namaUser" placeholder="Masukkan nama anda" autocomplete="off">
+        <button class="btn" onclick="startQuiz()">MULAI UJIAN <i class="fas fa-arrow-right"></i></button>
+    </div>
+</div>
+
+<!-- PAGE 2: SOALAN -->
+<div id="pageQuiz" class="quiz-container hidden">
+    <div class="progress-bar-container">
+        <div class="progress-fill" id="progressFill"></div>
+    </div>
+    <div class="question-card" id="quizCard">
+        <div class="question-text" id="questionText">Memuatkan...</div>
+        <div class="options">
+            <button class="opt-btn" id="btnSetuju"><i class="fas fa-check-circle"></i> SAYA MINAT / SETUJU</button>
+            <button class="opt-btn" id="btnTidak"><i class="fas fa-times-circle"></i> SAYA TIDAK MINAT</button>
+        </div>
+    </div>
+</div>
+
+<!-- PAGE 3: KEPUTUSAN -->
+<div id="pageResult" class="result-container hidden">
+    <div class="result-card">
+        <h2 style="text-align: center;"><i class="fas fa-chart-simple"></i> Keputusan RIASEK</h2>
+        <p style="text-align: center;" id="resultName"></p>
+        
+        <div class="chart-wrapper">
+            <canvas id="riasekChart" width="400" height="250"></canvas>
+        </div>
+        
+        <!-- BUTTON UNTUK SETIAP CATEGORY DI BAWAH GRAF -->
+        <div class="chart-buttons">
+            <button class="cat-btn" data-cat="R">🔧 R - Realistik</button>
+            <button class="cat-btn" data-cat="I">🔬 I - Investigatif</button>
+            <button class="cat-btn" data-cat="A">🎨 A - Artistik</button>
+            <button class="cat-btn" data-cat="S">🤝 S - Sosial</button>
+            <button class="cat-btn" data-cat="E">💼 E - Enterprising</button>
+            <button class="cat-btn" data-cat="K">📂 K - Konvensional</button>
+        </div>
+    </div>
+
+    <div class="result-card" id="topCategoryBox">
+        <h3>🏆 Kategori Tertinggi Anda</h3>
+        <div class="top-category">
+            <div class="top-badge" id="topCatLetter">-</div>
+            <div id="topCatName" style="font-size: 1.5rem; font-weight: bold;"></div>
+        </div>
+        <div class="sinopsis" id="sinopsisText">
+            Sinopsis akan dipaparkan di sini.
+        </div>
+        <div class="btn-group">
+            <button class="btn btn-primary" id="btnTopCategory"><i class="fas fa-star"></i> Lihat Kerjaya untuk Kategori Tertinggi Saya</button>
+            <button class="btn btn-secondary" onclick="resetUjian()"><i class="fas fa-rotate-left"></i> Ambil Ujian Semula</button>
+        </div>
+    </div>
+    <footer>RIASEK by John Holland | Hala Tuju Kerjaya</footer>
+</div>
+
+<script>
+    // =============================================
+    // 60 SOALAN (10 setiap kategori)
+    // =============================================
+    const allQuestions = [
+        // R (10 soalan)
+        { q: "Memasang atau membaiki peralatan elektrik.", cat: "R" },
+        { q: "Membaiki kereta atau motosikal.", cat: "R" },
+        { q: "Mengendalikan mesin atau alatan berat.", cat: "R" },
+        { q: "Membina perabot daripada kayu.", cat: "R" },
+        { q: "Bekerja di luar rumah (ladang, bengkel, tapak bina).", cat: "R" },
+        { q: "Menggunakan alat tangan (tukul, gerudi, sepana).", cat: "R" },
+        { q: "Menanam sayur atau menjaga ternakan.", cat: "R" },
+        { q: "Memandu lori, jentolak atau traktor.", cat: "R" },
+        { q: "Membuat kerja paip atau pendawaian.", cat: "R" },
+        { q: "Bermain sukan lasak atau aktiviti fizikal.", cat: "R" },
+        // I (10 soalan)
+        { q: "Menyelesaikan masalah matematik atau logik.", cat: "I" },
+        { q: "Menjalankan eksperimen sains di makmal.", cat: "I" },
+        { q: "Mempelajari bagaimana sesuatu benda berfungsi.", cat: "I" },
+        { q: "Menganalisis data atau statistik.", cat: "I" },
+        { q: "Membaca buku sains atau jurnal penyelidikan.", cat: "I" },
+        { q: "Menyiasat punca penyakit atau kerosakan.", cat: "I" },
+        { q: "Bekerja dengan mikroskop atau peralatan saintifik.", cat: "I" },
+        { q: "Menulis laporan teknikal atau kajian.", cat: "I" },
+        { q: "Menyelesaikan teka-teki atau permainan strategi.", cat: "I" },
+        { q: "Belajar tentang astronomi, biologi atau kimia.", cat: "I" },
+        // A (10 soalan)
+        { q: "Melukis, mewarna atau menghasilkan karya seni.", cat: "A" },
+        { q: "Menulis cerpen, puisi atau skrip.", cat: "A" },
+        { q: "Bermain alat muzik atau menyanyi.", cat: "A" },
+        { q: "Mereka bentuk pakaian, poster atau grafik.", cat: "A" },
+        { q: "Mengambil gambar atau membuat video.", cat: "A" },
+        { q: "Menghias bilik atau membuat kraftangan.", cat: "A" },
+        { q: "Menari atau berlakon di atas pentas.", cat: "A" },
+        { q: "Mencipta reka bentuk digital (animasi, logo).", cat: "A" },
+        { q: "Membaca novel, komik atau karya sastera.", cat: "A" },
+        { q: "Menghasilkan karya seni menggunakan bahan terbuang.", cat: "A" },
+        // S (10 soalan)
+        { q: "Mengajar rakan atau adik belajar.", cat: "S" },
+        { q: "Membantu orang yang bermasalah.", cat: "S" },
+        { q: "Menjadi sukarelawan di rumah anak yatim atau orang tua.", cat: "S" },
+        { q: "Memberi nasihat kepada kawan yang sedih.", cat: "S" },
+        { q: "Bekerja dalam pasukan berbanding bersendirian.", cat: "S" },
+        { q: "Menjadi pengacara, fasilitator atau pembimbing.", cat: "S" },
+        { q: "Menjaga kanak-kanak atau orang sakit.", cat: "S" },
+        { q: "Mendengar masalah orang lain dengan bersungguh.", cat: "S" },
+        { q: "Menguruskan aktiviti kemasyarakatan.", cat: "S" },
+        { q: "Bekerja sebagai guru, kaunselor atau nurse.", cat: "S" },
+        // E (10 soalan)
+        { q: "Memimpin projek atau pasukan.", cat: "E" },
+        { q: "Meyakinkan orang ramai untuk membeli sesuatu.", cat: "E" },
+        { q: "Memulakan perniagaan sendiri.", cat: "E" },
+        { q: "Menjadi pengerusi atau ketua dalam mesyuarat.", cat: "E" },
+        { q: "Merancang strategi jualan atau pemasaran.", cat: "E" },
+        { q: "Menyertai pertandingan debat atau pidato.", cat: "E" },
+        { q: "Membuat keputusan penting dengan pantas.", cat: "E" },
+        { q: "Menjual produk secara langsung (door to door / online).", cat: "E" },
+        { q: "Mempromosikan idea atau produk kepada orang lain.", cat: "E" },
+        { q: "Mempunyai cita-cita tinggi untuk berjaya dalam kerjaya.", cat: "E" },
+        // K (10 soalan)
+        { q: "Menyusun fail atau dokumen dengan kemas.", cat: "K" },
+        { q: "Membuat catatan kewangan atau belanjawan.", cat: "K" },
+        { q: "Menggunakan komputer untuk kerja data entry.", cat: "K" },
+        { q: "Membuat jadual atau senarai tugasan harian.", cat: "K" },
+        { q: "Mengurus surat-menyurat atau emel rasmi.", cat: "K" },
+        { q: "Menyimpan rekod inventori atau stok barangan.", cat: "K" },
+        { q: "Membuat pengiraan gaji, bil atau invois.", cat: "K" },
+        { q: "Mengatur jadual mesyuarat atau perjalanan.", cat: "K" },
+        { q: "Mengisi borang dengan teliti tanpa kesilapan.", cat: "K" },
+        { q: "Mengikut prosedur operasi standard (SOP) dengan ketat.", cat: "K" }
+    ];
+
+    // Susun soalan mengikut urutan R,I,A,S,E,K berulang 10 kali
+    let questions = [];
+    for (let i = 0; i < 10; i++) {
+        questions.push(allQuestions[i]);           // R ke-i
+        questions.push(allQuestions[10 + i]);      // I ke-i
+        questions.push(allQuestions[20 + i]);      // A ke-i
+        questions.push(allQuestions[30 + i]);      // S ke-i
+        questions.push(allQuestions[40 + i]);      // E ke-i
+        questions.push(allQuestions[50 + i]);      // K ke-i
+    }
+
+    // State
+    let currentIndex = 0;
+    let scores = { R: 0, I: 0, A: 0, S: 0, E: 0, K: 0 };
+    let userName = "";
+    let chartInstance = null;
+
+    // Elemen DOM
+    const pageName = document.getElementById('pageName');
+    const pageQuiz = document.getElementById('pageQuiz');
+    const pageResult = document.getElementById('pageResult');
+    const questionText = document.getElementById('questionText');
+    const progressFill = document.getElementById('progressFill');
+    const btnSetuju = document.getElementById('btnSetuju');
+    const btnTidak = document.getElementById('btnTidak');
+
+    // Data sinopsis panjang untuk setiap kategori
+    const sinopsisPanjang = {
+        'R': `🔧 **REALISTIK (Praktikal / Kerja Fizikal)** – Individu REALISTIK adalah mereka yang praktikal, gemar bekerja dengan tangan, alatan, mesin, dan aktiviti fizikal. Mereka cenderung menyelesaikan masalah secara konkrit dan menikmati kerja yang membawa hasil ketara. Personaliti ini selalunya jujur, sederhana, gigih, dan kurang selesa dengan situasi sosial yang kompleks atau kerja yang banyak berteori. Mereka lebih suka belajar melalui pengalaman langsung berbanding membaca teori.
+
+✅ **Ciri-ciri utama:** Suka bekerja di luar, menggunakan alatan, membaiki, membina, dan aktiviti lasak. Mereka juga biasanya realistik dalam jangkaan kerjaya.
+
+💼 **Contoh kerjaya:** Jurutera mekanikal, arkitek, juruteknik, mekanik, tukang kayu, pemandu lori, pegawai pertanian, ahli sukan profesional, pegawai polis, anggota tentera.`,
+        
+        'I': `🔬 **INVESTIGATIF (Sains / Penyelidikan)** – Individu INVESTIGATIF bersifat analitikal, ingin tahu, dan gemar menyelesaikan masalah abstrak. Mereka menikmati aktiviti seperti membaca, menyelidik, menganalisis data, dan menjalankan eksperimen. Personaliti ini cenderung berdikari, skeptikal, dan berfikiran logik. Mereka lebih selesa bekerja bersendirian atau dalam pasukan kecil yang fokus kepada penemuan ilmu baharu.
+
+✅ **Ciri-ciri utama:** Suka bertanya "mengapa", gemar sains, matematik, kajian, dan kerja makmal. Mereka juga suka membaca buku ilmiah.
+
+💼 **Contoh kerjaya:** Doktor, ahli farmasi, saintis, ahli biologi, ahli kimia, ahli fizik, penganalisis data, penyelidik pasaran, ahli IT, jurutera perisian, ahli arkeologi.`,
+        
+        'A': `🎨 **ARTISTIK (Kreatif / Ekspresi Diri)** – Individu ARTISTIK kreatif, imaginatif, dan suka mengekspresikan diri melalui pelbagai medium seni. Mereka gemar melukis, menulis, bermain muzik, menari, berlakon, dan mencipta sesuatu yang baharu. Personaliti ini cenderung emosional, terbuka kepada pengalaman baharu, dan kurang selesa dengan rutin atau peraturan ketat. Mereka menghargai keindahan dan keunikan.
+
+✅ **Ciri-ciri utama:** Suka aktiviti tidak berstruktur, bereksperimen dengan idea, dan mencipta produk seni. Mereka juga gemar membaca fiksyen.
+
+💼 **Contoh kerjaya:** Pereka grafik, ilustrator, animator, penulis kreatif, wartawan, penyanyi, pemuzik, pelakon, pengarah filem, arkitek dalaman, pereka fesyen, koreografer.`,
+        
+        'S': `🤝 **SOSIAL (Membantu / Berkomunikasi)** – Individu SOSIAL suka membantu, mengajar, dan berinteraksi dengan orang lain. Mereka bersifat empati, mesra, dan bertanggungjawab terhadap kesejahteraan orang di sekeliling. Personaliti ini gemar bekerja dalam pasukan, memberi nasihat, dan menyelesaikan konflik. Mereka sering menjadi pendengar yang baik dan mudah bergaul dengan pelbagai lapisan masyarakat.
+
+✅ **Ciri-ciri utama:** Suka aktiviti kemasyarakatan, sukarelawan, mengajar, merawat, dan memberi khidmat bimbingan.
+
+💼 **Contoh kerjaya:** Guru, kaunselor, psikologis, pekerja sosial, jururawat, doktor, pegawai kebajikan, fasilitator, pengacara, pegawai sumber manusia, pegawai hubungan pelanggan.`,
+        
+        'E': `💼 **ENTERPRISING (Memimpin / Berniaga)** – Individu ENTERPRISING bercita-cita tinggi, suka memimpin, meyakinkan orang lain, dan mengambil risiko. Mereka gemar aktiviti jualan, pemasaran, pengurusan, dan keusahawanan. Personaliti ini bertenaga, optimis, dan berorientasikan matlamat. Mereka selesa membuat keputusan pantas dan bertanggungjawab terhadap hasil kerja kumpulan.
+
+✅ **Ciri-ciri utama:** Suka mempengaruhi orang, berdebat, berpidato, memulakan perniagaan, dan mengejar kejayaan material.
+
+💼 **Contoh kerjaya:** Usahawan, CEO, pengurus projek, jurujual, pemasar, ejen hartanah, peguam, ahli politik, pengarah eksekutif, broker saham, perunding perniagaan.`,
+        
+        'K': `📂 **KONVENSIONAL (Teratur / Sistematik)** – Individu KONVENSIONAL menyukai ketertiban, sistematik, dan prosedur yang jelas. Mereka gemar bekerja dengan data, nombor, fail, dan sistem pentadbiran. Personaliti ini teliti, bertanggungjawab, dan selesa dengan rutin. Mereka kurang selesa dengan situasi kabur atau kerja yang tidak berstruktur. Kecekapan dan ketepatan adalah keutamaan mereka.
+
+✅ **Ciri-ciri utama:** Suka menyusun, mengira, menyimpan rekod, mengikut SOP, dan bekerja di pejabat.
+
+💼 **Contoh kerjaya:** Akauntan, kerani, penganalisis kredit, pegawai bank, pentadbir, setiausaha, juruaudit, pegawai kewangan, pengurus operasi, pakar data entry.`
+    };
+
+    // Fungsi navigasi
+    function startQuiz() {
+        const inputNama = document.getElementById('namaUser').value.trim();
+        if (inputNama === "") {
+            alert("Sila masukkan nama anda terlebih dahulu.");
+            return;
+        }
+        userName = inputNama;
+        localStorage.setItem("namaPelajar", userName);
+        pageName.classList.add('hidden');
+        pageQuiz.classList.remove('hidden');
+        currentIndex = 0;
+        scores = { R: 0, I: 0, A: 0, S: 0, E: 0, K: 0 };
+        loadQuestion();
+    }
+
+    function loadQuestion() {
+        if (currentIndex < questions.length) {
+            questionText.innerText = questions[currentIndex].q;
+            const percent = (currentIndex / questions.length) * 100;
+            progressFill.style.width = percent + "%";
+        } else {
+            finishQuiz();
+        }
+    }
+
+    function answerQuestion(jawapan) {
+        if (jawapan === 'setuju') {
+            const cat = questions[currentIndex].cat;
+            scores[cat]++;
+        }
+        currentIndex++;
+        loadQuestion();
+    }
+
+    function finishQuiz() {
+        localStorage.setItem("riasekScores", JSON.stringify(scores));
+        pageQuiz.classList.add('hidden');
+        pageResult.classList.remove('hidden');
+        displayResults();
+    }
+
+    function displayResults() {
+        document.getElementById('resultName').innerHTML = `👋 ${userName}, berikut adalah profil minat kerjaya anda:`;
+
+        // Cari kategori tertinggi
+        let maxCat = '';
+        let maxVal = -1;
+        for (let cat in scores) {
+            if (scores[cat] > maxVal) {
+                maxVal = scores[cat];
+                maxCat = cat;
+            }
+        }
+
+        const catFull = {
+            'R': 'REALISTIK (Praktikal / Kerja Fizikal)',
+            'I': 'INVESTIGATIF (Sains / Penyelidikan)',
+            'A': 'ARTISTIK (Kreatif / Ekspresi Diri)',
+            'S': 'SOSIAL (Membantu / Berkomunikasi)',
+            'E': 'ENTERPRISING (Memimpin / Berniaga)',
+            'K': 'KONVENSIONAL (Teratur / Sistematik)'
+        };
+
+        document.getElementById('topCatLetter').innerHTML = maxCat;
+        document.getElementById('topCatName').innerHTML = catFull[maxCat];
+        document.getElementById('sinopsisText').innerHTML = sinopsisPanjang[maxCat];
+
+        // Chart
+        const ctx = document.getElementById('riasekChart').getContext('2d');
+        if (chartInstance) chartInstance.destroy();
+        
+        chartInstance = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['R (Realistik)', 'I (Investigatif)', 'A (Artistik)', 'S (Sosial)', 'E (Enterprising)', 'K (Konvensional)'],
+                datasets: [{
+                    label: 'Skor Minat (0-10)',
+                    data: [scores.R, scores.I, scores.A, scores.S, scores.E, scores.K],
+                    backgroundColor: ['#00d2ff', '#3a7bd5', '#6c5ce7', '#00b894', '#fdcb6e', '#e17055'],
+                    borderRadius: 10,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: { labels: { color: 'white' } },
+                    tooltip: { callbacks: { label: (ctx) => `Skor: ${ctx.raw}` } }
+                },
+                scales: {
+                    y: { beginAtZero: true, max: 10, grid: { color: '#444' }, ticks: { color: 'white' } },
+                    x: { ticks: { color: 'white', font: { size: 10 } } }
+                }
+            }
+        });
+
+        // Set button untuk setiap kategori (bawah graf)
+        document.querySelectorAll('.cat-btn').forEach(btn => {
+            btn.onclick = () => {
+                const cat = btn.getAttribute('data-cat');
+                window.location.href = `kerjaya-${cat}.html`;
+            };
+        });
+
+        // Button untuk kategori tertinggi
+        const btnTop = document.getElementById('btnTopCategory');
+        btnTop.onclick = () => {
+            window.location.href = `kerjaya-${maxCat}.html`;
+        };
+    }
+
+    function resetUjian() {
+        pageResult.classList.add('hidden');
+        pageName.classList.remove('hidden');
+        document.getElementById('namaUser').value = '';
+        currentIndex = 0;
+        scores = { R: 0, I: 0, A: 0, S: 0, E: 0, K: 0 };
+    }
+
+    // Event listeners
+    btnSetuju.addEventListener('click', () => answerQuestion('setuju'));
+    btnTidak.addEventListener('click', () => answerQuestion('tidak'));
+
+    const savedName = localStorage.getItem("namaPelajar");
+    if (savedName) document.getElementById('namaUser').value = savedName;
+</script>
+</body>
+</html>

@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kerjaya Artistik - SEMSIRA</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;700&family=Orbitron:wght@500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #0a0b1e;
+            color: white;
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .background {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at center, #2a1b35 0%, #08090a 100%);
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header-section {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            color: #f093fb;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 0 0 15px rgba(240, 147, 251, 0.4);
+        }
+
+        .subtitle {
+            color: #ccc;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .career-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+
+        .career-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(240, 147, 251, 0.2);
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            transition: 0.3s;
+            backdrop-filter: blur(10px);
+            cursor: pointer;
+        }
+
+        .career-card:hover {
+            transform: translateY(-10px);
+            background: rgba(240, 147, 251, 0.15);
+            border-color: #f093fb;
+            box-shadow: 0 0 20px rgba(240, 147, 251, 0.4);
+        }
+
+        .career-card i {
+            font-size: 3rem;
+            color: #f093fb;
+            margin-bottom: 20px;
+        }
+
+        .career-card h3 {
+            font-family: 'Orbitron', sans-serif;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+            color: #f093fb;
+        }
+
+        .career-card p {
+            font-size: 0.9rem;
+            color: #bbb;
+            line-height: 1.5;
+            flex-grow: 1;
+        }
+
+        .click-hint {
+            display: block;
+            margin-top: 15px;
+            font-size: 0.7rem;
+            color: #f093fb;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        .back-btn {
+            display: inline-block;
+            margin-top: 50px;
+            padding: 12px 30px;
+            background: transparent;
+            border: 1px solid #f093fb;
+            color: #f093fb;
+            text-decoration: none;
+            border-radius: 5px;
+            font-family: 'Orbitron', sans-serif;
+            transition: 0.3s;
+        }
+
+        .back-btn:hover {
+            background: #f093fb;
+            color: #000;
+        }
+
+        /* MODAL STYLES */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.85);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #0f1123 0%, #0a0b1e 100%);
+            margin: 30px auto;
+            padding: 0;
+            border: 1px solid #f093fb;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 1100px;
+            max-height: 85vh;
+            overflow-y: auto;
+            position: relative;
+            animation: modalFadeIn 0.3s;
+        }
+
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .modal-header {
+            background: rgba(240, 147, 251, 0.15);
+            padding: 20px;
+            border-radius: 20px 20px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #f093fb;
+        }
+
+        .modal-header h2 {
+            font-family: 'Orbitron', sans-serif;
+            color: #f093fb;
+            margin: 0;
+        }
+
+        .close-modal {
+            color: #fff;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .close-modal:hover {
+            color: #f093fb;
+        }
+
+        .modal-body {
+            padding: 25px;
+        }
+
+        .diary-btn-modal {
+            background: #f093fb;
+            color: #000;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: bold;
+            font-size: 0.8rem;
+            transition: 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            border: none;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+
+        .diary-btn-modal:hover {
+            background: #fff;
+            box-shadow: 0 0 15px #f093fb;
+            transform: translateY(-2px);
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .requirement-box {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 15px;
+            border-left: 5px solid #f093fb;
+            backdrop-filter: blur(10px);
+        }
+
+        .section-title {
+            font-family: 'Orbitron', sans-serif;
+            color: #f093fb;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+        }
+
+        .info-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            border: 1px solid rgba(240, 147, 251, 0.3);
+            padding: 20px;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 700px;
+        }
+
+        th {
+            background: rgba(240, 147, 251, 0.2);
+            color: #f093fb;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            padding: 12px;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .uni-name {
+            color: #fff;
+            font-weight: bold;
+        }
+
+        .badge {
+            background: #f093fb;
+            color: #000;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 0.65rem;
+            display: inline-block;
+            margin-top: 5px;
+        }
+
+        @media (max-width: 768px) {
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+            .modal-content {
+                margin: 20px auto;
+                width: 95%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="background"></div>
+
+    <div class="container">
+        <div class="header-section">
+            <p class="subtitle">Eksplorasi Kerjaya</p>
+            <h1>UNIT ARTISTIK (A)</h1>
+            <p>Pilih kerjaya di bawah untuk melihat syarat UPU & Universiti.</p>
+        </div>
+
+        <div class="career-grid">
+            <!-- 6 KERJAYA DALAM UNIT ARTISTIK -->
+            <div class="career-card" onclick="openModal('grafik')">
+                <i class="fas fa-bezier-curve"></i>
+                <h3>Pereka Grafik Digital</h3>
+                <p>Mencipta identiti visual dan grafik menarik untuk jenama besar serta media sosial masa kini.</p>
+                <span class="click-hint">KLIK UNTUK INFO UPU</span>
+            </div>
+
+            <div class="career-card" onclick="openModal('filem')">
+                <i class="fas fa-camera-retro"></i>
+                <h3>Pengarah Seni / Filem</h3>
+                <p>Mengetuai visi kreatif bagi sesebuah filem atau produksi media untuk menyampaikan cerita bermakna.</p>
+                <span class="click-hint">KLIK UNTUK INFO UPU</span>
+            </div>
+
+            <div class="career-card" onclick="openModal('penulis')">
+                <i class="fas fa-pen-nib"></i>
+                <h3>Penulis Kandungan Kreatif</h3>
+                <p>Menghasilkan skrip, novel, atau kandungan kreatif yang mampu mempengaruhi emosi pembaca.</p>
+                <span class="click-hint">KLIK UNTUK INFO UPU</span>
+            </div>
+
+            <div class="career-card" onclick="openModal('uxui')">
+                <i class="fas fa-vr-cardboard"></i>
+                <h3>Pereka UX/UI</h3>
+                <p>Merangka pengalaman pengguna (UX) dan antaramuka (UI) yang cantik untuk aplikasi telefon pintar.</p>
+                <span class="click-hint">KLIK UNTUK INFO UPU</span>
+            </div>
+
+            <div class="career-card" onclick="openModal('muzik')">
+                <i class="fas fa-music"></i>
+                <h3>Komposer / Penerbit Muzik</h3>
+                <p>Mencipta melodi dan menyusun audio untuk lagu, iklan, atau runut bunyi permainan video.</p>
+                <span class="click-hint">KLIK UNTUK INFO UPU</span>
+            </div>
+
+            <div class="career-card" onclick="openModal('arkitek')">
+                <i class="fas fa-drafting-compass"></i>
+                <h3>Arkitek / Pereka Dalaman</h3>
+                <p>Merancang ruang kediaman dan bangunan yang mempunyai nilai estetika tinggi serta fungsi moden.</p>
+                <span class="click-hint">KLIK UNTUK INFO UPU</span>
+            </div>
+        </div>
+
+        <div style="text-align: center;">
+            <a href="keputusan.html" class="back-btn"><i class="fas fa-arrow-left"></i> KEMBALI KE KEPUTUSAN</a>
+        </div>
+    </div>
+
+    <!-- MODAL UNTUK PEREKA GRAFIK DIGITAL -->
+    <div id="modalGrafik" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-bezier-curve"></i> INFO UPU: PEREKA GRAFIK DIGITAL</h2>
+                <span class="close-modal" onclick="closeModal('grafik')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <button onclick="simpanKeDiari('grafik')" class="diary-btn-modal"><i class="fas fa-book"></i> CETAK DIARI</button>
+                <div class="info-grid">
+                    <div class="requirement-box">
+                        <h3 class="section-title"><i class="fas fa-id-card"></i> SYARAT AM (WAJIB)</h3>
+                        <p>• Warganegara Malaysia.<br>• Lulus SPM dengan mendapat sekurang-kurangnya <strong>LIMA (5) Kepujian</strong> termasuk Bahasa Melayu.<br>• Lulus Mata Pelajaran <strong>Sejarah</strong>.<br>• Memohon melalui UPUOnline [citation:2][citation:3][citation:6].</p>
+                    </div>
+                    <div class="requirement-box" style="border-left-color: #ff6b6b;">
+                        <h3 class="section-title" style="color: #ff6b6b;"><i class="fas fa-palette"></i> SYARAT KHAS (SPM)</h3>
+                        <p>• <strong>Seni Visual / Reka Cipta:</strong> Minimum Gred C.<br>• <strong>Matematik:</strong> Minimum Gred C.<br>• <strong>Bahasa Inggeris:</strong> Minimum Gred C.<br>• <strong>Portfolio / Temuduga:</strong> Diperlukan untuk kebanyakan IPTA.<br>• MUET: Minimum Band 2 (untuk program Ijazah).</p>
+                    </div>
+                </div>
+                <div class="info-card">
+                    <table>
+                        <thead>
+                            <tr><th>Universiti & Lokasi</th><th>Program Pengajian</th><th>Tempoh</th><th>Yuran (Est. Per Sem)</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><span class="uni-name">UiTM Shah Alam</span><br><small>Selangor</small></td><td>Diploma Seni Lukis & Grafik<br><span class="badge">DIPLOMA</span></td><td>2.5 Tahun</td><td>RM 550.00</td></tr>
+                            <tr><td><span class="uni-name">UniKL MIIT</span><br><small>Kuala Lumpur</small></td><td>Diploma Reka Bentuk Digital (Kreatif Multimedia)<br><span class="badge">DIPLOMA</span></td><td>3 Tahun</td><td>RM 2,800.00</td></tr>
+                            <tr><td><span class="uni-name">UTM Skudai</span><br><small>Johor</small></td><td>Diploma Reka Bentuk Digital<br><span class="badge">DIPLOMA</span></td><td>3 Tahun</td><td>RM 850.00</td></tr>
+                            <tr><td><span class="uni-name">Politeknik Ibrahim Sultan</span><br><small>Pasir Gudang, Johor</small></td><td>Diploma Reka Bentuk Grafik<br><span class="badge">DIPLOMA</span></td><td>3 Tahun</td><td>RM 200.00</td></tr>
+                            <tr><td><span class="uni-name">Kolej Komuniti Kementerian</span><br><small>Seluruh Malaysia</small></td><td>Sijil Reka Bentuk Grafik<br><span class="badge">SIJIL</span></td><td>1.5 - 2 Tahun</td><td>RM 200.00</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL UNTUK PENGARAH SENI / FILEM -->
+    <div id="modalFilem" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-camera-retro"></i> INFO UPU: PENGARAH SENI / FILEM</h2>
+                <span class="close-modal" onclick="closeModal('filem')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <button onclick="simpanKeDiari('filem')" class="diary-btn-modal"><i class="fas fa-book"></i> CETAK DIARI</button>
+                <div class="info-grid">
+                    <div class="requirement-box">
+                        <h3 class="section-title"><i class="fas fa-id-card"></i> SYARAT AM (WAJIB)</h3>
+                        <p>• Warganegara Malaysia.<br>• Lulus SPM dengan mendapat sekurang-kurangnya <strong>LIMA (5) Kepujian</strong> termasuk Bahasa Melayu.<br>• Lulus Mata Pelajaran <strong>Sejarah</strong> [citation:6].</p>
+                    </div>
+                    <div class="requirement-box" style="border-left-color: #ffa502;">
+                        <h3 class="section-title" style="color: #ffa502;"><i class="fas fa-film"></i> SYARAT KHAS (SPM)</h3>
+                        <p>• <strong>Bahasa Melayu:</strong> Minimum Gred C.<br>• <strong>Bahasa Inggeris:</strong> Minimum Gred C.<br>• <strong>Tiga (3) subjek lain:</strong> Lulus.<br>• <strong>Temuduga / Ujian Bakat:</strong> Diperlukan.<br>• MUET: Minimum Band 2.</p>
+                    </div>
+                </div>
+                <div class="info-card">
+                    <table>
+                        <thead><tr><th>Universiti & Lokasi</th><th>Program Pengajian</th><th>Tempoh</th><th>Yuran (Est. Per Sem)</th></tr></thead>
+                        <tbody>
+                            <tr><td><span class="uni-name">UiTM Shah Alam</span><br><small>Selangor</small></td><td>Diploma Seni Kreatif (Filem & Televisyen)<br><span class="badge">DIPLOMA</span></td><td>2.5 Tahun</td><td>RM 550.00</td></tr>
+                            <tr><td><span class="uni-name">UniKL RCMC</span><br><small>Kuala Lumpur</small></td><td>Diploma Produksi Media<br><span class="badge">DIPLOMA</span></td><td>3 Tahun</td><td>RM 2,500.00</td></tr>
+                            <tr><td><span class="uni-name">ASWARA (Akademi Seni)</span><br><small>Kuala Lumpur</small></td><td>Diploma Pengarahan Filem & Televisyen<br><span class="badge">DIPLOMA</span></td><td>3 Tahun</td><td>RM 1,200.00</td></tr>
+                            <tr><td><span class="uni-name">Politeknik Merlimau</span><br><small>Melaka</small></td><td>Diploma Teknologi Media Digital (Produksi Filem)<br><span class="badge">DIPLOMA</span></td><td>3 Tahun</td><td>RM 200.00</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL UNTUK PENULIS KANDUNGAN KREATIF -->
+    <div id="modalPenulis" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-pen-nib"></i> INFO UPU: PENULIS KANDUNGAN KREATIF</h2>
+                <span class="close-modal" onclick="closeModal('penulis')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <button onclick="simpanKeDiari('penulis')" class="diary-btn-modal"><i class="fas fa-book"></i> CETAK DIARI</button>
+                <div class="info-grid">
+                    <div class="requirement-box">
+                        <h3 class="section-title"><i class="fas fa-id-card"></i> SYARAT AM (WAJIB)</h3>
+                        <p>• Warganegara Malaysia.<br>• Lulus SPM dengan mendapat sekurang-kurangnya <strong>LIMA (5) Kepujian</strong> termasuk Bahasa Melayu.<br>• Lulus Mata Pelajaran <strong>Sejarah</strong> [citation:3][citation:6].</p>
+                    </div>
+                    <div class="requirement-box" style="border-left-color: #70a1ff;">
+                        <h3 class="section-title" style="color: #70a1ff;"><i class="fas fa-book-open"></i> SYARAT KHAS (SPM)</h3>
+                        <p>• <strong>Bahasa Melayu:</strong> Minimum Gred B.<br>• <strong>Bahasa Inggeris:</strong> Minimum Gred C.<br>• <strong>Kesusasteraan Melayu / English Literature:</strong> Kelebihan.<br>• MUET: Minimum Band 2.</p>
+                    </div>
+                </div>
+                <div class="info-card">
+                    <table>
+                        <thead><tr><th>Universiti & Lokasi</th><th>Program Pengajian</th><th>Tempoh</th><th>Yuran (Est. Per Sem)</th></tr></thead>
+                        <tbody>
+                            <tr><td><span class="uni-name">UiTM Shah Alam</span><br><small>Selangor</small></td><td>Diploma Penulisan Kreatif<br><span class="badge">DIPLOMA</span></td><td>2.5 Tahun</td><td>RM 550.00</td></tr>
+                            <tr><td><span class="uni-name">Universiti Malaya (UM)</span><br><small>Kuala Lumpur</small></td><td>Ijazah Sarjana Muda Sastera (Kesusasteraan)<br><span class="badge">IJAZAH (Laluan Asasi/Matrik)</span></td><td>4 Tahun</td><td>RM 1,100.00</td></tr>
+                            <tr><td><span class="uni-name">Universiti Sains Malaysia (USM)</span><br><small>Pulau Pinang</small></td><td>Ijazah Sarjana Muda Sastera (Kreatif)<br><span class="badge">IJAZAH (Laluan Asasi/Matrik)</span></td><td>4 Tahun</td><td>RM 900.00</td></tr>
+                            <tr><td><span class="uni-name">Politeknik Seberang Perai</span><br><small>Pulau Pinang</small></td><td>Diploma Komunikasi Korporat<br><span class="badge">DIPLOMA</span></td><td>3 Tahun</td><td>RM 200.00</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL UNTUK PEREKA UX/UI -->
+    <div id="modalUxui" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-vr-cardboard"></i> INFO UPU: PEREKA UX/UI</h2>
+                <span class="close-modal" onclick="closeModal('uxui')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <button onclick="simpanKeDiari('uxui')" class="diary-btn-modal"><i class="fas fa-book"></i> CETAK DIARI</button>
+                <div class="info-grid">
+                    <div class="requirement-box">
+                        <h3 class="section-title"><i class="fas fa-id-card"></i> SYARAT AM (WAJIB)</h3>
+                        <p>• Warganegara Malaysia.<br>• Lulus SPM dengan mendapat sekurang-kurangnya <strong>LIMA (5) Kepujian</strong> termasuk Bahasa Melayu.<br>• Lulus Mata Pelajaran <strong>Sejarah</strong> [citation:3].</p>
+                    </div>
+                    <div class="requirement-box" style="border-left-color: #7bed9f;">
+                        <h3 class="section-title" style="color: #7bed9f;"><i class="fas fa-laptop-code"></i> SYARAT KHAS (SPM)</h3>
+                        <p>• <strong>Matematik:</strong> Minimum Gred C.<br>• <strong>Reka Cipta / Teknologi Maklumat / Sains Komputer:</strong> Lulus.<br>• <strong>Bahasa Inggeris:</strong> Minimum Gred C.<br>• MUET: Minimum Band 2.</p>
+                    </div>
+                </div>
+                <div class="info-card">
+                    <table>
+                        <thead><tr><th>Universiti & Lokasi</th><th>Program Pengajian</th><th>Tempoh</th><th>Yuran (Est. Per Sem)</th></tr></thead>
+                        <tbody>
+                            <tr><td><span class="uni-name">UTM Skudai</span><br><small>Johor</small></td><td>Diploma Reka Bentuk Digital (UX/UI)<br><span class="badge">DIPLOMA</span></td><td>3 Tahun</td><td>RM 850.00</td></tr>
+                            <tr><td><span class="uni-name">UiTM Shah Alam</span><br><small>Selangor</small></td><td>Diploma Seni Lukis & Grafik (Interaksi Digital)<br><span class="badge">DIPLOMA</span></td><td>2.5 Tahun</td><td>RM 550.00</td></tr>
+                            <tr><td><span class="uni-name">UniKL MIIT</span><br><small>Kuala Lumpur</small></td><td>Diploma Teknologi Multimedia (Reka Bentuk Interaksi)<br><span class="badge">DIPLOMA</span></td><td>3 Tahun</td><td>RM 2,800.00</td></tr>
+                            <tr><td><span class="uni-name">Politeknik Sultan Mizan</span><br><small>Terengganu</small></td><td>Diploma Teknologi Maklumat (Multimedia)<br><span class="badge">DIPLOMA</span></td><td>3 Tahun</td><td>RM 200.00</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL UNTUK KOMPOSER / PENERBIT MUZIK -->
+    <div id="modalMuzik" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-music"></i> INFO UPU: KOMPOSER / PENERBIT MUZIK</h2>
+                <span class="close-modal" onclick="closeModal('muzik')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <button onclick="simpanKeDiari('muzik')" class="diary-btn-modal"><i class="fas fa-book"></i> CETAK DIARI</button>
+                <div class="info-grid">
+                    <div class="requirement-box">
+                        <h3 class="section-title"><i class="fas fa-id-card"></i> SYARAT AM (WAJIB)</h3>
+                        <p>• Warganegara Malaysia.<br>• Lulus SPM dengan mendapat sekurang-kurangnya <strong>TIGA (3) Kepujian</strong> termasuk Bahasa Melayu.<br>• Lulus Mata Pelajaran <strong>Sejarah</strong> [citation:4].</p>
+                    </div>
+                    <div class="requirement-box" style="border-left-color: #ff6b81;">
+                        <h3 class="section-title" style="color: #ff6b81;"><i class="fas fa-headphones"></i> SYARAT KHAS (SPM)</h3>
+                        <p>• <strong>TIGA (3) Kepujian</strong> dalam mana-mana mata pelajaran termasuk Bahasa Melayu.<br>• <strong>Temuduga & Uji Bakat</strong> (wajib di UiTM) [citation:4].<br>• Lulus Bahasa Inggeris, Matematik & Sejarah [citation:4].<br>• MUET: Minimum Band 2.</p>
+                    </div>
+                </div>
+                <div class="info-card">
+                    <p style="margin-bottom: 15px;"><strong>⚠️ Nota Penting:</strong> UiTM adalah universiti awam pertama di Malaysia yang menawarkan pendidikan muzik formal [citation:4]. Pengambilan dibuat melalui UPUOnline dan permohonan di bawah kendalian UiTM sendiri. Ujian bakat dan temuduga adalah WAJIB [citation:4].</p>
+                    <table>
+                        <thead><tr><th>Universiti & Lokasi</th><th>Program Pengajian</th><th>Tempoh</th><th>Yuran (Est. Per Sem)</th></tr></thead>
+                        <tbody>
+                            <tr><td><span class="uni-name">UiTM Shah Alam</span><br><small>Selangor</small></td><td>Diploma Muzik<br><span class="badge">DIPLOMA</span></td><td>2.5 Tahun</td><td>RM 550.00</td></tr>
+                            <tr><td><span class="uni-name">UiTM Shah Alam</span><br><small>Selangor</small></td><td>Diploma Produksi Audio Digital<br><span class="badge">DIPLOMA (Program Baru 2021)</span></td><td>2.5 Tahun</td><td>RM 550.00</td></tr>
+                            <tr><td><span class="uni-name">ASWARA</span><br><small>Kuala Lumpur</small></td><td>Diploma Muzik (Persembahan / Komposisi)<br><span class="badge">DIPLOMA</span></td><td>3 Tahun</td><td>RM 1,200.00</td></tr>
+                            <tr><td><span class="uni-name">Universiti Malaysia Sabah (UMS)</span><br><small>Sabah</small></td><td>Ijazah Sarjana Muda Muzik (Komposisi)<br><span class="badge">IJAZAH (Laluan Asasi/Matrik)</span></td><td>4 Tahun</td><td>RM 1,000.00</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL UNTUK ARKITEK / PEREKA DALAMAN -->
+    <div id="modalArkitek" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-drafting-compass"></i> INFO UPU: ARKITEK / PEREKA DALAMAN</h2>
+                <span class="close-modal" onclick="closeModal('arkitek')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <button onclick="simpanKeDiari('arkitek')" class="diary-btn-modal"><i class="fas fa-book"></i> CETAK DIARI</button>
+                <div class="info-grid">
+                    <div class="requirement-box">
+                        <h3 class="section-title"><i class="fas fa-id-card"></i> SYARAT AM (WAJIB)</h3>
+                        <p>• Warganegara Malaysia.<br>• Lulus SPM dengan mendapat sekurang-kurangnya <strong>LIMA (5) Kepujian</strong> termasuk Bahasa Melayu.<br>• Lulus Mata Pelajaran <strong>Sejarah</strong>.</p>
+                    </div>
+                    <div class="requirement-box" style="border-left-color: #1e90ff;">
+                        <h3 class="section-title" style="color: #1e90ff;"><i class="fas fa-drafting-compass"></i> SYARAT KHAS (SPM)</h3>
+                        <p>• <strong>Matematik:</strong> Minimum Gred C.<br>• <strong>Lukisan Kejuruteraan / Reka Cipta / Seni Visual:</strong> Kelebihan.<br>• <strong>Fizik / Matematik Tambahan:</strong> Kelebihan (untuk Ijazah Arkitek).<br>• MUET: Minimum Band 2.</p>
+                    </div>
+                </div>
+                <div class="info-card">
+                    <table>
+                        <thead><tr><th>Universiti & Lokasi</th><th>Program Pengajian</th><th>Tempoh</th><th>Yuran (Est. Per Sem)</th></tr></thead>
+                        <tbody>
+                            <tr><td><span class="uni-name">UiTM Shah Alam</span><br><small>Selangor</small></td><td>Diploma Seni Bina<br><span class="badge">DIPLOMA</span></td><td>3 Tahun</td><td>RM 600.00</td></tr>
+                            <tr><td><span class="uni-name">UTM Skudai</span><br><small>Johor</small></td><td>Diploma Seni Bina<br><span class="badge">DIPLOMA</span></td><td>3 Tahun</td><td>RM 850.00</td></tr>
+                            <tr><td><span class="uni-name">USM Pulau Pinang</span><br><small>Pulau Pinang</small></td><td>Ijazah Sarjana Muda Seni Bina (Laluan Asasi/Matrik)<br><span class="badge">IJAZAH</span></td><td>4 Tahun</td><td>RM 900.00</td></tr>
+                            <tr><td><span class="uni-name">Politeknik Sultan Idris Shah</span><br><small>Selangor</small></td><td>Diploma Seni Bina<br><span class="badge">DIPLOMA</span></td><td>3 Tahun</td><td>RM 200.00</td></tr>
+                            <tr><td><span class="uni-name">Kolej Komuniti (Seluruh Malaysia)</span><br><small>Pelbagai lokasi</small></td><td>Diploma Reka Bentuk Dalaman<br><span class="badge">DIPLOMA</span></td><td>3 Tahun</td><td>RM 200.00 - RM 500.00</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Function untuk buka modal
+        function openModal(type) {
+            const modal = document.getElementById(`modal${type.charAt(0).toUpperCase() + type.slice(1)}`);
+            if (modal) modal.style.display = "block";
+            document.body.style.overflow = "hidden";
+        }
+
+        // Function untuk tutup modal
+        function closeModal(type) {
+            const modal = document.getElementById(`modal${type.charAt(0).toUpperCase() + type.slice(1)}`);
+            if (modal) modal.style.display = "none";
+            document.body.style.overflow = "auto";
+        }
+
+        // Tutup modal bila klik luar content
+        window.onclick = function(event) {
+            const modals = document.querySelectorAll('.modal');
+            modals.forEach(modal => {
+                if (event.target === modal) {
+                    modal.style.display = "none";
+                    document.body.style.overflow = "auto";
+                }
+            });
+        }
+
+        // Function simpan ke localStorage dan redirect ke diari.html
+        function simpanKeDiari(jenis) {
+            let data = {};
+
+            switch(jenis) {
+                case 'grafik':
+                    data = {
+                        nama: "PEREKA GRAFIK DIGITAL",
+                        am: "Warganegara Malaysia. Lulus SPM LIMA (5) Kepujian termasuk BM. Lulus Sejarah.",
+                        khas: "Seni Visual/Reka Cipta (C), Matematik (C), English (C), MUET Band 2.",
+                        universiti: "1. UiTM: Diploma Seni Lukis & Grafik<br>2. UniKL: Diploma Reka Bentuk Digital<br>3. UTM: Diploma Reka Bentuk Digital<br>4. Politeknik: Diploma Reka Bentuk Grafik"
+                    };
+                    break;
+                case 'filem':
+                    data = {
+                        nama: "PENGARAH SENI / FILEM",
+                        am: "Warganegara Malaysia. Lulus SPM LIMA (5) Kepujian termasuk BM. Lulus Sejarah.",
+                        khas: "BM & BI (C), Tiga subjek lain lulus, MUET Band 2.",
+                        universiti: "1. UiTM: Diploma Seni Kreatif (Filem)<br>2. UniKL: Diploma Produksi Media<br>3. ASWARA: Diploma Pengarahan Filem<br>4. Politeknik: Diploma Media Digital"
+                    };
+                    break;
+                case 'penulis':
+                    data = {
+                        nama: "PENULIS KANDUNGAN KREATIF",
+                        am: "Warganegara Malaysia. Lulus SPM LIMA (5) Kepujian termasuk BM. Lulus Sejarah.",
+                        khas: "BM (B), English (C), MUET Band 2.",
+                        universiti: "1. UiTM: Diploma Penulisan Kreatif<br>2. UM: Ijazah Sastera (Kesusasteraan)<br>3. USM: Ijazah Sastera (Kreatif)<br>4. Politeknik: Diploma Komunikasi"
+                    };
+                    break;
+                case 'uxui':
+                    data = {
+                        nama: "PEREKA UX/UI",
+                        am: "Warganegara Malaysia. Lulus SPM LIMA (5) Kepujian termasuk BM. Lulus Sejarah.",
+                        khas: "Matematik (C), IT/Reka Cipta lulus, English (C), MUET Band 2.",
+                        universiti: "1. UTM: Diploma Reka Bentuk Digital (UX/UI)<br>2. UiTM: Diploma Seni Lukis & Grafik<br>3. UniKL: Diploma Multimedia<br>4. Politeknik: Diploma Teknologi Maklumat"
+                    };
+                    break;
+                case 'muzik':
+                    data = {
+                        nama: "KOMPOSER / PENERBIT MUZIK",
+                        am: "Warganegara Malaysia. Lulus SPM TIGA (3) Kepujian termasuk BM. Lulus Sejarah.",
+                        khas: "3 subjek lulus termasuk BM, Ujian bakat & temuduga WAJIB, Lulus English, Math.",
+                        universiti: "1. UiTM: Diploma Muzik / Diploma Produksi Audio Digital<br>2. ASWARA: Diploma Muzik<br>3. UMS: Ijazah Muzik (Komposisi)"
+                    };
+                    break;
+                case 'arkitek':
+                    data = {
+                        nama: "ARKITEK / PEREKA DALAMAN",
+                        am: "Warganegara Malaysia. Lulus SPM LIMA (5) Kepujian termasuk BM. Lulus Sejarah.",
+                        khas: "Matematik (C), Lukisan Kejuruteraan/Reka Cipta kelebihan, MUET Band 2.",
+                        universiti: "1. UiTM: Diploma Seni Bina<br>2. UTM: Diploma Seni Bina<br>3. USM: Ijazah Seni Bina<br>4. Politeknik: Diploma Seni Bina<br>5. Kolej Komuniti: Diploma Reka Bentuk Dalaman"
+                    };
+                    break;
+            }
+
+            localStorage.setItem("pilihanKerjaya", JSON.stringify(data));
+            window.location.href = "diari.html";
+        }
+    </script>
+</body>
+</html>

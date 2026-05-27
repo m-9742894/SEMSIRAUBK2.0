@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Mood Check-in | E-MindCare SEMSIRA</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: linear-gradient(135deg, #fdf4f4 0%, #fef3c7 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Animated Background */
+        .bg-blob {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            overflow: hidden;
+        }
+        .blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.25;
+            animation: floatBlob 25s infinite alternate ease-in-out;
+        }
+        .blob1 { width: 500px; height: 500px; background: #fbcfe8; top: -150px; left: -200px; }
+        .blob2 { width: 600px; height: 600px; background: #bae6fd; bottom: -200px; right: -150px; animation-duration: 30s; }
+        .blob3 { width: 400px; height: 400px; background: #fde68a; top: 40%; left: 70%; animation-duration: 22s; }
+        @keyframes floatBlob {
+            0% { transform: translate(0,0) scale(1); }
+            100% { transform: translate(40px, -40px) scale(1.2); }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid rgba(236, 72, 153, 0.2);
+        }
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .logo-icon {
+            background: linear-gradient(145deg, #ec489a, #f43f5e);
+            width: 50px;
+            height: 50px;
+            border-radius: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .logo-icon i { font-size: 1.8rem; color: white; }
+        .logo-text h1 {
+            font-size: 1.4rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #be185d, #ec489a);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .back-btn {
+            background: #eef2ff;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 40px;
+            cursor: pointer;
+            font-weight: 600;
+            color: #ec489a;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: 0.2s;
+        }
+        .back-btn:hover { background: #ec489a; color: white; }
+
+        /* Hero Section */
+        .hero { text-align: center; margin-bottom: 3rem; }
+        .hero h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #be185d, #ec489a, #f97316);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 0.5rem;
+        }
+        .hero .subtitle { font-size: 1rem; color: #5b6e8c; letter-spacing: 1px; }
+        .hero-divider { width: 80px; height: 4px; background: linear-gradient(90deg, #ec489a, #f97316); margin: 1rem auto; border-radius: 4px; }
+
+        /* Category Cards */
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+        .category-card {
+            background: white;
+            border-radius: 2rem;
+            padding: 2rem 1.8rem;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            box-shadow: 0 15px 35px -12px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(236, 72, 153, 0.15);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .category-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: linear-gradient(90deg, #ec489a, #f97316);
+        }
+        .category-card:hover {
+            transform: translateY(-12px);
+            box-shadow: 0 25px 45px -15px rgba(236, 72, 153, 0.25);
+            border-color: rgba(236, 72, 153, 0.3);
+        }
+
+        .card-icon {
+            width: 90px;
+            height: 90px;
+            background: linear-gradient(145deg, #fdf2f8, #fce7f3);
+            margin: 0 auto 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50px;
+            font-size: 3rem;
+            color: #ec489a;
+            transition: 0.3s;
+        }
+        .category-card:hover .card-icon {
+            background: linear-gradient(145deg, #ec489a, #f43f5e);
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .category-card h3 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: #1e293b;
+        }
+        .category-card p {
+            font-size: 0.9rem;
+            color: #6c7289;
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }
+        .card-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #f1f5f9;
+            padding: 0.6rem 1.8rem;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: #ec489a;
+            transition: 0.2s;
+        }
+        .category-card:hover .card-btn { background: #ec489a; color: white; gap: 12px; }
+
+        /* Anonim Note */
+        .anonim-note {
+            text-align: center;
+            margin-top: 1rem;
+            padding: 0.8rem;
+            background: #fef3c7;
+            border-radius: 1rem;
+            font-size: 0.75rem;
+            color: #92400e;
+        }
+        .anonim-note i {
+            margin-right: 6px;
+        }
+
+        .footer-info {
+            text-align: center;
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(0,0,0,0.05);
+            color: #7c7f9e;
+            font-size: 0.75rem;
+        }
+
+        @media (max-width: 700px) {
+            .container { padding: 1rem; }
+            .hero h1 { font-size: 1.8rem; }
+            .category-grid { gap: 1rem; }
+            .category-card { padding: 1.5rem 1rem; }
+            .card-icon { width: 70px; height: 70px; font-size: 2.2rem; }
+            .category-card h3 { font-size: 1.3rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="bg-blob">
+    <div class="blob blob1"></div>
+    <div class="blob blob2"></div>
+    <div class="blob blob3"></div>
+</div>
+
+<div class="container">
+    <div class="header">
+        <div class="logo-area">
+            <div class="logo-icon"><i class="fas fa-smile-beam"></i></div>
+            <div class="logo-text"><h1>E-MindCare SEMSIRA</h1></div>
+        </div>
+        <a href="../portal-utama.html" class="back-btn"><i class="fas fa-arrow-left"></i> Kembali ke Portal</a>
+    </div>
+
+    <div class="hero" data-aos="fade-up">
+        <h1><i class="fas fa-heart"></i> Mood Check-in</h1>
+        <div class="hero-divider"></div>
+        <div class="subtitle">Luahkan rasa, tenang di jiwa • Jejak emosi harian</div>
+    </div>
+
+    <div class="category-grid" data-aos="fade-up" data-aos-delay="100">
+        <!-- 1. Kongsikan Perasaan Anda (Anonim) -->
+        <div class="category-card" onclick="window.location.href='kongsi-perasaan.html'">
+            <div class="card-icon"><i class="fas fa-comment-dots"></i></div>
+            <h3>Kongsikan Perasaan Anda</h3>
+            <p>Kongsi luahan hati anda hari ini bersama semua orang secara awanama.<br>Jangan risau, tiada siapa akan tahu identiti anda.</p>
+            <div class="anonim-note">
+                <i class="fas fa-user-secret"></i> Sepenuhnya ANONIM • Identiti anda dirahsiakan
+            </div>
+            <div class="card-btn">Luahkan Sekarang <i class="fas fa-arrow-right"></i></div>
+        </div>
+
+        <!-- 2. Kongsikan Bersama Kaunselor -->
+        <div class="category-card" onclick="window.location.href='../../dashboard/page-pelajar.html'">
+            <div class="card-icon"><i class="fas fa-user-shield"></i></div>
+            <h3>Kongsikan Bersama Kaunselor</h3>
+            <p>Dapatkan khidmat bimbingan dan kaunseling secara peribadi bersama kaunselor SMK Syed Sirajuddin yang bertauliah.</p>
+            <div class="anonim-note" style="background:#e0e7ff; color:#4f46e5;">
+                <i class="fas fa-lock"></i> Peribadi & Sulit • Sesi kaunseling profesional
+            </div>
+            <div class="card-btn">Buat Temujanji <i class="fas fa-arrow-right"></i></div>
+        </div>
+    </div>
+
+    <div class="footer-info">
+        <i class="fas fa-heart" style="color:#ec489a;"></i> Kesihatan mental adalah keutamaan — E-MindCare SEMSIRA
+    </div>
+</div>
+
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+    AOS.init({ once: true, duration: 800, offset: 20 });
+</script>
+</body>
+</html>

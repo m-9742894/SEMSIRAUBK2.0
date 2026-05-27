@@ -570,17 +570,17 @@
         <div class="modal-body">
             <div class="form-group">
                 <label><i class="fas fa-chalkboard"></i> Kelas</label>
-                <input type="text" id="newClassName" placeholder="cth: 5 Cemerlang (biarkan kosong jika bukan guru kelas)">
-                <p style="font-size:0.65rem; color:#64748b; margin-top:0.3rem;">Biarkan kosong untuk melihat semua pelajar tanpa filter kelas</p>
+                <input type="text" id="newClassName" placeholder="cth: 5 Cemerlang">
+                <p style="font-size:0.65rem; color:#64748b; margin-top:0.3rem;">Masukkan kelas yang anda ajar</p>
             </div>
             <div class="form-group">
                 <label><i class="fas fa-calendar"></i> Tahun / Sesi</label>
                 <input type="text" id="newYear" placeholder="cth: 2024, 2025, 2026" value="2026">
             </div>
-            <p style="font-size:0.7rem; color:#64748b; margin-top:0.5rem;">
-                <i class="fas fa-info-circle"></i> Menukar kelas/tahun akan menukar paparan kepada data baharu. Biarkan kelas kosong untuk lihat semua pelajar.
+            <p style="font-size:0.7rem; color:#f59e0b; background:#fef3c7; padding:0.8rem; border-radius:0.8rem; margin-top:0.5rem;">
+                <i class="fas fa-sync-alt"></i> Perubahan akan disimpan ke profil guru anda di Firebase.
             </p>
-            <button class="modal-btn" id="saveClassYearBtn"><i class="fas fa-save"></i> Tukar Paparan</button>
+            <button class="modal-btn" id="saveClassYearBtn"><i class="fas fa-save"></i> Simpan & Kemaskini Profil</button>
         </div>
     </div>
 </div>
@@ -659,6 +659,7 @@
     const db = getFirestore(app);
     const studentsCollection = collection(db, "students");
     const meritCollection = collection(db, "merit_records");
+    const teachersCollection = collection(db, "teachers");
     
     // Current view settings
     let currentClass = sessionStorage.getItem('teacherClass') || '';
@@ -687,33 +688,27 @@
     
     // Check if teacher has a class assigned (not empty and not "-")
     function hasTeacherClass() {
-        const teacherAssignedClass = sessionStorage.getItem('teacherAssignedClass') || sessionStorage.getItem('teacherClass') || '';
+        const teacherAssignedClass = sessionStorage.getItem('teacherClass') || '';
         return teacherAssignedClass && teacherAssignedClass.trim() !== "" && teacherAssignedClass !== "-";
     }
     
     // Check if teacher is class teacher for current class/year
     function checkAccessRights() {
-        // Get teacher's assigned class from session
-        const teacherAssignedClass = sessionStorage.getItem('teacherAssignedClass') || sessionStorage.getItem('teacherClass') || '';
-        const teacherAssignedYear = sessionStorage.getItem('teacherAssignedYear') || sessionStorage.getItem('teacherYear') || '';
+        const teacherAssignedClass = sessionStorage.getItem('teacherClass') || '';
+        const teacherAssignedYear = sessionStorage.getItem('teacherYear') || '';
         
         // CASE 1: Teacher has NO class assigned
         if (!teacherAssignedClass || teacherAssignedClass.trim() === "" || teacherAssignedClass === "-") {
             return { hasAccess: false, reason: 'no_class' };
         }
         
-        // CASE 2: Teacher has class but viewing ALL classes (currentClass empty)
-        if (!currentClass || currentClass.trim() === "") {
-            return { hasAccess: false, reason: 'no_class_filter' };
+        // CASE 2: Teacher has class and viewing their own class
+        if (teacherAssignedClass === currentClass && teacherAssignedYear === currentYear) {
+            return { hasAccess: true, reason: 'ok', assignedClass: teacherAssignedClass, assignedYear: teacherAssignedYear };
         }
         
-        // CASE 3: Teacher has class but viewing different class
-        if (teacherAssignedClass !== currentClass || teacherAssignedYear !== currentYear) {
-            return { hasAccess: false, reason: 'wrong_class', assignedClass: teacherAssignedClass, assignedYear: teacherAssignedYear };
-        }
-        
-        // CASE 4: Teacher has class and viewing their own class
-        return { hasAccess: true, reason: 'ok' };
+        // CASE 3: Teacher viewing different class or year
+        return { hasAccess: false, reason: 'wrong_class', assignedClass: teacherAssignedClass, assignedYear: teacherAssignedYear };
     }
     
     function updateUIBasedOnAccess() {
@@ -725,30 +720,17 @@
         const accessResult = checkAccessRights();
         
         if (!accessResult.hasAccess) {
-            // Hide main content
             mainContent.style.display = 'none';
             
             if (accessResult.reason === 'no_class') {
-                // Teacher has no class assigned
                 noClassCard.style.display = 'block';
                 accessDeniedCard.style.display = 'none';
                 if (stats) stats.style.opacity = '0.5';
-                // Show zero stats
                 document.getElementById('totalStudents').innerText = '0';
                 document.getElementById('totalClassMerit').innerText = '0';
                 document.getElementById('averageMerit').innerText = '0';
-                // Also hide student container
                 document.getElementById('studentsContainer').innerHTML = `<div class="empty-state"><i class="fas fa-user-tag" style="font-size: 2rem;"></i><p>Anda belum ditetapkan sebagai guru kelas. Sila rujuk kaunselor.</p></div>`;
-            } else if (accessResult.reason === 'no_class_filter') {
-                // Teacher has class but viewing all classes (no filter)
-                noClassCard.style.display = 'block';
-                accessDeniedCard.style.display = 'none';
-                noClassCard.querySelector('h3').innerText = 'Anda Hanya Boleh Melihat Kelas Anda Sendiri';
-                noClassCard.querySelector('p').innerHTML = `Anda adalah guru kelas untuk <strong>${accessResult.assignedClass || 'kelas anda'}</strong> pada tahun ${accessResult.assignedYear || currentYear}. Sila tetapkan kelas anda untuk melihat senarai pelajar.`;
-                if (stats) stats.style.opacity = '0.5';
-                document.getElementById('studentsContainer').innerHTML = `<div class="empty-state"><i class="fas fa-lock" style="font-size: 2rem;"></i><p>Sila tetapkan kelas anda untuk melihat senarai pelajar.</p></div>`;
             } else {
-                // Teacher viewing wrong class
                 noClassCard.style.display = 'none';
                 accessDeniedCard.style.display = 'block';
                 document.getElementById('deniedClass').innerText = currentClass;
@@ -757,7 +739,6 @@
                 document.getElementById('studentsContainer').innerHTML = `<div class="empty-state"><i class="fas fa-lock" style="font-size: 2rem;"></i><p>Akses tidak dibenarkan untuk kelas ini.</p></div>`;
             }
         } else {
-            // Teacher has access
             noClassCard.style.display = 'none';
             accessDeniedCard.style.display = 'none';
             mainContent.style.display = 'block';
@@ -765,8 +746,29 @@
         }
     }
     
+    // ==================== UPDATE TEACHER PROFILE IN FIRESTORE ====================
+    async function updateTeacherProfileInFirestore(newClass, newYear) {
+        if (!teacherId) {
+            console.warn("No teacher ID found in session");
+            return false;
+        }
+        
+        try {
+            const teacherRef = doc(db, "teachers", teacherId);
+            await updateDoc(teacherRef, {
+                teacherClass: newClass,
+                year: newYear,
+                updatedAt: new Date().toISOString()
+            });
+            console.log(`Teacher profile updated: class=${newClass}, year=${newYear}`);
+            return true;
+        } catch (error) {
+            console.error("Error updating teacher profile:", error);
+            return false;
+        }
+    }
+    
     async function loadAllData() {
-        // First check access rights
         const accessResult = checkAccessRights();
         
         if (!accessResult.hasAccess) {
@@ -774,16 +776,13 @@
             return;
         }
         
-        // Show main content and hide cards
         updateUIBasedOnAccess();
         
         try {
-            // Build query - filter by teacher's assigned class and year
-            const teacherAssignedClass = sessionStorage.getItem('teacherAssignedClass') || sessionStorage.getItem('teacherClass') || '';
-            const teacherAssignedYear = sessionStorage.getItem('teacherAssignedYear') || sessionStorage.getItem('teacherYear') || currentYear;
+            const teacherClass = sessionStorage.getItem('teacherClass') || '';
+            const teacherYear = sessionStorage.getItem('teacherYear') || currentYear;
             
-            // Only load students for teacher's assigned class and year
-            const q = query(studentsCollection, where("class", "==", teacherAssignedClass), where("session", "==", teacherAssignedYear));
+            const q = query(studentsCollection, where("class", "==", teacherClass), where("session", "==", teacherYear));
             
             const studentsSnap = await getDocs(q);
             studentsList = [];
@@ -809,13 +808,12 @@
     function updateStats() {
         document.getElementById('totalStudents').innerText = studentsList.length;
         
-        // Display teacher's assigned class and year
-        const teacherAssignedClass = sessionStorage.getItem('teacherAssignedClass') || sessionStorage.getItem('teacherClass') || '-';
-        const teacherAssignedYear = sessionStorage.getItem('teacherAssignedYear') || sessionStorage.getItem('teacherYear') || currentYear;
+        const teacherClass = sessionStorage.getItem('teacherClass') || '-';
+        const teacherYear = sessionStorage.getItem('teacherYear') || currentYear;
         
-        const displayClassText = (teacherAssignedClass && teacherAssignedClass.trim() !== "" && teacherAssignedClass !== "-") ? teacherAssignedClass : 'Tiada Kelas';
+        const displayClassText = (teacherClass && teacherClass.trim() !== "" && teacherClass !== "-") ? teacherClass : '-';
         document.getElementById('displayClass').innerText = displayClassText;
-        document.getElementById('displayYear').innerText = teacherAssignedYear;
+        document.getElementById('displayYear').innerText = teacherYear;
         
         let classTotalMerit = 0;
         studentsList.forEach(student => {
@@ -930,7 +928,7 @@
             );
         }
         
-        const teacherClass = sessionStorage.getItem('teacherAssignedClass') || sessionStorage.getItem('teacherClass') || '-';
+        const teacherClass = sessionStorage.getItem('teacherClass') || '-';
         
         if (filtered.length === 0) {
             container.innerHTML = `<div class="empty-state"><i class="fas fa-user-slash" style="font-size: 2rem;"></i><p>Tiada pelajar ditemui dalam kelas ${teacherClass} (${currentYear}).</p><button class="btn-add" id="quickAddBtn" style="margin-top:1rem;"><i class="fas fa-plus"></i> Tambah Pelajar</button></div>`;
@@ -1033,15 +1031,15 @@
     
     // ==================== STUDENT CRUD ====================
     function openAddStudentModal() {
-        const teacherAssignedClass = sessionStorage.getItem('teacherAssignedClass') || sessionStorage.getItem('teacherClass') || '';
-        const teacherAssignedYear = sessionStorage.getItem('teacherAssignedYear') || sessionStorage.getItem('teacherYear') || currentYear;
+        const teacherClass = sessionStorage.getItem('teacherClass') || '';
+        const teacherYear = sessionStorage.getItem('teacherYear') || currentYear;
         
         document.getElementById('modalTitle').innerHTML = '<i class="fas fa-user-plus"></i> Tambah Pelajar Baru';
         document.getElementById('studentId').value = '';
         document.getElementById('fullname').value = '';
         document.getElementById('icNumber').value = '';
-        document.getElementById('className').value = teacherAssignedClass;
-        document.getElementById('session').value = teacherAssignedYear;
+        document.getElementById('className').value = teacherClass;
+        document.getElementById('session').value = teacherYear;
         document.getElementById('studentModal').style.display = 'flex';
     }
     
@@ -1105,37 +1103,47 @@
         }
     });
     
-    // ==================== CLASS & YEAR MANAGEMENT ====================
+    // ==================== CLASS & YEAR MANAGEMENT - UPDATE FIRESTORE ====================
     document.getElementById('editClassYearBtn').addEventListener('click', () => {
-        const currentClassFromSession = sessionStorage.getItem('teacherAssignedClass') || sessionStorage.getItem('teacherClass') || '';
-        const currentYearFromSession = sessionStorage.getItem('teacherAssignedYear') || sessionStorage.getItem('teacherYear') || currentYear;
+        const currentClassFromSession = sessionStorage.getItem('teacherClass') || '';
+        const currentYearFromSession = sessionStorage.getItem('teacherYear') || currentYear;
         document.getElementById('newClassName').value = currentClassFromSession;
         document.getElementById('newYear').value = currentYearFromSession;
         document.getElementById('editClassModal').style.display = 'flex';
     });
     
-    document.getElementById('saveClassYearBtn').addEventListener('click', () => {
+    document.getElementById('saveClassYearBtn').addEventListener('click', async () => {
         const newClass = document.getElementById('newClassName').value.trim();
         const newYear = document.getElementById('newYear').value.trim();
+        
+        if (!newClass || newClass === "") {
+            showAlert('Sila masukkan nama kelas', 'error');
+            return;
+        }
         
         if (!newYear || !/^\d{4}$/.test(newYear)) {
             showAlert('Sila masukkan tahun yang sah (4 digit, cth: 2026)', 'error');
             return;
         }
         
-        // Save to session storage
-        sessionStorage.setItem('teacherAssignedClass', newClass);
-        sessionStorage.setItem('teacherAssignedYear', newYear);
-        sessionStorage.setItem('teacherClass', newClass);
-        sessionStorage.setItem('teacherYear', newYear);
+        // Save to Firebase first
+        const updateSuccess = await updateTeacherProfileInFirestore(newClass, newYear);
         
-        currentClass = newClass;
-        currentYear = newYear;
-        
-        closeEditClassModal();
-        loadAllData();
-        const classDisplay = (newClass && newClass !== "") ? newClass : "semua kelas";
-        showAlert(`✅ Kini melihat ${classDisplay} (${newYear})`, 'success');
+        if (updateSuccess) {
+            // Update session storage
+            sessionStorage.setItem('teacherClass', newClass);
+            sessionStorage.setItem('teacherYear', newYear);
+            
+            currentClass = newClass;
+            currentYear = newYear;
+            
+            closeEditClassModal();
+            await loadAllData();
+            
+            showAlert(`✅ Profil guru dikemaskini: Kelas ${newClass} (${newYear})`, 'success');
+        } else {
+            showAlert('❌ Gagal mengemaskini profil guru di Firebase. Sila cuba lagi.', 'error');
+        }
     });
     
     // ==================== TRANSFER STUDENTS ====================
@@ -1201,12 +1209,12 @@
     });
     
     // Initialize
-    const teacherAssignedClass = sessionStorage.getItem('teacherAssignedClass') || sessionStorage.getItem('teacherClass') || '-';
-    const teacherAssignedYear = sessionStorage.getItem('teacherAssignedYear') || sessionStorage.getItem('teacherYear') || currentYear;
+    const teacherClass = sessionStorage.getItem('teacherClass') || '-';
+    const teacherYear = sessionStorage.getItem('teacherYear') || currentYear;
     
-    const displayClassText = (teacherAssignedClass && teacherAssignedClass.trim() !== "" && teacherAssignedClass !== "-") ? teacherAssignedClass : '-';
+    const displayClassText = (teacherClass && teacherClass.trim() !== "" && teacherClass !== "-") ? teacherClass : '-';
     document.getElementById('displayClass').innerText = displayClassText;
-    document.getElementById('displayYear').innerText = teacherAssignedYear;
+    document.getElementById('displayYear').innerText = teacherYear;
     
     loadAllData();
 </script>

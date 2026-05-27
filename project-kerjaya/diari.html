@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio Kerjaya Impian - SEMSIRA</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Plus+Jakarta+Sans:wght@300;400;600;800&family=Great+Vibes&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
+    <style>
+        :root {
+            --bg-body: #f8fafc;
+            --accent: #38bdf8;
+            --gold: #fbbf24;
+            --dark-navy: #0f172a;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background: var(--bg-body); 
+            color: #1e293b;
+        }
+
+        .a4-page {
+            width: 210mm;
+            min-height: 296mm;
+            padding: 15mm;
+            margin: 20px auto;
+            background: #ffffff;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            page-break-after: always;
+        }
+
+        .a4-page::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 10px;
+            background: linear-gradient(90deg, var(--accent), var(--dark-navy), var(--gold));
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #f1f5f9;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        .brand-logo {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 800;
+            font-size: 14px;
+            color: var(--dark-navy);
+        }
+
+        .title-block h1 { 
+            font-family: 'Orbitron', sans-serif; 
+            font-size: 24px; 
+            color: var(--dark-navy);
+            margin-bottom: 5px;
+        }
+
+        .title-line { width: 50px; height: 4px; background: var(--accent); margin-bottom: 20px; }
+
+        .grid-info { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
+        .card {
+            background: #f8fafc;
+            padding: 12px;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+        }
+        .card h4 { font-size: 9px; color: #64748b; text-transform: uppercase; margin-bottom: 5px; }
+        .card p { font-size: 14px; font-weight: 700; color: var(--dark-navy); }
+
+        .mandate-highlight {
+            background: #fffbeb;
+            border: 2px solid #fef3c7;
+            padding: 15px;
+            border-radius: 15px;
+            margin-top: 15px;
+        }
+
+        .uni-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            font-size: 11px;
+        }
+        .uni-table th {
+            background: #1e293b;
+            color: white;
+            text-align: left;
+            padding: 10px;
+            font-size: 10px;
+        }
+        .uni-table td {
+            border: 1px solid #e2e8f0;
+            padding: 8px;
+            vertical-align: top;
+        }
+
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            margin-top: 15px;
+        }
+
+        th {
+            background: var(--dark-navy);
+            color: white;
+            padding: 10px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 9px;
+            border: 1px solid var(--dark-navy);
+        }
+
+        td {
+            height: 40px;
+            border: 1px solid #cbd5e1;
+            text-align: center;
+            padding: 5px;
+            font-size: 11px;
+        }
+
+        .quote-wrap {
+            height: 100%;
+            min-height: 250px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+        .big-quote { font-family: 'Great Vibes', cursive; font-size: 45px; color: var(--dark-navy); }
+        .author { font-family: 'Orbitron', sans-serif; letter-spacing: 3px; color: var(--accent); margin-top: 10px; }
+
+        .control-panel {
+            position: fixed; bottom: 30px; right: 30px;
+            display: flex; gap: 10px; z-index: 999;
+        }
+
+        .btn-print, .btn-tempah {
+            padding: 15px 25px; border-radius: 50px;
+            font-family: 'Orbitron', sans-serif; border: none;
+            cursor: pointer; box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            color: white; font-weight: bold; font-size: 12px;
+            transition: transform 0.2s;
+        }
+
+        .btn-print { background: var(--dark-navy); }
+        .btn-tempah { background: #fbbf24; color: #0f172a; }
+        
+        /* OVERLAY FORM & RESIT */
+        #form-overlay, #receipt-overlay {
+            display: none;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85); z-index: 1000;
+            overflow-y: auto; padding: 20px;
+        }
+
+        .form-card, .receipt-card {
+            background: white; width: 100%; max-width: 450px; margin: 50px auto;
+            padding: 30px; border-radius: 20px; position: relative;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+
+        .form-card h2, .receipt-card h2 {
+            font-family: 'Orbitron', sans-serif;
+            margin-bottom: 20px;
+            text-align: center;
+            color: var(--dark-navy);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--dark-navy);
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 10px;
+            font-size: 14px;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(56,189,248,0.1);
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, var(--accent), var(--dark-navy));
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .btn-download {
+            width: 100%;
+            padding: 14px;
+            background: #10b981;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+
+        .receipt-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 12px 0;
+            padding: 8px 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .receipt-total {
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--accent);
+        }
+
+        .close-btn {
+            text-align: center;
+            margin-top: 20px;
+            cursor: pointer;
+            color: #ef4444;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid white;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @media print {
+            .control-panel, #form-overlay, #receipt-overlay { display: none !important; }
+            body { background: white; }
+            .a4-page { margin: 0; box-shadow: none; border: none; page-break-after: always; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="control-panel">
+        <button class="btn-print" onclick="window.print()">
+            <i class="fas fa-print"></i> CETAK DIARI
+        </button>
+        <button class="btn-tempah" onclick="showForm()">
+            <i class="fas fa-shopping-cart"></i> TEMPAH DIARI ANDA
+        </button>
+    </div>
+
+    <!-- FORM TEMPAHAN -->
+    <div id="form-overlay">
+        <div class="form-card">
+            <h2><i class="fas fa-book"></i> Tempahan Diari Fizikal</h2>
+            <form id="tempahForm">
+                <div class="form-group">
+                    <label>Nama Penuh</label>
+                    <input type="text" id="formNama" readonly style="background:#f1f5f9;">
+                </div>
+                <div class="form-group">
+                    <label>Kelas</label>
+                    <input type="text" id="formKelas" placeholder="Contoh: 5 ALPHA" required>
+                </div>
+                <div class="form-group">
+                    <label>Nombor Telefon</label>
+                    <input type="tel" id="formTelefon" placeholder="Contoh: 0123456789" required>
+                </div>
+                <button type="submit" class="btn-submit" id="submitTempah">
+                    <i class="fas fa-paper-plane"></i> HANTAR TEMPAHAN
+                </button>
+            </form>
+            <div class="close-btn" onclick="closeForm()">[ BATAL ]</div>
+        </div>
+    </div>
+
+    <!-- RESIT TEMPAHAN -->
+    <div id="receipt-overlay">
+        <div class="receipt-card" id="receiptContent">
+            <h2><i class="fas fa-receipt"></i> RESIT TEMPAHAN</h2>
+            <div style="text-align: center; margin-bottom: 20px;">
+                <p style="font-size: 12px; color: #64748b;">UBK SEMSIRA 2026</p>
+                <p style="font-size: 10px;">Unit Bimbingan & Kaunseling SMK Syed Sirajuddin</p>
+            </div>
+            <div class="receipt-row"><span>Nombor Tempahan:</span><span id="receiptNo">-</span></div>
+            <div class="receipt-row"><span>Tarikh:</span><span id="receiptTarikh">-</span></div>
+            <div class="receipt-row"><span>Nama Pelajar:</span><span id="receiptNama">-</span></div>
+            <div class="receipt-row"><span>Kelas:</span><span id="receiptKelas">-</span></div>
+            <div class="receipt-row"><span>No. Telefon:</span><span id="receiptTelefon">-</span></div>
+            <div class="receipt-row"><span>Kerjaya Impian:</span><span id="receiptKerjaya">-</span></div>
+            <div class="receipt-row"><span>Unit Dominan:</span><span id="receiptUnit">-</span></div>
+            <div class="receipt-row"><span>Harga Seunit:</span><span>RM 2.00</span></div>
+            <div class="receipt-row"><span>Status:</span><span style="color: #10b981;">MENUNGGU PENGESAHAN</span></div>
+            <hr style="margin: 15px 0;">
+            <div class="receipt-row receipt-total"><span>JUMLAH BAYARAN:</span><span>RM 2.00</span></div>
+            <div style="background: #fef3c7; padding: 12px; border-radius: 10px; margin: 15px 0; text-align: center;">
+                <i class="fas fa-info-circle"></i> Sila jumpa <strong>Guru Kaunselor</strong> di Bilik Kaunseling untuk menuntut diari fizikal anda.<br>
+                <small>Sila tunjukkan resit ini sebagai bukti tempahan.</small>
+            </div>
+            <button class="btn-download" onclick="downloadReceiptPDF()">
+                <i class="fas fa-download"></i> MUAT TURUN RESIT (PDF)
+            </button>
+            <div class="close-btn" onclick="closeReceipt()">[ TUTUP ]</div>
+        </div>
+    </div>
+
+    <div id="content-to-export">
+        <div class="a4-page">
+            <div class="page-header"><div class="brand-logo">SEMSIRA / 2026</div><div class="page-number">P.01</div></div>
+            <div class="title-block"><h1>Profil & Matlamat</h1><div class="title-line"></div></div>
+            <div class="grid-info">
+                <div class="card"><h4>Nama Calon</h4><p id="printNama">-</p></div>
+                <div class="card"><h4>Dominasi RIASEC</h4><p id="printUnit">-</p></div>
+            </div>
+            <div class="card" style="margin-bottom: 15px;">
+                <h4>Kerjaya Impian Utama</h4>
+                <p id="namaKerjaya" style="font-size: 18px; color: #0369a1;">-</p>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                <div class="card"><h4>Syarat Am</h4><div id="syaratAm" style="font-size: 11px; line-height: 1.4;">-</div></div>
+                <div class="card"><h4>Syarat Khas</h4><div id="syaratKhas" style="font-size: 11px; line-height: 1.4;">-</div></div>
+            </div>
+            <div class="mandate-highlight">
+                <h5 style="color: #b45309; font-size: 11px; margin-bottom: 8px;"><i class="fas fa-award"></i> MANDAT AKADEMIK (SASARAN SUBJEK SPM)</h5>
+                <div id="mandatTeks" style="font-size: 12px; font-weight: 600; color: #1e293b;"></div>
+            </div>
+        </div>
+
+        <div class="a4-page">
+            <div class="page-header"><div class="brand-logo">SEMSIRA / 2026</div><div>P.02</div></div>
+            <div class="title-block"><h1>Destinasi Pendidikan</h1><div class="title-line"></div></div>
+            <div class="card" style="min-height: 230mm; background: white; border: 1px solid #cbd5e1; padding: 10px;">
+                <h4>Senarai Institusi & Program Pengajian</h4>
+                <table class="uni-table">
+                    <thead>
+                        <tr>
+                            <th width="25%">Universiti & Negeri</th>
+                            <th width="35%">Program Pengajian</th>
+                            <th width="15%">Tahap</th>
+                            <th width="12%">Tempoh</th>
+                            <th width="13%">Yuran/Sem</th>
+                        </tr>
+                    </thead>
+                    <tbody id="uniTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="a4-page">
+            <div class="page-header"><div class="brand-logo">SEMSIRA / 2026</div><div>P.03</div></div>
+            <div class="title-block"><h1>Tracker Prestasi</h1><div class="title-line"></div></div>
+            <table>
+                <thead>
+                    <tr><th width="20%">UJIAN</th><th>BM</th><th>BI</th><th>SEJ</th><th>MATE</th><th>ELEKTIF 1</th><th>ELEKTIF 2</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>UJIAN 1</strong></span></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                    <tr><td><strong>UJIAN 2</strong></span></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                    <tr><td><strong>UJIAN 3</strong></span></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="a4-page">
+            <div class="page-header"><div class="brand-logo">SEMSIRA / 2026</div><div>P.04</div></div>
+            <div class="title-block"><h1>Jadual Perancangan</h1><div class="title-line"></div></div>
+            <table>
+                <thead>
+                    <tr><th width="12%">WAKTU</th><th>ISNIN</th><th>SELASA</th><th>RABU</th><th>KHAMIS</th><th>JUMAAT</th><th>SABTU</th><th>AHAD</th></tr>
+                </thead>
+                <tbody>
+                    <tr style="height: 100px;"><td><strong>PAGI</strong></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                    <tr style="height: 100px;"><td><strong>PETANG</strong></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                    <tr style="height: 100px;"><td><strong>MALAM</strong></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="a4-page">
+            <div class="quote-wrap">
+                <p class="big-quote">"Masa depan adalah milik mereka yang percaya pada keindahan impian mereka."</p>
+                <p class="author">— Eleanor Roosevelt —</p>
+                <div style="margin-top: 40px; max-width: 500px; line-height: 2; color: #64748b; font-size: 14px;">
+                    Teruskan berjuang, calon <b><span id="kerjayaFinal"></span></b>!
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==================== KONFIGURASI FIREBASE ====================
+        // Gantikan dengan konfigurasi Firebase anda sendiri
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_AUTH_DOMAIN",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_STORAGE_BUCKET",
+            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+
+        // Initialize Firebase
+        let db = null;
+        try {
+            firebase.initializeApp(firebaseConfig);
+            db = firebase.firestore();
+            console.log("Firebase connected");
+        } catch (e) {
+            console.warn("Firebase not configured:", e);
+        }
+
+        // ==================== DATA DARI LOCALSTORAGE ====================
+        const namaPelajar = localStorage.getItem("namaPelajar") || "PELAJAR";
+        const scores = JSON.parse(localStorage.getItem("riasekScores")) || {R:0, I:0, A:0, S:0, E:0, K:0};
+        const pilihan = JSON.parse(localStorage.getItem("pilihanKerjaya")) || null;
+        
+        // Cari unit dominan
+        let highestUnit = 'R';
+        let maxScore = -1;
+        for(let u in scores) { 
+            if(scores[u] > maxScore) { 
+                maxScore = scores[u]; 
+                highestUnit = u; 
+            } 
+        }
+        
+        const unitFullName = {
+            R: "REALISTIK", I: "INVESTIGATIF", A: "ARTISTIK", 
+            S: "SOSIAL", E: "ENTERPRISING", K: "KONVENSIONAL"
+        };
+        
+        // Populate data ke diari
+        document.getElementById("printNama").innerText = namaPelajar.toUpperCase();
+        document.getElementById("printUnit").innerText = unitFullName[highestUnit];
+        document.getElementById("formNama").value = namaPelajar;
+        
+        if(pilihan) {
+            document.getElementById("namaKerjaya").innerText = pilihan.nama?.toUpperCase() || "-";
+            document.getElementById("kerjayaFinal").innerText = pilihan.nama || "-";
+            document.getElementById("syaratAm").innerHTML = pilihan.am || "-";
+            document.getElementById("syaratKhas").innerHTML = pilihan.khas || "-";
+            
+            // Set mandat akademik
+            let subjekList = "SASARAN SPM: Pastikan 5 Kepujian dalam subjek teras termasuk subjek pengkhususan bidang.";
+            if(pilihan.nama && (pilihan.nama.includes("AWAM") || pilihan.nama.includes("ROBOTIK") || pilihan.nama.includes("DOKTOR"))) {
+                subjekList = "SASARAN SPM: Mate Tambahan (B/A), Fizik (B/A), Matematik (A), Kimia (Lulus), BM & BI (Kepujian).";
+            } else if(pilihan.nama && pilihan.nama.includes("PERAKAUNAN")) {
+                subjekList = "SASARAN SPM: Matematik (A), Prinsip Perakaunan/Perdagangan (Kepujian), BM & BI (Kepujian).";
+            }
+            document.getElementById("mandatTeks").innerText = subjekList;
+
+            // Populate universiti table
+            const tbody = document.getElementById("uniTableBody");
+            tbody.innerHTML = "";
+            if(pilihan.universiti) {
+                const unis = pilihan.universiti.split("<br>");
+                unis.forEach(line => {
+                    if(line.trim() !== "") {
+                        let parts = line.split(":");
+                        let uName = parts[0] || "-";
+                        let progInfo = parts[1] || "-";
+                        let row = `<tr>
+                            <td>${uName}</td>
+                            <td>${progInfo.split('(')[0]}</span></td>
+                            <td>${progInfo.includes('Dip') ? 'DIPLOMA' : (progInfo.includes('Ijazah') ? 'IJAZAH' : 'ASASI')}</span></td>
+                            <td>3-4 TAHUN</span></td>
+                            <td>RM 200-900</span></td>
+                        </tr>`;
+                        tbody.innerHTML += row;
+                    }
+                });
+            }
+        }
+
+        // ==================== FUNGSI FORM TEMPAHAN ====================
+        function showForm() {
+            document.getElementById("form-overlay").style.display = "block";
+        }
+        
+        function closeForm() {
+            document.getElementById("form-overlay").style.display = "none";
+        }
+        
+        function closeReceipt() {
+            document.getElementById("receipt-overlay").style.display = "none";
+        }
+        
+        // Generate nombor tempahan unik
+        function generateReceiptNo() {
+            const date = new Date();
+            const yyyy = date.getFullYear();
+            const mm = String(date.getMonth() + 1).padStart(2, '0');
+            const dd = String(date.getDate()).padStart(2, '0');
+            const random = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+            return `SEMS/${dd}${mm}${yyyy}/${random}`;
+        }
+        
+        // Simpan ke Firebase dan papar resit
+        document.getElementById("tempahForm").addEventListener("submit", async function(e) {
+            e.preventDefault();
+            
+            const kelas = document.getElementById("formKelas").value.trim();
+            const telefon = document.getElementById("formTelefon").value.trim();
+            
+            if(!kelas || !telefon) {
+                alert("Sila lengkapkan semua maklumat!");
+                return;
+            }
+            
+            const submitBtn = document.getElementById("submitTempah");
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<span class="loading"></span> Memproses...';
+            submitBtn.disabled = true;
+            
+            const receiptNo = generateReceiptNo();
+            const tarikh = new Date().toLocaleString('ms-MY', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+            const kerjayaNama = pilihan ? pilihan.nama : "Tidak dipilih";
+            
+            // Data tempahan
+            const tempahanData = {
+                receiptNo: receiptNo,
+                tarikh: new Date().toISOString(),
+                nama: namaPelajar,
+                kelas: kelas,
+                telefon: telefon,
+                kerjayaImpian: kerjayaNama,
+                unitDominan: unitFullName[highestUnit],
+                harga: 2.00,
+                status: "MENUNGGU PENGESAHAN",
+                createdAt: firebase.firestore ? firebase.firestore.FieldValue.serverTimestamp() : new Date()
+            };
+            
+            // Simpan ke Firestore jika ada
+            let savedToFirebase = false;
+            if(db) {
+                try {
+                    await db.collection("tempahanDiari").add(tempahanData);
+                    savedToFirebase = true;
+                    console.log("Data disimpan ke Firebase");
+                } catch(err) {
+                    console.error("Firestore error:", err);
+                }
+            }
+            
+            // Papar resit
+            document.getElementById("receiptNo").innerText = receiptNo;
+            document.getElementById("receiptTarikh").innerText = tarikh;
+            document.getElementById("receiptNama").innerText = namaPelajar;
+            document.getElementById("receiptKelas").innerText = kelas;
+            document.getElementById("receiptTelefon").innerText = telefon;
+            document.getElementById("receiptKerjaya").innerText = kerjayaNama;
+            document.getElementById("receiptUnit").innerText = unitFullName[highestUnit];
+            
+            closeForm();
+            document.getElementById("receipt-overlay").style.display = "block";
+            
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
+            
+            if(savedToFirebase) {
+                console.log("✅ Tempahan berjaya disimpan!");
+            } else {
+                console.warn("⚠️ Firebase tidak dikonfigurasi. Data tidak disimpan ke pangkalan data.");
+            }
+        });
+        
+        // ==================== FUNGSI DOWNLOAD RESIT PDF ====================
+        function downloadReceiptPDF() {
+            const receiptElement = document.getElementById("receiptContent");
+            const opt = {
+                margin: [10, 10, 10, 10],
+                filename: `RESIT_TEMPAHAN_${namaPelajar}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, letterRendering: true },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+            html2pdf().set(opt).from(receiptElement).save();
+        }
+        
+        // Fungsi global untuk digunakan dalam onclick
+        window.showForm = showForm;
+        window.closeForm = closeForm;
+        window.closeReceipt = closeReceipt;
+        window.downloadReceiptPDF = downloadReceiptPDF;
+    </script>
+</body>
+</html>

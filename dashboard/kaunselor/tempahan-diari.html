@@ -1,0 +1,1167 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Tempahan Diari - Kaunselor | E-MindCare SEMSIRA</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: linear-gradient(135deg, #f0f4ff 0%, #e9eef6 100%);
+            min-height: 100vh;
+        }
+        .navbar {
+            background: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .nav-logo i {
+            font-size: 1.8rem;
+            color: #4f46e5;
+        }
+        .nav-logo h1 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #1e293b;
+        }
+        .nav-logo p {
+            font-size: 0.7rem;
+            color: #64748b;
+        }
+        .back-btn {
+            background: #f1f5f9;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 30px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            text-decoration: none;
+            color: #4f46e5;
+        }
+        .back-btn:hover {
+            background: #4f46e5;
+            color: white;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        .page-header {
+            margin-bottom: 2rem;
+        }
+        .page-header h2 {
+            font-size: 1.8rem;
+            color: #1e293b;
+            margin-bottom: 0.5rem;
+        }
+        .page-header p {
+            color: #64748b;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .stat-card {
+            background: white;
+            border-radius: 1rem;
+            padding: 1.2rem;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .stat-card i {
+            font-size: 2rem;
+            color: #4f46e5;
+            margin-bottom: 0.5rem;
+        }
+        .stat-card .number {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #1e293b;
+        }
+        .stat-card .label {
+            font-size: 0.8rem;
+            color: #64748b;
+        }
+        .search-section {
+            background: white;
+            border-radius: 1rem;
+            padding: 1.2rem;
+            margin-bottom: 2rem;
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+        }
+        .search-wrapper {
+            flex: 1;
+            position: relative;
+        }
+        .search-box {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #f8fafc;
+            padding: 0.6rem 1rem;
+            border-radius: 50px;
+            border: 1px solid #e2e8f0;
+        }
+        .search-box i {
+            color: #94a3b8;
+        }
+        .search-box input {
+            flex: 1;
+            border: none;
+            background: transparent;
+            outline: none;
+            font-size: 0.9rem;
+        }
+        .suggestions-list {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border-radius: 0.8rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            max-height: 250px;
+            overflow-y: auto;
+            z-index: 100;
+            margin-top: 5px;
+            display: none;
+        }
+        .suggestions-list div {
+            padding: 0.8rem 1rem;
+            cursor: pointer;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        .suggestions-list div:hover { background: #f1f5f9; }
+        .refresh-btn {
+            background: #f1f5f9;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        .refresh-btn:hover { background: #e2e8f0; }
+        .orders-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+            gap: 1.5rem;
+        }
+        .order-card {
+            background: white;
+            border-radius: 1.2rem;
+            padding: 1.2rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            border-left: 5px solid #fbbf24;
+            position: relative;
+        }
+        .order-status {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            font-size: 0.7rem;
+            background: #fef3c7;
+            color: #d97706;
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+        .order-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 1rem;
+        }
+        .order-header i {
+            font-size: 2rem;
+            color: #4f46e5;
+            background: #eef2ff;
+            padding: 0.7rem;
+            border-radius: 1rem;
+        }
+        .order-header h3 {
+            font-size: 1.1rem;
+            color: #1e293b;
+        }
+        .order-details { margin: 1rem 0; }
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 0.85rem;
+        }
+        .detail-row span:first-child { color: #64748b; }
+        .detail-row span:last-child { font-weight: 600; color: #1e293b; }
+        .order-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 1rem;
+        }
+        .btn-print {
+            flex: 1;
+            background: #10b981;
+            color: white;
+            border: none;
+            padding: 0.6rem;
+            border-radius: 0.6rem;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .btn-print:hover { background: #059669; }
+        .btn-done {
+            flex: 1;
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 0.6rem;
+            border-radius: 0.6rem;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .btn-done:hover { background: #dc2626; }
+        .loading-state, .empty-state { text-align: center; padding: 3rem; color: #64748b; }
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #1e293b;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 10px;
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
+        }
+        .toast.success { background: #10b981; }
+        .toast.error { background: #ef4444; }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @media (max-width: 768px) {
+            .container { padding: 1rem; }
+            .orders-grid { grid-template-columns: 1fr; }
+            .search-section { flex-direction: column; }
+            .search-wrapper { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="navbar">
+    <div class="nav-logo">
+        <i class="fas fa-book"></i>
+        <div>
+            <h1>Tempahan Diari</h1>
+            <p>Kaunselor SEMSIRA</p>
+        </div>
+    </div>
+    <a href="dashboard-kaunselor.html" class="back-btn"><i class="fas fa-arrow-left"></i> Kembali ke Dashboard</a>
+</div>
+
+<div class="container">
+    <div class="page-header">
+        <h2><i class="fas fa-shopping-cart"></i> Senarai Tempahan Diari</h2>
+        <p>Urus tempahan diari fizikal oleh pelajar - cetak diari lengkap & sahkan tempahan</p>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <i class="fas fa-clock"></i>
+            <div class="number" id="totalMenunggu">0</div>
+            <div class="label">Menunggu Pengesahan</div>
+        </div>
+        <div class="stat-card">
+            <i class="fas fa-book"></i>
+            <div class="number" id="totalKeseluruhan">0</div>
+            <div class="label">Jumlah Tempahan</div>
+        </div>
+    </div>
+
+    <div class="search-section">
+        <div class="search-wrapper">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" placeholder="Cari mengikut nama pelajar atau kelas..." autocomplete="off">
+            </div>
+            <div id="suggestionsList" class="suggestions-list"></div>
+        </div>
+        <button class="refresh-btn" id="refreshBtn"><i class="fas fa-sync-alt"></i> Muat Semula</button>
+    </div>
+
+    <div id="ordersContainer">
+        <div class="loading-state">
+            <i class="fas fa-spinner fa-spin"></i>
+            <p>Memuatkan tempahan diari...</p>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ==================== KONFIGURASI FIREBASE ====================
+    const firebaseConfig = {
+        apiKey: "AIzaSyCfu7XC8pXtpDyQ-9Cjdg4AobA-EVEwWcc",
+        authDomain: "e-mindcare.firebaseapp.com",
+        projectId: "e-mindcare",
+        storageBucket: "e-mindcare.firebasestorage.app",
+        messagingSenderId: "1021883944936",
+        appId: "1:1021883944936:web:39c75a0c98d19a37afde5d",
+        measurementId: "G-3CJVKWGEXV"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    let allOrders = [];
+
+    // ==================== DATABASE KERJAYA LENGKAP DARI SEMUA UNIT ====================
+    const kerjayaDatabase = {
+        // ========== UNIT REALISTIK (R) - DARI kerjaya-r.html ==========
+        "JURUTERA AWAM": {
+            unit: "REALISTIK (R)",
+            syaratAm: "Warganegara Malaysia.\nLulus SPM dengan mendapat sekurang-kurangnya LIMA (5) Kepujian termasuk Bahasa Melayu.\nLulus Mata Pelajaran Sejarah.",
+            syaratKhas: "Matematik Tambahan: Minimum Gred B.\nFizik: Minimum Gred B.\nMatematik: Minimum Gred A.\nKimia / Lukisan Kejuruteraan: Lulus.",
+            universiti: [
+                { nama: "UiTM Pasir Gudang (Johor)", program: "Diploma Kejuruteraan Awam", tahap: "DIPLOMA", tempoh: "3 Tahun", yuran: "RM 520" },
+                { nama: "UTM Skudai (Johor)", program: "Diploma Kejuruteraan Awam", tahap: "DIPLOMA", tempoh: "3 Tahun", yuran: "RM 850" },
+                { nama: "Politeknik Ungku Omar (Perak)", program: "Diploma Kejuruteraan Awam", tahap: "DIPLOMA", tempoh: "3 Tahun", yuran: "RM 200" },
+                { nama: "UTHM Batu Pahat (Johor)", program: "Diploma Kejuruteraan Awam", tahap: "DIPLOMA", tempoh: "3 Tahun", yuran: "RM 750" }
+            ],
+            mandat: "SASARAN SPM: Mate Tambahan (B), Fizik (B), Matematik (A), Kimia (Lulus), BM & BI (Kepujian)."
+        },
+        "KEJURUTERAAN MEKANIKAL": {
+            unit: "REALISTIK (R)",
+            syaratAm: "Warganegara Malaysia.\nLulus SPM dengan mendapat sekurang-kurangnya TIGA (3) Kepujian termasuk Bahasa Melayu.\nLulus Mata Pelajaran Sejarah.",
+            syaratKhas: "Matematik / Matematik Tambahan: Minimum Gred C.\nFizik / Kimia / Sains / Lukisan Kejuruteraan: Minimum Gred C.\nBahasa Inggeris: Lulus.",
+            universiti: [
+                { nama: "UiTM Bukit Besi / Pasir Gudang (Terengganu/Johor)", program: "Diploma Kejuruteraan Mekanikal", tahap: "DIPLOMA", tempoh: "3 Tahun", yuran: "RM 520" },
+                { nama: "UTM Skudai (Johor)", program: "Diploma Kejuruteraan Mekanikal", tahap: "DIPLOMA", tempoh: "3 Tahun", yuran: "RM 1,200" },
+                { nama: "UTHM Batu Pahat (Johor)", program: "Diploma Kejuruteraan Mekanikal", tahap: "DIPLOMA", tempoh: "3 Tahun", yuran: "RM 700" },
+                { nama: "UTeM Durian Tunggal (Melaka)", program: "Diploma Kejuruteraan Mekanikal", tahap: "DIPLOMA", tempoh: "3 Tahun", yuran: "RM 800" },
+                { nama: "Politeknik Shah Alam (Selangor)", program: "Diploma Kejuruteraan Mekanikal (Pembuatan)", tahap: "DIPLOMA", tempoh: "3 Tahun", yuran: "RM 200" },
+                { nama: "Politeknik Ungku Omar (Perak)", program: "Diploma Kejuruteraan Mekanikal (Automotif)", tahap: "DIPLOMA", tempoh: "3 Tahun", yuran: "RM 200" }
+            ],
+            mandat: "SASARAN SPM: Matematik/MT (C), Fizik/Kimia/Sains (C), BM & BI (Lulus)."
+        },
+        "PAKAR ROBOTIK": {
+            unit: "REALISTIK (R)",
+            syaratAm: "Warganegara Malaysia.\nLulus SPM dengan mendapat sekurang-kurangnya LIMA (5) Kepujian termasuk Bahasa Melayu.\nLulus Mata Pelajaran Sejarah.",
+            syaratKhas: "Matematik Tambahan: Minimum Gred C.\nFizik: Minimum Gred C.\nMatematik: Minimum Gred B.\nBahasa Inggeris: Lulus.",
+            universiti: [
+                { nama: "UTeM Melaka", program: "Diploma Kejuruteraan Mekatronik", tahap: "DIPLOMA", tempoh: "3 Tahun", yuran: "RM 600" },
+                { nama: "UiTM Bukit Besi (Terengganu)", program: "Diploma Kejuruteraan Mekanikal (Robotik)", tahap: "DIPLOMA", tempoh: "3 Tahun", yuran: "RM 520" },
+                { nama: "UMPSA Pekan (Pahang)", program: "Diploma Kejuruteraan Mekatronik (Dual Degree)", tahap: "DIPLOMA", tempoh: "3 Tahun", yuran: "RM 900" },
+                { nama: "Politeknik Sultan Azlan Shah (Perak)", program: "Diploma Kejuruteraan Mekatronik", tahap: "DIPLOMA", tempoh: "3 Tahun", yuran: "RM 200" }
+            ],
+            mandat: "SASARAN SPM: Mate Tambahan (C), Fizik (C), Matematik (B)."
+        },
+        "JURUTERA AEROANGKASA": {
+            unit: "REALISTIK (R)",
+            syaratAm: "Warganegara Malaysia.\nLulus SPM dengan mendapat sekurang-kurangnya LIMA (5) Kepujian termasuk Bahasa Melayu.\nLulus Mata Pelajaran Sejarah.",
+            syaratKhas: "Matematik Tambahan: Minimum Gred B.\nFizik: Minimum Gred B.\nMatematik: Minimum Gred A-.\nBahasa Inggeris: Minimum Gred C.",
+            universiti: [
+                { nama: "USM Nibong Tebal (Pulau Pinang)", program: "Ijazah Sarjana Muda Kejuruteraan Aeroangkasa", tahap: "IJAZAH", tempoh: "4 Tahun", yuran: "RM 900" },
+                { nama: "UPM Serdang (Selangor)", program: "Ijazah Sarjana Muda Kejuruteraan Aeroangkasa", tahap: "IJAZAH", tempoh: "4 Tahun", yuran: "RM 1,100" },
+                { nama: "UIAM Gombak (Selangor)", program: "Ijazah Sarjana Muda Kejuruteraan Aeroangkasa", tahap: "IJAZAH", tempoh: "4 Tahun", yuran: "RM 1,200" },
+                { nama: "UniKL MIAT (Sepang)", program: "Diploma Teknologi Kejuruteraan Penyelenggaraan Pesawat", tahap: "DIPLOMA", tempoh: "3 Tahun", yuran: "RM 2,500" },
+                { nama: "Politeknik Banting (Selangor)", program: "Diploma Kejuruteraan Penyelenggaraan Pesawat", tahap: "DIPLOMA", tempoh: "3 Tahun", yuran: "RM 200" },
+                { nama: "Kolej Komuniti (Seluruh Malaysia)", program: "Sijil Penyelenggaraan Pesawat", tahap: "SIJIL", tempoh: "2 Tahun", yuran: "RM 200" }
+            ],
+            mandat: "SASARAN SPM: Mate Tambahan (B), Fizik (B), Matematik (A-), English (C)."
+        },
+        "KEJURUTERAAN BIOPERUBATAN": {
+            unit: "REALISTIK (R)",
+            syaratAm: "Warganegara Malaysia.\nLulus SPM dengan mendapat sekurang-kurangnya LIMA (5) Kepujian termasuk Bahasa Melayu.\nLulus Mata Pelajaran Sejarah.",
+            syaratKhas: "Biologi / Fizik: Minimum Gred C.\nMatematik: Minimum Gred B.\nMatematik Tambahan: Minimum Gred C.\nBahasa Inggeris: Lulus.",
+            universiti: [
+                { nama: "UTM Skudai (Johor)", program: "Diploma Kejuruteraan Bioperubatan", tahap: "DIPLOMA", tempoh: "3 Tahun", yuran: "RM 1,250" },
+                { nama: "UniKL BMI (Gombak)", program: "Diploma Teknologi Kejuruteraan Elektronik (Perubatan)", tahap: "DIPLOMA", tempoh: "3 Tahun", yuran: "RM 2,800" },
+                { nama: "Politeknik Sultan Salahuddin Abdul Aziz Shah (Shah Alam)", program: "Diploma Kejuruteraan Elektronik (Perubatan)", tahap: "DIPLOMA", tempoh: "3 Tahun", yuran: "RM 200" },
+                { nama: "ILP Kuala Langat (Selangor)", program: "Diploma Teknologi Elektronik Bioperubatan", tahap: "DKM/DLKM", tempoh: "2.5-3 Tahun", yuran: "RM 500" },
+                { nama: "UTM Kuala Lumpur", program: "Asasi Kejuruteraan (Laluan ke Ijazah Bioperubatan)", tahap: "ASASI", tempoh: "1 Tahun", yuran: "RM 800" },
+                { nama: "ADTEC (Seluruh Malaysia)", program: "Diploma Kejuruteraan Elektronik Perubatan", tahap: "DIPLOMA", tempoh: "3 Tahun", yuran: "RM 600" }
+            ],
+            mandat: "SASARAN SPM: Biologi/Fizik (C), Matematik (B), MT (C)."
+        },
+        "PERTANIAN MODEN": {
+            unit: "REALISTIK (R)",
+            syaratAm: "Warganegara Malaysia.\nLulus SPM dengan mendapat sekurang-kurangnya TIGA (3) Kepujian termasuk Bahasa Melayu.\nLulus Mata Pelajaran Sejarah.",
+            syaratKhas: "Sains / Biologi / Pertanian: Minimum Gred C.\nMatematik: Minimum Gred C.\nBahasa Inggeris: Lulus.\nKelebihan bagi subjek Kimia.",
+            universiti: [
+                { nama: "UPM Bintulu (Sarawak)", program: "Diploma Pertanian Moden", tahap: "DIPLOMA", tempoh: "3 Tahun", yuran: "RM 700" },
+                { nama: "UiTM Jasin / Mukah / Kuala Pilah (Melaka/Sarawak/N.Sembilan)", program: "Diploma Agroteknologi", tahap: "DIPLOMA", tempoh: "3 Tahun", yuran: "RM 550" },
+                { nama: "UniSZA Besut (Terengganu)", program: "Diploma Teknologi Pertanian", tahap: "DIPLOMA", tempoh: "3 Tahun", yuran: "RM 650" },
+                { nama: "Politeknik Jeli (Kelantan)", program: "Diploma Agroteknologi (Pertanian Pintar)", tahap: "DIPLOMA", tempoh: "3 Tahun", yuran: "RM 200" },
+                { nama: "UMT Terengganu", program: "Asasi STEM (Laluan ke Agroteknologi)", tahap: "ASASI", tempoh: "1 Tahun", yuran: "RM 850" },
+                { nama: "Kolej Vokasional (Seluruh Malaysia)", program: "Diploma Teknologi Pertanian", tahap: "DIPLOMA VOKASIONAL", tempoh: "2.5 Tahun", yuran: "Percuma" }
+            ],
+            mandat: "SASARAN SPM: Sains/Biologi/Pertanian (C), Matematik (C)."
+        },
+
+        // ========== UNIT INVESTIGATIF (I) - DARI kerjaya-i.html ==========
+        "SAINTIS PENYELIDIK": {
+            unit: "INVESTIGATIF (I)",
+            syaratAm: "Warganegara Malaysia.\nLulus SPM dengan mendapat sekurang-kurangnya LIMA (5) Kepujian termasuk Bahasa Melayu.\nLulus Mata Pelajaran Sejarah.",
+            syaratKhas: "Matematik: Minimum Gred A.\nKimia: Minimum Gred B.\nBiologi / Fizik: Minimum Gred B.\nBahasa Inggeris: Minimum Gred C.\nMUET: Minimum Band 2.",
+            universiti: [
+                { nama: "USM Kubang Kerian (Kelantan)", program: "Ijazah Sarjana Muda Sains (Biologi Perubatan)", tahap: "IJAZAH", tempoh: "4 Tahun", yuran: "RM 900" },
+                { nama: "UPM Serdang (Selangor)", program: "Ijazah Sarjana Muda Sains (Biokimia)", tahap: "IJAZAH", tempoh: "4 Tahun", yuran: "RM 850" },
+                { nama: "UiTM Shah Alam", program: "Diploma Sains Gunaan (Biologi)", tahap: "DIPLOMA", tempoh: "3 Tahun", yuran: "RM 520" },
+                { nama: "UTHM Pagoh (Johor)", program: "Diploma Sains Gunaan", tahap: "DIPLOMA", tempoh: "3 Tahun", yuran: "RM 700" },
+                { nama: "Politeknik Sultan Salahuddin Abdul Aziz Shah (Shah Alam)", program: "Diploma Sains Gunaan", tahap: "DIPLOMA", tempoh: "3 Tahun", yuran: "RM 200" }
+            ],
+            mandat: "SASARAN SPM: Matematik (A), Kimia (B), Biologi/Fizik (B), MUET Band 2."
+        },
+        "DOKTOR PAKAR": {
+            unit: "INVESTIGATIF (I)",
+            syaratAm: "Warganegara Malaysia.\nLulus SPM dengan mendapat sekurang-kurangnya LIMA (5) Kepujian termasuk Bahasa Melayu.\nLulus Mata Pelajaran Sejarah.\nMUET: Minimum Band 3.",
+            syaratKhas: "Biologi: Minimum Gred A.\nKimia: Minimum Gred A.\nFizik / Matematik Tambahan: Minimum Gred A.\nBahasa Inggeris: Minimum Gred A.",
+            universiti: [
+                { nama: "UM Kuala Lumpur", program: "Ijazah Doktor Perubatan (Laluan Asasi/Matrik)", tahap: "IJAZAH", tempoh: "5 Tahun", yuran: "RM 1,500" },
+                { nama: "UKM Kuala Lumpur", program: "Ijazah Doktor Perubatan (Laluan Asasi/Matrik)", tahap: "IJAZAH", tempoh: "5 Tahun", yuran: "RM 1,400" },
+                { nama: "USM Kubang Kerian (Kelantan)", program: "Ijazah Doktor Perubatan (Laluan Asasi/Matrik)", tahap: "IJAZAH", tempoh: "5 Tahun", yuran: "RM 900" },
+                { nama: "UPM Serdang (Selangor)", program: "Ijazah Doktor Perubatan (Laluan Asasi/Matrik)", tahap: "IJAZAH", tempoh: "5 Tahun", yuran: "RM 1,200" },
+                { nama: "UMS Kota Kinabalu (Sabah)", program: "Ijazah Doktor Perubatan (Laluan Asasi/Matrik)", tahap: "IJAZAH", tempoh: "5 Tahun", yuran: "RM 1,000" }
+            ],
+            mandat: "SASARAN SPM: Biologi (A), Kimia (A), Fizik/MT (A), MUET Band 3."
+        },
+        "PAKAR ANALISIS DATA": {
+            unit: "INVESTIGATIF (I)",
+            syaratAm: "Warganegara Malaysia.\nLulus SPM dengan mendapat sekurang-kurangnya LIMA (5) Kepujian termasuk Bahasa Melayu.\nLulus Mata Pelajaran Sejarah.",
+            syaratKhas: "Matematik: Minimum Gred A.\nMatematik Tambahan: Minimum Gred C.\nBahasa Inggeris: Minimum Gred C.\nTeknologi Maklumat / Sains Komputer: Lulus.\nMUET: Minimum Band 2.",
+            universiti: [
+                { nama: "UTM Skudai (Johor)", program: "Diploma Sains Komputer (Data Sains)", tahap: "DIPLOMA", tempoh: "3 Tahun", yuran: "RM 850" },
+                { nama: "UMPSA Pekan (Pahang)", program: "Diploma Sains Komputer", tahap: "DIPLOMA", tempoh: "3 Tahun", yuran: "RM 800" },
+                { nama: "UiTM Shah Alam", program: "Diploma Sains Komputer (Teknologi Maklumat)", tahap: "DIPLOMA", tempoh: "3 Tahun", yuran: "RM 520" },
+                { nama: "UTHM Pagoh (Johor)", program: "Diploma Teknologi Maklumat", tahap: "DIPLOMA", tempoh: "3 Tahun", yuran: "RM 700" },
+                { nama: "Politeknik Ibrahim Sultan (Pasir Gudang, Johor)", program: "Diploma Teknologi Maklumat (Data Sains)", tahap: "DIPLOMA", tempoh: "3 Tahun", yuran: "RM 200" }
+            ],
+            mandat: "SASARAN SPM: Matematik (A), MT (C), English (C), MUET Band 2."
+        },
+        "PAKAR FORENSIK": {
+            unit: "INVESTIGATIF (I)",
+            syaratAm: "Warganegara Malaysia.\nLulus SPM dengan mendapat sekurang-kurangnya LIMA (5) Kepujian termasuk Bahasa Melayu.\nLulus Mata Pelajaran Sejarah.",
+            syaratKhas: "Biologi: Minimum Gred C.\nKimia: Minimum Gred C.\nMatematik: Minimum Gred B.\nBahasa Inggeris: Minimum Gred C.\nMUET: Minimum Band 2.",
+            universiti: [
+                { nama: "UKM Bangi (Selangor)", program: "Ijazah Sains Forensik (Laluan Asasi/Diploma)", tahap: "IJAZAH", tempoh: "4 Tahun", yuran: "RM 1,200" },
+                { nama: "UM Kuala Lumpur", program: "Ijazah Sains Forensik (Laluan Asasi/Diploma)", tahap: "IJAZAH", tempoh: "4 Tahun", yuran: "RM 1,100" },
+                { nama: "UiTM Shah Alam", program: "Diploma Sains Gunaan (Forensik)", tahap: "DIPLOMA", tempoh: "3 Tahun", yuran: "RM 520" },
+                { nama: "Politeknik Sultan Salahuddin Abdul Aziz Shah (Shah Alam)", program: "Diploma Sains Gunaan", tahap: "DIPLOMA", tempoh: "3 Tahun", yuran: "RM 200" }
+            ],
+            mandat: "SASARAN SPM: Biologi (C), Kimia (C), Matematik (B), MUET Band 2."
+        },
+        "PAKAR KESELAMATAN SIBER": {
+            unit: "INVESTIGATIF (I)",
+            syaratAm: "Warganegara Malaysia.\nLulus SPM dengan mendapat sekurang-kurangnya LIMA (5) Kepujian termasuk Bahasa Melayu.\nLulus Mata Pelajaran Sejarah.",
+            syaratKhas: "Matematik: Minimum Gred B.\nTeknologi Maklumat / Sains Komputer: Lulus.\nBahasa Inggeris: Minimum Gred C.\nMatematik Tambahan: Kelebihan.\nMUET: Minimum Band 2.",
+            universiti: [
+                { nama: "UMPSA Pekan (Pahang)", program: "Ijazah Sains Komputer (Keselamatan Siber) (Laluan Asasi/Diploma)", tahap: "IJAZAH", tempoh: "4 Tahun", yuran: "RM 900" },
+                { nama: "UTM Skudai (Johor)", program: "Diploma Sains Komputer (Keselamatan Siber)", tahap: "DIPLOMA", tempoh: "3 Tahun", yuran: "RM 850" },
+                { nama: "UiTM Shah Alam", program: "Diploma Sains Komputer (Teknologi Maklumat)", tahap: "DIPLOMA", tempoh: "3 Tahun", yuran: "RM 520" },
+                { nama: "UTHM Pagoh (Johor)", program: "Diploma Teknologi Maklumat (Keselamatan Siber)", tahap: "DIPLOMA", tempoh: "3 Tahun", yuran: "RM 700" },
+                { nama: "Politeknik Seberang Perai (Pulau Pinang)", program: "Diploma Keselamatan Siber", tahap: "DIPLOMA", tempoh: "3 Tahun", yuran: "RM 200" }
+            ],
+            mandat: "SASARAN SPM: Matematik (B), IT lulus, English (C), MUET Band 2."
+        },
+        "AHLI FARMASI": {
+            unit: "INVESTIGATIF (I)",
+            syaratAm: "Warganegara Malaysia.\nLulus SPM dengan mendapat sekurang-kurangnya LIMA (5) Kepujian termasuk Bahasa Melayu.\nLulus Mata Pelajaran Sejarah.",
+            syaratKhas: "Kimia: Minimum Gred B.\nBiologi: Minimum Gred B.\nMatematik: Minimum Gred B.\nBahasa Inggeris: Minimum Gred C.\nMUET: Minimum Band 3.",
+            universiti: [
+                { nama: "UM Kuala Lumpur", program: "Ijazah Sarjana Muda Farmasi (Laluan Asasi/Matrik)", tahap: "IJAZAH", tempoh: "4 Tahun", yuran: "RM 1,300" },
+                { nama: "UKM Kuala Lumpur", program: "Ijazah Sarjana Muda Farmasi (Laluan Asasi/Matrik)", tahap: "IJAZAH", tempoh: "4 Tahun", yuran: "RM 1,200" },
+                { nama: "USM Pulau Pinang", program: "Ijazah Sarjana Muda Farmasi (Laluan Asasi/Matrik)", tahap: "IJAZAH", tempoh: "4 Tahun", yuran: "RM 900" },
+                { nama: "UiTM Puncak Alam (Selangor)", program: "Ijazah Sarjana Muda Farmasi (Laluan Asasi/Matrik)", tahap: "IJAZAH", tempoh: "4 Tahun", yuran: "RM 550" }
+            ],
+            mandat: "SASARAN SPM: Kimia (B), Biologi (B), Matematik (B), MUET Band 3."
+        },
+
+        // ========== UNIT ARTISTIK (A) - DARI kerjaya-a.html ==========
+        "PEREKA GRAFIK DIGITAL": {
+            unit: "ARTISTIK (A)",
+            syaratAm: "Warganegara Malaysia.\nLulus SPM dengan mendapat sekurang-kurangnya LIMA (5) Kepujian termasuk Bahasa Melayu.\nLulus Mata Pelajaran Sejarah.",
+            syaratKhas: "Seni Visual / Reka Cipta: Minimum Gred C.\nMatematik: Minimum Gred C.\nBahasa Inggeris: Minimum Gred C.\nPortfolio / Temuduga: Diperlukan untuk kebanyakan IPTA.\nMUET: Minimum Band 2 (untuk program Ijazah).",
+            universiti: [
+                { nama: "UiTM Shah Alam", program: "Diploma Seni Lukis & Grafik", tahap: "DIPLOMA", tempoh: "2.5 Tahun", yuran: "RM 550" },
+                { nama: "UniKL MIIT (Kuala Lumpur)", program: "Diploma Reka Bentuk Digital (Kreatif Multimedia)", tahap: "DIPLOMA", tempoh: "3 Tahun", yuran: "RM 2,800" },
+                { nama: "UTM Skudai (Johor)", program: "Diploma Reka Bentuk Digital", tahap: "DIPLOMA", tempoh: "3 Tahun", yuran: "RM 850" },
+                { nama: "Politeknik Ibrahim Sultan (Pasir Gudang, Johor)", program: "Diploma Reka Bentuk Grafik", tahap: "DIPLOMA", tempoh: "3 Tahun", yuran: "RM 200" },
+                { nama: "Kolej Komuniti (Seluruh Malaysia)", program: "Sijil Reka Bentuk Grafik", tahap: "SIJIL", tempoh: "1.5-2 Tahun", yuran: "RM 200" }
+            ],
+            mandat: "SASARAN SPM: Seni Visual/Reka Cipta (C), Matematik (C), Portfolio."
+        },
+        "PENGARAH SENI": {
+            unit: "ARTISTIK (A)",
+            syaratAm: "Warganegara Malaysia.\nLulus SPM dengan mendapat sekurang-kurangnya LIMA (5) Kepujian termasuk Bahasa Melayu.\nLulus Mata Pelajaran Sejarah.",
+            syaratKhas: "Bahasa Melayu: Minimum Gred C.\nBahasa Inggeris: Minimum Gred C.\nTiga (3) subjek lain: Lulus.\nTemuduga / Ujian Bakat: Diperlukan.\nMUET: Minimum Band 2.",
+            universiti: [
+                { nama: "UiTM Shah Alam", program: "Diploma Seni Kreatif (Filem & Televisyen)", tahap: "DIPLOMA", tempoh: "2.5 Tahun", yuran: "RM 550" },
+                { nama: "UniKL RCMC (Kuala Lumpur)", program: "Diploma Produksi Media", tahap: "DIPLOMA", tempoh: "3 Tahun", yuran: "RM 2,500" },
+                { nama: "ASWARA Kuala Lumpur", program: "Diploma Pengarahan Filem & Televisyen", tahap: "DIPLOMA", tempoh: "3 Tahun", yuran: "RM 1,200" },
+                { nama: "Politeknik Merlimau (Melaka)", program: "Diploma Teknologi Media Digital (Produksi Filem)", tahap: "DIPLOMA", tempoh: "3 Tahun", yuran: "RM 200" }
+            ],
+            mandat: "SASARAN SPM: BM & BI (C), Tiga subjek lain lulus, MUET Band 2."
+        },
+        "PENULIS KREATIF": {
+            unit: "ARTISTIK (A)",
+            syaratAm: "Warganegara Malaysia.\nLulus SPM dengan mendapat sekurang-kurangnya LIMA (5) Kepujian termasuk Bahasa Melayu.\nLulus Mata Pelajaran Sejarah.",
+            syaratKhas: "Bahasa Melayu: Minimum Gred B.\nBahasa Inggeris: Minimum Gred C.\nKesusasteraan Melayu / English Literature: Kelebihan.\nMUET: Minimum Band 2.",
+            universiti: [
+                { nama: "UiTM Shah Alam", program: "Diploma Penulisan Kreatif", tahap: "DIPLOMA", tempoh: "2.5 Tahun", yuran: "RM 550" },
+                { nama: "UM Kuala Lumpur", program: "Ijazah Sarjana Muda Sastera (Kesusasteraan)", tahap: "IJAZAH", tempoh: "4 Tahun", yuran: "RM 1,100" },
+                { nama: "USM Pulau Pinang", program: "Ijazah Sarjana Muda Sastera (Kreatif)", tahap: "IJAZAH", tempoh: "4 Tahun", yuran: "RM 900" },
+                { nama: "Politeknik Seberang Perai (Pulau Pinang)", program: "Diploma Komunikasi Korporat", tahap: "DIPLOMA", tempoh: "3 Tahun", yuran: "RM 200" }
+            ],
+            mandat: "SASARAN SPM: BM (B), English (C), MUET Band 2."
+        },
+        "PEREKA UX/UI": {
+            unit: "ARTISTIK (A)",
+            syaratAm: "Warganegara Malaysia.\nLulus SPM dengan mendapat sekurang-kurangnya LIMA (5) Kepujian termasuk Bahasa Melayu.\nLulus Mata Pelajaran Sejarah.",
+            syaratKhas: "Matematik: Minimum Gred C.\nReka Cipta / Teknologi Maklumat / Sains Komputer: Lulus.\nBahasa Inggeris: Minimum Gred C.\nMUET: Minimum Band 2.",
+            universiti: [
+                { nama: "UTM Skudai (Johor)", program: "Diploma Reka Bentuk Digital (UX/UI)", tahap: "DIPLOMA", tempoh: "3 Tahun", yuran: "RM 850" },
+                { nama: "UiTM Shah Alam", program: "Diploma Seni Lukis & Grafik (Interaksi Digital)", tahap: "DIPLOMA", tempoh: "2.5 Tahun", yuran: "RM 550" },
+                { nama: "UniKL MIIT (Kuala Lumpur)", program: "Diploma Teknologi Multimedia (Reka Bentuk Interaksi)", tahap: "DIPLOMA", tempoh: "3 Tahun", yuran: "RM 2,800" },
+                { nama: "Politeknik Sultan Mizan (Terengganu)", program: "Diploma Teknologi Maklumat (Multimedia)", tahap: "DIPLOMA", tempoh: "3 Tahun", yuran: "RM 200" }
+            ],
+            mandat: "SASARAN SPM: Matematik (C), IT/Reka Cipta lulus, English (C)."
+        },
+        "KOMPOSER MUZIK": {
+            unit: "ARTISTIK (A)",
+            syaratAm: "Warganegara Malaysia.\nLulus SPM dengan mendapat sekurang-kurangnya TIGA (3) Kepujian termasuk Bahasa Melayu.\nLulus Mata Pelajaran Sejarah.",
+            syaratKhas: "TIGA (3) Kepujian dalam mana-mana mata pelajaran termasuk Bahasa Melayu.\nTemuduga & Uji Bakat (wajib di UiTM).\nLulus Bahasa Inggeris, Matematik & Sejarah.\nMUET: Minimum Band 2.",
+            universiti: [
+                { nama: "UiTM Shah Alam", program: "Diploma Muzik", tahap: "DIPLOMA", tempoh: "2.5 Tahun", yuran: "RM 550" },
+                { nama: "UiTM Shah Alam", program: "Diploma Produksi Audio Digital", tahap: "DIPLOMA", tempoh: "2.5 Tahun", yuran: "RM 550" },
+                { nama: "ASWARA Kuala Lumpur", program: "Diploma Muzik (Persembahan / Komposisi)", tahap: "DIPLOMA", tempoh: "3 Tahun", yuran: "RM 1,200" },
+                { nama: "UMS Sabah", program: "Ijazah Sarjana Muda Muzik (Komposisi)", tahap: "IJAZAH", tempoh: "4 Tahun", yuran: "RM 1,000" }
+            ],
+            mandat: "SASARAN SPM: 3 kepujian termasuk BM, Ujian bakat & temuduga WAJIB."
+        },
+        "ARKITEK": {
+            unit: "ARTISTIK (A)",
+            syaratAm: "Warganegara Malaysia.\nLulus SPM dengan mendapat sekurang-kurangnya LIMA (5) Kepujian termasuk Bahasa Melayu.\nLulus Mata Pelajaran Sejarah.",
+            syaratKhas: "Matematik: Minimum Gred C.\nLukisan Kejuruteraan / Reka Cipta / Seni Visual: Kelebihan.\nFizik / Matematik Tambahan: Kelebihan (untuk Ijazah Arkitek).\nMUET: Minimum Band 2.",
+            universiti: [
+                { nama: "UiTM Shah Alam", program: "Diploma Seni Bina", tahap: "DIPLOMA", tempoh: "3 Tahun", yuran: "RM 600" },
+                { nama: "UTM Skudai (Johor)", program: "Diploma Seni Bina", tahap: "DIPLOMA", tempoh: "3 Tahun", yuran: "RM 850" },
+                { nama: "USM Pulau Pinang", program: "Ijazah Sarjana Muda Seni Bina (Laluan Asasi/Matrik)", tahap: "IJAZAH", tempoh: "4 Tahun", yuran: "RM 900" },
+                { nama: "Politeknik Sultan Idris Shah (Selangor)", program: "Diploma Seni Bina", tahap: "DIPLOMA", tempoh: "3 Tahun", yuran: "RM 200" },
+                { nama: "Kolej Komuniti (Seluruh Malaysia)", program: "Diploma Reka Bentuk Dalaman", tahap: "DIPLOMA", tempoh: "3 Tahun", yuran: "RM 200-500" }
+            ],
+            mandat: "SASARAN SPM: Matematik (C), Lukisan Kejuruteraan kelebihan."
+        },
+
+        // ========== UNIT SOSIAL (S) - DARI kerjaya-s.html ==========
+        "GURU": {
+            unit: "SOSIAL (S)",
+            syaratAm: "Warganegara Malaysia.\nLulus SPM dengan mendapat sekurang-kurangnya LIMA (5) Kepujian termasuk Bahasa Melayu.\nLulus Mata Pelajaran Sejarah.\nLulus Ujian Kelayakan Calon Guru (UKCG) dan temuduga.",
+            syaratKhas: "Bahasa Melayu: Minimum Gred A (untuk program Ijazah/Diploma Pendidikan).\nLIMA (5) Kepujian termasuk Bahasa Melayu.\nMUET: Minimum Band 3.\nKepujian dalam bidang pengkhususan.",
+            universiti: [
+                { nama: "IPG (Institut Pendidikan Guru) Seluruh Malaysia", program: "Program Ijazah Sarjana Muda Perguruan (PISMP)", tahap: "IJAZAH", tempoh: "5 Tahun", yuran: "Percuma (Elaun RM430/bulan)" },
+                { nama: "UiTM (Pelbagai Kampus)", program: "Diploma Pendidikan / Ijazah Pendidikan", tahap: "IJAZAH", tempoh: "3-4 Tahun", yuran: "RM 550-1,000" },
+                { nama: "UM Kuala Lumpur", program: "Ijazah Sarjana Muda Pendidikan", tahap: "IJAZAH", tempoh: "4 Tahun", yuran: "RM 1,100" },
+                { nama: "UPSI Tanjung Malim (Perak)", program: "Ijazah Sarjana Muda Pendidikan (Pelbagai Bidang)", tahap: "IJAZAH", tempoh: "4 Tahun", yuran: "RM 800" },
+                { nama: "UUM Sintok (Kedah)", program: "Ijazah Sarjana Muda Pendidikan", tahap: "IJAZAH", tempoh: "4 Tahun", yuran: "RM 700" }
+            ],
+            mandat: "SASARAN SPM: BM (A), MUET Band 3, Lulus UKCG."
+        },
+        "KAUNSELOR": {
+            unit: "SOSIAL (S)",
+            syaratAm: "Warganegara Malaysia.\nLulus SPM dengan mendapat sekurang-kurangnya LIMA (5) Kepujian termasuk Bahasa Melayu.\nLulus Mata Pelajaran Sejarah.",
+            syaratKhas: "Bahasa Melayu: Minimum Gred C.\nBahasa Inggeris: Minimum Gred C.\nLIMA (5) Kepujian termasuk Bahasa Melayu.\nMUET: Minimum Band 2.\nLulus temuduga (untuk program tertentu).",
+            universiti: [
+                { nama: "UM Kuala Lumpur", program: "Asasi Sains (Laluan ke Psikologi)", tahap: "ASASI", tempoh: "1 Tahun", yuran: "RM 800" },
+                { nama: "UKM Bangi (Selangor)", program: "Asasi Sains (Psikologi)", tahap: "ASASI", tempoh: "1 Tahun", yuran: "RM 750" },
+                { nama: "USM Pulau Pinang", program: "Program Matrikulasi (Laluan ke Psikologi)", tahap: "MATRIKULASI", tempoh: "1 Tahun", yuran: "RM 500" },
+                { nama: "UPSI Tanjung Malim (Perak)", program: "Diploma Kaunseling", tahap: "DIPLOMA", tempoh: "3 Tahun", yuran: "RM 650" },
+                { nama: "UiTM Shah Alam", program: "Diploma Psikologi", tahap: "DIPLOMA", tempoh: "3 Tahun", yuran: "RM 550" },
+                { nama: "UUM Sintok (Kedah)", program: "Diploma Psikologi", tahap: "DIPLOMA", tempoh: "3 Tahun", yuran: "RM 520" }
+            ],
+            mandat: "SASARAN SPM: BM (C), English (C), MUET Band 2."
+        },
+        "JURURAWAT": {
+            unit: "SOSIAL (S)",
+            syaratAm: "Warganegara Malaysia.\nLulus SPM dengan mendapat sekurang-kurangnya LIMA (5) Kepujian termasuk Bahasa Melayu.\nLulus Mata Pelajaran Sejarah.\nSihat tubuh badan (tidak buta warna/halangan fizikal).",
+            syaratKhas: "Bahasa Melayu: Minimum Gred C.\nBahasa Inggeris: Minimum Gred C.\nMatematik: Minimum Gred C.\nSains / Biologi: Minimum Gred C (Kelebihan).",
+            universiti: [
+                { nama: "KKM (Kementerian Kesihatan Malaysia) - Kolej/Institut Latihan KKM", program: "Sijil Kejururawatan (Jururawat Pelatih)", tahap: "SIJIL", tempoh: "3 Tahun", yuran: "Percuma + Elaun bulanan RM600-800" },
+                { nama: "UiTM Puncak Alam (Selangor)", program: "Diploma Kejururawatan", tahap: "DIPLOMA", tempoh: "3 Tahun", yuran: "RM 600" },
+                { nama: "USM Kubang Kerian (Kelantan)", program: "Diploma Sains Kesihatan (Kejururawatan)", tahap: "DIPLOMA", tempoh: "3 Tahun", yuran: "RM 1,000" },
+                { nama: "UM Kuala Lumpur", program: "Ijazah Kejururawatan (Laluan Asasi/Matrik/Diploma)", tahap: "IJAZAH", tempoh: "4 Tahun", yuran: "RM 1,200" },
+                { nama: "Politeknik Kesihatan KKM (Seluruh Malaysia)", program: "Diploma Kejururawatan", tahap: "DIPLOMA", tempoh: "3 Tahun", yuran: "Percuma + Elaun" }
+            ],
+            mandat: "SASARAN SPM: BM (C), English (C), Math (C), Sains/Biology (C)."
+        },
+        "PEGAWAI KEBAJIKAN": {
+            unit: "SOSIAL (S)",
+            syaratAm: "Warganegara Malaysia.\nLulus SPM dengan mendapat sekurang-kurangnya LIMA (5) Kepujian termasuk Bahasa Melayu.\nLulus Mata Pelajaran Sejarah.",
+            syaratKhas: "Bahasa Melayu: Minimum Gred C.\nBahasa Inggeris: Minimum Gred C.\nLIMA (5) Kepujian termasuk Bahasa Melayu.\nMUET: Minimum Band 2.\nBerminat dalam kerja sosial/kemanusiaan.",
+            universiti: [
+                { nama: "UUM Sintok (Kedah)", program: "Ijazah Sarjana Muda Kerja Sosial (Laluan Asasi/Diploma)", tahap: "IJAZAH", tempoh: "4 Tahun", yuran: "RM 700" },
+                { nama: "UKM Bangi (Selangor)", program: "Ijazah Sarjana Muda Sains Kemasyarakatan (Kerja Sosial)", tahap: "IJAZAH", tempoh: "4 Tahun", yuran: "RM 1,000" },
+                { nama: "USM Pulau Pinang", program: "Ijazah Sarjana Muda Sains Kemasyarakatan", tahap: "IJAZAH", tempoh: "4 Tahun", yuran: "RM 900" },
+                { nama: "UiTM Shah Alam", program: "Diploma Pentadbiran Kesihatan dan Kerja Sosial", tahap: "DIPLOMA", tempoh: "3 Tahun", yuran: "RM 550" },
+                { nama: "Politeknik (Pelbagai Kampus)", program: "Diploma Kerja Sosial / Pentadbiran Kesihatan", tahap: "DIPLOMA", tempoh: "3 Tahun", yuran: "RM 200" }
+            ],
+            mandat: "SASARAN SPM: 5 Kepujian termasuk BM, MUET Band 2."
+        },
+        "PEGAWAI PR": {
+            unit: "SOSIAL (S)",
+            syaratAm: "Warganegara Malaysia.\nLulus SPM dengan mendapat sekurang-kurangnya LIMA (5) Kepujian termasuk Bahasa Melayu.\nLulus Mata Pelajaran Sejarah.",
+            syaratKhas: "Bahasa Melayu: Minimum Gred C.\nBahasa Inggeris: Minimum Gred C.\nLIMA (5) Kepujian termasuk BM.\nMUET: Minimum Band 2.",
+            universiti: [
+                { nama: "UiTM Shah Alam", program: "Diploma Perhubungan Awam", tahap: "DIPLOMA", tempoh: "3 Tahun", yuran: "RM 550" },
+                { nama: "UUM Sintok (Kedah)", program: "Diploma Komunikasi (Perhubungan Awam)", tahap: "DIPLOMA", tempoh: "3 Tahun", yuran: "RM 520" },
+                { nama: "UM Kuala Lumpur", program: "Ijazah Komunikasi (Perhubungan Awam) - Laluan Asasi/Matrik", tahap: "IJAZAH", tempoh: "4 Tahun", yuran: "RM 1,100" },
+                { nama: "UPM Serdang (Selangor)", program: "Ijazah Komunikasi (Perhubungan Awam)", tahap: "IJAZAH", tempoh: "4 Tahun", yuran: "RM 1,000" },
+                { nama: "Politeknik (Pelbagai Kampus)", program: "Diploma Komunikasi Korporat/PR", tahap: "DIPLOMA", tempoh: "3 Tahun", yuran: "RM 200" }
+            ],
+            mandat: "SASARAN SPM: 5 Kepujian, MUET Band 2."
+        },
+
+        // ========== UNIT ENTERPRISING (E) - DARI kerjaya-e.html ==========
+        "USAHAWAN": {
+            unit: "ENTERPRISING (E)",
+            syaratAm: "Warganegara Malaysia.\nLulus SPM dengan mendapat sekurang-kurangnya TIGA (3) Kepujian termasuk Bahasa Melayu.\nLulus Mata Pelajaran Sejarah.",
+            syaratKhas: "Bahasa Melayu: Minimum Gred C.\nBahasa Inggeris: Minimum Gred C.\nMatematik: Minimum Gred C.\nTIGA (3) Kepujian lain dalam mana-mana subjek.\nMUET: Minimum Band 2 (untuk program Ijazah).",
+            universiti: [
+                { nama: "UiTM Shah Alam", program: "Diploma Keusahawanan / Diploma Pengurusan Perniagaan", tahap: "DIPLOMA", tempoh: "3 Tahun", yuran: "RM 550" },
+                { nama: "UMK Kelantan", program: "Diploma Keusahawanan", tahap: "DIPLOMA", tempoh: "3 Tahun", yuran: "RM 600" },
+                { nama: "UUM Sintok (Kedah)", program: "Diploma Pengurusan Perniagaan", tahap: "DIPLOMA", tempoh: "3 Tahun", yuran: "RM 520" },
+                { nama: "UM Kuala Lumpur", program: "Ijazah Sarjana Muda Keusahawanan (Laluan Asasi/Matrik)", tahap: "IJAZAH", tempoh: "4 Tahun", yuran: "RM 1,100" },
+                { nama: "Politeknik (Pelbagai Kampus)", program: "Diploma Perniagaan / Diploma Keusahawanan", tahap: "DIPLOMA", tempoh: "3 Tahun", yuran: "RM 200" }
+            ],
+            mandat: "SASARAN SPM: 3 Kepujian termasuk BM dan Matematik."
+        },
+        "PENGURUS PEMASARAN": {
+            unit: "ENTERPRISING (E)",
+            syaratAm: "Warganegara Malaysia.\nLulus SPM dengan mendapat sekurang-kurangnya TIGA (3) Kepujian termasuk Bahasa Melayu.\nLulus Mata Pelajaran Sejarah.",
+            syaratKhas: "Bahasa Melayu: Minimum Gred C.\nBahasa Inggeris: Minimum Gred C.\nMatematik / Matematik Perniagaan: Kelebihan.\nMUET: Minimum Band 2.",
+            universiti: [
+                { nama: "UiTM (Pelbagai Kampus)", program: "Diploma Pemasaran / Diploma Pengurusan Pemasaran", tahap: "DIPLOMA", tempoh: "3 Tahun", yuran: "RM 550" },
+                { nama: "UMK Kelantan", program: "Diploma Pemasaran", tahap: "DIPLOMA", tempoh: "3 Tahun", yuran: "RM 600" },
+                { nama: "UUM Sintok (Kedah)", program: "Diploma Pengurusan Pemasaran", tahap: "DIPLOMA", tempoh: "3 Tahun", yuran: "RM 520" },
+                { nama: "UPM Serdang (Selangor)", program: "Ijazah Sarjana Muda Pemasaran (Laluan Asasi/Matrik)", tahap: "IJAZAH", tempoh: "4 Tahun", yuran: "RM 1,000" },
+                { nama: "Politeknik (Pelbagai Kampus)", program: "Diploma Pemasaran", tahap: "DIPLOMA", tempoh: "3 Tahun", yuran: "RM 200" }
+            ],
+            mandat: "SASARAN SPM: 3 Kepujian, Matematik/Perniagaan kelebihan."
+        },
+        "PEGUAM": {
+            unit: "ENTERPRISING (E)",
+            syaratAm: "Warganegara Malaysia.\nLulus SPM dengan mendapat sekurang-kurangnya LIMA (5) Kepujian termasuk Bahasa Melayu.\nLulus Mata Pelajaran Sejarah.\nMUET: Minimum Band 3.",
+            syaratKhas: "Bahasa Melayu: Minimum Gred C.\nBahasa Inggeris: Minimum Gred C.\nSejarah: Wajib lulus.\nLIMA (5) Kepujian termasuk Bahasa Melayu.",
+            universiti: [
+                { nama: "UM Kuala Lumpur", program: "Ijazah Sarjana Muda Undang-Undang (Laluan Asasi/Matrik)", tahap: "IJAZAH", tempoh: "4 Tahun", yuran: "RM 1,300" },
+                { nama: "UKM Bangi (Selangor)", program: "Ijazah Sarjana Muda Undang-Undang", tahap: "IJAZAH", tempoh: "4 Tahun", yuran: "RM 1,200" },
+                { nama: "UiTM Shah Alam", program: "Diploma Undang-Undang (Laluan ke Ijazah)", tahap: "DIPLOMA", tempoh: "3 Tahun", yuran: "RM 550" },
+                { nama: "UUM Sintok (Kedah)", program: "Ijazah Sarjana Muda Undang-Undang", tahap: "IJAZAH", tempoh: "4 Tahun", yuran: "RM 700" },
+                { nama: "UniSZA Terengganu", program: "Ijazah Sarjana Muda Undang-Undang", tahap: "IJAZAH", tempoh: "4 Tahun", yuran: "RM 650" }
+            ],
+            mandat: "SASARAN SPM: 5 Kepujian, MUET Band 3, Lulus Sejarah."
+        },
+        "STRATEGI POLITIK": {
+            unit: "ENTERPRISING (E)",
+            syaratAm: "Warganegara Malaysia.\nLulus SPM dengan mendapat sekurang-kurangnya LIMA (5) Kepujian termasuk Bahasa Melayu.\nLulus Mata Pelajaran Sejarah.",
+            syaratKhas: "Bahasa Melayu: Minimum Gred C.\nBahasa Inggeris: Minimum Gred C.\nSejarah: Wajib lulus.\nMUET: Minimum Band 2.",
+            universiti: [
+                { nama: "UM Kuala Lumpur", program: "Ijazah Sains Sosial (Sains Politik) - Laluan Asasi/Matrik", tahap: "IJAZAH", tempoh: "4 Tahun", yuran: "RM 1,000" },
+                { nama: "UKM Bangi (Selangor)", program: "Ijazah Sains Sosial (Komunikasi Politik)", tahap: "IJAZAH", tempoh: "4 Tahun", yuran: "RM 950" },
+                { nama: "UUM Sintok (Kedah)", program: "Diploma Komunikasi / Ijazah Komunikasi", tahap: "DIPLOMA/IJAZAH", tempoh: "3-4 Tahun", yuran: "RM 520-700" },
+                { nama: "UiTM Shah Alam", program: "Diploma Komunikasi Korporat", tahap: "DIPLOMA", tempoh: "3 Tahun", yuran: "RM 550" },
+                { nama: "Politeknik (Pelbagai Kampus)", program: "Diploma Komunikasi", tahap: "DIPLOMA", tempoh: "3 Tahun", yuran: "RM 200" }
+            ],
+            mandat: "SASARAN SPM: 5 Kepujian, Lulus Sejarah."
+        },
+        "EJEN HARTANAH": {
+            unit: "ENTERPRISING (E)",
+            syaratAm: "Warganegara Malaysia.\nLulus SPM dengan mendapat sekurang-kurangnya TIGA (3) Kepujian termasuk Bahasa Melayu.\nLulus Mata Pelajaran Sejarah.",
+            syaratKhas: "Bahasa Melayu: Minimum Gred C.\nMatematik: Minimum Gred C.\nBahasa Inggeris: Kelebihan.",
+            universiti: [
+                { nama: "UiTM (Pelbagai Kampus)", program: "Diploma Pengurusan Hartanah / Diploma Pentadbiran Perniagaan", tahap: "DIPLOMA", tempoh: "3 Tahun", yuran: "RM 550" },
+                { nama: "UM Kuala Lumpur", program: "Ijazah Sarjana Muda Pentadbiran Perniagaan (Kewangan/Pemasaran)", tahap: "IJAZAH", tempoh: "4 Tahun", yuran: "RM 1,200" },
+                { nama: "UUM Sintok (Kedah)", program: "Diploma Pentadbiran Perniagaan / Ijazah Kewangan", tahap: "DIPLOMA/IJAZAH", tempoh: "3-4 Tahun", yuran: "RM 520-700" },
+                { nama: "Politeknik (Pelbagai Kampus)", program: "Diploma Perniagaan (Pengurusan)", tahap: "DIPLOMA", tempoh: "3 Tahun", yuran: "RM 200" }
+            ],
+            mandat: "SASARAN SPM: 3 Kepujian, Matematik (C)."
+        },
+        "PENGURUS ACARA": {
+            unit: "ENTERPRISING (E)",
+            syaratAm: "Warganegara Malaysia.\nLulus SPM dengan mendapat sekurang-kurangnya TIGA (3) Kepujian termasuk Bahasa Melayu.\nLulus Mata Pelajaran Sejarah.",
+            syaratKhas: "Bahasa Melayu: Minimum Gred C.\nBahasa Inggeris: Minimum Gred C.\nMUET: Minimum Band 2.",
+            universiti: [
+                { nama: "UiTM Shah Alam", program: "Diploma Pengurusan Acara / Diploma Komunikasi Korporat", tahap: "DIPLOMA", tempoh: "3 Tahun", yuran: "RM 550" },
+                { nama: "UMK Kelantan", program: "Diploma Pengurusan Acara", tahap: "DIPLOMA", tempoh: "3 Tahun", yuran: "RM 600" },
+                { nama: "UUM Sintok (Kedah)", program: "Diploma Pengurusan Acara & Pelancongan", tahap: "DIPLOMA", tempoh: "3 Tahun", yuran: "RM 520" },
+                { nama: "Politeknik (Pelbagai Kampus)", program: "Diploma Pengurusan Acara / Diploma Pelancongan", tahap: "DIPLOMA", tempoh: "3 Tahun", yuran: "RM 200" }
+            ],
+            mandat: "SASARAN SPM: 3 Kepujian termasuk BM."
+        },
+
+        // ========== UNIT KONVENSIONAL (K) - DARI kerjaya-k.html ==========
+        "AKAUNTAN": {
+            unit: "KONVENSIONAL (K)",
+            syaratAm: "Warganegara Malaysia.\nLulus SPM dengan mendapat sekurang-kurangnya LIMA (5) Kepujian termasuk Bahasa Melayu.\nLulus Mata Pelajaran Sejarah.",
+            syaratKhas: "Matematik: Minimum Gred A.\nPerdagangan / Ekonomi Asas / Prinsip Perakaunan: Kelebihan.\nBahasa Inggeris: Minimum Gred C.\nMUET: Minimum Band 2.",
+            universiti: [
+                { nama: "UM Kuala Lumpur", program: "Ijazah Sarjana Muda Perakaunan", tahap: "IJAZAH", tempoh: "4 Tahun", yuran: "RM 1,100" },
+                { nama: "UKM Bangi (Selangor)", program: "Ijazah Sarjana Muda Perakaunan", tahap: "IJAZAH", tempoh: "4 Tahun", yuran: "RM 1,000" },
+                { nama: "UiTM Shah Alam", program: "Diploma Perakaunan", tahap: "DIPLOMA", tempoh: "3 Tahun", yuran: "RM 550" },
+                { nama: "UUM Sintok (Kedah)", program: "Diploma Perakaunan / Ijazah Perakaunan", tahap: "DIPLOMA/IJAZAH", tempoh: "3-4 Tahun", yuran: "RM 520-700" },
+                { nama: "Politeknik (Pelbagai Kampus)", program: "Diploma Perakaunan", tahap: "DIPLOMA", tempoh: "3 Tahun", yuran: "RM 200" }
+            ],
+            mandat: "SASARAN SPM: Matematik (A), Perakaunan/Perdagangan (Kepujian), MUET Band 2."
+        },
+        "PEGAWAI PENTADBIRAN": {
+            unit: "KONVENSIONAL (K)",
+            syaratAm: "Warganegara Malaysia.\nLulus SPM dengan mendapat sekurang-kurangnya TIGA (3) Kepujian termasuk Bahasa Melayu.\nLulus Mata Pelajaran Sejarah.",
+            syaratKhas: "Bahasa Melayu: Minimum Gred C.\nMatematik: Minimum Gred C.\nBahasa Inggeris: Minimum Gred C.\nKomputer / Aplikasi Pejabat: Kelebihan.",
+            universiti: [
+                { nama: "UiTM (Pelbagai Kampus)", program: "Diploma Pentadbiran Pejabat / Diploma Pengurusan", tahap: "DIPLOMA", tempoh: "3 Tahun", yuran: "RM 550" },
+                { nama: "UUM Sintok (Kedah)", program: "Diploma Pengurusan / Diploma Pentadbiran Perniagaan", tahap: "DIPLOMA", tempoh: "3 Tahun", yuran: "RM 520" },
+                { nama: "Politeknik (Pelbagai Kampus)", program: "Diploma Pentadbiran Pejabat", tahap: "DIPLOMA", tempoh: "3 Tahun", yuran: "RM 200" },
+                { nama: "Kolej Komuniti (Seluruh Malaysia)", program: "Sijil Pentadbiran Pejabat", tahap: "SIJIL", tempoh: "1.5 Tahun", yuran: "RM 200" }
+            ],
+            mandat: "SASARAN SPM: 3 Kepujian, BM (C), Math (C), English (C)."
+        },
+        "PENGANALISIS DATA": {
+            unit: "KONVENSIONAL (K)",
+            syaratAm: "Warganegara Malaysia.\nLulus SPM dengan mendapat sekurang-kurangnya LIMA (5) Kepujian termasuk Bahasa Melayu.\nLulus Mata Pelajaran Sejarah.",
+            syaratKhas: "Matematik: Minimum Gred C.\nMatematik Tambahan: Kelebihan.\nTeknologi Maklumat / Sains Komputer: Kelebihan.\nMUET: Minimum Band 2.",
+            universiti: [
+                { nama: "UiTM (Pelbagai Kampus)", program: "Diploma Sains Komputer (Teknologi Maklumat)", tahap: "DIPLOMA", tempoh: "3 Tahun", yuran: "RM 550" },
+                { nama: "UUM Sintok (Kedah)", program: "Diploma Teknologi Maklumat", tahap: "DIPLOMA", tempoh: "3 Tahun", yuran: "RM 520" },
+                { nama: "UMPSA Pekan (Pahang)", program: "Diploma Sains Komputer", tahap: "DIPLOMA", tempoh: "3 Tahun", yuran: "RM 800" },
+                { nama: "Politeknik (Pelbagai Kampus)", program: "Diploma Teknologi Maklumat", tahap: "DIPLOMA", tempoh: "3 Tahun", yuran: "RM 200" }
+            ],
+            mandat: "SASARAN SPM: 5 Kepujian, Matematik (C), IT kelebihan."
+        },
+        "PEGAWAI BANK": {
+            unit: "KONVENSIONAL (K)",
+            syaratAm: "Warganegara Malaysia.\nLulus SPM dengan mendapat sekurang-kurangnya LIMA (5) Kepujian termasuk Bahasa Melayu.\nLulus Mata Pelajaran Sejarah.",
+            syaratKhas: "Matematik: Minimum Gred B.\nPrinsip Perakaunan / Perdagangan / Ekonomi: Kelebihan.\nBahasa Inggeris: Minimum Gred C.\nMUET: Minimum Band 2.",
+            universiti: [
+                { nama: "UUM Sintok (Kedah)", program: "Diploma Perbankan & Kewangan", tahap: "DIPLOMA", tempoh: "3 Tahun", yuran: "RM 520" },
+                { nama: "UiTM (Pelbagai Kampus)", program: "Diploma Perbankan / Diploma Kewangan", tahap: "DIPLOMA", tempoh: "3 Tahun", yuran: "RM 550" },
+                { nama: "UM Kuala Lumpur", program: "Ijazah Sarjana Muda Kewangan (Laluan Asasi/Matrik)", tahap: "IJAZAH", tempoh: "4 Tahun", yuran: "RM 1,100" },
+                { nama: "Politeknik (Pelbagai Kampus)", program: "Diploma Kewangan & Perbankan", tahap: "DIPLOMA", tempoh: "3 Tahun", yuran: "RM 200" }
+            ],
+            mandat: "SASARAN SPM: Matematik (B), Perakaunan/Perdagangan kelebihan."
+        },
+        "PENTADBIR HR": {
+            unit: "KONVENSIONAL (K)",
+            syaratAm: "Warganegara Malaysia.\nLulus SPM dengan mendapat sekurang-kurangnya TIGA (3) Kepujian termasuk Bahasa Melayu.\nLulus Mata Pelajaran Sejarah.",
+            syaratKhas: "Bahasa Melayu: Minimum Gred C.\nBahasa Inggeris: Minimum Gred C.\nMatematik: Minimum Gred C.\nMUET: Minimum Band 2.",
+            universiti: [
+                { nama: "UiTM (Pelbagai Kampus)", program: "Diploma Pengurusan Sumber Manusia", tahap: "DIPLOMA", tempoh: "3 Tahun", yuran: "RM 550" },
+                { nama: "UUM Sintok (Kedah)", program: "Diploma Pengurusan Sumber Manusia", tahap: "DIPLOMA", tempoh: "3 Tahun", yuran: "RM 520" },
+                { nama: "UM Kuala Lumpur", program: "Ijazah Sarjana Muda Sumber Manusia (Laluan Asasi/Matrik)", tahap: "IJAZAH", tempoh: "4 Tahun", yuran: "RM 1,000" },
+                { nama: "Politeknik (Pelbagai Kampus)", program: "Diploma Pengurusan Sumber Manusia", tahap: "DIPLOMA", tempoh: "3 Tahun", yuran: "RM 200" }
+            ],
+            mandat: "SASARAN SPM: 3 Kepujian termasuk BM."
+        },
+        "PEGAWAI SOP": {
+            unit: "KONVENSIONAL (K)",
+            syaratAm: "Warganegara Malaysia.\nLulus SPM dengan mendapat sekurang-kurangnya LIMA (5) Kepujian termasuk Bahasa Melayu.\nLulus Mata Pelajaran Sejarah.",
+            syaratKhas: "Bahasa Melayu: Minimum Gred C.\nBahasa Inggeris: Minimum Gred C.\nMatematik: Minimum Gred C.\nMUET: Minimum Band 2.",
+            universiti: [
+                { nama: "UiTM Shah Alam", program: "Diploma Pengurusan Kualiti & Produktiviti", tahap: "DIPLOMA", tempoh: "3 Tahun", yuran: "RM 550" },
+                { nama: "UUM Sintok (Kedah)", program: "Diploma Pentadbiran / Diploma Pengurusan", tahap: "DIPLOMA", tempoh: "3 Tahun", yuran: "RM 520" },
+                { nama: "UM Kuala Lumpur", program: "Ijazah Pentadbiran Perniagaan (Pengurusan)", tahap: "IJAZAH", tempoh: "4 Tahun", yuran: "RM 1,100" },
+                { nama: "Politeknik (Pelbagai Kampus)", program: "Diploma Pengurusan Kualiti", tahap: "DIPLOMA", tempoh: "3 Tahun", yuran: "RM 200" }
+            ],
+            mandat: "SASARAN SPM: 5 Kepujian, BM (C), English (C), Math (C)."
+        }
+    };
+
+    // Fungsi untuk mendapatkan data kerjaya berdasarkan nama kerjaya
+    function getKerjayaData(kerjayaNama) {
+        if (!kerjayaNama) {
+            return {
+                unit: "TIDAK DIKENAL PASTI",
+                syaratAm: "Sila rujuk kaunselor untuk maklumat lanjut.",
+                syaratKhas: "Sila rujuk kaunselor untuk maklumat lanjut.",
+                universiti: [{ nama: "Sila rujuk kaunselor", program: "Maklumat akan dikemaskini", tahap: "-", tempoh: "-", yuran: "-" }],
+                mandat: "SASARAN SPM: Pastikan 5 Kepujian dalam subjek teras."
+            };
+        }
+        
+        // Cari padanan tepat
+        for (let [key, value] of Object.entries(kerjayaDatabase)) {
+            if (kerjayaNama.toUpperCase().includes(key.toUpperCase()) || key.toUpperCase().includes(kerjayaNama.toUpperCase())) {
+                return value;
+            }
+        }
+        
+        // Cari padanan separa untuk kerjaya yang mungkin ditulis berbeza
+        const kerjayaUpper = kerjayaNama.toUpperCase();
+        if (kerjayaUpper.includes("JURUTERA AWAM")) return kerjayaDatabase["JURUTERA AWAM"];
+        if (kerjayaUpper.includes("MEKANIKAL")) return kerjayaDatabase["KEJURUTERAAN MEKANIKAL"];
+        if (kerjayaUpper.includes("ROBOT")) return kerjayaDatabase["PAKAR ROBOTIK"];
+        if (kerjayaUpper.includes("AERO")) return kerjayaDatabase["JURUTERA AEROANGKASA"];
+        if (kerjayaUpper.includes("BIOPER")) return kerjayaDatabase["KEJURUTERAAN BIOPERUBATAN"];
+        if (kerjayaUpper.includes("PERTANIAN")) return kerjayaDatabase["PERTANIAN MODEN"];
+        if (kerjayaUpper.includes("SAINTIS")) return kerjayaDatabase["SAINTIS PENYELIDIK"];
+        if (kerjayaUpper.includes("DOKTOR")) return kerjayaDatabase["DOKTOR PAKAR"];
+        if (kerjayaUpper.includes("DATA")) return kerjayaDatabase["PAKAR ANALISIS DATA"];
+        if (kerjayaUpper.includes("FORENSIK")) return kerjayaDatabase["PAKAR FORENSIK"];
+        if (kerjayaUpper.includes("SIBER")) return kerjayaDatabase["PAKAR KESELAMATAN SIBER"];
+        if (kerjayaUpper.includes("FARMASI")) return kerjayaDatabase["AHLI FARMASI"];
+        if (kerjayaUpper.includes("GRAFIK")) return kerjayaDatabase["PEREKA GRAFIK DIGITAL"];
+        if (kerjayaUpper.includes("PENGARAH")) return kerjayaDatabase["PENGARAH SENI"];
+        if (kerjayaUpper.includes("PENULIS")) return kerjayaDatabase["PENULIS KREATIF"];
+        if (kerjayaUpper.includes("UX") || kerjayaUpper.includes("UI")) return kerjayaDatabase["PEREKA UX/UI"];
+        if (kerjayaUpper.includes("MUZIK") || kerjayaUpper.includes("KOMPOSER")) return kerjayaDatabase["KOMPOSER MUZIK"];
+        if (kerjayaUpper.includes("ARKITEK")) return kerjayaDatabase["ARKITEK"];
+        if (kerjayaUpper.includes("GURU")) return kerjayaDatabase["GURU"];
+        if (kerjayaUpper.includes("KAUNSELOR")) return kerjayaDatabase["KAUNSELOR"];
+        if (kerjayaUpper.includes("JURURAWAT")) return kerjayaDatabase["JURURAWAT"];
+        if (kerjayaUpper.includes("KEBAJIKAN")) return kerjayaDatabase["PEGAWAI KEBAJIKAN"];
+        if (kerjayaUpper.includes("PR") || kerjayaUpper.includes("HUBUNGAN AWAM")) return kerjayaDatabase["PEGAWAI PR"];
+        if (kerjayaUpper.includes("USAHAWAN")) return kerjayaDatabase["USAHAWAN"];
+        if (kerjayaUpper.includes("PEMASARAN")) return kerjayaDatabase["PENGURUS PEMASARAN"];
+        if (kerjayaUpper.includes("PEGUAM")) return kerjayaDatabase["PEGUAM"];
+        if (kerjayaUpper.includes("POLITIK")) return kerjayaDatabase["STRATEGI POLITIK"];
+        if (kerjayaUpper.includes("HARTANAH")) return kerjayaDatabase["EJEN HARTANAH"];
+        if (kerjayaUpper.includes("ACARA")) return kerjayaDatabase["PENGURUS ACARA"];
+        if (kerjayaUpper.includes("AKAUNTAN")) return kerjayaDatabase["AKAUNTAN"];
+        if (kerjayaUpper.includes("PENTADBIRAN")) return kerjayaDatabase["PEGAWAI PENTADBIRAN"];
+        if (kerjayaUpper.includes("PENGANALISIS")) return kerjayaDatabase["PENGANALISIS DATA"];
+        if (kerjayaUpper.includes("BANK")) return kerjayaDatabase["PEGAWAI BANK"];
+        if (kerjayaUpper.includes("HR") || kerjayaUpper.includes("SUMBER MANUSIA")) return kerjayaDatabase["PENTADBIR HR"];
+        if (kerjayaUpper.includes("SOP") || kerjayaUpper.includes("PEMATUHAN")) return kerjayaDatabase["PEGAWAI SOP"];
+        
+        // Default fallback
+        return {
+            unit: kerjayaData.unit || "TIDAK DIKENAL PASTI",
+            syaratAm: kerjayaDatabase["JURUTERA AWAM"]?.syaratAm || "Warganegara Malaysia.\nLulus SPM dengan mendapat sekurang-kurangnya LIMA (5) Kepujian termasuk Bahasa Melayu.\nLulus Mata Pelajaran Sejarah.",
+            syaratKhas: kerjayaDatabase["JURUTERA AWAM"]?.syaratKhas || "Sila rujuk kaunselor untuk maklumat lanjut.",
+            universiti: kerjayaDatabase["JURUTERA AWAM"]?.universiti || [{ nama: "Sila rujuk kaunselor", program: "Maklumat akan dikemaskini", tahap: "-", tempoh: "-", yuran: "-" }],
+            mandat: kerjayaDatabase["JURUTERA AWAM"]?.mandat || "SASARAN SPM: Pastikan 5 Kepujian dalam subjek teras."
+        };
+    }
+
+    function formatSyarat(syarat) {
+        if (!syarat) return '-';
+        return syarat.replace(/\n/g, '<br>');
+    }
+
+    function showToast(message, type = 'success') {
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        toast.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i> ${message}`;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 3000);
+    }
+
+    function formatDate(timestamp) {
+        if (!timestamp) return 'Tarikh tidak tersedia';
+        try {
+            const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+            return date.toLocaleString('ms-MY', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+        } catch(e) {
+            return 'Tarikh tidak sah';
+        }
+    }
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
+
+    async function printFullDiary(order) {
+        const kerjayaData = getKerjayaData(order.kerjayaImpian || "");
+        
+        let universitiRows = '';
+        kerjayaData.universiti.forEach(uni => {
+            universitiRows += `<tr>
+                <td>${escapeHtml(uni.nama)}</td>
+                <td>${escapeHtml(uni.program)}</td>
+                <td>${escapeHtml(uni.tahap)}</td>
+                <td>${escapeHtml(uni.tempoh)}</td>
+                <td>${escapeHtml(uni.yuran)}</td>
+            </tr>`;
+        });
+
+        const diariHTML = `<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Diari Kerjaya - ${escapeHtml(order.nama)}</title>
+            <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700;800&family=Orbitron:wght@400;700&family=Great+Vibes&display=swap" rel="stylesheet">
+            <style>
+                * { margin: 0; padding: 0; box-sizing: border-box; }
+                body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f8fafc; color: #1e293b; }
+                .a4-page {
+                    width: 210mm;
+                    min-height: 296mm;
+                    padding: 15mm;
+                    margin: 0 auto;
+                    background: white;
+                    page-break-after: always;
+                    position: relative;
+                }
+                .a4-page::before {
+                    content: "";
+                    position: absolute;
+                    top: 0; left: 0; width: 100%; height: 8px;
+                    background: linear-gradient(90deg, #38bdf8, #0f172a, #fbbf24);
+                }
+                .page-header { display: flex; justify-content: space-between; border-bottom: 2px solid #f1f5f9; padding-bottom: 10px; margin-bottom: 20px; }
+                .brand-logo { font-family: 'Orbitron', sans-serif; font-weight: 800; font-size: 12px; }
+                .title-block h1 { font-family: 'Orbitron', sans-serif; font-size: 22px; margin-bottom: 5px; }
+                .title-line { width: 50px; height: 3px; background: #38bdf8; margin-bottom: 20px; }
+                .grid-info { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
+                .card { background: #f8fafc; padding: 12px; border-radius: 12px; border: 1px solid #e2e8f0; }
+                .card h4 { font-size: 9px; color: #64748b; text-transform: uppercase; margin-bottom: 5px; }
+                .card p { font-size: 13px; font-weight: 700; }
+                .mandate-highlight { background: #fffbeb; border: 2px solid #fef3c7; padding: 15px; border-radius: 15px; margin-top: 15px; }
+                .uni-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 10px; }
+                .uni-table th { background: #1e293b; color: white; padding: 10px; font-size: 9px; }
+                .uni-table td { border: 1px solid #e2e8f0; padding: 8px; }
+                .quote-wrap { text-align: center; padding: 50px 20px; }
+                .big-quote { font-family: 'Great Vibes', cursive; font-size: 40px; color: #1e293b; }
+                .author { font-family: 'Orbitron', sans-serif; letter-spacing: 2px; color: #38bdf8; margin-top: 10px; }
+                .tracker-table, .schedule-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+                .tracker-table th, .schedule-table th { background: #1e293b; color: white; padding: 10px; font-size: 9px; }
+                .tracker-table td, .schedule-table td { border: 1px solid #cbd5e1; padding: 8px; text-align: center; height: 60px; }
+                @media print {
+                    body { background: white; }
+                    .a4-page { margin: 0; box-shadow: none; page-break-after: always; }
+                }
+            </style>
+        </head>
+        <body>
+            <div class="a4-page">
+                <div class="page-header"><div class="brand-logo">SEMSIRA / 2026</div><div>P.01</div></div>
+                <div class="title-block"><h1>Profil & Matlamat</h1><div class="title-line"></div></div>
+                <div class="grid-info">
+                    <div class="card"><h4>Nama Calon</h4><p>${escapeHtml(order.nama)}</p></div>
+                    <div class="card"><h4>Dominasi RIASEC</h4><p>${escapeHtml(kerjayaData.unit)}</p></div>
+                </div>
+                <div class="card" style="margin-bottom: 15px;">
+                    <h4>Kerjaya Impian Utama</h4>
+                    <p style="font-size: 16px; color: #0369a1; font-weight: bold;">${escapeHtml(order.kerjayaImpian || 'Tidak dipilih')}</p>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div class="card"><h4>Syarat Am</h4><div style="font-size: 11px; line-height: 1.5;">${formatSyarat(kerjayaData.syaratAm)}</div></div>
+                    <div class="card"><h4>Syarat Khas</h4><div style="font-size: 11px; line-height: 1.5;">${formatSyarat(kerjayaData.syaratKhas)}</div></div>
+                </div>
+                <div class="mandate-highlight">
+                    <h5 style="color: #b45309; font-size: 11px;"><i class="fas fa-award"></i> MANDAT AKADEMIK (SASARAN SUBJEK SPM)</h5>
+                    <div style="font-size: 12px; font-weight: 600;">${escapeHtml(kerjayaData.mandat)}</div>
+                </div>
+            </div>
+            
+            <div class="a4-page">
+                <div class="page-header"><div class="brand-logo">SEMSIRA / 2026</div><div>P.02</div></div>
+                <div class="title-block"><h1>Destinasi Pendidikan</h1><div class="title-line"></div></div>
+                <div class="card">
+                    <h4>Senarai Institusi & Program Pengajian</h4>
+                    <table class="uni-table">
+                        <thead><tr><th>Institusi & Lokasi</th><th>Program Pengajian</th><th>Tahap</th><th>Tempoh</th><th>Yuran/Sem</th></tr></thead>
+                        <tbody>${universitiRows}</tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="a4-page">
+                <div class="page-header"><div class="brand-logo">SEMSIRA / 2026</div><div>P.03</div></div>
+                <div class="title-block"><h1>Tracker Prestasi</h1><div class="title-line"></div></div>
+                <table class="tracker-table">
+                    <thead><tr><th>UJIAN</th><th>BM</th><th>BI</th><th>SEJ</th><th>MATE</th><th>ELEKTIF 1</th><th>ELEKTIF 2</th></tr></thead>
+                    <tbody>
+                        <tr><td><strong>UJIAN 1</strong></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                        <tr><td><strong>UJIAN 2</strong></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                        <tr><td><strong>UJIAN 3</strong></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="a4-page">
+                <div class="page-header"><div class="brand-logo">SEMSIRA / 2026</div><div>P.04</div></div>
+                <div class="title-block"><h1>Jadual Perancangan</h1><div class="title-line"></div></div>
+                <table class="schedule-table">
+                    <thead><tr><th>WAKTU</th><th>ISNIN</th><th>SELASA</th><th>RABU</th><th>KHAMIS</th><th>JUMAAT</th><th>SABTU</th><th>AHAD</th></tr></thead>
+                    <tbody>
+                        <tr><td><strong>PAGI</strong></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                        <tr><td><strong>PETANG</strong></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                        <tr><td><strong>MALAM</strong></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="a4-page">
+                <div class="quote-wrap">
+                    <p class="big-quote">"Masa depan adalah milik mereka yang percaya pada keindahan impian mereka."</p>
+                    <p class="author">— Eleanor Roosevelt —</p>
+                    <div style="margin-top: 30px; color: #64748b; font-size: 14px;">
+                        Teruskan berjuang, calon <b>${escapeHtml(order.kerjayaImpian || 'kecemerlangan')}</b>!
+                    </div>
+                </div>
+            </div>
+        </body>
+        </html>`;
+        
+        const printWindow = window.open('', '_blank');
+        printWindow.document.write(diariHTML);
+        printWindow.document.close();
+        printWindow.onload = () => { printWindow.print(); };
+    }
+
+    async function completeOrder(orderId) {
+        if (!confirm('Pastikan pelajar sudah menerima diari fizikal. Tandakan sebagai SELESAI dan hapuskan tempahan ini?')) return;
+        try {
+            await db.collection('tempahanDiari').doc(orderId).delete();
+            showToast('✅ Tempahan telah diselesaikan!', 'success');
+            loadOrders();
+        } catch (error) {
+            showToast('❌ Gagal menyelesaikan tempahan.', 'error');
+        }
+    }
+
+    function displayOrders(orders) {
+        const container = document.getElementById('ordersContainer');
+        if (!orders || orders.length === 0) {
+            container.innerHTML = `<div class="empty-state"><i class="fas fa-inbox" style="font-size: 3rem;"></i><p>Tiada tempahan diari buat masa ini.</p></div>`;
+            document.getElementById('totalMenunggu').innerText = '0';
+            document.getElementById('totalKeseluruhan').innerText = '0';
+            return;
+        }
+        
+        document.getElementById('totalKeseluruhan').innerText = orders.length;
+        document.getElementById('totalMenunggu').innerText = orders.length;
+        
+        container.innerHTML = `<div class="orders-grid">${orders.map(order => `
+            <div class="order-card">
+                <div class="order-status"><i class="fas fa-hourglass-half"></i> MENUNGGU</div>
+                <div class="order-header">
+                    <i class="fas fa-user-graduate"></i>
+                    <div>
+                        <h3>${escapeHtml(order.nama)}</h3>
+                        <p style="font-size: 0.7rem; color: #64748b;">ID: ${order.receiptNo || order.id.slice(-8)}</p>
+                    </div>
+                </div>
+                <div class="order-details">
+                    <div class="detail-row"><span><i class="fas fa-school"></i> Kelas:</span><span>${escapeHtml(order.kelas)}</span></div>
+                    <div class="detail-row"><span><i class="fas fa-phone"></i> No. Telefon:</span><span>${escapeHtml(order.telefon)}</span></div>
+                    <div class="detail-row"><span><i class="fas fa-calendar"></i> Tarikh Tempah:</span><span>${order.tarikhDisplay || formatDate(order.tarikh)}</span></div>
+                    <div class="detail-row"><span><i class="fas fa-briefcase"></i> Kerjaya Impian:</span><span>${escapeHtml(order.kerjayaImpian || '-')}</span></div>
+                </div>
+                <div class="order-actions">
+                    <button class="btn-print" onclick="printFullDiaryWindow('${order.id}')"><i class="fas fa-print"></i> Cetak Diari</button>
+                    <button class="btn-done" onclick="completeOrderWindow('${order.id}')"><i class="fas fa-check"></i> Selesai</button>
+                </div>
+            </div>
+        `).join('')}</div>`;
+    }
+
+    window.printFullDiaryWindow = function(orderId) {
+        const order = allOrders.find(o => o.id === orderId);
+        if (order) printFullDiary(order);
+    };
+    window.completeOrderWindow = completeOrder;
+
+    function filterOrders(searchTerm) {
+        if (!searchTerm.trim()) { displayOrders(allOrders); return; }
+        const term = searchTerm.toLowerCase();
+        const filtered = allOrders.filter(order => 
+            order.nama?.toLowerCase().includes(term) || order.kelas?.toLowerCase().includes(term));
+        displayOrders(filtered);
+    }
+
+    function updateSuggestions(searchTerm) {
+        const suggestionsDiv = document.getElementById('suggestionsList');
+        if (!searchTerm.trim()) { suggestionsDiv.style.display = 'none'; return; }
+        const term = searchTerm.toLowerCase();
+        const matches = allOrders.filter(order => 
+            order.nama?.toLowerCase().includes(term) || order.kelas?.toLowerCase().includes(term)).slice(0, 8);
+        if (matches.length === 0) { suggestionsDiv.style.display = 'none'; return; }
+        suggestionsDiv.innerHTML = matches.map(match => `
+            <div onclick="selectSuggestion('${match.id}')">
+                <div class="suggestion-name">${escapeHtml(match.nama)}</div>
+                <div class="suggestion-detail">${escapeHtml(match.kelas)} • ${escapeHtml(match.kerjayaImpian || 'Tiada kerjaya')}</div>
+            </div>
+        `).join('');
+        suggestionsDiv.style.display = 'block';
+    }
+
+    window.selectSuggestion = function(orderId) {
+        const order = allOrders.find(o => o.id === orderId);
+        if (order) {
+            document.getElementById('searchInput').value = order.nama;
+            document.getElementById('suggestionsList').style.display = 'none';
+            filterOrders(order.nama);
+        }
+    };
+
+    function loadOrders() {
+        const container = document.getElementById('ordersContainer');
+        container.innerHTML = `<div class="loading-state"><i class="fas fa-spinner fa-spin"></i><p>Memuatkan tempahan diari...</p></div>`;
+        db.collection('tempahanDiari').orderBy('tarikh', 'desc').get().then((snapshot) => {
+            allOrders = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            displayOrders(allOrders);
+        }).catch((error) => {
+            console.error("Error loading orders:", error);
+            container.innerHTML = `<div class="empty-state"><i class="fas fa-exclamation-triangle"></i><p>Gagal memuatkan data.</p></div>`;
+        });
+    }
+
+    document.getElementById('searchInput').addEventListener('input', (e) => {
+        updateSuggestions(e.target.value);
+        filterOrders(e.target.value);
+    });
+    document.addEventListener('click', function(e) {
+        const wrapper = document.querySelector('.search-wrapper');
+        if (wrapper && !wrapper.contains(e.target)) {
+            document.getElementById('suggestionsList').style.display = 'none';
+        }
+    });
+    document.getElementById('refreshBtn').addEventListener('click', () => loadOrders());
+    
+    loadOrders();
+</script>
+</body>
+</html>

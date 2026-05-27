@@ -94,20 +94,9 @@
             padding: 0.5rem 1rem;
             border-radius: 2rem;
         }
-        .settings-item i {
-            font-size: 1.1rem;
-            color: #2563eb;
-        }
-        .settings-item .label {
-            font-weight: 600;
-            color: #64748b;
-            font-size: 0.8rem;
-        }
-        .settings-item .value {
-            font-weight: 700;
-            color: #1e293b;
-            font-size: 0.9rem;
-        }
+        .settings-item i { font-size: 1.1rem; color: #2563eb; }
+        .settings-item .label { font-weight: 600; color: #64748b; font-size: 0.8rem; }
+        .settings-item .value { font-weight: 700; color: #1e293b; font-size: 0.9rem; }
         .edit-class-btn {
             background: #e0e7ff;
             border: none;
@@ -122,10 +111,7 @@
             gap: 6px;
             font-size: 0.8rem;
         }
-        .edit-class-btn:hover {
-            background: #2563eb;
-            color: white;
-        }
+        .edit-class-btn:hover { background: #2563eb; color: white; }
         
         .stats {
             background: white;
@@ -204,7 +190,7 @@
         /* Student Cards Grid */
         .students-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
             gap: 1.2rem;
         }
         .student-card {
@@ -225,18 +211,8 @@
             color: white;
             position: relative;
         }
-        .student-card-header h3 {
-            font-size: 1rem;
-            font-weight: 600;
-            margin-bottom: 0.3rem;
-        }
-        .student-card-header .ic {
-            font-size: 0.7rem;
-            opacity: 0.9;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
+        .student-card-header h3 { font-size: 1rem; font-weight: 600; margin-bottom: 0.3rem; }
+        .student-card-header .ic { font-size: 0.7rem; opacity: 0.9; display: flex; align-items: center; gap: 5px; }
         .merit-badge {
             position: absolute;
             top: 1rem;
@@ -249,12 +225,8 @@
         }
         .merit-positive { background: rgba(16,185,129,0.2); color: #10b981; }
         .merit-negative { background: rgba(220,38,38,0.2); color: #dc2626; }
-        .student-card-body {
-            padding: 1rem;
-        }
-        .student-details {
-            margin-bottom: 1rem;
-        }
+        .student-card-body { padding: 1rem; }
+        .student-details { margin-bottom: 1rem; }
         .detail-row {
             display: flex;
             justify-content: space-between;
@@ -262,13 +234,8 @@
             font-size: 0.8rem;
             border-bottom: 1px solid #f1f5f9;
         }
-        .detail-row span:first-child {
-            color: #64748b;
-        }
-        .detail-row span:last-child {
-            font-weight: 600;
-            color: #1e293b;
-        }
+        .detail-row span:first-child { color: #64748b; }
+        .detail-row span:last-child { font-weight: 600; color: #1e293b; }
         .card-actions {
             display: flex;
             gap: 0.5rem;
@@ -401,6 +368,35 @@
         .alert.success { background: #dcfce7; color: #166534; display: block; }
         .alert.error { background: #fee2e2; color: #dc2626; display: block; }
         .alert.info { background: #dbeafe; color: #1e40af; display: block; }
+        
+        /* Delete confirmation modal */
+        .confirm-delete {
+            max-width: 400px;
+        }
+        .confirm-delete .warning-icon {
+            font-size: 3rem;
+            color: #dc2626;
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+        .confirm-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+        .btn-confirm {
+            flex: 1;
+            padding: 0.8rem;
+            border-radius: 2rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: 0.2s;
+        }
+        .btn-confirm-yes { background: #dc2626; color: white; }
+        .btn-confirm-yes:hover { background: #b91c1c; }
+        .btn-confirm-no { background: #e2e8f0; color: #1e293b; }
+        .btn-confirm-no:hover { background: #cbd5e1; }
         
         @media (max-width: 700px) {
             .students-grid { grid-template-columns: 1fr; }
@@ -587,6 +583,10 @@
     let allMeritRecords = [];
     let searchTerm = '';
     
+    // Store current student to delete
+    let pendingDeleteId = null;
+    let pendingDeleteName = null;
+    
     function showAlert(msg, type) {
         const alertDiv = document.getElementById('alertMessage');
         alertDiv.textContent = msg;
@@ -601,13 +601,11 @@
     
     async function loadAllData() {
         try {
-            // Load students for current class & year
             let q = query(studentsCollection, where("class", "==", currentClass), where("session", "==", currentYear));
             const studentsSnap = await getDocs(q);
             studentsList = [];
             studentsSnap.forEach(doc => studentsList.push({ id: doc.id, ...doc.data() }));
             
-            // Load all merit records (for current students only)
             const meritSnap = await getDocs(meritCollection);
             allMeritRecords = [];
             meritSnap.forEach(doc => {
@@ -647,6 +645,98 @@
         return records.reduce((sum, r) => sum + (r.points || 0), 0);
     }
     
+    // ==================== DELETE STUDENT - FULL DELETE FROM FIRESTORE ====================
+    async function executeDeleteStudent(id, name) {
+        try {
+            // Step 1: Find all merit records for this student
+            const studentMeritRecords = allMeritRecords.filter(r => r.studentId === id);
+            
+            // Step 2: Delete each merit record from Firestore
+            for (const record of studentMeritRecords) {
+                await deleteDoc(doc(db, "merit_records", record.id));
+                console.log(`Deleted merit record: ${record.id}`);
+            }
+            
+            // Step 3: Delete the student document from Firestore
+            await deleteDoc(doc(db, "students", id));
+            console.log(`Deleted student: ${id} (${name})`);
+            
+            // Step 4: Update local arrays
+            allMeritRecords = allMeritRecords.filter(r => r.studentId !== id);
+            studentsList = studentsList.filter(s => s.id !== id);
+            
+            // Step 5: Update UI
+            updateStats();
+            renderStudents();
+            
+            showAlert(`✅ Pelajar "${name}" dan ${studentMeritRecords.length} rekod merit telah dipadam sepenuhnya dari sistem.`, 'success');
+        } catch(e) {
+            console.error("Delete error:", e);
+            showAlert('❌ Gagal memadam pelajar. Sila cuba lagi.', 'error');
+        }
+    }
+    
+    // Show confirmation modal before delete
+    function confirmDeleteStudent(id, name) {
+        pendingDeleteId = id;
+        pendingDeleteName = name;
+        
+        // Get student merit count
+        const meritCount = allMeritRecords.filter(r => r.studentId === id).length;
+        
+        const modalHtml = `
+            <div id="confirmDeleteModal" class="modal">
+                <div class="modal-content confirm-delete">
+                    <div class="modal-header">
+                        <h3><i class="fas fa-trash-alt"></i> Sahkan Pemadaman</h3>
+                        <button class="modal-close" onclick="closeConfirmModal()">&times;</button>
+                    </div>
+                    <div class="modal-body" style="text-align:center;">
+                        <div class="warning-icon">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <p style="font-size:1rem; font-weight:600; margin-bottom:0.5rem;">Padam Pelajar: <strong style="color:#dc2626;">${escapeHtml(name)}</strong></p>
+                        <p style="font-size:0.85rem; color:#64748b; margin-bottom:1rem;">No. IC: ${escapeHtml(studentsList.find(s => s.id === id)?.icNumber || '-')}</p>
+                        <div style="background:#fee2e2; padding:0.8rem; border-radius:0.8rem; margin:1rem 0;">
+                            <p style="color:#dc2626; font-size:0.8rem;">
+                                <i class="fas fa-database"></i> Tindakan ini akan memadam:
+                            </p>
+                            <p style="color:#1e293b; font-size:0.8rem; margin-top:0.3rem;">
+                                • 1 rekod pelajar<br>
+                                • ${meritCount} rekod merit
+                            </p>
+                        </div>
+                        <p style="color:#dc2626; font-size:0.7rem; font-weight:600;">
+                            ⚠️ Tindakan ini TIDAK BOLEH DIBATALKAN!
+                        </p>
+                        <div class="confirm-buttons">
+                            <button class="btn-confirm btn-confirm-no" onclick="closeConfirmModal()">Batal</button>
+                            <button class="btn-confirm btn-confirm-yes" onclick="proceedDelete()">Ya, Padam</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+    }
+    
+    window.closeConfirmModal = function() {
+        const modal = document.getElementById('confirmDeleteModal');
+        if (modal) modal.remove();
+        pendingDeleteId = null;
+        pendingDeleteName = null;
+    };
+    
+    window.proceedDelete = function() {
+        if (pendingDeleteId) {
+            executeDeleteStudent(pendingDeleteId, pendingDeleteName);
+            closeConfirmModal();
+        }
+    };
+    
+    // Make delete function available globally
+    window.deleteStudent = confirmDeleteStudent;
+    
     function renderStudents() {
         const container = document.getElementById('studentsContainer');
         let filtered = studentsList;
@@ -673,7 +763,7 @@
             const meritColor = totalMerit >= 0 ? '#10b981' : '#dc2626';
             
             html += `
-                <div class="student-card">
+                <div class="student-card" data-id="${student.id}">
                     <div class="student-card-header">
                         <h3>${escapeHtml(student.fullname)}</h3>
                         <div class="ic"><i class="fas fa-id-card"></i> ${escapeHtml(student.icNumber)}</div>
@@ -707,28 +797,58 @@
         container.innerHTML = html;
     }
     
-    // ==================== STUDENT CRUD ====================
-    async function deleteStudent(id, name) {
-        if (confirm(`⚠️ PERHATIAN!\n\nAnda akan memadam pelajar "${name}" dan SEMUA rekod merit pelajar ini.\n\nTindakan ini TIDAK BOLEH DIBATALKAN.\n\nAdakah anda pasti?`)) {
-            try {
-                const studentMeritRecords = allMeritRecords.filter(r => r.studentId === id);
-                for (const record of studentMeritRecords) {
-                    await deleteDoc(doc(db, "merit_records", record.id));
-                }
-                await deleteDoc(doc(db, "students", id));
-                
-                allMeritRecords = allMeritRecords.filter(r => r.studentId !== id);
-                studentsList = studentsList.filter(s => s.id !== id);
-                
-                showAlert(`✅ Pelajar "${name}" dan ${studentMeritRecords.length} rekod merit telah dipadam.`, 'success');
-                updateStats();
-                renderStudents();
-            } catch(e) {
-                showAlert('❌ Gagal memadam pelajar', 'error');
+    // ==================== VIEW STUDENT MERIT ====================
+    window.viewStudentMerit = async function(studentId) {
+        const student = studentsList.find(s => s.id === studentId);
+        if (!student) return;
+        
+        const total = getStudentTotalMerit(studentId);
+        const studentRecords = allMeritRecords.filter(r => r.studentId === studentId).sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
+        
+        let meritHtml = '';
+        if (studentRecords.length === 0) {
+            meritHtml = '<p style="text-align:center; color:#94a3b8;"><i class="fas fa-info-circle"></i> Tiada rekod merit</p>';
+        } else {
+            for (const record of studentRecords) {
+                const isPositive = record.type === 'positive';
+                const pointClass = isPositive ? 'merit-positive' : 'merit-negative';
+                const pointSymbol = isPositive ? '+' : '';
+                meritHtml += `
+                    <div style="background:#f8fafc; border-radius:0.8rem; padding:0.8rem; margin-bottom:0.5rem; border-left:4px solid ${isPositive ? '#10b981' : '#dc2626'}">
+                        <div style="display:flex; justify-content:space-between;">
+                            <span class="${pointClass}" style="font-weight:700;">${pointSymbol}${record.points} markah</span>
+                            <span style="font-size:0.7rem; color:#94a3b8;">${new Date(record.createdAt).toLocaleDateString('ms-MY')}</span>
+                        </div>
+                        <div style="font-size:0.8rem; margin-top:0.3rem;">${escapeHtml(record.description)}</div>
+                        <div style="font-size:0.7rem; color:#64748b; margin-top:0.3rem;"><i class="fas fa-user-check"></i> ${escapeHtml(record.createdBy || 'Guru')}</div>
+                    </div>
+                `;
             }
         }
-    }
+        
+        const modalHtml = `
+            <div id="meritModal" class="modal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3><i class="fas fa-star"></i> Rekod Merit - ${escapeHtml(student.fullname)}</h3>
+                        <button class="modal-close" onclick="document.getElementById('meritModal').remove()">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <div style="background:linear-gradient(135deg,#2563eb,#7c3aed); color:white; border-radius:1rem; padding:1rem; margin-bottom:1rem;">
+                            <p><i class="fas fa-id-card"></i> ${escapeHtml(student.icNumber)}</p>
+                            <p><i class="fas fa-school"></i> ${escapeHtml(student.class)} (${student.session})</p>
+                            <h2 style="margin-top:0.5rem;">${total} <span style="font-size:0.9rem;">Jumlah Merit</span></h2>
+                        </div>
+                        <h4><i class="fas fa-list-alt"></i> Senarai Transaksi</h4>
+                        <div id="meritListContainer">${meritHtml}</div>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+    };
     
+    // ==================== STUDENT CRUD ====================
     function openAddStudentModal() {
         document.getElementById('modalTitle').innerHTML = '<i class="fas fa-user-plus"></i> Tambah Pelajar Baru';
         document.getElementById('studentId').value = '';
@@ -771,6 +891,8 @@
                     updatedAt: new Date().toISOString() 
                 });
                 showAlert('✅ Maklumat pelajar dikemaskini!', 'success');
+                closeStudentModal();
+                await loadAllData();
             } else {
                 const q = query(studentsCollection, where("icNumber", "==", icNumber));
                 const snapshot = await getDocs(q);
@@ -783,64 +905,14 @@
                     createdAt: new Date().toISOString() 
                 });
                 showAlert('✅ Pelajar baru ditambah!', 'success');
+                closeStudentModal();
+                await loadAllData();
             }
-            closeStudentModal();
-            await loadAllData();
         } catch(e) { 
+            console.error(e);
             showAlert('❌ Gagal menyimpan', 'error'); 
         }
     });
-    
-    // ==================== VIEW STUDENT MERIT ====================
-    window.viewStudentMerit = async function(studentId) {
-        const student = studentsList.find(s => s.id === studentId);
-        if (!student) return;
-        
-        const total = getStudentTotalMerit(studentId);
-        const studentRecords = allMeritRecords.filter(r => r.studentId === studentId).sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
-        
-        let meritHtml = '';
-        if (studentRecords.length === 0) {
-            meritHtml = '<p style="text-align:center; color:#94a3b8;"><i class="fas fa-info-circle"></i> Tiada rekod merit</p>';
-        } else {
-            for (const record of studentRecords) {
-                const isPositive = record.type === 'positive';
-                const pointClass = isPositive ? 'merit-positive' : 'merit-negative';
-                const pointSymbol = isPositive ? '+' : '';
-                meritHtml += `
-                    <div style="background:#f8fafc; border-radius:0.8rem; padding:0.8rem; margin-bottom:0.5rem; border-left:4px solid ${isPositive ? '#10b981' : '#dc2626'}">
-                        <div style="display:flex; justify-content:space-between;">
-                            <span class="${pointClass}" style="font-weight:700;">${pointSymbol}${record.points} markah</span>
-                            <span style="font-size:0.7rem; color:#94a3b8;">${new Date(record.createdAt).toLocaleDateString('ms-MY')}</span>
-                        </div>
-                        <div style="font-size:0.8rem; margin-top:0.3rem;">${escapeHtml(record.description)}</div>
-                        <div style="font-size:0.7rem; color:#64748b; margin-top:0.3rem;"><i class="fas fa-user-check"></i> ${escapeHtml(record.createdBy || 'Guru')}</div>
-                    </div>
-                `;
-            }
-        }
-        
-        const modalHtml = `
-            <div id="meritModal" class="modal">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h3><i class="fas fa-star"></i> Rekod Merit - ${escapeHtml(student.fullname)}</h3>
-                        <button class="modal-close" onclick="document.getElementById('meritModal').remove()">&times;</button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="profile-section" style="background:linear-gradient(135deg,#2563eb,#7c3aed); color:white; border-radius:1rem; padding:1rem; margin-bottom:1rem;">
-                            <p><i class="fas fa-id-card"></i> ${escapeHtml(student.icNumber)}</p>
-                            <p><i class="fas fa-school"></i> ${escapeHtml(student.class)} (${student.session})</p>
-                            <h2 style="margin-top:0.5rem;">${total} <span style="font-size:0.9rem;">Jumlah Merit</span></h2>
-                        </div>
-                        <h4><i class="fas fa-list-alt"></i> Senarai Transaksi</h4>
-                        <div id="meritListContainer">${meritHtml}</div>
-                    </div>
-                </div>
-            </div>
-        `;
-        document.body.insertAdjacentHTML('beforeend', modalHtml);
-    };
     
     // ==================== CLASS & YEAR MANAGEMENT ====================
     document.getElementById('editClassYearBtn').addEventListener('click', () => {
@@ -887,7 +959,6 @@
             try {
                 let copied = 0;
                 for (const student of studentsList) {
-                    // Check if student already exists in target class/year
                     const q = query(studentsCollection, 
                         where("icNumber", "==", student.icNumber),
                         where("class", "==", targetClass),

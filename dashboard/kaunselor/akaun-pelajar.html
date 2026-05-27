@@ -7,403 +7,6 @@
   <!-- Fonts & Icons -->
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <!-- Firebase SDK -->
-  <script type="module">
-    // Import Firebase SDK
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-    
-    // Firebase configuration
-    const firebaseConfig = {
-      apiKey: "AIzaSyCfu7XC8pXtpDyQ-9Cjdg4AobA-EVEwWcc",
-      authDomain: "e-mindcare.firebaseapp.com",
-      projectId: "e-mindcare",
-      storageBucket: "e-mindcare.firebasestorage.app",
-      messagingSenderId: "1021883944936",
-      appId: "1:1021883944936:web:39c75a0c98d19a37afde5d",
-      measurementId: "G-3CJVKWGEXV"
-    };
-
-    // Initialize Firebase
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    const studentsCollection = collection(db, "students");
-
-    // ==================== GLOBAL FUNCTIONS ====================
-    window.students = [];
-    
-    // Load students from Firestore
-    window.loadStudents = async function() {
-      try {
-        const querySnapshot = await getDocs(studentsCollection);
-        window.students = [];
-        querySnapshot.forEach((doc) => {
-          window.students.push({
-            id: doc.id,
-            ...doc.data()
-          });
-        });
-        window.updateClassFilter();
-        window.renderStudentList();
-        window.updateTotalCount();
-        console.log("Students loaded from Firebase:", window.students.length);
-      } catch (error) {
-        console.error("Error loading students:", error);
-        window.showMessage("Gagal memuat data dari Firebase. Sila semak sambungan internet.", "error");
-      }
-    };
-
-    // Add student to Firestore
-    window.addStudentToFirebase = async function(fullname, icNumber, className, session) {
-      try {
-        // Check if IC already exists
-        const q = query(studentsCollection, where("icNumber", "==", icNumber));
-        const querySnapshot = await getDocs(q);
-        
-        if (!querySnapshot.empty) {
-          const existing = querySnapshot.docs[0];
-          return { success: false, message: `No. IC ${icNumber} sudah wujud untuk ${existing.data().fullname}` };
-        }
-        
-        const newStudent = {
-          fullname: fullname.trim(),
-          icNumber: icNumber.trim(),
-          class: className.trim() || "-",
-          session: session.trim() || "2026",
-          createdAt: new Date().toISOString()
-        };
-        
-        const docRef = await addDoc(studentsCollection, newStudent);
-        window.students.push({
-          id: docRef.id,
-          ...newStudent
-        });
-        
-        // Save credentials for login
-        await window.saveStudentCredentials();
-        
-        window.renderStudentList();
-        window.updateTotalCount();
-        window.updateClassFilter();
-        
-        return { success: true, student: newStudent };
-      } catch (error) {
-        console.error("Error adding student:", error);
-        return { success: false, message: "Ralat Firebase: " + error.message };
-      }
-    };
-
-    // Delete student from Firestore
-    window.deleteStudentFromFirebase = async function(id) {
-      if (!confirm("Padam pelajar ini? Pelajar tidak akan dapat login lagi.")) return;
-      
-      try {
-        await deleteDoc(doc(db, "students", id));
-        window.students = window.students.filter(s => s.id !== id);
-        await window.saveStudentCredentials();
-        window.renderStudentList();
-        window.updateTotalCount();
-        window.updateClassFilter();
-        window.showMessage("Pelajar berjaya dipadam.", "success");
-      } catch (error) {
-        console.error("Error deleting student:", error);
-        window.showMessage("Gagal memadam pelajar: " + error.message, "error");
-      }
-    };
-
-    // Edit ALL student fields in Firestore (Nama, IC, Kelas, Tahun)
-    window.editStudentFullInFirebase = async function(id, newFullname, newIcNumber, newClass, newSession) {
-      try {
-        // Jika No. IC berubah, semak sama ada IC baru sudah wujud untuk pelajar lain
-        if (newIcNumber) {
-          const q = query(studentsCollection, where("icNumber", "==", newIcNumber));
-          const querySnapshot = await getDocs(q);
-          // Cari jika ada dokumen lain dengan IC yang sama (bukan dokumen ini)
-          let icExists = false;
-          querySnapshot.forEach((docSnap) => {
-            if (docSnap.id !== id) {
-              icExists = true;
-            }
-          });
-          if (icExists) {
-            window.showMessage(`❌ No. IC ${newIcNumber} sudah wujud untuk pelajar lain!`, "error");
-            return false;
-          }
-        }
-        
-        const studentRef = doc(db, "students", id);
-        const updateData = {};
-        if (newFullname) updateData.fullname = newFullname.trim();
-        if (newIcNumber) updateData.icNumber = newIcNumber.trim();
-        if (newClass !== undefined) updateData.class = newClass.trim() || "-";
-        if (newSession !== undefined) updateData.session = newSession.trim() || "2026";
-        
-        await updateDoc(studentRef, updateData);
-        
-        // Update local array
-        const student = window.students.find(s => s.id === id);
-        if (student) {
-          if (newFullname) student.fullname = newFullname.trim();
-          if (newIcNumber) student.icNumber = newIcNumber.trim();
-          if (newClass !== undefined) student.class = newClass.trim() || "-";
-          if (newSession !== undefined) student.session = newSession.trim() || "2026";
-        }
-        
-        await window.saveStudentCredentials();
-        window.renderStudentList();
-        window.updateClassFilter();
-        window.showMessage("✅ Maklumat pelajar berjaya dikemaskini!", "success");
-        return true;
-      } catch (error) {
-        console.error("Error editing student:", error);
-        window.showMessage("Gagal mengemaskini pelajar: " + error.message, "error");
-        return false;
-      }
-    };
-
-    // Edit individual field (legacy - keep for compatibility)
-    window.editStudentInFirebase = async function(id, newClass, newSession) {
-      return window.editStudentFullInFirebase(id, null, null, newClass, newSession);
-    };
-
-    // Save all student credentials to localStorage for login page
-    window.saveStudentCredentials = async function() {
-      const credentials = {};
-      window.students.forEach(s => {
-        credentials[s.icNumber] = {
-          id: s.id,
-          name: s.fullname,
-          ic: s.icNumber,
-          class: s.class,
-          session: s.session
-        };
-      });
-      localStorage.setItem('student_credentials', JSON.stringify(credentials));
-    };
-
-    // ==================== UI FUNCTIONS ====================
-    window.updateClassFilter = function() {
-      const classes = [...new Set(window.students.map(s => s.class).filter(c => c && c !== "-"))];
-      const select = document.getElementById('filterClass');
-      if (select) {
-        select.innerHTML = '<option value="">Semua Kelas/Tingkatan</option>' + 
-          classes.map(c => `<option value="${window.escapeHtml(c)}">${window.escapeHtml(c)}</option>`).join('');
-      }
-    };
-
-    let currentFilterClass = "";
-    let currentSearch = "";
-
-    window.getFilteredStudents = function() {
-      let filtered = [...window.students];
-      if (currentFilterClass) {
-        filtered = filtered.filter(s => s.class === currentFilterClass);
-      }
-      if (currentSearch) {
-        const search = currentSearch.toLowerCase();
-        filtered = filtered.filter(s => 
-          s.fullname.toLowerCase().includes(search) || 
-          s.icNumber.toLowerCase().includes(search)
-        );
-      }
-      return filtered;
-    };
-
-    // Open comprehensive edit dialog
-    window.openFullEditDialog = function(id, currentName, currentIc, currentClass, currentSession) {
-      // Create modal dialog using prompt sequence (simpler, but effective)
-      const newName = prompt("✏️ Edit Nama Penuh:", currentName);
-      if (newName === null) return;
-      if (newName.trim() === "") {
-        window.showMessage("Nama tidak boleh kosong!", "error");
-        return;
-      }
-      
-      const newIc = prompt("✏️ Edit No. Kad Pengenalan:", currentIc);
-      if (newIc === null) return;
-      if (newIc.trim() === "") {
-        window.showMessage("No. Kad Pengenalan tidak boleh kosong!", "error");
-        return;
-      }
-      
-      const newClass = prompt("✏️ Edit Kelas / Tingkatan:", currentClass);
-      if (newClass === null) return;
-      
-      const newSession = prompt("✏️ Edit Tahun / Sesi:", currentSession);
-      if (newSession === null) return;
-      
-      window.editStudentFullInFirebase(id, newName, newIc, newClass, newSession);
-    };
-    
-    // Legacy edit dialog (for class & session only)
-    window.openEditDialog = function(id, currentClass, currentSession) {
-      const newClass = prompt("Edit Kelas/Tingkatan:", currentClass);
-      if (newClass !== null) {
-        const newSession = prompt("Edit Tahun/Sesi:", currentSession);
-        if (newSession !== null) {
-          window.editStudentInFirebase(id, newClass, newSession);
-        }
-      }
-    };
-
-    window.renderStudentList = function() {
-      const filtered = window.getFilteredStudents();
-      const container = document.getElementById('studentListContainer');
-      
-      if (filtered.length === 0) {
-        container.innerHTML = `<div class="empty-state"><i class="fas fa-user-slash" style="font-size: 2rem;"></i><p>Tiada pelajar ditemui.</p></div>`;
-        return;
-      }
-
-      container.innerHTML = filtered.map(student => `
-        <div class="student-item">
-          <div class="student-info">
-            <div class="student-name">
-              <i class="fas fa-user-circle" style="color:#4f46e5;"></i>
-              ${window.escapeHtml(student.fullname)}
-              <span class="student-badge"><i class="fas fa-id-card"></i> ${window.escapeHtml(student.icNumber)}</span>
-            </div>
-            <div class="student-detail">
-              <i class="fas fa-school"></i> Kelas: ${window.escapeHtml(student.class)} &nbsp;|&nbsp;
-              <i class="fas fa-calendar"></i> Tahun: ${student.session}
-            </div>
-          </div>
-          <div>
-            <button class="btn-edit-full" onclick="window.openFullEditDialog('${student.id}', '${window.escapeHtml(student.fullname)}', '${window.escapeHtml(student.icNumber)}', '${window.escapeHtml(student.class)}', '${student.session}')">
-              <i class="fas fa-edit"></i> Edit
-            </button>
-            <button class="btn-delete" onclick="window.deleteStudentFromFirebase('${student.id}')">
-              <i class="fas fa-trash-alt"></i> Hapus
-            </button>
-          </div>
-        </div>
-      `).join('');
-    };
-
-    window.updateTotalCount = function() {
-      document.getElementById('totalStudents').innerText = window.students.length;
-    };
-
-    window.escapeHtml = function(str) {
-      if (!str) return '';
-      return str.replace(/[&<>]/g, function(m) {
-        if (m === '&') return '&amp;';
-        if (m === '<') return '&lt;';
-        if (m === '>') return '&gt;';
-        return m;
-      });
-    };
-
-    window.showMessage = function(msg, type) {
-      const msgDiv = document.getElementById('successMsg');
-      msgDiv.textContent = msg;
-      msgDiv.style.backgroundColor = type === 'success' ? '#dcfce7' : '#fee2e2';
-      msgDiv.style.color = type === 'success' ? '#166534' : '#991b1b';
-      msgDiv.style.display = 'block';
-      setTimeout(() => { msgDiv.style.display = 'none'; }, 4000);
-    };
-
-    // Single registration
-    const singleForm = document.getElementById('addStudentForm');
-    if (singleForm) {
-      singleForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const fullname = document.getElementById('fullname').value;
-        const icNumber = document.getElementById('icNumber').value;
-        const className = document.getElementById('class').value;
-        const session = document.getElementById('session').value;
-        
-        if (!fullname.trim()) { alert("Sila masukkan Nama Penuh."); return; }
-        if (!icNumber.trim()) { alert("Sila masukkan No. Kad Pengenalan."); return; }
-        
-        const result = await window.addStudentToFirebase(fullname, icNumber, className, session);
-        if (result.success) {
-          singleForm.reset();
-          document.getElementById('session').value = '2026';
-          window.showMessage(`✅ Pelajar ${fullname} berjaya didaftarkan ke Firebase! Kini boleh login di page-pelajar.html`, "success");
-        } else {
-          window.showMessage(`❌ Gagal: ${result.message}`, "error");
-        }
-      });
-    }
-
-    // Bulk registration
-    const bulkForm = document.getElementById('bulkForm');
-    if (bulkForm) {
-      bulkForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const bulkData = document.getElementById('bulkData').value;
-        const lines = bulkData.split(/\r?\n/);
-        let successCount = 0;
-        let failCount = 0;
-        
-        for (let line of lines) {
-          line = line.trim();
-          if (line === "") continue;
-          const parts = line.split('|');
-          if (parts.length < 2) {
-            failCount++;
-            continue;
-          }
-          const fullname = parts[0].trim();
-          const icNumber = parts[1].trim();
-          const className = parts[2] ? parts[2].trim() : "";
-          const session = parts[3] ? parts[3].trim() : "2026";
-          
-          if (!fullname || !icNumber) {
-            failCount++;
-            continue;
-          }
-          
-          const result = await window.addStudentToFirebase(fullname, icNumber, className, session);
-          if (result.success) {
-            successCount++;
-          } else {
-            failCount++;
-          }
-        }
-        
-        if (successCount > 0) {
-          window.showMessage(`✅ Berjaya daftar ${successCount} pelajar ke Firebase. Gagal: ${failCount}`, "success");
-        } else {
-          window.showMessage(`❌ Tiada pelajar berjaya didaftarkan. Sila semak format.`, "error");
-        }
-        bulkForm.reset();
-      });
-    }
-
-    // Filter event listeners
-    document.getElementById('filterClass')?.addEventListener('change', (e) => {
-      currentFilterClass = e.target.value;
-      window.renderStudentList();
-    });
-    document.getElementById('searchInput')?.addEventListener('input', (e) => {
-      currentSearch = e.target.value;
-      window.renderStudentList();
-    });
-
-    // Tab switching
-    const tabBtns = document.querySelectorAll('.tab-btn');
-    const singleTab = document.getElementById('singleTab');
-    const bulkTab = document.getElementById('bulkTab');
-    
-    tabBtns.forEach(btn => {
-      btn.addEventListener('click', () => {
-        tabBtns.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        if (btn.dataset.tab === 'single') {
-          singleTab.style.display = 'block';
-          bulkTab.style.display = 'none';
-        } else {
-          singleTab.style.display = 'none';
-          bulkTab.style.display = 'block';
-        }
-      });
-    });
-
-    // Load initial data
-    window.loadStudents();
-  </script>
   
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -621,6 +224,88 @@
       margin-bottom: 1rem;
       display: none;
     }
+    
+    /* Confirmation Modal */
+    .confirm-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(4px);
+      z-index: 2000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .confirm-content {
+      max-width: 450px;
+      width: 100%;
+      background: white;
+      border-radius: 1.5rem;
+      overflow: hidden;
+      animation: modalFadeIn 0.3s ease;
+    }
+    @keyframes modalFadeIn {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .confirm-header {
+      padding: 1.2rem;
+      background: #fee2e2;
+      text-align: center;
+    }
+    .confirm-header i {
+      font-size: 3rem;
+      color: #dc2626;
+    }
+    .confirm-body {
+      padding: 1.5rem;
+      text-align: center;
+    }
+    .confirm-body p {
+      margin-bottom: 0.5rem;
+      color: #1e293b;
+    }
+    .confirm-body .warning-text {
+      background: #fef3c7;
+      padding: 0.8rem;
+      border-radius: 0.8rem;
+      margin: 1rem 0;
+      font-size: 0.8rem;
+      color: #d97706;
+    }
+    .confirm-buttons {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+    .confirm-btn {
+      flex: 1;
+      padding: 0.8rem;
+      border-radius: 2rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: 0.2s;
+    }
+    .confirm-btn-yes {
+      background: #dc2626;
+      color: white;
+    }
+    .confirm-btn-yes:hover {
+      background: #b91c1c;
+    }
+    .confirm-btn-no {
+      background: #e2e8f0;
+      color: #1e293b;
+    }
+    .confirm-btn-no:hover {
+      background: #cbd5e1;
+    }
+    
     @media (max-width: 900px) {
       body { padding: 1rem; }
       .stats { flex-direction: column; align-items: stretch; }
@@ -704,5 +389,489 @@ Muhammad Danish bin Rosli|070303-03-9012|3 Bestari|2025'></textarea>
     </div>
   </div>
 </div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    
+    // Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyCfu7XC8pXtpDyQ-9Cjdg4AobA-EVEwWcc",
+      authDomain: "e-mindcare.firebaseapp.com",
+      projectId: "e-mindcare",
+      storageBucket: "e-mindcare.firebasestorage.app",
+      messagingSenderId: "1021883944936",
+      appId: "1:1021883944936:web:39c75a0c98d19a37afde5d",
+      measurementId: "G-3CJVKWGEXV"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const studentsCollection = collection(db, "students");
+    const meritCollection = collection(db, "merit_records");
+
+    // ==================== GLOBAL VARIABLES ====================
+    window.students = [];
+    let allMeritRecords = [];
+    let pendingDeleteId = null;
+    let pendingDeleteName = null;
+    let pendingDeleteIc = null;
+    let pendingDeleteMeritCount = 0;
+    
+    // ==================== LOAD MERIT RECORDS ====================
+    async function loadMeritRecords() {
+      try {
+        const meritSnap = await getDocs(meritCollection);
+        allMeritRecords = [];
+        meritSnap.forEach((doc) => {
+          allMeritRecords.push({ id: doc.id, ...doc.data() });
+        });
+        console.log("Merit records loaded:", allMeritRecords.length);
+      } catch (error) {
+        console.error("Error loading merit records:", error);
+      }
+    }
+    
+    // ==================== GET STUDENT MERIT COUNT ====================
+    function getStudentMeritCount(studentId) {
+      return allMeritRecords.filter(r => r.studentId === studentId).length;
+    }
+    
+    // ==================== DELETE STUDENT WITH ALL MERIT RECORDS ====================
+    async function executeDeleteStudent(id, name, ic, meritCount) {
+      try {
+        // Step 1: Find all merit records for this student
+        const studentMeritRecords = allMeritRecords.filter(r => r.studentId === id);
+        
+        // Step 2: Delete each merit record from Firestore
+        for (const record of studentMeritRecords) {
+          await deleteDoc(doc(db, "merit_records", record.id));
+          console.log(`Deleted merit record: ${record.id}`);
+        }
+        
+        // Step 3: Delete the student document from Firestore
+        await deleteDoc(doc(db, "students", id));
+        console.log(`Deleted student: ${id} (${name})`);
+        
+        // Step 4: Update local arrays
+        allMeritRecords = allMeritRecords.filter(r => r.studentId !== id);
+        window.students = window.students.filter(s => s.id !== id);
+        
+        // Step 5: Update UI
+        await saveStudentCredentials();
+        renderStudentList();
+        updateTotalCount();
+        updateClassFilter();
+        
+        showMessage(`✅ Pelajar "${name}" (${ic}) dan ${meritCount} rekod merit telah dipadam sepenuhnya dari sistem.`, "success");
+      } catch (error) {
+        console.error("Delete error:", error);
+        showMessage("❌ Gagal memadam pelajar. Sila cuba lagi.", "error");
+      }
+    }
+    
+    // Show confirmation modal before delete
+    function confirmDeleteStudent(id, name, ic, meritCount) {
+      pendingDeleteId = id;
+      pendingDeleteName = name;
+      pendingDeleteIc = ic;
+      pendingDeleteMeritCount = meritCount;
+      
+      const modalHtml = `
+        <div id="confirmDeleteModal" class="confirm-modal">
+          <div class="confirm-content">
+            <div class="confirm-header">
+              <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <div class="confirm-body">
+              <p style="font-size:1.1rem; font-weight:700;">Padam Pelajar?</p>
+              <p><strong style="color:#dc2626;">${escapeHtml(name)}</strong><br>
+              <span style="font-size:0.85rem; color:#64748b;">No. IC: ${escapeHtml(ic)}</span></p>
+              
+              <div class="warning-text">
+                <i class="fas fa-database"></i> Tindakan ini akan memadam:
+                <ul style="margin-top:0.5rem; text-align:left; padding-left:1.5rem;">
+                  <li>1 rekod pelajar</li>
+                  <li>${meritCount} rekod merit</li>
+                </ul>
+              </div>
+              
+              <p style="color:#dc2626; font-size:0.75rem; font-weight:600;">
+                ⚠️ Tindakan ini TIDAK BOLEH DIBATALKAN!
+              </p>
+              
+              <div class="confirm-buttons">
+                <button class="confirm-btn confirm-btn-no" onclick="closeConfirmModal()">Batal</button>
+                <button class="confirm-btn confirm-btn-yes" onclick="proceedDelete()">Ya, Padam</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+      document.body.insertAdjacentHTML('beforeend', modalHtml);
+    }
+    
+    window.closeConfirmModal = function() {
+      const modal = document.getElementById('confirmDeleteModal');
+      if (modal) modal.remove();
+      pendingDeleteId = null;
+      pendingDeleteName = null;
+      pendingDeleteIc = null;
+      pendingDeleteMeritCount = 0;
+    };
+    
+    window.proceedDelete = function() {
+      if (pendingDeleteId) {
+        executeDeleteStudent(pendingDeleteId, pendingDeleteName, pendingDeleteIc, pendingDeleteMeritCount);
+        closeConfirmModal();
+      }
+    };
+    
+    // Replace delete function
+    window.deleteStudentFromFirebase = function(id, name, ic, meritCount) {
+      confirmDeleteStudent(id, name, ic, meritCount);
+    };
+    
+    // ==================== LOAD STUDENTS ====================
+    window.loadStudents = async function() {
+      try {
+        const querySnapshot = await getDocs(studentsCollection);
+        window.students = [];
+        querySnapshot.forEach((doc) => {
+          window.students.push({
+            id: doc.id,
+            ...doc.data()
+          });
+        });
+        await loadMeritRecords();
+        updateClassFilter();
+        renderStudentList();
+        updateTotalCount();
+        console.log("Students loaded from Firebase:", window.students.length);
+      } catch (error) {
+        console.error("Error loading students:", error);
+        showMessage("Gagal memuat data dari Firebase. Sila semak sambungan internet.", "error");
+      }
+    };
+
+    // ==================== ADD STUDENT ====================
+    window.addStudentToFirebase = async function(fullname, icNumber, className, session) {
+      try {
+        const q = query(studentsCollection, where("icNumber", "==", icNumber));
+        const querySnapshot = await getDocs(q);
+        
+        if (!querySnapshot.empty) {
+          const existing = querySnapshot.docs[0];
+          return { success: false, message: `No. IC ${icNumber} sudah wujud untuk ${existing.data().fullname}` };
+        }
+        
+        const newStudent = {
+          fullname: fullname.trim(),
+          icNumber: icNumber.trim(),
+          class: className.trim() || "-",
+          session: session.trim() || "2026",
+          createdAt: new Date().toISOString()
+        };
+        
+        const docRef = await addDoc(studentsCollection, newStudent);
+        window.students.push({
+          id: docRef.id,
+          ...newStudent
+        });
+        
+        await saveStudentCredentials();
+        renderStudentList();
+        updateTotalCount();
+        updateClassFilter();
+        
+        return { success: true, student: newStudent };
+      } catch (error) {
+        console.error("Error adding student:", error);
+        return { success: false, message: "Ralat Firebase: " + error.message };
+      }
+    };
+
+    // ==================== EDIT STUDENT ====================
+    window.editStudentFullInFirebase = async function(id, newFullname, newIcNumber, newClass, newSession) {
+      try {
+        if (newIcNumber) {
+          const q = query(studentsCollection, where("icNumber", "==", newIcNumber));
+          const querySnapshot = await getDocs(q);
+          let icExists = false;
+          querySnapshot.forEach((docSnap) => {
+            if (docSnap.id !== id) {
+              icExists = true;
+            }
+          });
+          if (icExists) {
+            showMessage(`❌ No. IC ${newIcNumber} sudah wujud untuk pelajar lain!`, "error");
+            return false;
+          }
+        }
+        
+        const studentRef = doc(db, "students", id);
+        const updateData = {};
+        if (newFullname) updateData.fullname = newFullname.trim();
+        if (newIcNumber) updateData.icNumber = newIcNumber.trim();
+        if (newClass !== undefined) updateData.class = newClass.trim() || "-";
+        if (newSession !== undefined) updateData.session = newSession.trim() || "2026";
+        
+        await updateDoc(studentRef, updateData);
+        
+        const student = window.students.find(s => s.id === id);
+        if (student) {
+          if (newFullname) student.fullname = newFullname.trim();
+          if (newIcNumber) student.icNumber = newIcNumber.trim();
+          if (newClass !== undefined) student.class = newClass.trim() || "-";
+          if (newSession !== undefined) student.session = newSession.trim() || "2026";
+        }
+        
+        await saveStudentCredentials();
+        renderStudentList();
+        updateClassFilter();
+        showMessage("✅ Maklumat pelajar berjaya dikemaskini!", "success");
+        return true;
+      } catch (error) {
+        console.error("Error editing student:", error);
+        showMessage("Gagal mengemaskini pelajar: " + error.message, "error");
+        return false;
+      }
+    };
+
+    // ==================== SAVE CREDENTIALS ====================
+    window.saveStudentCredentials = async function() {
+      const credentials = {};
+      window.students.forEach(s => {
+        credentials[s.icNumber] = {
+          id: s.id,
+          name: s.fullname,
+          ic: s.icNumber,
+          class: s.class,
+          session: s.session
+        };
+      });
+      localStorage.setItem('student_credentials', JSON.stringify(credentials));
+    };
+
+    // ==================== UI FUNCTIONS ====================
+    window.updateClassFilter = function() {
+      const classes = [...new Set(window.students.map(s => s.class).filter(c => c && c !== "-"))];
+      const select = document.getElementById('filterClass');
+      if (select) {
+        select.innerHTML = '<option value="">Semua Kelas/Tingkatan</option>' + 
+          classes.map(c => `<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`).join('');
+      }
+    };
+
+    let currentFilterClass = "";
+    let currentSearch = "";
+
+    window.getFilteredStudents = function() {
+      let filtered = [...window.students];
+      if (currentFilterClass) {
+        filtered = filtered.filter(s => s.class === currentFilterClass);
+      }
+      if (currentSearch) {
+        const search = currentSearch.toLowerCase();
+        filtered = filtered.filter(s => 
+          s.fullname.toLowerCase().includes(search) || 
+          s.icNumber.toLowerCase().includes(search)
+        );
+      }
+      return filtered;
+    };
+
+    // Open comprehensive edit dialog
+    window.openFullEditDialog = function(id, currentName, currentIc, currentClass, currentSession) {
+      const newName = prompt("✏️ Edit Nama Penuh:", currentName);
+      if (newName === null) return;
+      if (newName.trim() === "") {
+        showMessage("Nama tidak boleh kosong!", "error");
+        return;
+      }
+      
+      const newIc = prompt("✏️ Edit No. Kad Pengenalan:", currentIc);
+      if (newIc === null) return;
+      if (newIc.trim() === "") {
+        showMessage("No. Kad Pengenalan tidak boleh kosong!", "error");
+        return;
+      }
+      
+      const newClass = prompt("✏️ Edit Kelas / Tingkatan:", currentClass);
+      if (newClass === null) return;
+      
+      const newSession = prompt("✏️ Edit Tahun / Sesi:", currentSession);
+      if (newSession === null) return;
+      
+      window.editStudentFullInFirebase(id, newName, newIc, newClass, newSession);
+    };
+
+    function renderStudentList() {
+      const filtered = window.getFilteredStudents();
+      const container = document.getElementById('studentListContainer');
+      
+      if (filtered.length === 0) {
+        container.innerHTML = `<div class="empty-state"><i class="fas fa-user-slash" style="font-size: 2rem;"></i><p>Tiada pelajar ditemui.</p></div>`;
+        return;
+      }
+
+      container.innerHTML = filtered.map(student => {
+        const meritCount = getStudentMeritCount(student.id);
+        return `
+          <div class="student-item">
+            <div class="student-info">
+              <div class="student-name">
+                <i class="fas fa-user-circle" style="color:#4f46e5;"></i>
+                ${escapeHtml(student.fullname)}
+                <span class="student-badge"><i class="fas fa-id-card"></i> ${escapeHtml(student.icNumber)}</span>
+                ${meritCount > 0 ? `<span class="student-badge" style="background:#dbeafe;"><i class="fas fa-star"></i> ${meritCount} merit</span>` : ''}
+              </div>
+              <div class="student-detail">
+                <i class="fas fa-school"></i> Kelas: ${escapeHtml(student.class)} &nbsp;|&nbsp;
+                <i class="fas fa-calendar"></i> Tahun: ${student.session}
+              </div>
+            </div>
+            <div>
+              <button class="btn-edit-full" onclick="window.openFullEditDialog('${student.id}', '${escapeHtml(student.fullname)}', '${escapeHtml(student.icNumber)}', '${escapeHtml(student.class)}', '${student.session}')">
+                <i class="fas fa-edit"></i> Edit
+              </button>
+              <button class="btn-delete" onclick="window.deleteStudentFromFirebase('${student.id}', '${escapeHtml(student.fullname)}', '${escapeHtml(student.icNumber)}', ${meritCount})">
+                <i class="fas fa-trash-alt"></i> Hapus
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    window.updateTotalCount = function() {
+      document.getElementById('totalStudents').innerText = window.students.length;
+    };
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return str.replace(/[&<>]/g, function(m) {
+        if (m === '&') return '&amp;';
+        if (m === '<') return '&lt;';
+        if (m === '>') return '&gt;';
+        return m;
+      });
+    }
+
+    window.showMessage = function(msg, type) {
+      const msgDiv = document.getElementById('successMsg');
+      msgDiv.textContent = msg;
+      msgDiv.style.backgroundColor = type === 'success' ? '#dcfce7' : '#fee2e2';
+      msgDiv.style.color = type === 'success' ? '#166534' : '#991b1b';
+      msgDiv.style.display = 'block';
+      setTimeout(() => { msgDiv.style.display = 'none'; }, 4000);
+    };
+
+    // Make functions global
+    window.escapeHtml = escapeHtml;
+    window.renderStudentList = renderStudentList;
+    window.updateClassFilter = updateClassFilter;
+    
+    // ==================== EVENT LISTENERS ====================
+    const singleForm = document.getElementById('addStudentForm');
+    if (singleForm) {
+      singleForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const fullname = document.getElementById('fullname').value;
+        const icNumber = document.getElementById('icNumber').value;
+        const className = document.getElementById('class').value;
+        const session = document.getElementById('session').value;
+        
+        if (!fullname.trim()) { alert("Sila masukkan Nama Penuh."); return; }
+        if (!icNumber.trim()) { alert("Sila masukkan No. Kad Pengenalan."); return; }
+        
+        const result = await window.addStudentToFirebase(fullname, icNumber, className, session);
+        if (result.success) {
+          singleForm.reset();
+          document.getElementById('session').value = '2026';
+          showMessage(`✅ Pelajar ${fullname} berjaya didaftarkan ke Firebase! Kini boleh login di page-pelajar.html`, "success");
+        } else {
+          showMessage(`❌ Gagal: ${result.message}`, "error");
+        }
+      });
+    }
+
+    const bulkForm = document.getElementById('bulkForm');
+    if (bulkForm) {
+      bulkForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const bulkData = document.getElementById('bulkData').value;
+        const lines = bulkData.split(/\r?\n/);
+        let successCount = 0;
+        let failCount = 0;
+        
+        for (let line of lines) {
+          line = line.trim();
+          if (line === "") continue;
+          const parts = line.split('|');
+          if (parts.length < 2) {
+            failCount++;
+            continue;
+          }
+          const fullname = parts[0].trim();
+          const icNumber = parts[1].trim();
+          const className = parts[2] ? parts[2].trim() : "";
+          const session = parts[3] ? parts[3].trim() : "2026";
+          
+          if (!fullname || !icNumber) {
+            failCount++;
+            continue;
+          }
+          
+          const result = await window.addStudentToFirebase(fullname, icNumber, className, session);
+          if (result.success) {
+            successCount++;
+          } else {
+            failCount++;
+          }
+        }
+        
+        if (successCount > 0) {
+          showMessage(`✅ Berjaya daftar ${successCount} pelajar ke Firebase. Gagal: ${failCount}`, "success");
+        } else {
+          showMessage(`❌ Tiada pelajar berjaya didaftarkan. Sila semak format.`, "error");
+        }
+        bulkForm.reset();
+      });
+    }
+
+    // Filter event listeners
+    document.getElementById('filterClass')?.addEventListener('change', (e) => {
+      currentFilterClass = e.target.value;
+      renderStudentList();
+    });
+    document.getElementById('searchInput')?.addEventListener('input', (e) => {
+      currentSearch = e.target.value;
+      renderStudentList();
+    });
+
+    // Tab switching
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    const singleTab = document.getElementById('singleTab');
+    const bulkTab = document.getElementById('bulkTab');
+    
+    tabBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        tabBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        if (btn.dataset.tab === 'single') {
+          singleTab.style.display = 'block';
+          bulkTab.style.display = 'none';
+        } else {
+          singleTab.style.display = 'none';
+          bulkTab.style.display = 'block';
+        }
+      });
+    });
+
+    // Load initial data
+    window.loadStudents();
+</script>
 </body>
 </html>

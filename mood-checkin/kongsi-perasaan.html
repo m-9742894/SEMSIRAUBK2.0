@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Kongsi Perasaan | E-MindCare SEMSIRA</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(145deg, #f5f7fc 0%, #eef2f9 100%);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid rgba(100, 108, 255, 0.15);
+        }
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .logo-icon {
+            background: linear-gradient(145deg, #6366f1, #8b5cf6);
+            width: 50px;
+            height: 50px;
+            border-radius: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 20px -8px rgba(99, 102, 241, 0.3);
+        }
+        .logo-icon i { font-size: 1.8rem; color: white; }
+        .logo-text h1 {
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #1e293b, #4f46e5);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .back-btn {
+            background: #eef2ff;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 40px;
+            cursor: pointer;
+            font-weight: 600;
+            color: #4f46e5;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: 0.2s;
+        }
+        .back-btn:hover {
+            background: #4f46e5;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+        .hero h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #1e293b, #4f46e5, #8b5cf6);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 0.5rem;
+        }
+        .hero p {
+            color: #5b6e8c;
+            font-size: 0.95rem;
+        }
+
+        /* Form Card */
+        .form-card {
+            background: white;
+            border-radius: 2rem;
+            padding: 1.8rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(99, 102, 241, 0.1);
+            transition: all 0.3s;
+        }
+        .form-card:hover {
+            box-shadow: 0 25px 40px -15px rgba(99, 102, 241, 0.15);
+        }
+        .form-card h3 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .form-card h3 i {
+            color: #4f46e5;
+            font-size: 1.3rem;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        .input-group textarea {
+            flex: 1;
+            padding: 1rem 1.2rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 1.2rem;
+            font-family: inherit;
+            font-size: 0.95rem;
+            resize: none;
+            outline: none;
+            transition: all 0.2s;
+            background: #fafcff;
+        }
+        .input-group textarea:focus {
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+            background: white;
+        }
+
+        .char-counter {
+            font-size: 0.7rem;
+            color: #5b6e8c;
+            margin-top: 0.5rem;
+            text-align: right;
+        }
+        .char-counter.warning {
+            color: #dc2626;
+            font-weight: 500;
+        }
+
+        .btn-submit {
+            background: linear-gradient(95deg, #4f46e5, #7c3aed);
+            color: white;
+            border: none;
+            padding: 0 2rem;
+            border-radius: 1.2rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            white-space: nowrap;
+        }
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px -8px rgba(79, 70, 229, 0.4);
+        }
+        .btn-submit:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Wall of Feelings Section */
+        .wall-section {
+            background: white;
+            border-radius: 2rem;
+            padding: 1.8rem;
+            box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(99, 102, 241, 0.1);
+        }
+        .wall-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .wall-header h3 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #1e293b;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .wall-header h3 i {
+            color: #4f46e5;
+        }
+        .share-count {
+            background: #eef2ff;
+            padding: 0.3rem 1rem;
+            border-radius: 40px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #4f46e5;
+        }
+
+        /* Grid Bubbles */
+        .bubbles-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 1.2rem;
+            max-height: 550px;
+            overflow-y: auto;
+            padding-right: 0.3rem;
+        }
+        /* Custom scrollbar */
+        .bubbles-grid::-webkit-scrollbar {
+            width: 6px;
+        }
+        .bubbles-grid::-webkit-scrollbar-track {
+            background: #e2e8f0;
+            border-radius: 10px;
+        }
+        .bubbles-grid::-webkit-scrollbar-thumb {
+            background: #4f46e5;
+            border-radius: 10px;
+        }
+
+        .bubble-card {
+            background: #f8fafc;
+            border-radius: 1.2rem;
+            padding: 1.2rem;
+            transition: all 0.3s;
+            border: 1px solid #e2e8f0;
+            position: relative;
+            animation: fadeInUp 0.4s ease;
+        }
+        .bubble-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 20px -12px rgba(0, 0, 0, 0.1);
+            border-color: #cbd5e1;
+            background: white;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .bubble-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.8rem;
+            padding-bottom: 0.6rem;
+            border-bottom: 1px dashed #e2e8f0;
+        }
+        .bubble-icon {
+            background: linear-gradient(145deg, #eef2ff, #ffffff);
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .bubble-icon i {
+            font-size: 0.9rem;
+            color: #4f46e5;
+        }
+        .bubble-date {
+            font-size: 0.7rem;
+            color: #94a3b8;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .bubble-message {
+            font-size: 0.9rem;
+            color: #1e293b;
+            line-height: 1.55;
+            word-wrap: break-word;
+            white-space: pre-wrap;
+            padding-left: 0.3rem;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #94a3b8;
+        }
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        .alert {
+            padding: 12px 16px;
+            border-radius: 1rem;
+            margin-bottom: 1rem;
+            font-size: 0.85rem;
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .alert.success {
+            background: #dcfce7;
+            color: #166534;
+            border-left: 4px solid #10b981;
+            display: block;
+        }
+        .alert.error {
+            background: #fee2e2;
+            color: #dc2626;
+            border-left: 4px solid #ef4444;
+            display: block;
+        }
+
+        @media (max-width: 750px) {
+            body { padding: 1rem; }
+            .bubbles-grid { grid-template-columns: 1fr; }
+            .hero h1 { font-size: 1.8rem; }
+            .btn-submit { padding: 0.8rem 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <div class="logo-area">
+            <div class="logo-icon"><i class="fas fa-heart"></i></div>
+            <div class="logo-text"><h1>E-MindCare SEMSIRA</h1></div>
+        </div>
+        <a href="mood-checkin.html" class="back-btn"><i class="fas fa-arrow-left"></i> Kembali ke Mood Check-in</a>
+    </div>
+
+    <div class="hero">
+        <h1><i class="fas fa-user-secret"></i> Kongsi Perasaan</h1>
+        <p>Luahkan perasaan anda secara ANONIM • Tiada identiti • Hati yang tenang</p>
+    </div>
+
+    <!-- Form Section -->
+    <div class="form-card">
+        <h3><i class="fas fa-pen-fancy"></i> Apa yang anda rasa hari ini?</h3>
+        <div class="input-group">
+            <textarea id="messageInput" rows="3" placeholder="Contoh: Hari ini saya berasa sangat gembira kerana... atau Saya rasa sedikit tertekan dengan... (Maksimum 200 huruf)" maxlength="200"></textarea>
+            <button class="btn-submit" id="submitBtn"><i class="fas fa-paper-plane"></i> Kongsi</button>
+        </div>
+        <div class="char-counter" id="charCounter">0 / 200 huruf</div>
+        <div id="alertMessage" class="alert"></div>
+    </div>
+
+    <!-- Wall of Feelings Section -->
+    <div class="wall-section">
+        <div class="wall-header">
+            <h3><i class="fas fa-comment-dots"></i> Dinding Perasaan</h3>
+            <div class="share-count" id="shareCount">0 Perkongsian</div>
+        </div>
+        <div id="bubblesContainer" class="bubbles-grid">
+            <div class="empty-state">
+                <i class="fas fa-comment-slash"></i>
+                <p>Belum ada perkongsian</p>
+                <p style="font-size: 0.8rem;">Jadilah yang pertama berkongsi perasaan anda</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, collection, addDoc, getDocs, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    
+    const firebaseConfig = {
+        apiKey: "AIzaSyCfu7XC8pXtpDyQ-9Cjdg4AobA-EVEwWcc",
+        authDomain: "e-mindcare.firebaseapp.com",
+        projectId: "e-mindcare",
+        storageBucket: "e-mindcare.firebasestorage.app",
+        messagingSenderId: "1021883944936",
+        appId: "1:1021883944936:web:39c75a0c98d19a37afde5d",
+        measurementId: "G-3CJVKWGEXV"
+    };
+    
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const sharesCollection = collection(db, "anonim_shares");
+    
+    const messageInput = document.getElementById('messageInput');
+    const charCounter = document.getElementById('charCounter');
+    const submitBtn = document.getElementById('submitBtn');
+    const bubblesContainer = document.getElementById('bubblesContainer');
+    const shareCountSpan = document.getElementById('shareCount');
+    
+    // Character counter - max 200 characters
+    messageInput.addEventListener('input', () => {
+        const length = messageInput.value.length;
+        charCounter.innerText = `${length} / 200 huruf`;
+        if (length >= 190) {
+            charCounter.classList.add('warning');
+        } else {
+            charCounter.classList.remove('warning');
+        }
+    });
+    
+    function showAlert(msg, type) {
+        const alertDiv = document.getElementById('alertMessage');
+        alertDiv.textContent = msg;
+        alertDiv.className = `alert ${type}`;
+        setTimeout(() => { alertDiv.style.display = 'none'; }, 3000);
+    }
+    
+    // Format date nicely
+    function formatDate(dateStr) {
+        if (!dateStr) return 'Baru sahaja';
+        try {
+            const date = new Date(dateStr);
+            const now = new Date();
+            const diffMs = now - date;
+            const diffMins = Math.floor(diffMs / 60000);
+            const diffHours = Math.floor(diffMs / 3600000);
+            const diffDays = Math.floor(diffMs / 86400000);
+            
+            if (diffMins < 1) return 'Baru sahaja';
+            if (diffMins < 60) return `${diffMins} minit lalu`;
+            if (diffHours < 24) return `${diffHours} jam lalu`;
+            if (diffDays < 7) return `${diffDays} hari lalu`;
+            return date.toLocaleDateString('ms-MY', { day: 'numeric', month: 'long', year: 'numeric' });
+        } catch(e) {
+            return 'Baru sahaja';
+        }
+    }
+    
+    // Load shares from Firestore - latest first
+    async function loadShares() {
+        try {
+            const q = query(sharesCollection, orderBy("createdAt", "desc"), limit(50));
+            const snapshot = await getDocs(q);
+            
+            const totalCount = snapshot.size;
+            shareCountSpan.innerText = `${totalCount} Perkongsian`;
+            
+            if (snapshot.empty) {
+                bubblesContainer.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-comment-slash"></i>
+                        <p>Belum ada perkongsian</p>
+                        <p style="font-size: 0.8rem;">Jadilah yang pertama berkongsi perasaan anda</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = '';
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                const timeAgo = formatDate(data.createdAt);
+                html += `
+                    <div class="bubble-card">
+                        <div class="bubble-header">
+                            <div class="bubble-icon">
+                                <i class="fas fa-user-circle"></i>
+                            </div>
+                            <div class="bubble-date">
+                                <i class="far fa-clock"></i> ${timeAgo}
+                            </div>
+                        </div>
+                        <div class="bubble-message">${escapeHtml(data.message)}</div>
+                    </div>
+                `;
+            });
+            bubblesContainer.innerHTML = html;
+        } catch(e) {
+            console.error("Error loading shares:", e);
+            bubblesContainer.innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-triangle"></i><p>Ralat memuat data. Sila refresh.</p></div>';
+        }
+    }
+    
+    // Submit new share
+    async function submitShare() {
+        const message = messageInput.value.trim();
+        
+        if (message === "") {
+            showAlert('Sila kongsikan perasaan anda!', 'error');
+            return;
+        }
+        
+        if (message.length > 200) {
+            showAlert('Mesej terlalu panjang! Maksimum 200 huruf.', 'error');
+            return;
+        }
+        
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Menghantar...';
+        
+        try {
+            await addDoc(sharesCollection, {
+                message: message,
+                createdAt: new Date().toISOString()
+            });
+            
+            showAlert('✅ Terima kasih berkongsi! Perasaan anda telah dipaparkan.', 'success');
+            messageInput.value = '';
+            charCounter.innerText = '0 / 200 huruf';
+            charCounter.classList.remove('warning');
+            
+            // Reload shares - latest will appear at top
+            await loadShares();
+            
+        } catch(e) {
+            console.error("Error submitting:", e);
+            showAlert('❌ Gagal berkongsi. Sila cuba lagi.', 'error');
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Kongsi';
+        }
+    }
+    
+    submitBtn.addEventListener('click', submitShare);
+    
+    // Allow Enter key to submit (but Shift+Enter for new line)
+    messageInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            submitShare();
+        }
+    });
+    
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, m => m==='&'?'&amp;':m==='<'?'&lt;':'&gt;');
+    }
+    
+    // Load initial data
+    loadShares();
+</script>
+</body>
+</html>

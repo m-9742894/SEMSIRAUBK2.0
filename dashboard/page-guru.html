@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>Login Guru | E-MindCare SEMSIRA</title>
+  <title>Login & Daftar Guru | E-MindCare SEMSIRA</title>
   <!-- Fonts & Icons -->
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -106,6 +106,44 @@
       margin-top: 6px;
     }
 
+    /* Tab Styles */
+    .tab-container {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1.8rem;
+      background: #f1f5f9;
+      padding: 0.3rem;
+      border-radius: 3rem;
+    }
+    .tab-btn {
+      flex: 1;
+      background: transparent;
+      border: none;
+      padding: 0.7rem;
+      border-radius: 2.5rem;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: 0.2s;
+      color: #64748b;
+    }
+    .tab-btn.active {
+      background: white;
+      color: #2563eb;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    .tab-pane {
+      display: none;
+    }
+    .tab-pane.active {
+      display: block;
+      animation: fadeIn 0.3s ease;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
     .input-group {
       margin-bottom: 1.5rem;
     }
@@ -135,8 +173,12 @@
       border-color: #2563eb;
       box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
     }
+    .input-field[readonly] {
+      background: #f1f5f9;
+      cursor: not-allowed;
+    }
 
-    .login-btn {
+    .login-btn, .register-btn {
       width: 100%;
       background: linear-gradient(95deg, #2563eb, #7c3aed);
       border: none;
@@ -154,15 +196,23 @@
       margin-top: 0.8rem;
       box-shadow: 0 8px 18px rgba(37, 99, 235, 0.3);
     }
-    .login-btn:hover {
+    .login-btn:hover, .register-btn:hover {
       transform: translateY(-2px);
       background: linear-gradient(95deg, #1d4ed8, #6d28d9);
       box-shadow: 0 12px 22px rgba(37, 99, 235, 0.4);
     }
-    .login-btn:disabled {
+    .login-btn:disabled, .register-btn:disabled {
       opacity: 0.7;
       cursor: not-allowed;
       transform: none;
+    }
+
+    .register-btn {
+      background: linear-gradient(95deg, #10b981, #059669);
+      box-shadow: 0 8px 18px rgba(16, 185, 129, 0.3);
+    }
+    .register-btn:hover {
+      background: linear-gradient(95deg, #059669, #047857);
     }
 
     .back-link {
@@ -242,43 +292,86 @@
     <div class="login-icon">
       <i class="fas fa-chalkboard-user"></i>
     </div>
-    <h1>LOGIN GURU</h1>
+    <h1>PORTAL GURU</h1>
     <div class="sub">E-MindCare SEMSIRA • SMK Syed Sirajuddin</div>
   </div>
 
-  <form id="loginForm">
-    <div class="input-group">
-      <label><i class="fas fa-user-circle"></i> Nama Penuh</label>
-      <input type="text" class="input-field" id="fullname" placeholder="cth: Puan Sarah binti Abdullah" required autocomplete="off">
-    </div>
-    <div class="input-group">
-      <label><i class="fas fa-id-card"></i> Nombor Kad Pengenalan</label>
-      <input type="text" class="input-field" id="icNumber" placeholder="cth: 800101-01-1234" required autocomplete="off">
-    </div>
-    
-    <button type="submit" class="login-btn" id="loginBtn">
-      <span>Masuk ke Dashboard</span> <i class="fas fa-arrow-right"></i>
-    </button>
-  </form>
+  <!-- TABS -->
+  <div class="tab-container">
+    <button class="tab-btn active" data-tab="login">🔐 LOGIN</button>
+    <button class="tab-btn" data-tab="register">📝 DAFTAR BARU</button>
+  </div>
+
+  <!-- LOGIN PANE -->
+  <div id="loginPane" class="tab-pane active">
+    <form id="loginForm">
+      <div class="input-group">
+        <label><i class="fas fa-user-circle"></i> Nama Penuh</label>
+        <input type="text" class="input-field" id="fullname" placeholder="cth: PUAN SARAH BINTI ABDULLAH" autocomplete="off">
+      </div>
+      <div class="input-group">
+        <label><i class="fas fa-id-card"></i> Nombor Kad Pengenalan</label>
+        <input type="text" class="input-field" id="icNumber" placeholder="cth: 800101011234 (tanpa sempang)" autocomplete="off">
+      </div>
+      
+      <button type="submit" class="login-btn" id="loginBtn">
+        <span>Masuk ke Dashboard</span> <i class="fas fa-arrow-right"></i>
+      </button>
+    </form>
+  </div>
+
+  <!-- REGISTER PANE -->
+  <div id="registerPane" class="tab-pane">
+    <form id="registerForm">
+      <div class="input-group">
+        <label><i class="fas fa-user-circle"></i> Nama Penuh <span style="color:#dc2626;">*</span></label>
+        <input type="text" class="input-field" id="regFullname" placeholder="cth: PUAN SARAH BINTI ABDULLAH" autocomplete="off" style="text-transform:uppercase;">
+        <div class="info-note" style="margin-top:0.3rem; padding:0.3rem; font-size:0.65rem;">Gunakan HURUF BESAR (UPPERCASE)</div>
+      </div>
+      <div class="input-group">
+        <label><i class="fas fa-id-card"></i> Nombor Kad Pengenalan <span style="color:#dc2626;">*</span></label>
+        <input type="text" class="input-field" id="regIcNumber" placeholder="cth: 800101011234 (tanpa sempang)" autocomplete="off">
+        <div class="info-note" style="margin-top:0.3rem; padding:0.3rem; font-size:0.65rem;">Tiada sempang, 12 digit nombor</div>
+      </div>
+      <div class="input-group">
+        <label><i class="fas fa-school"></i> Guru Kelas / Tingkatan</label>
+        <input type="text" class="input-field" id="regTeacherClass" placeholder="cth: 5 Cemerlang (biarkan kosong jika tiada)" autocomplete="off">
+      </div>
+      <div class="input-group">
+        <label><i class="fas fa-calendar"></i> Tahun Pendaftaran <span style="color:#dc2626;">*</span></label>
+        <select class="input-field" id="regYear">
+          <option value="2024">2024</option>
+          <option value="2025">2025</option>
+          <option value="2026" selected>2026</option>
+          <option value="2027">2027</option>
+          <option value="2028">2028</option>
+        </select>
+      </div>
+      
+      <button type="submit" class="register-btn" id="registerBtn">
+        <span>Hantar Permohonan</span> <i class="fas fa-paper-plane"></i>
+      </button>
+      <div class="info-note" style="margin-top:1rem;">
+        <i class="fas fa-clock"></i> Permohonan akan diproses oleh kaunselor. Anda akan dimaklumkan setelah diluluskan.
+      </div>
+    </form>
+  </div>
 
   <div class="back-link">
     <a href="../index.html"><i class="fas fa-arrow-left"></i> Kembali ke Laman Utama</a>
-  </div>
-  <div class="info-note">
-    <i class="fas fa-shield-alt"></i> Akses hanya untuk guru SMK Syed Sirajuddin.
   </div>
 </div>
 
 <div class="loading-overlay" id="loadingOverlay">
   <div class="loading-spinner">
     <i class="fas fa-spinner fa-pulse fa-2x"></i>
-    <p>Mengesahkan data...</p>
+    <p>Memproses...</p>
   </div>
 </div>
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-  import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+  import { getFirestore, collection, query, where, getDocs, addDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
   
   const firebaseConfig = {
     apiKey: "AIzaSyCfu7XC8pXtpDyQ-9Cjdg4AobA-EVEwWcc",
@@ -293,30 +386,68 @@
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
   const teachersCollection = collection(db, "teachers");
+  const pendingTeachersCollection = collection(db, "pending_teachers");
 
-  const form = document.getElementById('loginForm');
+  // ==================== DOM ELEMENTS ====================
+  const loginForm = document.getElementById('loginForm');
   const fullnameInput = document.getElementById('fullname');
   const icInput = document.getElementById('icNumber');
   const loginBtn = document.getElementById('loginBtn');
+  
+  const registerForm = document.getElementById('registerForm');
+  const regFullname = document.getElementById('regFullname');
+  const regIcNumber = document.getElementById('regIcNumber');
+  const regTeacherClass = document.getElementById('regTeacherClass');
+  const regYear = document.getElementById('regYear');
+  const registerBtn = document.getElementById('registerBtn');
+  
   const loadingOverlay = document.getElementById('loadingOverlay');
-
+  
+  // ==================== TAB SWITCHING ====================
+  const tabBtns = document.querySelectorAll('.tab-btn');
+  const loginPane = document.getElementById('loginPane');
+  const registerPane = document.getElementById('registerPane');
+  
+  tabBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const tab = btn.dataset.tab;
+      tabBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      
+      if (tab === 'login') {
+        loginPane.classList.add('active');
+        registerPane.classList.remove('active');
+      } else {
+        loginPane.classList.remove('active');
+        registerPane.classList.add('active');
+      }
+    });
+  });
+  
+  // ==================== LOADING FUNCTIONS ====================
   function showLoading() {
     loadingOverlay.style.visibility = 'visible';
-    loginBtn.disabled = true;
+    if (loginBtn) loginBtn.disabled = true;
+    if (registerBtn) registerBtn.disabled = true;
   }
 
   function hideLoading() {
     loadingOverlay.style.visibility = 'hidden';
-    loginBtn.disabled = false;
+    if (loginBtn) loginBtn.disabled = false;
+    if (registerBtn) registerBtn.disabled = false;
   }
-
+  
+  // ==================== LOGIN FUNCTION ====================
   async function verifyAndRedirect(fullname, icNumber) {
     try {
-      const q = query(teachersCollection, where("icNumber", "==", icNumber));
+      // Format IC tanpa sempang untuk perbandingan
+      const formattedIc = icNumber.replace(/-/g, '');
+      
+      const q = query(teachersCollection, where("icNumber", "==", formattedIc));
       const querySnapshot = await getDocs(q);
       
       if (querySnapshot.empty) {
-        alert("❌ Akaun tidak ditemui! Sila pastikan No. Kad Pengenalan anda telah didaftarkan.");
+        alert("❌ Akaun tidak ditemui! Sila pastikan No. Kad Pengenalan anda telah didaftarkan dan diluluskan oleh kaunselor.");
         hideLoading();
         return false;
       }
@@ -326,7 +457,7 @@
         teacherData = { id: doc.id, ...doc.data() };
       });
       
-      if (teacherData && teacherData.fullname.toLowerCase() !== fullname.toLowerCase()) {
+      if (teacherData && teacherData.fullname.toUpperCase() !== fullname.toUpperCase()) {
         alert("❌ Nama Penuh tidak sepadan dengan No. Kad Pengenalan yang didaftarkan.");
         hideLoading();
         return false;
@@ -339,7 +470,6 @@
       sessionStorage.setItem('teacherYear', teacherData.year || '2026');
       sessionStorage.setItem('teacherLoginTime', new Date().toISOString());
       
-      // ✅ REDIRECT TERUS KE URL PENUH YANG ANDA MAHU
       window.location.href = "https://m-9742894.github.io/SEMSIRAUBK2.0/dashboard/guru/dashboard-guru.html";
       return true;
       
@@ -350,12 +480,60 @@
       return false;
     }
   }
-
-  form.addEventListener('submit', async (e) => {
+  
+  // ==================== REGISTER FUNCTION ====================
+  async function registerTeacher(fullname, icNumber, teacherClass, year) {
+    try {
+      // Format IC tanpa sempang
+      const formattedIc = icNumber.replace(/-/g, '');
+      
+      // Semak sama ada IC sudah wujud dalam teachers (sudah diluluskan)
+      const existingTeachers = query(teachersCollection, where("icNumber", "==", formattedIc));
+      const teachersSnap = await getDocs(existingTeachers);
+      
+      if (!teachersSnap.empty) {
+        alert("❌ No. Kad Pengenalan ini sudah berdaftar sebagai guru! Sila login.");
+        return false;
+      }
+      
+      // Semak sama ada IC sudah dalam pending (menunggu kelulusan)
+      const pendingQuery = query(pendingTeachersCollection, where("icNumber", "==", formattedIc));
+      const pendingSnap = await getDocs(pendingQuery);
+      
+      if (!pendingSnap.empty) {
+        alert("⏳ Permohonan anda sudah dalam proses kelulusan. Sila tunggu kaunselor meluluskan pendaftaran anda.");
+        return false;
+      }
+      
+      // Simpan ke pending_teachers
+      const pendingData = {
+        fullname: fullname.toUpperCase().trim(),
+        icNumber: formattedIc,
+        teacherClass: teacherClass.trim() || "-",
+        year: year || "2026",
+        status: "pending",
+        createdAt: new Date().toISOString(),
+        registerDate: new Date().toLocaleDateString('ms-MY'),
+        registerTime: new Date().toLocaleTimeString('ms-MY')
+      };
+      
+      await addDoc(pendingTeachersCollection, pendingData);
+      console.log("Teacher registration pending:", pendingData);
+      
+      return true;
+      
+    } catch (error) {
+      console.error("Register error:", error);
+      return false;
+    }
+  }
+  
+  // ==================== LOGIN FORM SUBMIT ====================
+  loginForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     
     const fullname = fullnameInput.value.trim();
-    const icNumber = icInput.value.trim();
+    let icNumber = icInput.value.trim();
     
     if (fullname === "") {
       alert("Sila masukkan Nama Penuh anda.");
@@ -369,15 +547,78 @@
       return;
     }
     
-    const icPattern = /^[0-9]{2}[0-9]{4}-[0-9]{2}-[0-9]{4}$|^[0-9]{12}$/;
-    if (!icPattern.test(icNumber) && icNumber.length < 6) {
-      if(!confirm("Nombor Kad Pengenalan tidak mengikut format biasa (cth: 800101-01-1234). Teruskan?")) {
-        return;
-      }
-    }
+    // Buang sempang jika ada
+    icNumber = icNumber.replace(/-/g, '');
     
     showLoading();
     await verifyAndRedirect(fullname, icNumber);
+  });
+  
+  // ==================== REGISTER FORM SUBMIT ====================
+  registerForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    let fullname = regFullname.value.trim();
+    let icNumber = regIcNumber.value.trim();
+    const teacherClass = regTeacherClass.value.trim();
+    const year = regYear.value;
+    
+    // Validation
+    if (fullname === "") {
+      alert("Sila masukkan Nama Penuh (gunakan HURUF BESAR).");
+      regFullname.focus();
+      return;
+    }
+    
+    // Pastikan nama dalam huruf besar
+    fullname = fullname.toUpperCase();
+    
+    if (icNumber === "") {
+      alert("Sila masukkan Nombor Kad Pengenalan (tanpa sempang).");
+      regIcNumber.focus();
+      return;
+    }
+    
+    // Buang sempang
+    icNumber = icNumber.replace(/-/g, '');
+    
+    // Validate IC format (12 digit)
+    if (!/^\d{12}$/.test(icNumber)) {
+      alert("❌ No. Kad Pengenalan mestilah 12 digit nombor (tanpa sempang).\nContoh: 800101011234");
+      regIcNumber.focus();
+      return;
+    }
+    
+    showLoading();
+    
+    const result = await registerTeacher(fullname, icNumber, teacherClass, year);
+    
+    if (result) {
+      alert("✅ Permohonan pendaftaran anda telah dihantar!\n\nKaunselor akan meluluskan pendaftaran anda. Sila login semula setelah menerima pengesahan.");
+      // Reset form
+      registerForm.reset();
+      regYear.value = '2026';
+      // Switch to login tab
+      document.querySelector('.tab-btn[data-tab="login"]').click();
+    } else {
+      alert("❌ Gagal menghantar permohonan. Sila cuba lagi atau hubungi kaunselor.");
+    }
+    
+    hideLoading();
+  });
+  
+  // Auto uppercase for fullname field
+  regFullname.addEventListener('input', function() {
+    this.value = this.value.toUpperCase();
+  });
+  
+  // Format IC to remove dashes automatically
+  regIcNumber.addEventListener('input', function() {
+    this.value = this.value.replace(/-/g, '');
+  });
+  
+  icInput.addEventListener('input', function() {
+    this.value = this.value.replace(/-/g, '');
   });
 </script>
 </body>

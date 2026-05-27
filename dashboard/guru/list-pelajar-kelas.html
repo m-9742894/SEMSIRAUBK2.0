@@ -66,7 +66,7 @@
         }
         .back-btn:hover { background: #2563eb; color: white; }
         
-        /* Settings Card for Class & Year */
+        /* Settings Card - DISPLAY ONLY (No Edit Button) */
         .settings-card {
             background: white;
             border-radius: 1.2rem;
@@ -97,23 +97,8 @@
         .settings-item i { font-size: 1.1rem; color: #2563eb; }
         .settings-item .label { font-weight: 600; color: #64748b; font-size: 0.8rem; }
         .settings-item .value { font-weight: 700; color: #1e293b; font-size: 0.9rem; }
-        .edit-class-btn {
-            background: #e0e7ff;
-            border: none;
-            padding: 0.4rem 1rem;
-            border-radius: 2rem;
-            cursor: pointer;
-            font-weight: 600;
-            color: #2563eb;
-            transition: 0.2s;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 0.8rem;
-        }
-        .edit-class-btn:hover { background: #2563eb; color: white; }
         
-        /* No Class Card */
+        /* No Class Card - Tanpa Button Edit */
         .no-class-card {
             background: linear-gradient(135deg, #fef3c7, #fde68a);
             border-radius: 1.2rem;
@@ -136,22 +121,8 @@
             color: #78350f;
             margin-bottom: 1rem;
         }
-        .no-class-card .btn-edit-class {
-            background: #d97706;
-            color: white;
-            border: none;
-            padding: 0.6rem 1.2rem;
-            border-radius: 2rem;
-            cursor: pointer;
-            font-weight: 600;
-            transition: 0.2s;
-        }
-        .no-class-card .btn-edit-class:hover {
-            background: #b45309;
-            transform: translateY(-2px);
-        }
         
-        /* Access Denied Card */
+        /* Access Denied Card - Tanpa Button Edit */
         .access-denied {
             background: linear-gradient(135deg, #fee2e2, #fecaca);
             border-radius: 1.2rem;
@@ -173,20 +144,6 @@
         .access-denied p {
             color: #7f1d1d;
             margin-bottom: 1rem;
-        }
-        .access-denied .btn-change-view {
-            background: #dc2626;
-            color: white;
-            border: none;
-            padding: 0.6rem 1.2rem;
-            border-radius: 2rem;
-            cursor: pointer;
-            font-weight: 600;
-            transition: 0.2s;
-        }
-        .access-denied .btn-change-view:hover {
-            background: #b91c1c;
-            transform: translateY(-2px);
         }
         
         .stats {
@@ -478,7 +435,6 @@
             .students-grid { grid-template-columns: 1fr; }
             .settings-left { flex-direction: column; align-items: flex-start; width: 100%; }
             .settings-item { width: 100%; justify-content: space-between; }
-            .edit-class-btn { width: 100%; justify-content: center; }
         }
     </style>
 </head>
@@ -497,7 +453,7 @@
     
     <div id="alertMessage" class="alert"></div>
     
-    <!-- Settings Card - Edit Class & Year -->
+    <!-- Settings Card - DISPLAY ONLY (No Edit Button) -->
     <div class="settings-card">
         <div class="settings-left">
             <div class="settings-item">
@@ -511,9 +467,6 @@
                 <span class="value" id="displayYear">-</span>
             </div>
         </div>
-        <button class="edit-class-btn" id="editClassYearBtn">
-            <i class="fas fa-edit"></i> Tukar Kelas / Tahun
-        </button>
     </div>
     
     <div class="stats">
@@ -527,9 +480,6 @@
         <i class="fas fa-user-tag"></i>
         <h3>Anda Belum Ditetapkan Sebagai Guru Kelas</h3>
         <p>Anda belum mempunyai kelas yang dilantik untuk tahun ini. Sila rujuk kaunselor untuk penetapan kelas.</p>
-        <button class="btn-edit-class" onclick="document.getElementById('editClassYearBtn').click()">
-            <i class="fas fa-edit"></i> Tukar Paparan Kelas / Tahun
-        </button>
     </div>
     
     <!-- Access Denied Card - Teacher not assigned to this specific class -->
@@ -538,9 +488,6 @@
         <h3>Akses Tidak Dibenarkan</h3>
         <p>Anda bukan guru kelas untuk <strong id="deniedClass">-</strong> pada tahun <strong id="deniedYear">-</strong>.</p>
         <p>Hanya guru kelas yang dilantik boleh melihat senarai pelajar untuk kelas ini.</p>
-        <button class="btn-change-view" onclick="document.getElementById('editClassYearBtn').click()">
-            <i class="fas fa-edit"></i> Tukar Paparan Kelas / Tahun
-        </button>
     </div>
     
     <!-- Main Content - only visible if teacher has a class AND is the assigned class teacher -->
@@ -556,31 +503,6 @@
         
         <div id="studentsContainer">
             <div class="empty-state"><i class="fas fa-spinner fa-pulse"></i> Memuatkan...</div>
-        </div>
-    </div>
-</div>
-
-<!-- Modal Edit Class & Year -->
-<div id="editClassModal" class="modal" style="display: none;">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h3><i class="fas fa-edit"></i> Tukar Kelas / Tahun</h3>
-            <button class="modal-close" onclick="closeEditClassModal()">&times;</button>
-        </div>
-        <div class="modal-body">
-            <div class="form-group">
-                <label><i class="fas fa-chalkboard"></i> Kelas</label>
-                <input type="text" id="newClassName" placeholder="cth: 5 Cemerlang">
-                <p style="font-size:0.65rem; color:#64748b; margin-top:0.3rem;">Masukkan kelas yang anda ajar</p>
-            </div>
-            <div class="form-group">
-                <label><i class="fas fa-calendar"></i> Tahun / Sesi</label>
-                <input type="text" id="newYear" placeholder="cth: 2024, 2025, 2026" value="2026">
-            </div>
-            <p style="font-size:0.7rem; color:#f59e0b; background:#fef3c7; padding:0.8rem; border-radius:0.8rem; margin-top:0.5rem;">
-                <i class="fas fa-sync-alt"></i> Perubahan akan disimpan ke profil guru anda di Firebase.
-            </p>
-            <button class="modal-btn" id="saveClassYearBtn"><i class="fas fa-save"></i> Simpan & Kemaskini Profil</button>
         </div>
     </div>
 </div>
@@ -659,12 +581,10 @@
     const db = getFirestore(app);
     const studentsCollection = collection(db, "students");
     const meritCollection = collection(db, "merit_records");
-    const teachersCollection = collection(db, "teachers");
     
-    // Current view settings
+    // Current view settings - from session storage only
     let currentClass = sessionStorage.getItem('teacherClass') || '';
     let currentYear = sessionStorage.getItem('teacherYear') || '2026';
-    let teacherId = sessionStorage.getItem('teacherId') || '';
     
     let studentsList = [];
     let allMeritRecords = [];
@@ -692,23 +612,15 @@
         return teacherAssignedClass && teacherAssignedClass.trim() !== "" && teacherAssignedClass !== "-";
     }
     
-    // Check if teacher is class teacher for current class/year
+    // Check access - simply check if teacher has class
     function checkAccessRights() {
         const teacherAssignedClass = sessionStorage.getItem('teacherClass') || '';
-        const teacherAssignedYear = sessionStorage.getItem('teacherYear') || '';
         
-        // CASE 1: Teacher has NO class assigned
         if (!teacherAssignedClass || teacherAssignedClass.trim() === "" || teacherAssignedClass === "-") {
             return { hasAccess: false, reason: 'no_class' };
         }
         
-        // CASE 2: Teacher has class and viewing their own class
-        if (teacherAssignedClass === currentClass && teacherAssignedYear === currentYear) {
-            return { hasAccess: true, reason: 'ok', assignedClass: teacherAssignedClass, assignedYear: teacherAssignedYear };
-        }
-        
-        // CASE 3: Teacher viewing different class or year
-        return { hasAccess: false, reason: 'wrong_class', assignedClass: teacherAssignedClass, assignedYear: teacherAssignedYear };
+        return { hasAccess: true, reason: 'ok', assignedClass: teacherAssignedClass };
     }
     
     function updateUIBasedOnAccess() {
@@ -732,39 +644,13 @@
                 document.getElementById('studentsContainer').innerHTML = `<div class="empty-state"><i class="fas fa-user-tag" style="font-size: 2rem;"></i><p>Anda belum ditetapkan sebagai guru kelas. Sila rujuk kaunselor.</p></div>`;
             } else {
                 noClassCard.style.display = 'none';
-                accessDeniedCard.style.display = 'block';
-                document.getElementById('deniedClass').innerText = currentClass;
-                document.getElementById('deniedYear').innerText = currentYear;
-                if (stats) stats.style.opacity = '0.5';
-                document.getElementById('studentsContainer').innerHTML = `<div class="empty-state"><i class="fas fa-lock" style="font-size: 2rem;"></i><p>Akses tidak dibenarkan untuk kelas ini.</p></div>`;
+                accessDeniedCard.style.display = 'none';
             }
         } else {
             noClassCard.style.display = 'none';
             accessDeniedCard.style.display = 'none';
             mainContent.style.display = 'block';
             if (stats) stats.style.opacity = '1';
-        }
-    }
-    
-    // ==================== UPDATE TEACHER PROFILE IN FIRESTORE ====================
-    async function updateTeacherProfileInFirestore(newClass, newYear) {
-        if (!teacherId) {
-            console.warn("No teacher ID found in session");
-            return false;
-        }
-        
-        try {
-            const teacherRef = doc(db, "teachers", teacherId);
-            await updateDoc(teacherRef, {
-                teacherClass: newClass,
-                year: newYear,
-                updatedAt: new Date().toISOString()
-            });
-            console.log(`Teacher profile updated: class=${newClass}, year=${newYear}`);
-            return true;
-        } catch (error) {
-            console.error("Error updating teacher profile:", error);
-            return false;
         }
     }
     
@@ -1103,49 +989,6 @@
         }
     });
     
-    // ==================== CLASS & YEAR MANAGEMENT - UPDATE FIRESTORE ====================
-    document.getElementById('editClassYearBtn').addEventListener('click', () => {
-        const currentClassFromSession = sessionStorage.getItem('teacherClass') || '';
-        const currentYearFromSession = sessionStorage.getItem('teacherYear') || currentYear;
-        document.getElementById('newClassName').value = currentClassFromSession;
-        document.getElementById('newYear').value = currentYearFromSession;
-        document.getElementById('editClassModal').style.display = 'flex';
-    });
-    
-    document.getElementById('saveClassYearBtn').addEventListener('click', async () => {
-        const newClass = document.getElementById('newClassName').value.trim();
-        const newYear = document.getElementById('newYear').value.trim();
-        
-        if (!newClass || newClass === "") {
-            showAlert('Sila masukkan nama kelas', 'error');
-            return;
-        }
-        
-        if (!newYear || !/^\d{4}$/.test(newYear)) {
-            showAlert('Sila masukkan tahun yang sah (4 digit, cth: 2026)', 'error');
-            return;
-        }
-        
-        // Save to Firebase first
-        const updateSuccess = await updateTeacherProfileInFirestore(newClass, newYear);
-        
-        if (updateSuccess) {
-            // Update session storage
-            sessionStorage.setItem('teacherClass', newClass);
-            sessionStorage.setItem('teacherYear', newYear);
-            
-            currentClass = newClass;
-            currentYear = newYear;
-            
-            closeEditClassModal();
-            await loadAllData();
-            
-            showAlert(`✅ Profil guru dikemaskini: Kelas ${newClass} (${newYear})`, 'success');
-        } else {
-            showAlert('❌ Gagal mengemaskini profil guru di Firebase. Sila cuba lagi.', 'error');
-        }
-    });
-    
     // ==================== TRANSFER STUDENTS ====================
     document.getElementById('transferStudentsBtn').addEventListener('click', () => {
         document.getElementById('transferModal').style.display = 'flex';
@@ -1198,7 +1041,6 @@
     });
     
     // ==================== CLOSE MODALS ====================
-    window.closeEditClassModal = () => document.getElementById('editClassModal').style.display = 'none';
     window.closeTransferModal = () => document.getElementById('transferModal').style.display = 'none';
     window.closeStudentModal = () => document.getElementById('studentModal').style.display = 'none';
     

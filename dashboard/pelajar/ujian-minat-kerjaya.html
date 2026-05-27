@@ -12,24 +12,14 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
             background: linear-gradient(135deg, #e8f0fe 0%, #dfe7f5 100%);
             min-height: 100vh;
             padding: 20px;
         }
-
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-        }
-
+        .container { max-width: 800px; margin: 0 auto; }
         .header {
             display: flex;
             justify-content: space-between;
@@ -40,24 +30,16 @@
             padding-bottom: 1rem;
             border-bottom: 2px solid rgba(37,99,235,0.2);
         }
-        .logo-area {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
+        .logo-area { display: flex; align-items: center; gap: 1rem; }
         .logo-icon {
             background: linear-gradient(145deg, #2563eb, #7c3aed);
-            width: 45px;
-            height: 45px;
+            width: 45px; height: 45px;
             border-radius: 28px;
             display: flex;
             align-items: center;
             justify-content: center;
         }
-        .logo-icon i {
-            font-size: 1.5rem;
-            color: white;
-        }
+        .logo-icon i { font-size: 1.5rem; color: white; }
         .logo-text h1 {
             font-size: 1.2rem;
             font-weight: 800;
@@ -77,7 +59,6 @@
             text-decoration: none;
             font-size: 0.8rem;
         }
-
         .profile-card {
             background: white;
             border-radius: 1rem;
@@ -91,20 +72,9 @@
             gap: 1rem;
             justify-content: space-between;
         }
-        .profile-item {
-            flex: 1;
-            min-width: 150px;
-        }
-        .profile-item .label {
-            font-size: 0.7rem;
-            color: #64748b;
-        }
-        .profile-item .value {
-            font-weight: 700;
-            color: #1e293b;
-            font-size: 0.9rem;
-        }
-
+        .profile-item { flex: 1; min-width: 150px; }
+        .profile-item .label { font-size: 0.7rem; color: #64748b; }
+        .profile-item .value { font-weight: 700; color: #1e293b; font-size: 0.9rem; }
         .progress-container {
             background: #e2e8f0;
             border-radius: 20px;
@@ -118,7 +88,13 @@
             height: 100%;
             transition: width 0.3s ease;
         }
-
+        .progress-text {
+            text-align: right;
+            font-size: 0.7rem;
+            color: #64748b;
+            margin-top: -1rem;
+            margin-bottom: 1rem;
+        }
         .question-card {
             background: white;
             border-radius: 1.5rem;
@@ -146,17 +122,18 @@
             font-size: 0.7rem;
             color: #64748b;
         }
+        .question-prefix {
+            color: #2563eb;
+            font-size: 0.9rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
         .question-text {
             font-size: 1.1rem;
             font-weight: 600;
             color: #1e293b;
             margin-bottom: 1.5rem;
             line-height: 1.4;
-        }
-        .question-prefix {
-            color: #2563eb;
-            font-size: 0.9rem;
-            margin-bottom: 0.5rem;
         }
         .options {
             display: flex;
@@ -177,31 +154,12 @@
             gap: 8px;
             font-size: 1rem;
         }
-        .option-yes {
-            background: #10b981;
-            color: white;
-        }
-        .option-yes:hover {
-            background: #059669;
-            transform: scale(1.02);
-        }
-        .option-no {
-            background: #ef4444;
-            color: white;
-        }
-        .option-no:hover {
-            background: #dc2626;
-            transform: scale(1.02);
-        }
-        .option-selected-yes {
-            background: #059669;
-            box-shadow: 0 0 0 3px rgba(16,185,129,0.3);
-        }
-        .option-selected-no {
-            background: #dc2626;
-            box-shadow: 0 0 0 3px rgba(220,38,38,0.3);
-        }
-
+        .option-yes { background: #10b981; color: white; }
+        .option-yes:hover { background: #059669; transform: scale(1.02); }
+        .option-no { background: #ef4444; color: white; }
+        .option-no:hover { background: #dc2626; transform: scale(1.02); }
+        .option-selected-yes { background: #059669; box-shadow: 0 0 0 3px rgba(16,185,129,0.3); }
+        .option-selected-no { background: #dc2626; box-shadow: 0 0 0 3px rgba(220,38,38,0.3); }
         .nav-buttons {
             display: flex;
             gap: 1rem;
@@ -218,18 +176,9 @@
             background: #e2e8f0;
             color: #1e293b;
         }
-        .nav-btn-primary {
-            background: linear-gradient(95deg, #2563eb, #7c3aed);
-            color: white;
-        }
-        .nav-btn-primary:hover {
-            transform: translateY(-2px);
-        }
-        .nav-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
+        .nav-btn-primary { background: linear-gradient(95deg, #2563eb, #7c3aed); color: white; }
+        .nav-btn-primary:hover { transform: translateY(-2px); }
+        .nav-btn:disabled { opacity: 0.5; cursor: not-allowed; }
         .result-card {
             background: white;
             border-radius: 1.5rem;
@@ -244,12 +193,8 @@
             text-align: center;
             margin-bottom: 1rem;
         }
-        .result-chart {
-            margin: 1.5rem 0;
-        }
-        .result-bar {
-            margin-bottom: 1rem;
-        }
+        .result-chart { margin: 1.5rem 0; }
+        .result-bar { margin-bottom: 1rem; }
         .result-bar-label {
             display: flex;
             justify-content: space-between;
@@ -283,10 +228,7 @@
             text-align: center;
             margin: 1rem 0;
         }
-        .top-categories h4 {
-            color: #2563eb;
-            margin-bottom: 0.5rem;
-        }
+        .top-categories h4 { color: #2563eb; margin-bottom: 0.5rem; }
         .top-badge {
             display: inline-block;
             background: #2563eb;
@@ -309,10 +251,7 @@
             transition: 0.2s;
             margin-top: 1rem;
         }
-        .btn-submit:hover {
-            transform: translateY(-2px);
-        }
-
+        .btn-submit:hover { transform: translateY(-2px); }
         .locked-message {
             text-align: center;
             padding: 2rem;
@@ -320,7 +259,6 @@
             border-radius: 1rem;
             color: #92400e;
         }
-
         .toast {
             position: fixed;
             bottom: 30px;
@@ -336,7 +274,6 @@
             from { transform: translateX(100%); opacity: 0; }
             to { transform: translateX(0); opacity: 1; }
         }
-
         @media (max-width: 600px) {
             body { padding: 10px; }
             .question-text { font-size: 0.95rem; }
@@ -350,13 +287,10 @@
     <div class="header">
         <div class="logo-area">
             <div class="logo-icon"><i class="fas fa-chart-line"></i></div>
-            <div class="logo-text">
-                <h1>Inventori Minat Kerjaya</h1>
-            </div>
+            <div class="logo-text"><h1>Inventori Minat Kerjaya</h1></div>
         </div>
         <a href="psikometrik.html" class="back-btn"><i class="fas fa-arrow-left"></i> Kembali</a>
     </div>
-
     <div id="contentArea">
         <div class="loading-state" style="text-align:center; padding:2rem;">
             <i class="fas fa-spinner fa-pulse"></i> Memuatkan...
@@ -382,97 +316,228 @@
     const db = getFirestore(app);
     const ujianResultsCollection = collection(db, "ujian_minat_kerjaya");
     
-    // Get student data from session storage
+    // Student data
     const studentName = sessionStorage.getItem('studentName') || localStorage.getItem('studentName') || 'Pelajar';
     const studentIC = sessionStorage.getItem('studentIC') || localStorage.getItem('studentIC') || '-';
     const studentClass = sessionStorage.getItem('studentClass') || localStorage.getItem('studentClass') || '-';
     const studentSession = sessionStorage.getItem('studentSession') || localStorage.getItem('studentSession') || '2026';
     
-    // Current date, time, day
+    // Date & Time
     const now = new Date();
     const currentDate = now.toLocaleDateString('ms-MY', { day: 'numeric', month: 'long', year: 'numeric' });
     const currentTime = now.toLocaleTimeString('ms-MY', { hour: '2-digit', minute: '2-digit' });
     const currentDay = now.toLocaleDateString('ms-MY', { weekday: 'long' });
     
-    // ==================== SOALAN ====================
-    // 30 soalan untuk setiap kategori R, I, A, S, E, K (180 soalan total)
-    const rSoalan = [
-        "menghasilkan model binaan", "belajar cara-cara penjagaan haiwan", "bermain permainan video", "menyertai aktiviti sukan", "melakukan aktiviti lasak",
-        "mencantas tanaman hiasan", "membaiki peralatan yang rosak", "menggunakan peralatan dalam bengkel", "menggunakan komputer untuk mencari maklumat", "menonton acara sukan",
-        "pereka peralatan", "kontraktor binaan", "jurukimpal", "jurulatih kecergasan", "pemandu e-hailing",
-        "juruteknik", "jurutera", "ahli sukan esports", "arkitek", "pembuat pastri",
-        "menukar tayar basikal", "menyusun atur perabot", "memasang alat permainan berpandukan manual", "menghasilkan animasi", "membaiki kerosakan alat elektrik yang mudah",
-        "menggunakan mesin", "menggunakan perisian komputer", "menjaga haiwan peliharaan", "membuat keputusan mengikut situasi", "menggunakan peralatan sukan"
+    // ==================== SOALAN LENGKAP DENGAN PREFIX YANG BETUL ====================
+    // Format: { text: "soalan", cat: "R/I/A/S/E/K", prefix: "SAYA SUKA.../SAYA BERMINAT MENJADI.../SAYA BOLEH..." }
+    
+    const allQuestions = [
+        // ========== KITARAN 1: SAYA SUKA (Soalan 1-10 R, 1-10 I, 1-10 A, 1-10 S, 1-10 E, 1-10 K) ==========
+        // R - SUKA
+        { text: "menghasilkan model binaan", cat: "R", prefix: "SAYA SUKA..." },
+        { text: "belajar cara-cara penjagaan haiwan", cat: "R", prefix: "SAYA SUKA..." },
+        { text: "bermain permainan video", cat: "R", prefix: "SAYA SUKA..." },
+        { text: "menyertai aktiviti sukan", cat: "R", prefix: "SAYA SUKA..." },
+        { text: "melakukan aktiviti lasak", cat: "R", prefix: "SAYA SUKA..." },
+        { text: "mencantas tanaman hiasan", cat: "R", prefix: "SAYA SUKA..." },
+        { text: "membaiki peralatan yang rosak", cat: "R", prefix: "SAYA SUKA..." },
+        { text: "menggunakan peralatan dalam bengkel", cat: "R", prefix: "SAYA SUKA..." },
+        { text: "menggunakan komputer untuk mencari maklumat", cat: "R", prefix: "SAYA SUKA..." },
+        { text: "menonton acara sukan", cat: "R", prefix: "SAYA SUKA..." },
+        // I - SUKA
+        { text: "memerhati fasa bulan", cat: "I", prefix: "SAYA SUKA..." },
+        { text: "mengetahui salah silah keluarga", cat: "I", prefix: "SAYA SUKA..." },
+        { text: "mencari perkataan tersembunyi", cat: "I", prefix: "SAYA SUKA..." },
+        { text: "aktiviti STEM", cat: "I", prefix: "SAYA SUKA..." },
+        { text: "aktiviti penyelesaian masalah", cat: "I", prefix: "SAYA SUKA..." },
+        { text: "menggunakan alat bantu navigasi", cat: "I", prefix: "SAYA SUKA..." },
+        { text: "mengkaji budaya kaum lain", cat: "I", prefix: "SAYA SUKA..." },
+        { text: "mengelaskan bahan kimia", cat: "I", prefix: "SAYA SUKA..." },
+        { text: "mengambil tahu perkembangan teknologi", cat: "I", prefix: "SAYA SUKA..." },
+        { text: "mengetahui kandungan bahan dalam makanan", cat: "I", prefix: "SAYA SUKA..." },
+        // A - SUKA
+        { text: "mengikuti rancangan hiburan", cat: "A", prefix: "SAYA SUKA..." },
+        { text: "menggayakan fesyen terkini", cat: "A", prefix: "SAYA SUKA..." },
+        { text: "mendengar muzik", cat: "A", prefix: "SAYA SUKA..." },
+        { text: "mengambil gambar", cat: "A", prefix: "SAYA SUKA..." },
+        { text: "aktiviti keceriaan", cat: "A", prefix: "SAYA SUKA..." },
+        { text: "bertindak mengikut gerak hati", cat: "A", prefix: "SAYA SUKA..." },
+        { text: "mengikuti siri animasi", cat: "A", prefix: "SAYA SUKA..." },
+        { text: "menghasilkan karya digital", cat: "A", prefix: "SAYA SUKA..." },
+        { text: "membuat rakaman kreatif", cat: "A", prefix: "SAYA SUKA..." },
+        { text: "menghayati pemandangan yang indah", cat: "A", prefix: "SAYA SUKA..." },
+        // S - SUKA
+        { text: "menyertai aktiviti perkhemahan", cat: "S", prefix: "SAYA SUKA..." },
+        { text: "bergotong-royong membersihkan kawasan sekolah", cat: "S", prefix: "SAYA SUKA..." },
+        { text: "menolong rakan yang ditimpa kesusahan", cat: "S", prefix: "SAYA SUKA..." },
+        { text: "berada dalam kumpulan", cat: "S", prefix: "SAYA SUKA..." },
+        { text: "beramah mesra", cat: "S", prefix: "SAYA SUKA..." },
+        { text: "mengambil berat terhadap orang sekeliling", cat: "S", prefix: "SAYA SUKA..." },
+        { text: "belajar pelbagai bahasa", cat: "S", prefix: "SAYA SUKA..." },
+        { text: "meraikan rakan-rakan", cat: "S", prefix: "SAYA SUKA..." },
+        { text: "berkongsi idea dengan orang lain", cat: "S", prefix: "SAYA SUKA..." },
+        { text: "melibatkan diri dengan aktiviti khidmat sosial", cat: "S", prefix: "SAYA SUKA..." },
+        // E - SUKA
+        { text: "mengusahakan perniagaan", cat: "E", prefix: "SAYA SUKA..." },
+        { text: "menjadi ketua", cat: "E", prefix: "SAYA SUKA..." },
+        { text: "mencari peluang", cat: "E", prefix: "SAYA SUKA..." },
+        { text: "memenangi pertandingan", cat: "E", prefix: "SAYA SUKA..." },
+        { text: "memimpin lafaz ikrar", cat: "E", prefix: "SAYA SUKA..." },
+        { text: "aktiviti yang mencabar", cat: "E", prefix: "SAYA SUKA..." },
+        { text: "dikenali ramai", cat: "E", prefix: "SAYA SUKA..." },
+        { text: "menarik perhatian orang lain", cat: "E", prefix: "SAYA SUKA..." },
+        { text: "mengetuai persembahan", cat: "E", prefix: "SAYA SUKA..." },
+        { text: "berniaga", cat: "E", prefix: "SAYA SUKA..." },
+        // K - SUKA
+        { text: "merekod setiap perbelanjaan", cat: "K", prefix: "SAYA SUKA..." },
+        { text: "menyusun sijil dalam fail", cat: "K", prefix: "SAYA SUKA..." },
+        { text: "membuat senarai barang yang hendak dibeli", cat: "K", prefix: "SAYA SUKA..." },
+        { text: "menyusun barang-barang peribadi", cat: "K", prefix: "SAYA SUKA..." },
+        { text: "mengutamakan kekemasan", cat: "K", prefix: "SAYA SUKA..." },
+        { text: "melaksanakan tugasan secara terperinci", cat: "K", prefix: "SAYA SUKA..." },
+        { text: "bertugas mengikut jadual", cat: "K", prefix: "SAYA SUKA..." },
+        { text: "menyiapkan tugasan tepat pada masanya", cat: "K", prefix: "SAYA SUKA..." },
+        { text: "membuat kerja secara sistematik", cat: "K", prefix: "SAYA SUKA..." },
+        { text: "mematuhi peraturan", cat: "K", prefix: "SAYA SUKA..." },
+        
+        // ========== KITARAN 2: SAYA BERMINAT MENJADI (Soalan 11-20 setiap kategori) ==========
+        // R - BERMINAT MENJADI
+        { text: "pereka peralatan", cat: "R", prefix: "SAYA BERMINAT MENJADI..." },
+        { text: "kontraktor binaan", cat: "R", prefix: "SAYA BERMINAT MENJADI..." },
+        { text: "jurukimpal", cat: "R", prefix: "SAYA BERMINAT MENJADI..." },
+        { text: "jurulatih kecergasan", cat: "R", prefix: "SAYA BERMINAT MENJADI..." },
+        { text: "pemandu e-hailing", cat: "R", prefix: "SAYA BERMINAT MENJADI..." },
+        { text: "juruteknik", cat: "R", prefix: "SAYA BERMINAT MENJADI..." },
+        { text: "jurutera", cat: "R", prefix: "SAYA BERMINAT MENJADI..." },
+        { text: "ahli sukan esports", cat: "R", prefix: "SAYA BERMINAT MENJADI..." },
+        { text: "arkitek", cat: "R", prefix: "SAYA BERMINAT MENJADI..." },
+        { text: "pembuat pastri", cat: "R", prefix: "SAYA BERMINAT MENJADI..." },
+        // I - BERMINAT MENJADI
+        { text: "ahli biologi marin", cat: "I", prefix: "SAYA BERMINAT MENJADI..." },
+        { text: "ahli kaji bumi", cat: "I", prefix: "SAYA BERMINAT MENJADI..." },
+        { text: "ahli astronomi", cat: "I", prefix: "SAYA BERMINAT MENJADI..." },
+        { text: "angkasawan", cat: "I", prefix: "SAYA BERMINAT MENJADI..." },
+        { text: "pakar bedah", cat: "I", prefix: "SAYA BERMINAT MENJADI..." },
+        { text: "pegawai penyiasat", cat: "I", prefix: "SAYA BERMINAT MENJADI..." },
+        { text: "ahli farmasi", cat: "I", prefix: "SAYA BERMINAT MENJADI..." },
+        { text: "ahli arkeologi", cat: "I", prefix: "SAYA BERMINAT MENJADI..." },
+        { text: "pakar ekonomi", cat: "I", prefix: "SAYA BERMINAT MENJADI..." },
+        { text: "ahli forensik", cat: "I", prefix: "SAYA BERMINAT MENJADI..." },
+        // A - BERMINAT MENJADI
+        { text: "penggubah lagu", cat: "A", prefix: "SAYA BERMINAT MENJADI..." },
+        { text: "penyanyi", cat: "A", prefix: "SAYA BERMINAT MENJADI..." },
+        { text: "pelakon", cat: "A", prefix: "SAYA BERMINAT MENJADI..." },
+        { text: "juruhias", cat: "A", prefix: "SAYA BERMINAT MENJADI..." },
+        { text: "jurusolek", cat: "A", prefix: "SAYA BERMINAT MENJADI..." },
+        { text: "pereka fesyen", cat: "A", prefix: "SAYA BERMINAT MENJADI..." },
+        { text: "pereka tari", cat: "A", prefix: "SAYA BERMINAT MENJADI..." },
+        { text: "jurufoto", cat: "A", prefix: "SAYA BERMINAT MENJADI..." },
+        { text: "pengarah filem", cat: "A", prefix: "SAYA BERMINAT MENJADI..." },
+        { text: "content creator", cat: "A", prefix: "SAYA BERMINAT MENJADI..." },
+        // S - BERMINAT MENJADI
+        { text: "guru", cat: "S", prefix: "SAYA BERMINAT MENJADI..." },
+        { text: "pendakwah", cat: "S", prefix: "SAYA BERMINAT MENJADI..." },
+        { text: "jururawat", cat: "S", prefix: "SAYA BERMINAT MENJADI..." },
+        { text: "penyambut tetamu", cat: "S", prefix: "SAYA BERMINAT MENJADI..." },
+        { text: "pakar motivasi", cat: "S", prefix: "SAYA BERMINAT MENJADI..." },
+        { text: "pegawai tadbir diplomatik", cat: "S", prefix: "SAYA BERMINAT MENJADI..." },
+        { text: "pegawai kebajikan masyarakat", cat: "S", prefix: "SAYA BERMINAT MENJADI..." },
+        { text: "pensyarah", cat: "S", prefix: "SAYA BERMINAT MENJADI..." },
+        { text: "wartawan", cat: "S", prefix: "SAYA BERMINAT MENJADI..." },
+        { text: "pelayan kapal terbang", cat: "S", prefix: "SAYA BERMINAT MENJADI..." },
+        // E - BERMINAT MENJADI
+        { text: "peguam", cat: "E", prefix: "SAYA BERMINAT MENJADI..." },
+        { text: "pakar runding", cat: "E", prefix: "SAYA BERMINAT MENJADI..." },
+        { text: "pengurus bank", cat: "E", prefix: "SAYA BERMINAT MENJADI..." },
+        { text: "pengarah syarikat", cat: "E", prefix: "SAYA BERMINAT MENJADI..." },
+        { text: "agen insurans", cat: "E", prefix: "SAYA BERMINAT MENJADI..." },
+        { text: "pengusaha restoran", cat: "E", prefix: "SAYA BERMINAT MENJADI..." },
+        { text: "pegawai pemasaran", cat: "E", prefix: "SAYA BERMINAT MENJADI..." },
+        { text: "ahli politik", cat: "E", prefix: "SAYA BERMINAT MENJADI..." },
+        { text: "broker saham", cat: "E", prefix: "SAYA BERMINAT MENJADI..." },
+        { text: "usahawan", cat: "E", prefix: "SAYA BERMINAT MENJADI..." },
+        // K - BERMINAT MENJADI
+        { text: "pegawai bank", cat: "K", prefix: "SAYA BERMINAT MENJADI..." },
+        { text: "akauntan", cat: "K", prefix: "SAYA BERMINAT MENJADI..." },
+        { text: "juruwang", cat: "K", prefix: "SAYA BERMINAT MENJADI..." },
+        { text: "setiausaha", cat: "K", prefix: "SAYA BERMINAT MENJADI..." },
+        { text: "juruaudit", cat: "K", prefix: "SAYA BERMINAT MENJADI..." },
+        { text: "pengaturcara komputer", cat: "K", prefix: "SAYA BERMINAT MENJADI..." },
+        { text: "pustakawan", cat: "K", prefix: "SAYA BERMINAT MENJADI..." },
+        { text: "pengurup wang", cat: "K", prefix: "SAYA BERMINAT MENJADI..." },
+        { text: "penilai harta", cat: "K", prefix: "SAYA BERMINAT MENJADI..." },
+        { text: "kerani", cat: "K", prefix: "SAYA BERMINAT MENJADI..." },
+        
+        // ========== KITARAN 3: SAYA BOLEH (Soalan 21-30 setiap kategori) ==========
+        // R - BOLEH
+        { text: "menukar tayar basikal", cat: "R", prefix: "SAYA BOLEH..." },
+        { text: "menyusun atur perabot", cat: "R", prefix: "SAYA BOLEH..." },
+        { text: "memasang alat permainan berpandukan manual", cat: "R", prefix: "SAYA BOLEH..." },
+        { text: "menghasilkan animasi", cat: "R", prefix: "SAYA BOLEH..." },
+        { text: "membaiki kerosakan alat elektrik yang mudah", cat: "R", prefix: "SAYA BOLEH..." },
+        { text: "menggunakan mesin", cat: "R", prefix: "SAYA BOLEH..." },
+        { text: "menggunakan perisian komputer", cat: "R", prefix: "SAYA BOLEH..." },
+        { text: "menjaga haiwan peliharaan", cat: "R", prefix: "SAYA BOLEH..." },
+        { text: "membuat keputusan mengikut situasi", cat: "R", prefix: "SAYA BOLEH..." },
+        { text: "menggunakan peralatan sukan", cat: "R", prefix: "SAYA BOLEH..." },
+        // I - BOLEH
+        { text: "mengenal pasti kandungan nutrisi makanan", cat: "I", prefix: "SAYA BOLEH..." },
+        { text: "menggunakan kalkulator saintifik", cat: "I", prefix: "SAYA BOLEH..." },
+        { text: "memahami fenomena alam semula jadi", cat: "I", prefix: "SAYA BOLEH..." },
+        { text: "menjalankan eksperimen untuk membuktikan sesuatu teori", cat: "I", prefix: "SAYA BOLEH..." },
+        { text: "menggunakan formula yang mudah", cat: "I", prefix: "SAYA BOLEH..." },
+        { text: "mencari penyelesaian suatu tugasan", cat: "I", prefix: "SAYA BOLEH..." },
+        { text: "menyelesaikan soalan yang menguji minda", cat: "I", prefix: "SAYA BOLEH..." },
+        { text: "mengaplikasi pengetahuan sains dalam aktiviti harian", cat: "I", prefix: "SAYA BOLEH..." },
+        { text: "bertanya soalan untuk mendapatkan maklumat", cat: "I", prefix: "SAYA BOLEH..." },
+        { text: "menganalisis fakta", cat: "I", prefix: "SAYA BOLEH..." },
+        // A - BOLEH
+        { text: "membuat persembahan kebudayaan", cat: "A", prefix: "SAYA BOLEH..." },
+        { text: "melukis", cat: "A", prefix: "SAYA BOLEH..." },
+        { text: "mengukir", cat: "A", prefix: "SAYA BOLEH..." },
+        { text: "menghasilkan poster", cat: "A", prefix: "SAYA BOLEH..." },
+        { text: "menghasilkan penulisan kreatif", cat: "A", prefix: "SAYA BOLEH..." },
+        { text: "berimaginasi tinggi", cat: "A", prefix: "SAYA BOLEH..." },
+        { text: "meluahkan perasaan melalui aktiviti seni", cat: "A", prefix: "SAYA BOLEH..." },
+        { text: "menghayati pelbagai emosi", cat: "A", prefix: "SAYA BOLEH..." },
+        { text: "menghasilkan nota dengan pelbagai cara", cat: "A", prefix: "SAYA BOLEH..." },
+        { text: "bertindak mengikut kemahuan diri", cat: "A", prefix: "SAYA BOLEH..." },
+        // S - BOLEH
+        { text: "berinteraksi dengan ramai orang", cat: "S", prefix: "SAYA BOLEH..." },
+        { text: "bekerjasama dengan orang lain", cat: "S", prefix: "SAYA BOLEH..." },
+        { text: "menyertai acara sukan", cat: "S", prefix: "SAYA BOLEH..." },
+        { text: "mendapatkan sumbangan", cat: "S", prefix: "SAYA BOLEH..." },
+        { text: "memujuk orang yang dalam kesedihan", cat: "S", prefix: "SAYA BOLEH..." },
+        { text: "beramah mesra dengan orang yang baru dikenali", cat: "S", prefix: "SAYA BOLEH..." },
+        { text: "memberi bantuan kepada orang yang memerlukan", cat: "S", prefix: "SAYA BOLEH..." },
+        { text: "didekati oleh ramai orang", cat: "S", prefix: "SAYA BOLEH..." },
+        { text: "menolong orang yang dalam kesusahan", cat: "S", prefix: "SAYA BOLEH..." },
+        { text: "menjadi sukarelawan", cat: "S", prefix: "SAYA BOLEH..." },
+        // E - BOLEH
+        { text: "menyelia kerja-kerja orang lain", cat: "E", prefix: "SAYA BOLEH..." },
+        { text: "mempengaruhi orang lain", cat: "E", prefix: "SAYA BOLEH..." },
+        { text: "menjadi jurujual", cat: "E", prefix: "SAYA BOLEH..." },
+        { text: "mewakili kumpulan dalam pembentangan", cat: "E", prefix: "SAYA BOLEH..." },
+        { text: "berniaga kecil-kecilan", cat: "E", prefix: "SAYA BOLEH..." },
+        { text: "menjadi pemimpin", cat: "E", prefix: "SAYA BOLEH..." },
+        { text: "meyakinkan orang lain menerima idea saya", cat: "E", prefix: "SAYA BOLEH..." },
+        { text: "mengendalikan majlis", cat: "E", prefix: "SAYA BOLEH..." },
+        { text: "mempengaruhi rakan-rakan menyertai sesuatu aktiviti", cat: "E", prefix: "SAYA BOLEH..." },
+        { text: "merancang matlamat dengan jelas", cat: "E", prefix: "SAYA BOLEH..." },
+        // K - BOLEH
+        { text: "menguruskan dokumen dengan sistematik", cat: "K", prefix: "SAYA BOLEH..." },
+        { text: "menggunakan perisian komputer", cat: "K", prefix: "SAYA BOLEH..." },
+        { text: "menyelesaikan tugasan secara terperinci", cat: "K", prefix: "SAYA BOLEH..." },
+        { text: "menyusun aktiviti harian", cat: "K", prefix: "SAYA BOLEH..." },
+        { text: "menyimpan dokumen dengan rapi", cat: "K", prefix: "SAYA BOLEH..." },
+        { text: "bekerja secara sistematik", cat: "K", prefix: "SAYA BOLEH..." },
+        { text: "melakukan tugasan mengikut arahan", cat: "K", prefix: "SAYA BOLEH..." },
+        { text: "menepati masa", cat: "K", prefix: "SAYA BOLEH..." },
+        { text: "mengurus perbelanjaan harian", cat: "K", prefix: "SAYA BOLEH..." },
+        { text: "merekod wang simpanan", cat: "K", prefix: "SAYA BOLEH..." }
     ];
     
-    const iSoalan = [
-        "memerhati fasa bulan", "mengetahui salah silah keluarga", "mencari perkataan tersembunyi", "aktiviti STEM", "aktiviti penyelesaian masalah",
-        "menggunakan alat bantu navigasi", "mengkaji budaya kaum lain", "mengelaskan bahan kimia", "mengambil tahu perkembangan teknologi", "mengetahui kandungan bahan dalam makanan",
-        "ahli biologi marin", "ahli kaji bumi", "ahli astronomi", "angkasawan", "pakar bedah",
-        "pegawai penyiasat", "ahli farmasi", "ahli arkeologi", "pakar ekonomi", "ahli forensik",
-        "mengenal pasti kandungan nutrisi makanan", "menggunakan kalkulator saintifik", "memahami fenomena alam semula jadi", "menjalankan eksperimen untuk membuktikan sesuatu teori", "menggunakan formula yang mudah",
-        "mencari penyelesaian suatu tugasan", "menyelesaikan soalan yang menguji minda", "mengaplikasi pengetahuan sains dalam aktiviti harian", "bertanya soalan untuk mendapatkan maklumat", "menganalisis fakta"
-    ];
-    
-    const aSoalan = [
-        "mengikuti rancangan hiburan", "menggayakan fesyen terkini", "mendengar muzik", "mengambil gambar", "aktiviti keceriaan",
-        "bertindak mengikut gerak hati", "mengikuti siri animasi", "menghasilkan karya digital", "membuat rakaman kreatif", "menghayati pemandangan yang indah",
-        "penggubah lagu", "penyanyi", "pelakon", "juruhias", "jurusolek",
-        "pereka fesyen", "pereka tari", "jurufoto", "pengarah filem", "content creator",
-        "membuat persembahan kebudayaan", "melukis", "mengukir", "menghasilkan poster", "menghasilkan penulisan kreatif",
-        "berimaginasi tinggi", "meluahkan perasaan melalui aktiviti seni", "menghayati pelbagai emosi", "menghasilkan nota dengan pelbagai cara", "bertindak mengikut kemahuan diri"
-    ];
-    
-    const sSoalan = [
-        "menyertai aktiviti perkhemahan", "bergotong-royong membersihkan kawasan sekolah", "menolong rakan yang ditimpa kesusahan", "berada dalam kumpulan", "beramah mesra",
-        "mengambil berat terhadap orang sekeliling", "belajar pelbagai bahasa", "meraikan rakan-rakan", "berkongsi idea dengan orang lain", "melibatkan diri dengan aktiviti khidmat sosial",
-        "guru", "pendakwah", "jururawat", "penyambut tetamu", "pakar motivasi",
-        "pegawai tadbir diplomatik", "pegawai kebajikan masyarakat", "pensyarah", "wartawan", "pelayan kapal terbang",
-        "berinteraksi dengan ramai orang", "bekerjasama dengan orang lain", "menyertai acara sukan", "mendapatkan sumbangan", "memujuk orang yang dalam kesedihan",
-        "beramah mesra dengan orang yang baru dikenali", "memberi bantuan kepada orang yang memerlukan", "didekati oleh ramai orang", "menolong orang yang dalam kesusahan", "menjadi sukarelawan"
-    ];
-    
-    const eSoalan = [
-        "mengusahakan perniagaan", "menjadi ketua", "mencari peluang", "memenangi pertandingan", "memimpin lafaz ikrar",
-        "aktiviti yang mencabar", "dikenali ramai", "menarik perhatian orang lain", "mengetuai persembahan", "berniaga",
-        "peguam", "pakar runding", "pengurus bank", "pengarah syarikat", "agen insurans",
-        "pengusaha restoran", "pegawai pemasaran", "ahli politik", "broker saham", "usahawan",
-        "menyelia kerja-kerja orang lain", "mempengaruhi orang lain", "menjadi jurujual", "mewakili kumpulan dalam pembentangan", "berniaga kecil-kecilan",
-        "menjadi pemimpin", "meyakinkan orang lain menerima idea saya", "mengendalikan majlis", "mempengaruhi rakan-rakan menyertai sesuatu aktiviti", "merancang matlamat dengan jelas"
-    ];
-    
-    const kSoalan = [
-        "merekod setiap perbelanjaan", "menyusun sijil dalam fail", "membuat senarai barang yang hendak dibeli", "menyusun barang-barang peribadi", "mengutamakan kekemasan",
-        "melaksanakan tugasan secara terperinci", "bertugas mengikut jadual", "menyiapkan tugasan tepat pada masanya", "membuat kerja secara sistematik", "mematuhi peraturan",
-        "pegawai bank", "akauntan", "juruwang", "setiausaha", "juruaudit",
-        "pengaturcara komputer", "pustakawan", "pengurup wang", "penilai harta", "kerani",
-        "menguruskan dokumen dengan sistematik", "menggunakan perisian komputer", "menyelesaikan tugasan secara terperinci", "menyusun aktiviti harian", "menyimpan dokumen dengan rapi",
-        "bekerja secara sistematik", "melakukan tugasan mengikut arahan", "menepati masa", "mengurus perbelanjaan harian", "merekod wang simpanan"
-    ];
-    
-    // Build complete questions array: R,I,A,S,E,K repeated (30 cycles = 180 soalan)
-    let allQuestions = [];
-    for (let i = 0; i < 30; i++) {
-        allQuestions.push({ q: rSoalan[i], cat: "R" });
-        allQuestions.push({ q: iSoalan[i], cat: "I" });
-        allQuestions.push({ q: aSoalan[i], cat: "A" });
-        allQuestions.push({ q: sSoalan[i], cat: "S" });
-        allQuestions.push({ q: eSoalan[i], cat: "E" });
-        allQuestions.push({ q: kSoalan[i], cat: "K" });
-    }
-    // 30 cycles * 6 = 180 soalan
-    
-    // Function to get prefix based on question index (0-based)
-    // Soalan 1-10 (index 0-9) -> "SAYA SUKA"
-    // Soalan 11-20 (index 10-19) -> "SAYA BERMINAT MENJADI"
-    // Soalan 21-30 (index 20-29) -> "SAYA BOLEH"
-    // Pattern repeats every 30 questions
-    function getQuestionPrefix(index) {
-        const positionInCycle = index % 30;
-        if (positionInCycle < 10) return "SAYA SUKA...";
-        if (positionInCycle < 20) return "SAYA BERMINAT MENJADI...";
-        return "SAYA BOLEH...";
-    }
+    console.log("Total soalan:", allQuestions.length); // Should be 180
     
     let answers = {};
     let currentIndex = 0;
@@ -529,9 +594,9 @@
     
     async function saveResultToFirestore() {
         const totalScore = Object.values(scores).reduce((a,b) => a + b, 0);
-        
         const sorted = Object.entries(scores).sort((a,b) => b[1] - a[1]);
         const top3 = sorted.slice(0,3).map(([cat, score]) => `${cat} (${score})`).join(", ");
+        const top3Codes = sorted.slice(0,3).map(([cat]) => cat).join("");
         
         const resultData = {
             studentName: studentName,
@@ -544,6 +609,7 @@
             scores: scores,
             totalScore: totalScore,
             topCategories: top3,
+            hollandCode: top3Codes,
             completedAt: new Date().toISOString(),
             status: "completed"
         };
@@ -567,26 +633,11 @@
         return `
             <div class="profile-card">
                 <div class="profile-grid">
-                    <div class="profile-item">
-                        <div class="label">Nama Penuh</div>
-                        <div class="value">${studentName}</div>
-                    </div>
-                    <div class="profile-item">
-                        <div class="label">No. Kad Pengenalan</div>
-                        <div class="value">${studentIC}</div>
-                    </div>
-                    <div class="profile-item">
-                        <div class="label">Kelas</div>
-                        <div class="value">${studentClass}</div>
-                    </div>
-                    <div class="profile-item">
-                        <div class="label">Tarikh / Masa</div>
-                        <div class="value">${currentDate} • ${currentTime}</div>
-                    </div>
-                    <div class="profile-item">
-                        <div class="label">Hari</div>
-                        <div class="value">${currentDay}</div>
-                    </div>
+                    <div class="profile-item"><div class="label">Nama Penuh</div><div class="value">${studentName}</div></div>
+                    <div class="profile-item"><div class="label">No. Kad Pengenalan</div><div class="value">${studentIC}</div></div>
+                    <div class="profile-item"><div class="label">Kelas</div><div class="value">${studentClass}</div></div>
+                    <div class="profile-item"><div class="label">Tarikh / Masa</div><div class="value">${currentDate} • ${currentTime}</div></div>
+                    <div class="profile-item"><div class="label">Hari</div><div class="value">${currentDay}</div></div>
                 </div>
             </div>
         `;
@@ -598,9 +649,7 @@
             <div class="progress-container">
                 <div class="progress-bar" style="width: ${percent}%;"></div>
             </div>
-            <div style="text-align: right; font-size: 0.7rem; color: #64748b; margin-top: -1rem; margin-bottom: 1rem;">
-                Soalan ${currentIndex + 1} / ${allQuestions.length}
-            </div>
+            <div class="progress-text">Soalan ${currentIndex + 1} / ${allQuestions.length}</div>
         `;
     }
     
@@ -611,7 +660,6 @@
         }
         
         const q = allQuestions[currentIndex];
-        const prefix = getQuestionPrefix(currentIndex);
         const selected = answers[currentIndex];
         
         const html = `
@@ -622,10 +670,8 @@
                     <span class="question-num">Soalan ${currentIndex + 1}</span>
                     <span class="question-cat">Kategori: ${q.cat}</span>
                 </div>
-                <div class="question-prefix">${prefix}</div>
-                <div class="question-text">
-                    ${q.q}
-                </div>
+                <div class="question-prefix">${q.prefix}</div>
+                <div class="question-text">${q.text}</div>
                 <div class="options">
                     <button class="option-btn option-yes ${selected === true ? 'option-selected-yes' : ''}" onclick="answerQuestion(true)">
                         <i class="fas fa-check-circle"></i> YA
@@ -713,9 +759,9 @@
     }
     
     function renderResult() {
-        const total = Object.values(scores).reduce((a,b) => a + b, 0);
         const sorted = Object.entries(scores).sort((a,b) => b[1] - a[1]);
         const top3 = sorted.slice(0,3);
+        const hollandCode = top3.map(([cat]) => cat).join("");
         
         const categoryNames = {
             R: "REALISTIK (R) - Praktikal / Kerja Fizikal",
@@ -760,6 +806,7 @@
                 <div class="top-categories">
                     <h4>🏆 3 KATEGORI TERTINGGI ANDA 🏆</h4>
                     <div>${topBadgesHtml}</div>
+                    <p style="margin-top: 0.8rem; font-size: 0.9rem;"><strong>Kod Holland Anda: ${hollandCode}</strong></p>
                 </div>
                 
                 <div class="result-chart">
@@ -768,7 +815,7 @@
                 
                 <div style="background: #f1f5f9; border-radius: 1rem; padding: 1rem; margin-top: 1rem;">
                     <p style="font-size: 0.8rem; color: #64748b; text-align: center;">
-                        <i class="fas fa-info-circle"></i> Kod Holland anda adalah gabungan tiga kategori tertinggi.<br>
+                        <i class="fas fa-info-circle"></i> Kod Holland adalah gabungan tiga kategori tertinggi.<br>
                         Contoh: Jika R, I, A tertinggi → Kod Holland anda adalah <strong>RIA</strong>
                     </p>
                     <p style="font-size: 0.7rem; color: #94a3b8; text-align: center; margin-top: 0.5rem;">

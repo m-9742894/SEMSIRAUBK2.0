@@ -334,7 +334,7 @@
 
   <!-- Menu Grid (3 menu) -->
   <div class="menu-grid">
-    <!-- 1. INVENTORI PSIKOMETRIK -->
+    <!-- 1. INVENTORI PSIKOMETRIK - Redirect ke psikometrik.html -->
     <div class="menu-card" data-menu="inventori-psikometrik">
       <div class="menu-icon"><i class="fas fa-chart-line"></i></div>
       <h3>Inventori Psikometrik</h3>
@@ -392,10 +392,10 @@
     
     switch(menuType) {
       case 'inventori-psikometrik':
-        targetUrl = 'inventori-psikometrik.html';
+        // ✅ TUKAR KE psikometrik.html (bukan inventori-psikometrik.html)
+        targetUrl = 'psikometrik.html';
         break;
       case 'mata-merit':
-        // ✅ TUKAR KE mata-merit.html
         targetUrl = 'mata-merit.html';
         break;
       case 'tempahan-kaunseling':
@@ -427,7 +427,7 @@
 
 <!-- NOTA PENTING:
      Fail-fail yang perlu dicipta dalam folder yang sama (pelajar/):
-     1. inventori-psikometrik.html
+     1. psikometrik.html ✅ (redirect ke sini)
      2. mata-merit.html
      3. tempahan-kaunseling.html
 -->

@@ -331,7 +331,7 @@
             margin-bottom: 0.5rem;
         }
         .form-group label i { color: #2563eb; margin-right: 6px; }
-        .form-group input, .form-group select {
+        .form-group input {
             width: 100%;
             padding: 0.8rem 1rem;
             border: 1.5px solid #e2e8f0;
@@ -340,7 +340,7 @@
             outline: none;
             font-size: 0.9rem;
         }
-        .form-group input:focus, .form-group select:focus {
+        .form-group input:focus {
             border-color: #2563eb;
             box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
         }
@@ -460,7 +460,7 @@
     </div>
 </div>
 
-<!-- Modal Edit Class & Year -->
+<!-- Modal Edit Class & Year - INPUT TEXT untuk tahun -->
 <div id="editClassModal" class="modal" style="display: none;">
     <div class="modal-content">
         <div class="modal-header">
@@ -470,27 +470,22 @@
         <div class="modal-body">
             <div class="form-group">
                 <label><i class="fas fa-chalkboard"></i> Kelas</label>
-                <input type="text" id="newClassName" placeholder="cth: 5 Cemerlang, Tingkatan 4 Amanah">
+                <input type="text" id="newClassName" placeholder="cth: 5 Cemerlang (biarkan kosong jika bukan guru kelas)">
+                <p style="font-size:0.65rem; color:#64748b; margin-top:0.3rem;">Biarkan kosong untuk melihat semua pelajar tanpa filter kelas</p>
             </div>
             <div class="form-group">
                 <label><i class="fas fa-calendar"></i> Tahun / Sesi</label>
-                <select id="newYear">
-                    <option value="2024">2024</option>
-                    <option value="2025">2025</option>
-                    <option value="2026" selected>2026</option>
-                    <option value="2027">2027</option>
-                    <option value="2028">2028</option>
-                </select>
+                <input type="text" id="newYear" placeholder="cth: 2024, 2025, 2026" value="2026">
             </div>
             <p style="font-size:0.7rem; color:#64748b; margin-top:0.5rem;">
-                <i class="fas fa-info-circle"></i> Menukar kelas/tahun akan menukar paparan kepada data baharu. Data lama kekal disimpan.
+                <i class="fas fa-info-circle"></i> Menukar kelas/tahun akan menukar paparan kepada data baharu. Biarkan kelas kosong untuk lihat semua pelajar.
             </p>
             <button class="modal-btn" id="saveClassYearBtn"><i class="fas fa-save"></i> Tukar Paparan</button>
         </div>
     </div>
 </div>
 
-<!-- Modal Transfer Students to New Year -->
+<!-- Modal Transfer Students to New Year - INPUT TEXT untuk tahun -->
 <div id="transferModal" class="modal" style="display: none;">
     <div class="modal-content">
         <div class="modal-header">
@@ -500,11 +495,7 @@
         <div class="modal-body">
             <div class="form-group">
                 <label><i class="fas fa-calendar"></i> Pilih Tahun Baru</label>
-                <select id="targetYear">
-                    <option value="2027">2027</option>
-                    <option value="2028">2028</option>
-                    <option value="2029">2029</option>
-                </select>
+                <input type="text" id="targetYear" placeholder="cth: 2027" value="2027">
             </div>
             <div class="form-group">
                 <label><i class="fas fa-chalkboard"></i> Kelas Baru (Optional)</label>
@@ -542,13 +533,7 @@
                 </div>
                 <div class="form-group">
                     <label><i class="fas fa-calendar"></i> Tahun/Sesi</label>
-                    <select id="session">
-                        <option value="2024">2024</option>
-                        <option value="2025">2025</option>
-                        <option value="2026" selected>2026</option>
-                        <option value="2027">2027</option>
-                        <option value="2028">2028</option>
-                    </select>
+                    <input type="text" id="session" placeholder="cth: 2024, 2025, 2026" value="2026">
                 </div>
                 <button type="submit" class="modal-btn"><i class="fas fa-save"></i> Simpan</button>
             </form>
@@ -601,7 +586,14 @@
     
     async function loadAllData() {
         try {
-            let q = query(studentsCollection, where("class", "==", currentClass), where("session", "==", currentYear));
+            // Build query - if class is empty, don't filter by class
+            let q;
+            if (currentClass && currentClass.trim() !== "") {
+                q = query(studentsCollection, where("class", "==", currentClass), where("session", "==", currentYear));
+            } else {
+                q = query(studentsCollection, where("session", "==", currentYear));
+            }
+            
             const studentsSnap = await getDocs(q);
             studentsList = [];
             studentsSnap.forEach(doc => studentsList.push({ id: doc.id, ...doc.data() }));
@@ -625,7 +617,8 @@
     
     function updateStats() {
         document.getElementById('totalStudents').innerText = studentsList.length;
-        document.getElementById('displayClass').innerText = currentClass || 'Kelas belum ditetapkan';
+        const displayClassText = (currentClass && currentClass.trim() !== "") ? currentClass : 'Semua Kelas';
+        document.getElementById('displayClass').innerText = displayClassText;
         document.getElementById('displayYear').innerText = currentYear;
         
         let classTotalMerit = 0;
@@ -648,24 +641,19 @@
     // ==================== DELETE STUDENT - FULL DELETE FROM FIRESTORE ====================
     async function executeDeleteStudent(id, name) {
         try {
-            // Step 1: Find all merit records for this student
             const studentMeritRecords = allMeritRecords.filter(r => r.studentId === id);
             
-            // Step 2: Delete each merit record from Firestore
             for (const record of studentMeritRecords) {
                 await deleteDoc(doc(db, "merit_records", record.id));
                 console.log(`Deleted merit record: ${record.id}`);
             }
             
-            // Step 3: Delete the student document from Firestore
             await deleteDoc(doc(db, "students", id));
             console.log(`Deleted student: ${id} (${name})`);
             
-            // Step 4: Update local arrays
             allMeritRecords = allMeritRecords.filter(r => r.studentId !== id);
             studentsList = studentsList.filter(s => s.id !== id);
             
-            // Step 5: Update UI
             updateStats();
             renderStudents();
             
@@ -676,12 +664,10 @@
         }
     }
     
-    // Show confirmation modal before delete
     function confirmDeleteStudent(id, name) {
         pendingDeleteId = id;
         pendingDeleteName = name;
         
-        // Get student merit count
         const meritCount = allMeritRecords.filter(r => r.studentId === id).length;
         
         const modalHtml = `
@@ -734,7 +720,6 @@
         }
     };
     
-    // Make delete function available globally
     window.deleteStudent = confirmDeleteStudent;
     
     function renderStudents() {
@@ -749,8 +734,10 @@
             );
         }
         
+        const classDisplay = (currentClass && currentClass.trim() !== "") ? currentClass : 'semua kelas';
+        
         if (filtered.length === 0) {
-            container.innerHTML = `<div class="empty-state"><i class="fas fa-user-slash" style="font-size: 2rem;"></i><p>Tiada pelajar ditemui dalam kelas ${currentClass} (${currentYear}).</p><button class="btn-add" id="quickAddBtn" style="margin-top:1rem;"><i class="fas fa-plus"></i> Tambah Pelajar</button></div>`;
+            container.innerHTML = `<div class="empty-state"><i class="fas fa-user-slash" style="font-size: 2rem;"></i><p>Tiada pelajar ditemui dalam ${classDisplay} (${currentYear}).</p><button class="btn-add" id="quickAddBtn" style="margin-top:1rem;"><i class="fas fa-plus"></i> Tambah Pelajar</button></div>`;
             const quickBtn = document.getElementById('quickAddBtn');
             if (quickBtn) quickBtn.onclick = () => openAddStudentModal();
             return;
@@ -877,11 +864,16 @@
         const fullname = document.getElementById('fullname').value.trim();
         const icNumber = document.getElementById('icNumber').value.trim();
         const className = document.getElementById('className').value.trim();
-        const session = document.getElementById('session').value;
+        const session = document.getElementById('session').value.trim();
         
         if (!fullname || !icNumber || !className) { 
             showAlert('Sila lengkapkan maklumat', 'error'); 
             return; 
+        }
+        
+        if (!session || !/^\d{4}$/.test(session)) {
+            showAlert('Sila masukkan tahun yang sah (4 digit, cth: 2026)', 'error');
+            return;
         }
         
         try {
@@ -923,10 +915,10 @@
     
     document.getElementById('saveClassYearBtn').addEventListener('click', () => {
         const newClass = document.getElementById('newClassName').value.trim();
-        const newYear = document.getElementById('newYear').value;
+        const newYear = document.getElementById('newYear').value.trim();
         
-        if (!newClass) {
-            showAlert('Sila masukkan nama kelas', 'error');
+        if (!newYear || !/^\d{4}$/.test(newYear)) {
+            showAlert('Sila masukkan tahun yang sah (4 digit, cth: 2026)', 'error');
             return;
         }
         
@@ -938,7 +930,8 @@
         
         closeEditClassModal();
         loadAllData();
-        showAlert(`✅ Kini melihat kelas ${currentClass} (${currentYear})`, 'success');
+        const classDisplay = (currentClass && currentClass !== "") ? currentClass : "semua kelas";
+        showAlert(`✅ Kini melihat ${classDisplay} (${currentYear})`, 'success');
     });
     
     // ==================== TRANSFER STUDENTS ====================
@@ -947,15 +940,20 @@
     });
     
     document.getElementById('confirmTransferBtn').addEventListener('click', async () => {
-        const targetYear = document.getElementById('targetYear').value;
+        const targetYear = document.getElementById('targetYear').value.trim();
         const targetClass = document.getElementById('targetClass').value.trim() || currentClass;
+        
+        if (!targetYear || !/^\d{4}$/.test(targetYear)) {
+            showAlert('Sila masukkan tahun yang sah (4 digit, cth: 2027)', 'error');
+            return;
+        }
         
         if (studentsList.length === 0) {
             showAlert('Tiada pelajar untuk dipindahkan', 'error');
             return;
         }
         
-        if (confirm(`Salin ${studentsList.length} pelajar dari ${currentClass} (${currentYear}) ke ${targetClass} (${targetYear})?`)) {
+        if (confirm(`Salin ${studentsList.length} pelajar dari ${currentClass || 'semua kelas'} (${currentYear}) ke ${targetClass || currentClass} (${targetYear})?`)) {
             try {
                 let copied = 0;
                 for (const student of studentsList) {
@@ -977,9 +975,10 @@
                         copied++;
                     }
                 }
-                showAlert(`✅ ${copied} pelajar telah disalin ke ${targetClass} (${targetYear})`, 'success');
+                showAlert(`✅ ${copied} pelajar telah disalin ke ${targetClass || currentClass} (${targetYear})`, 'success');
                 closeTransferModal();
                 document.getElementById('targetClass').value = '';
+                document.getElementById('targetYear').value = '2027';
             } catch(e) {
                 showAlert('❌ Gagal menyalin pelajar', 'error');
             }
@@ -998,7 +997,8 @@
     });
     
     // Initialize
-    document.getElementById('displayClass').innerText = currentClass || 'Kelas belum ditetapkan';
+    const displayClassText = (currentClass && currentClass.trim() !== "") ? currentClass : 'Semua Kelas';
+    document.getElementById('displayClass').innerText = displayClassText;
     document.getElementById('displayYear').innerText = currentYear;
     loadAllData();
 </script>

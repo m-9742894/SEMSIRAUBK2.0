@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carta Organisasi | UBK SEMSIRA</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --accent: #00f2fe;
+            --gold: #ffd700;
+            --glass: rgba(255, 255, 255, 0.08);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: radial-gradient(circle at center, #001529, #000000);
+            background-attachment: fixed;
+            min-height: 100vh;
+            font-family: 'Quicksand', sans-serif;
+            color: white;
+            padding: 40px 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden;
+        }
+
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            text-align: center;
+            margin-bottom: 50px;
+            text-shadow: 0 0 15px var(--accent);
+            letter-spacing: 2px;
+            font-size: 1.8rem;
+        }
+
+        .tree-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 40px;
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        .level {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            width: 100%;
+        }
+
+        .node {
+            background: var(--glass);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 20px 10px;
+            border-radius: 20px;
+            width: 180px;
+            text-align: center;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            position: relative;
+        }
+
+        .node:hover {
+            transform: translateY(-10px);
+            border-color: var(--accent);
+            box-shadow: 0 0 25px var(--accent);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .photo-slot {
+            width: 80px;
+            height: 80px;
+            background: #111;
+            border-radius: 50%;
+            margin: 0 auto 12px;
+            border: 3px solid var(--accent);
+            overflow: hidden;
+            box-shadow: 0 0 15px var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .photo-slot img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .photo-slot .placeholder-icon {
+            font-size: 3rem;
+            color: var(--accent);
+        }
+
+        .role {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.65rem;
+            color: var(--accent);
+            margin-bottom: 5px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .name {
+            font-size: 0.85rem;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+
+        .top-node { border: 2px solid var(--gold); }
+        .top-node .photo-slot { border-color: var(--gold); box-shadow: 0 0 15px var(--gold); }
+        .top-node .role { color: var(--gold); }
+
+        .btn-back {
+            margin-top: 60px;
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 0.9rem;
+            padding: 10px 25px;
+            border: 1px solid var(--accent);
+            border-radius: 50px;
+            transition: 0.3s;
+            background: rgba(0, 242, 254, 0.1);
+        }
+
+        .btn-back:hover {
+            background: var(--accent);
+            color: black;
+            box-shadow: 0 0 20px var(--accent);
+        }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 1.4rem; }
+            .tree-container { gap: 30px; }
+            .level {
+                flex-direction: column;
+                align-items: center;
+                gap: 15px;
+            }
+            .node {
+                width: 90%;
+                max-width: 320px;
+                display: flex;
+                align-items: center;
+                text-align: left;
+                padding: 15px;
+            }
+            .photo-slot {
+                margin: 0 20px 0 0;
+                width: 60px;
+                height: 60px;
+                flex-shrink: 0;
+            }
+            .role { font-size: 0.6rem; margin-bottom: 2px; }
+            .name { font-size: 0.9rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>CARTA ORGANISASI UBK</h1>
+
+    <div class="tree-container">
+        
+        <!-- Level 1: Pengetua -->
+        <div class="level">
+            <div class="node top-node">
+                <div class="photo-slot">
+                    <img src="../../Photos/HAMRAN BIN JANTAN.png" alt="HAMRAN BIN JANTAN" onerror="this.parentElement.innerHTML='<i class=\'fas fa-user-circle placeholder-icon\'></i>'">
+                </div>
+                <div class="details">
+                    <div class="role">Pengetua</div>
+                    <div class="name">HAMRAN BIN JANTAN</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Level 2: PK-PK -->
+        <div class="level">
+            <div class="node">
+                <div class="photo-slot"><img src="../../Photos/RAHMAT.png" alt="RAHMAT" onerror="this.parentElement.innerHTML='<i class=\'fas fa-user-circle placeholder-icon\'></i>'"></div>
+                <div class="details"><div class="role">PK Pentadbiran</div><div class="name">RAHMAT</div></div>
+            </div>
+            <div class="node">
+                <div class="photo-slot"><img src="../../Photos/RAKIAH.png" alt="RAKIAH" onerror="this.parentElement.innerHTML='<i class=\'fas fa-user-circle placeholder-icon\'></i>'"></div>
+                <div class="details"><div class="role">PK HEM</div><div class="name">RAKIAH</div></div>
+            </div>
+            <div class="node">
+                <div class="photo-slot"><img src="../../Photos/MAHAMAD NASIR.png" alt="MAHAMAD NASIR" onerror="this.parentElement.innerHTML='<i class=\'fas fa-user-circle placeholder-icon\'></i>'"></div>
+                <div class="details"><div class="role">PK Kokurikulum</div><div class="name">MAHAMAD NASIR</div></div>
+            </div>
+            <div class="node">
+                <div class="photo-slot"><img src="../../Photos/AMRAN.png" alt="AMRAN" onerror="this.parentElement.innerHTML='<i class=\'fas fa-user-circle placeholder-icon\'></i>'"></div>
+                <div class="details"><div class="role">PK Tingkatan 6</div><div class="name">AMRAN</div></div>
+            </div>
+            <div class="node">
+                <div class="photo-slot"><img src="../../Photos/JUNAIDAH.png" alt="JUNAIDAH" onerror="this.parentElement.innerHTML='<i class=\'fas fa-user-circle placeholder-icon\'></i>'"></div>
+                <div class="details"><div class="role">PK Pendidikan Khas</div><div class="name">JUNAIDAH</div></div>
+            </div>
+        </div>
+
+        <!-- Level 3: Guru Bimbingan & Kaunseling -->
+        <div class="level">
+            <div class="node">
+                <div class="photo-slot"><img src="../../Photos/NORZALINA.png" alt="NORZALINA" onerror="this.parentElement.innerHTML='<i class=\'fas fa-user-circle placeholder-icon\'></i>'"></div>
+                <div class="details"><div class="role">GBKSM</div><div class="name">NORZALINA</div></div>
+            </div>
+            <div class="node">
+                <div class="photo-slot"><img src="../../Photos/NURUL AKHMAR.png" alt="NURUL AKHMAR" onerror="this.parentElement.innerHTML='<i class=\'fas fa-user-circle placeholder-icon\'></i>'"></div>
+                <div class="details"><div class="role">GBKSM</div><div class="name">NURUL AKHMAR</div></div>
+            </div>
+            <div class="node">
+                <div class="photo-slot"><img src="../../Photos/FARAH.png" alt="FARAH" onerror="this.parentElement.innerHTML='<i class=\'fas fa-user-circle placeholder-icon\'></i>'"></div>
+                <div class="details"><div class="role">GBKSM</div><div class="name">FARAH</div></div>
+            </div>
+        </div>
+
+    </div>
+
+    <a href="../profil-gbk.html" class="btn-back">← KEMBALI</a>
+
+    <script>
+        if (window.innerWidth > 768) {
+            document.addEventListener('mousemove', (e) => {
+                const nodes = document.querySelectorAll('.node');
+                let xAxis = (window.innerWidth / 2 - e.clientX) / 90;
+                let yAxis = (window.innerHeight / 2 - e.clientY) / 90;
+                nodes.forEach(node => {
+                    node.style.transform = `rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
+                });
+            });
+        }
+    </script>
+</body>
+</html>

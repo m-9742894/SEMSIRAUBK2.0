@@ -1,548 +1,396 @@
 <!DOCTYPE html>
 <html lang="ms">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>Portal Utama · E-MindCare SEMSIRA (Guest)</title>
-  <!-- Google Fonts & Icons -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <!-- AOS -->
-  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Portal Utama · E-MindCare SEMSIRA (Guest)</title>
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- AOS -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    body {
-      font-family: 'Inter', sans-serif;
-      background: linear-gradient(135deg, #f6f9fc 0%, #ecf3fa 100%);
-      min-height: 100vh;
-      overflow-x: hidden;
-    }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: linear-gradient(135deg, #f6f9fc 0%, #ecf3fa 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
 
-    /* background animated soft blob */
-    .bg-blobs {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: -2;
-      overflow: hidden;
-    }
-    .blob-soft {
-      position: absolute;
-      border-radius: 50%;
-      filter: blur(80px);
-      opacity: 0.3;
-      animation: floatBlob 28s infinite alternate ease-in-out;
-    }
-    .blob-soft:nth-child(1) {
-      width: 500px;
-      height: 500px;
-      background: #a5f3fc;
-      top: -100px;
-      left: -150px;
-    }
-    .blob-soft:nth-child(2) {
-      width: 600px;
-      height: 600px;
-      background: #c7d2fe;
-      bottom: -200px;
-      right: -150px;
-      animation-duration: 32s;
-    }
-    .blob-soft:nth-child(3) {
-      width: 400px;
-      height: 400px;
-      background: #fbcfe8;
-      top: 30%;
-      left: 70%;
-      animation-duration: 24s;
-    }
-    @keyframes floatBlob {
-      0% { transform: translate(0,0) scale(1);}
-      100% { transform: translate(30px, -40px) scale(1.2);}
-    }
+        /* background animated soft blob */
+        .bg-blobs {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            overflow: hidden;
+        }
+        .blob-soft {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.3;
+            animation: floatBlob 28s infinite alternate ease-in-out;
+        }
+        .blob-soft:nth-child(1) {
+            width: 500px;
+            height: 500px;
+            background: #a5f3fc;
+            top: -100px;
+            left: -150px;
+        }
+        .blob-soft:nth-child(2) {
+            width: 600px;
+            height: 600px;
+            background: #c7d2fe;
+            bottom: -200px;
+            right: -150px;
+            animation-duration: 32s;
+        }
+        .blob-soft:nth-child(3) {
+            width: 400px;
+            height: 400px;
+            background: #fbcfe8;
+            top: 30%;
+            left: 70%;
+            animation-duration: 24s;
+        }
+        @keyframes floatBlob {
+            0% { transform: translate(0,0) scale(1);}
+            100% { transform: translate(30px, -40px) scale(1.2);}
+        }
 
-    /* main container */
-    .portal-container {
-      max-width: 1400px;
-      margin: 0 auto;
-      padding: 2rem 2rem 4rem;
-      position: relative;
-      z-index: 4;
-    }
+        /* main container */
+        .portal-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem 2rem 4rem;
+            position: relative;
+            z-index: 4;
+        }
 
-    /* header */
-    .portal-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 1rem;
-      margin-bottom: 2rem;
-      padding-bottom: 0.8rem;
-      border-bottom: 2px solid rgba(79, 70, 229, 0.2);
-    }
-    .logo-area {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-    }
-    .logo-icon {
-      background: white;
-      width: 48px;
-      height: 48px;
-      border-radius: 28px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 8px 18px rgba(0,0,0,0.05);
-    }
-    .logo-icon i {
-      font-size: 28px;
-      color: #4f46e5;
-    }
-    .logo-text h1 {
-      font-size: 1.7rem;
-      font-weight: 800;
-      background: linear-gradient(135deg, #1e293b, #4f46e5);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-    }
-    .logo-text p {
-      font-size: 0.75rem;
-      color: #5b6e8c;
-    }
-    .guest-badge {
-      background: rgba(79,70,229,0.12);
-      padding: 0.4rem 1.2rem;
-      border-radius: 40px;
-      font-weight: 600;
-      font-size: 0.85rem;
-      color: #4f46e5;
-      backdrop-filter: blur(4px);
-    }
+        /* header */
+        .portal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            padding-bottom: 0.8rem;
+            border-bottom: 2px solid rgba(79, 70, 229, 0.2);
+        }
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .logo-icon {
+            background: white;
+            width: 48px;
+            height: 48px;
+            border-radius: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 18px rgba(0,0,0,0.05);
+        }
+        .logo-icon i {
+            font-size: 28px;
+            color: #4f46e5;
+        }
+        .logo-text h1 {
+            font-size: 1.7rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #1e293b, #4f46e5);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .logo-text p {
+            font-size: 0.75rem;
+            color: #5b6e8c;
+        }
+        .guest-badge {
+            background: rgba(79,70,229,0.12);
+            padding: 0.4rem 1.2rem;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: #4f46e5;
+            backdrop-filter: blur(4px);
+        }
 
-    /* welcome section portal */
-    .welcome-block {
-      text-align: center;
-      margin: 1.5rem 0 2.8rem;
-    }
-    .welcome-block h2 {
-      font-size: 2.2rem;
-      font-weight: 700;
-      color: #1e2a3e;
-    }
-    .welcome-block span {
-      background: linear-gradient(120deg, #4f46e5, #c084fc);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-    }
-    .sub-welcome {
-      color: #5d6e8a;
-      margin-top: 0.5rem;
-      font-weight: 500;
-    }
+        /* welcome block */
+        .welcome-block {
+            text-align: center;
+            margin: 1.5rem 0 2.8rem;
+        }
+        .welcome-block h2 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #1e2a3e;
+        }
+        .welcome-block span {
+            background: linear-gradient(120deg, #4f46e5, #c084fc);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .sub-welcome {
+            color: #5d6e8a;
+            margin-top: 0.5rem;
+            font-weight: 500;
+        }
 
-    /* menu grid */
-    .menu-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
-      gap: 2rem;
-      margin: 2rem 0 3rem;
-    }
-    .menu-card {
-      background: rgba(255, 255, 255, 0.88);
-      backdrop-filter: blur(10px);
-      border-radius: 1.8rem;
-      padding: 1.6rem 1.4rem;
-      transition: all 0.35s ease;
-      cursor: pointer;
-      border: 1px solid rgba(255,255,245,0.7);
-      box-shadow: 0 12px 28px -12px rgba(0, 0, 0, 0.08);
-    }
-    .menu-card:hover {
-      transform: translateY(-8px);
-      background: white;
-      border-color: #c7d2fe;
-      box-shadow: 0 25px 35px -18px rgba(79, 70, 229, 0.2);
-    }
-    .menu-icon {
-      font-size: 2.5rem;
-      color: #4f46e5;
-      margin-bottom: 1rem;
-      background: #eef2ff;
-      width: 60px;
-      height: 60px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 24px;
-      transition: 0.2s;
-    }
-    .menu-card:hover .menu-icon {
-      background: #4f46e5;
-      color: white;
-    }
-    .menu-card h3 {
-      font-size: 1.45rem;
-      font-weight: 700;
-      margin: 0.75rem 0 0.5rem;
-      color: #1f2a44;
-    }
-    .menu-desc {
-      font-size: 0.85rem;
-      color: #5b6e8c;
-      line-height: 1.4;
-      margin-bottom: 1rem;
-      border-left: 3px solid #cbd5e1;
-      padding-left: 12px;
-    }
-    .enter-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 0.75rem;
-      font-weight: 600;
-      color: #4f46e5;
-      background: #f1f5f9;
-      padding: 5px 16px;
-      border-radius: 30px;
-      transition: all 0.2s;
-    }
-    .menu-card:hover .enter-btn {
-      background: #4f46e5;
-      color: white;
-      gap: 12px;
-    }
+        /* menu grid */
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0 3rem;
+        }
+        .menu-card {
+            background: rgba(255, 255, 255, 0.88);
+            backdrop-filter: blur(10px);
+            border-radius: 1.8rem;
+            padding: 1.6rem 1.4rem;
+            transition: all 0.35s ease;
+            cursor: pointer;
+            border: 1px solid rgba(255,255,245,0.7);
+            box-shadow: 0 12px 28px -12px rgba(0, 0, 0, 0.08);
+        }
+        .menu-card:hover {
+            transform: translateY(-8px);
+            background: white;
+            border-color: #c7d2fe;
+            box-shadow: 0 25px 35px -18px rgba(79, 70, 229, 0.2);
+        }
+        .menu-icon {
+            font-size: 2.5rem;
+            color: #4f46e5;
+            margin-bottom: 1rem;
+            background: #eef2ff;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 24px;
+            transition: 0.2s;
+        }
+        .menu-card:hover .menu-icon {
+            background: #4f46e5;
+            color: white;
+        }
+        .menu-card h3 {
+            font-size: 1.45rem;
+            font-weight: 700;
+            margin: 0.75rem 0 0.5rem;
+            color: #1f2a44;
+        }
+        .menu-desc {
+            font-size: 0.85rem;
+            color: #5b6e8c;
+            line-height: 1.4;
+            margin-bottom: 1rem;
+            border-left: 3px solid #cbd5e1;
+            padding-left: 12px;
+        }
+        .enter-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #4f46e5;
+            background: #f1f5f9;
+            padding: 5px 16px;
+            border-radius: 30px;
+            transition: all 0.2s;
+        }
+        .menu-card:hover .enter-btn {
+            background: #4f46e5;
+            color: white;
+            gap: 12px;
+        }
 
-    /* back button */
-    .back-home {
-      text-align: center;
-      margin-top: 2rem;
-    }
-    .btn-back {
-      background: #eef2ff;
-      border: none;
-      padding: 0.8rem 2rem;
-      border-radius: 50px;
-      font-weight: 600;
-      color: #4f46e5;
-      cursor: pointer;
-      transition: 0.2s;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .btn-back:hover {
-      background: #4f46e5;
-      color: white;
-      transform: scale(1.02);
-    }
+        /* back home button */
+        .back-home {
+            text-align: center;
+            margin-top: 2rem;
+        }
+        .btn-back {
+            background: #eef2ff;
+            border: none;
+            padding: 0.8rem 2rem;
+            border-radius: 50px;
+            font-weight: 600;
+            color: #4f46e5;
+            cursor: pointer;
+            transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-back:hover {
+            background: #4f46e5;
+            color: white;
+            transform: scale(1.02);
+        }
 
-    footer {
-      margin-top: 3rem;
-      text-align: center;
-      font-size: 0.75rem;
-      color: #6c7289;
-      border-top: 1px solid rgba(0,0,0,0.05);
-      padding-top: 2rem;
-    }
+        footer {
+            margin-top: 3rem;
+            text-align: center;
+            font-size: 0.75rem;
+            color: #6c7289;
+            border-top: 1px solid rgba(0,0,0,0.05);
+            padding-top: 2rem;
+        }
 
-    @media (max-width: 720px) {
-      .portal-container {
-        padding: 1.2rem;
-      }
-      .menu-grid {
-        grid-template-columns: 1fr;
-        gap: 1.2rem;
-      }
-      .welcome-block h2 {
-        font-size: 1.6rem;
-      }
-    }
-  </style>
+        @media (max-width: 720px) {
+            .portal-container {
+                padding: 1.2rem;
+            }
+            .menu-grid {
+                grid-template-columns: 1fr;
+                gap: 1.2rem;
+            }
+            .welcome-block h2 {
+                font-size: 1.6rem;
+            }
+        }
+    </style>
 </head>
 <body>
 <div class="bg-blobs">
-  <div class="blob-soft"></div>
-  <div class="blob-soft"></div>
-  <div class="blob-soft"></div>
+    <div class="blob-soft"></div>
+    <div class="blob-soft"></div>
+    <div class="blob-soft"></div>
 </div>
 
 <div class="portal-container">
-  <div class="portal-header" data-aos="fade-down">
-    <div class="logo-area">
-      <div class="logo-icon"><i class="fas fa-hands-helping"></i></div>
-      <div class="logo-text">
-        <h1>Portal Guest · E-MindCare</h1>
-        <p>Unit Bimbingan & Kaunseling SMK Syed Sirajuddin</p>
-      </div>
-    </div>
-    <div class="guest-badge"><i class="fas fa-user-astronaut"></i> Mod Tetamu</div>
-  </div>
-
-  <div class="welcome-block" data-aos="fade-up">
-    <h2>🌿 <span>Selamat Datang, Tetamu!</span> 🌿</h2>
-    <div class="sub-welcome">Terokai pelbagai ruang sokongan psikologi & perkembangan diri</div>
-  </div>
-
-  <!-- MENU KATEGORI (8 BUTTON) -->
-  <div class="menu-grid" data-aos="fade-up" data-aos-delay="100">
-    <!-- 1. KENALI UBK SEMSIRA -->
-    <div class="menu-card" data-menu="kenali-ubk">
-      <div class="menu-icon"><i class="fas fa-school"></i></div>
-      <h3>Kenali UBK SEMSIRA</h3>
-      <div class="menu-desc">Profil unit, kaunselor & misi membantu insan</div>
-      <div class="enter-btn">Terokai <i class="fas fa-arrow-right"></i></div>
+    <div class="portal-header" data-aos="fade-down">
+        <div class="logo-area">
+            <div class="logo-icon"><i class="fas fa-hands-helping"></i></div>
+            <div class="logo-text">
+                <h1>Portal Guest · E-MindCare</h1>
+                <p>Unit Bimbingan & Kaunseling SMK Syed Sirajuddin</p>
+            </div>
+        </div>
+        <div class="guest-badge"><i class="fas fa-user-astronaut"></i> Mod Tetamu</div>
     </div>
 
-    <!-- 2. MOOD CHECK IN -->
-    <div class="menu-card" data-menu="mood-checkin">
-      <div class="menu-icon"><i class="fas fa-smile-beam"></i></div>
-      <h3>Mood Check-in</h3>
-      <div class="menu-desc">Luahkan rasa, tenang di jiwa • Jejak emosi harian</div>
-      <div class="enter-btn">Luahkan <i class="fas fa-arrow-right"></i></div>
+    <div class="welcome-block" data-aos="fade-up">
+        <h2>🌿 <span>Selamat Datang, Tetamu!</span> 🌿</h2>
+        <div class="sub-welcome">Terokai pelbagai ruang sokongan psikologi & perkembangan diri</div>
     </div>
 
-    <!-- 3. KENAL PASTI HALA TUJU ANDA -->
-    <div class="menu-card" data-menu="hala-tuju">
-      <div class="menu-icon"><i class="fas fa-compass"></i></div>
-      <h3>Kenal Pasti Hala Tuju Anda</h3>
-      <div class="menu-desc">Refleksi kerjaya, matlamat hidup & potensi diri</div>
-      <div class="enter-btn">Teroka Hala Tuju <i class="fas fa-arrow-right"></i></div>
+    <!-- MENU KATEGORI (8 BUTTON) - SEMUA REDIRECT KE PAGE KOSONG -->
+    <div class="menu-grid" data-aos="fade-up" data-aos-delay="100">
+        <!-- 1. KENALI UBK SEMSIRA -->
+        <div class="menu-card" data-url="ubk-semsira/kenali-ubk.html">
+            <div class="menu-icon"><i class="fas fa-school"></i></div>
+            <h3>Kenali UBK SEMSIRA</h3>
+            <div class="menu-desc">Profil unit, kaunselor & misi membantu insan</div>
+            <div class="enter-btn">Terokai <i class="fas fa-arrow-right"></i></div>
+        </div>
+
+        <!-- 2. MOOD CHECK IN -->
+        <div class="menu-card" data-url="mood-checkin.html">
+            <div class="menu-icon"><i class="fas fa-smile-beam"></i></div>
+            <h3>Mood Check-in</h3>
+            <div class="menu-desc">Luahkan rasa, tenang di jiwa • Jejak emosi harian</div>
+            <div class="enter-btn">Luahkan <i class="fas fa-arrow-right"></i></div>
+        </div>
+
+        <!-- 3. KENAL PASTI HALA TUJU ANDA -->
+        <div class="menu-card" data-url="hala-tuju.html">
+            <div class="menu-icon"><i class="fas fa-compass"></i></div>
+            <h3>Kenal Pasti Hala Tuju Anda</h3>
+            <div class="menu-desc">Refleksi kerjaya, matlamat hidup & potensi diri</div>
+            <div class="enter-btn">Teroka Hala Tuju <i class="fas fa-arrow-right"></i></div>
+        </div>
+
+        <!-- 4. MINDFULNESS ACTIVITY -->
+        <div class="menu-card" data-url="mindfulness.html">
+            <div class="menu-icon"><i class="fas fa-brain"></i></div>
+            <h3>Mindfulness Activity</h3>
+            <div class="menu-desc">Latihan pernafasan, ketenangan & kesedaran penuh</div>
+            <div class="enter-btn">Mulakan <i class="fas fa-arrow-right"></i></div>
+        </div>
+
+        <!-- 5. GALERI AKTIVITI -->
+        <div class="menu-card" data-url="galeri.html">
+            <div class="menu-icon"><i class="fas fa-images"></i></div>
+            <h3>Galeri Aktiviti</h3>
+            <div class="menu-desc">Koleksi momen bimbingan, program & interaksi</div>
+            <div class="enter-btn">Lihat Galeri <i class="fas fa-arrow-right"></i></div>
+        </div>
+
+        <!-- 6. CHATBOX AI -->
+        <div class="menu-card" data-url="chatbox.html">
+            <div class="menu-icon"><i class="fas fa-robot"></i></div>
+            <h3>Chatbox AI</h3>
+            <div class="menu-desc">Ruang bicara mesra AI, sokongan awal 24/7</div>
+            <div class="enter-btn">Bual dengan AI <i class="fas fa-arrow-right"></i></div>
+        </div>
+
+        <!-- 7. UJIAN INVENTORI PSIKOMETRIK -->
+        <div class="menu-card" data-url="psikometrik.html">
+            <div class="menu-icon"><i class="fas fa-chart-line"></i></div>
+            <h3>Ujian Inventori Psikometrik</h3>
+            <div class="menu-desc">Penilaian personaliti, minat kerjaya & kecerdasan emosi</div>
+            <div class="enter-btn">Mulai Ujian <i class="fas fa-arrow-right"></i></div>
+        </div>
+
+        <!-- 8. MATA MERIT PELAJAR -->
+        <div class="menu-card" data-url="mata-merit.html">
+            <div class="menu-icon"><i class="fas fa-star"></i></div>
+            <h3>Mata Merit Pelajar</h3>
+            <div class="menu-desc">Semak ganjaran & pencapaian kokurikulum / sahsiah</div>
+            <div class="enter-btn">Semak Merit <i class="fas fa-arrow-right"></i></div>
+        </div>
     </div>
 
-    <!-- 4. MINDFULNESS ACTIVITY -->
-    <div class="menu-card" data-menu="mindfulness">
-      <div class="menu-icon"><i class="fas fa-brain"></i></div>
-      <h3>Mindfulness Activity</h3>
-      <div class="menu-desc">Latihan pernafasan, ketenangan & kesedaran penuh</div>
-      <div class="enter-btn">Mulakan <i class="fas fa-arrow-right"></i></div>
+    <div class="back-home">
+        <button class="btn-back" id="backToLandingBtn"><i class="fas fa-arrow-left"></i> Kembali ke Laman Utama</button>
     </div>
-
-    <!-- 5. GALERI AKTIVITI -->
-    <div class="menu-card" data-menu="galeri">
-      <div class="menu-icon"><i class="fas fa-images"></i></div>
-      <h3>Galeri Aktiviti</h3>
-      <div class="menu-desc">Koleksi momen bimbingan, program & interaksi</div>
-      <div class="enter-btn">Lihat Galeri <i class="fas fa-arrow-right"></i></div>
-    </div>
-
-    <!-- 6. CHATBOX AI -->
-    <div class="menu-card" data-menu="chatbox">
-      <div class="menu-icon"><i class="fas fa-robot"></i></div>
-      <h3>Chatbox AI</h3>
-      <div class="menu-desc">Ruang bicara mesra AI, sokongan awal 24/7</div>
-      <div class="enter-btn">Bual dengan AI <i class="fas fa-arrow-right"></i></div>
-    </div>
-
-    <!-- 7. UJIAN INVENTORI PSIKOMETRIK -->
-    <div class="menu-card" data-menu="psikometrik">
-      <div class="menu-icon"><i class="fas fa-chart-line"></i></div>
-      <h3>Ujian Inventori Psikometrik</h3>
-      <div class="menu-desc">Penilaian personaliti, minat kerjaya & kecerdasan emosi</div>
-      <div class="enter-btn">Mulai Ujian <i class="fas fa-arrow-right"></i></div>
-    </div>
-
-    <!-- 8. MATA MERIT PELAJAR -->
-    <div class="menu-card" data-menu="merit">
-      <div class="menu-icon"><i class="fas fa-star"></i></div>
-      <h3>Mata Merit Pelajar</h3>
-      <div class="menu-desc">Semak ganjaran & pencapaian kokurikulum / sahsiah</div>
-      <div class="enter-btn">Semak Merit <i class="fas fa-arrow-right"></i></div>
-    </div>
-  </div>
-
-  <div class="back-home">
-    <button class="btn-back" id="backToLandingBtn"><i class="fas fa-arrow-left"></i> Kembali ke Laman Utama</button>
-  </div>
-  <footer>
-    <i class="fas fa-heart" style="color:#ec489a;"></i> Ruang Sokongan Psikologi • E-MindCare SEMSIRA
-  </footer>
+    <footer>
+        <i class="fas fa-heart" style="color:#ec489a;"></i> Ruang Sokongan Psikologi • E-MindCare SEMSIRA
+    </footer>
 </div>
 
 <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
 <script>
-  AOS.init({ once: true, duration: 700, offset: 10 });
+    AOS.init({ once: true, duration: 700, offset: 10 });
 
-  // Fungsi untuk membuka halaman kosong (sandbox) bagi setiap menu
-  function openEmptySubpage(menuId, menuName) {
-    let title = '';
-    let desc = '';
-    switch(menuId) {
-      case 'kenali-ubk':
-        title = 'Kenali UBK SEMSIRA';
-        desc = 'Profil Unit Bimbingan & Kaunseling, visi, misi dan kaunselor sekolah.';
-        break;
-      case 'mood-checkin':
-        title = 'Mood Check-in';
-        desc = 'Luahkan perasaan, kenal pasti mood & jana ketenangan jiwa.';
-        break;
-      case 'hala-tuju':
-        title = 'Kenal Pasti Hala Tuju';
-        desc = 'Refleksi matlamat hidup, kerjaya & potensi diri.';
-        break;
-      case 'mindfulness':
-        title = 'Mindfulness Activity';
-        desc = 'Latihan pernafasan, kesedaran & teknik relaksasi.';
-        break;
-      case 'galeri':
-        title = 'Galeri Aktiviti';
-        desc = 'Gambar, video dokumentasi program kaunseling & bimbingan.';
-        break;
-      case 'chatbox':
-        title = 'Chatbox AI — E-MindCare';
-        desc = 'Ruang bicara mesra dengan AI untuk sokongan awal.';
-        break;
-      case 'psikometrik':
-        title = 'Ujian Inventori Psikometrik';
-        desc = 'Inventori personaliti, minat kerjaya & EQ.';
-        break;
-      case 'merit':
-        title = 'Mata Merit Pelajar';
-        desc = 'Semak kedudukan merit, ganjaran & rekod pelajar.';
-        break;
-      default:
-        title = 'Ruangan E-MindCare';
-        desc = 'Sedia untuk pengisian modul seterusnya.';
-    }
-    
-    const newWin = window.open();
-    if (!newWin) {
-      alert("Sila benarkan pop-up untuk membuka halaman baharu.");
-      return;
-    }
-    
-    newWin.document.write(`
-      <!DOCTYPE html>
-      <html lang="ms">
-      <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>${title} | E-MindCare Guest Portal</title>
-        <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;500;600;700;800&display=swap" rel="stylesheet">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-        <style>
-          * { margin: 0; padding: 0; box-sizing: border-box; }
-          body {
-            font-family: 'Inter', sans-serif;
-            background: linear-gradient(125deg, #f9fafc, #eef2ff);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 2rem;
-          }
-          .sandbox-card {
-            max-width: 780px;
-            width: 100%;
-            background: rgba(255,255,255,0.96);
-            backdrop-filter: blur(12px);
-            border-radius: 2rem;
-            padding: 2rem 1.8rem;
-            text-align: center;
-            box-shadow: 0 28px 42px -18px rgba(0,0,0,0.2);
-            border: 1px solid rgba(255,255,245,0.9);
-          }
-          .menu-title {
-            background: #4f46e5;
-            display: inline-block;
-            padding: 0.2rem 1rem;
-            border-radius: 40px;
-            color: white;
-            font-size: 0.7rem;
-            font-weight: 600;
-            margin-bottom: 1rem;
-          }
-          h2 {
-            font-size: 2rem;
-            background: linear-gradient(145deg, #1e293b, #4c1d95);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            margin: 0.8rem 0;
-          }
-          .desc-box {
-            background: #f8fafc;
-            border-radius: 1.2rem;
-            padding: 1.5rem;
-            margin: 1.5rem 0;
-            border: 1px solid #e2e8f0;
-          }
-          button {
-            background: #4f46e5;
-            border: none;
-            color: white;
-            font-weight: 600;
-            padding: 0.65rem 1.8rem;
-            border-radius: 40px;
-            cursor: pointer;
-            margin-top: 0.8rem;
-            transition: 0.2s;
-          }
-          button:hover { background: #4338ca; transform: scale(0.97);}
-          .info { font-size: 0.75rem; color: #5b6e8c; margin-top: 1rem; }
-        </style>
-      </head>
-      <body>
-        <div class="sandbox-card">
-          <div class="menu-title"><i class="fas fa-cube"></i> Halaman Kosong (Sandbox)</div>
-          <i class="fas fa-puzzle-piece" style="font-size: 3rem; color:#8b5cf6;"></i>
-          <h2>${title}</h2>
-          <div class="desc-box">
-            <p><strong>📌 Deskripsi:</strong> ${desc}</p>
-            <hr style="margin: 1rem 0; border-color:#eef2ff;">
-            <p><i class="fas fa-code"></i> Ruang ini disediakan untuk pembangunan HTML selanjutnya. <br>
-            Anda boleh menggantikan kandungan ini dengan sistem, borang, atau paparan lengkap modul <strong>${title}</strong>.</p>
-          </div>
-          <button onclick="window.close()"><i class="fas fa-times"></i> Tutup & Kembali</button>
-          <div class="info"><i class="fas fa-info-circle"></i> Sedia untuk sambungan kod antaramuka penuh.</div>
-        </div>
-        <script>
-          console.log("Empty page for menu: ${menuId}");
-        <\/script>
-      </body>
-      </html>
-    `);
-    newWin.document.close();
-  }
-
-  // Pasang event listeners untuk setiap kad menu
-  const menuCards = document.querySelectorAll('.menu-card');
-  menuCards.forEach(card => {
-    card.addEventListener('click', (e) => {
-      const menuAttr = card.getAttribute('data-menu');
-      let menuName = '';
-      if (menuAttr === 'kenali-ubk') menuName = 'Kenali UBK';
-      else if (menuAttr === 'mood-checkin') menuName = 'Mood Check-in';
-      else if (menuAttr === 'hala-tuju') menuName = 'Hala Tuju';
-      else if (menuAttr === 'mindfulness') menuName = 'Mindfulness';
-      else if (menuAttr === 'galeri') menuName = 'Galeri';
-      else if (menuAttr === 'chatbox') menuName = 'Chatbox AI';
-      else if (menuAttr === 'psikometrik') menuName = 'Psikometrik';
-      else if (menuAttr === 'merit') menuName = 'Mata Merit';
-      else menuName = 'Modul';
-      openEmptySubpage(menuAttr, menuName);
+    // Fungsi untuk redirect ke page kosong (atau page yang akan dibina nanti)
+    const menuCards = document.querySelectorAll('.menu-card');
+    menuCards.forEach(card => {
+        card.addEventListener('click', (e) => {
+            const targetUrl = card.getAttribute('data-url');
+            if (targetUrl) {
+                window.location.href = targetUrl;
+            } else {
+                alert("Halaman akan dibina selepas ini.");
+            }
+        });
     });
-  });
 
-  // Butang kembali ke landing page utama (muka hadapan SMK Syed Sirajuddin)
-  const backBtn = document.getElementById('backToLandingBtn');
-  backBtn.addEventListener('click', () => {
-    window.location.href = 'index.html';  // jika fail utama dinamakan index.html atau semula
-    // fallback: jika gagal, beri notis
-    setTimeout(() => {
-      alert("Sila pastikan anda berada di laman utama atau tutup tab ini.");
-    }, 100);
-  });
+    // Butang kembali ke landing page utama
+    const backBtn = document.getElementById('backToLandingBtn');
+    backBtn.addEventListener('click', () => {
+        window.location.href = 'index.html';
+    });
 </script>
 </body>
 </html>

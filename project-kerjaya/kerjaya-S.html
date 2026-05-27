@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kerjaya Sosial - SEMSIRA</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;700&family=Orbitron:wght@500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #0a0b1e;
+            color: white;
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .background {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at center, #1b3535 0%, #08090a 100%);
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header-section {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            color: #48ffc9;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 0 0 15px rgba(72, 255, 201, 0.4);
+        }
+
+        .subtitle {
+            color: #ccc;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .career-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+
+        .career-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(72, 255, 201, 0.2);
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            transition: 0.3s;
+            backdrop-filter: blur(10px);
+            cursor: pointer;
+        }
+
+        .career-card:hover {
+            transform: translateY(-10px);
+            background: rgba(72, 255, 201, 0.15);
+            border-color: #48ffc9;
+            box-shadow: 0 0 20px rgba(72, 255, 201, 0.4);
+        }
+
+        .career-card i {
+            font-size: 3rem;
+            color: #48ffc9;
+            margin-bottom: 20px;
+        }
+
+        .career-card h3 {
+            font-family: 'Orbitron', sans-serif;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+            color: #48ffc9;
+        }
+
+        .career-card p {
+            font-size: 0.9rem;
+            color: #bbb;
+            line-height: 1.5;
+            flex-grow: 1;
+        }
+
+        .click-hint {
+            display: block;
+            margin-top: 15px;
+            font-size: 0.7rem;
+            color: #48ffc9;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        .back-btn {
+            display: inline-block;
+            margin-top: 50px;
+            padding: 12px 30px;
+            background: transparent;
+            border: 1px solid #48ffc9;
+            color: #48ffc9;
+            text-decoration: none;
+            border-radius: 5px;
+            font-family: 'Orbitron', sans-serif;
+            transition: 0.3s;
+        }
+
+        .back-btn:hover {
+            background: #48ffc9;
+            color: #000;
+        }
+
+        /* MODAL STYLES */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.85);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #0f1123 0%, #0a0b1e 100%);
+            margin: 30px auto;
+            padding: 0;
+            border: 1px solid #48ffc9;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 1100px;
+            max-height: 85vh;
+            overflow-y: auto;
+            position: relative;
+            animation: modalFadeIn 0.3s;
+        }
+
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .modal-header {
+            background: rgba(72, 255, 201, 0.15);
+            padding: 20px;
+            border-radius: 20px 20px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #48ffc9;
+        }
+
+        .modal-header h2 {
+            font-family: 'Orbitron', sans-serif;
+            color: #48ffc9;
+            margin: 0;
+        }
+
+        .close-modal {
+            color: #fff;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .close-modal:hover {
+            color: #48ffc9;
+        }
+
+        .modal-body {
+            padding: 25px;
+        }
+
+        .diary-btn-modal {
+            background: #48ffc9;
+            color: #000;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: bold;
+            font-size: 0.8rem;
+            transition: 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            border: none;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+
+        .diary-btn-modal:hover {
+            background: #fff;
+            box-shadow: 0 0 15px #48ffc9;
+            transform: translateY(-2px);
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .requirement-box {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 15px;
+            border-left: 5px solid #48ffc9;
+            backdrop-filter: blur(10px);
+        }
+
+        .section-title {
+            font-family: 'Orbitron', sans-serif;
+            color: #48ffc9;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+        }
+
+        .info-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            border: 1px solid rgba(72, 255, 201, 0.3);
+            padding: 20px;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 700px;
+        }
+
+        th {
+            background: rgba(72, 255, 201, 0.2);
+            color: #48ffc9;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            padding: 12px;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .uni-name {
+            color: #fff;
+            font-weight: bold;
+        }
+
+        .badge {
+            background: #48ffc9;
+            color: #000;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 0.65rem;
+            display: inline-block;
+            margin-top: 5px;
+        }
+
+        @media (max-width: 768px) {
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+            .modal-content {
+                margin: 20px auto;
+                width: 95%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="background"></div>
+
+    <div class="container">
+        <div class="header-section">
+            <p class="subtitle">Eksplorasi Kerjaya</p>
+            <h1>UNIT SOSIAL (S)</h1>
+            <p>Pilih kerjaya di bawah untuk melihat syarat UPU & Universiti.</p>
+        </div>
+
+        <div class="career-grid">
+            <!-- 6 KERJAYA DALAM UNIT SOSIAL -->
+            <div class="career-card" onclick="openModal('guru')">
+                <i class="fas fa-user-graduate"></i>
+                <h3>Guru / Pendidik</h3>
+                <p>Menyampaikan ilmu pengetahuan dan membentuk sahsiah serta masa depan generasi muda.</p>
+                <span class="click-hint">KLIK UNTUK INFO UPU</span>
+            </div>
+
+            <div class="career-card" onclick="openModal('kaunselor')">
+                <i class="fas fa-hand-holding-heart"></i>
+                <h3>Kaunselor / Pakar Psikologi</h3>
+                <p>Memberi bimbingan mental dan emosi untuk membantu orang lain mengatasi cabaran hidup.</p>
+                <span class="click-hint">KLIK UNTUK INFO UPU</span>
+            </div>
+
+            <div class="career-card" onclick="openModal('jururawat')">
+                <i class="fas fa-stethoscope"></i>
+                <h3>Jururawat / Pegawai Kesihatan</h3>
+                <p>Memberikan rawatan dan penjagaan rapi kepada pesakit dengan penuh kasih sayang.</p>
+                <span class="click-hint">KLIK UNTUK INFO UPU</span>
+            </div>
+
+            <div class="career-card" onclick="openModal('kebajikan')">
+                <i class="fas fa-users"></i>
+                <h3>Pegawai Kebajikan Masyarakat</h3>
+                <p>Membantu golongan memerlukan dan menguruskan bantuan komuniti secara sistematik.</p>
+                <span class="click-hint">KLIK UNTUK INFO UPU</span>
+            </div>
+
+            <div class="career-card" onclick="openModal('pr')">
+                <i class="fas fa-comments"></i>
+                <h3>Pegawai Perhubungan Awam</h3>
+                <p>Membina jambatan komunikasi yang baik antara organisasi dengan masyarakat luar.</p>
+                <span class="click-hint">KLIK UNTUK INFO UPU</span>
+            </div>
+
+            <div class="career-card" onclick="openModal('ngo')">
+                <i class="fas fa-hands-helping"></i>
+                <h3>Penyelaras NGO</h3>
+                <p>Menggerakkan misi kemanusiaan di peringkat global untuk membantu mangsa bencana.</p>
+                <span class="click-hint">KLIK UNTUK INFO UPU</span>
+            </div>
+        </div>
+
+        <div style="text-align: center;">
+            <a href="keputusan.html" class="back-btn"><i class="fas fa-arrow-left"></i> KEMBALI KE KEPUTUSAN</a>
+        </div>
+    </div>
+
+    <!-- MODAL UNTUK GURU / PENDIDIK -->
+    <div id="modalGuru" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-user-graduate"></i> INFO UPU: GURU / PENDIDIK</h2>
+                <span class="close-modal" onclick="closeModal('guru')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <button onclick="simpanKeDiari('guru')" class="diary-btn-modal"><i class="fas fa-book"></i> CETAK DIARI</button>
+                <div class="info-grid">
+                    <div class="requirement-box">
+                        <h3 class="section-title"><i class="fas fa-id-card"></i> SYARAT AM (WAJIB)</h3>
+                        <p>• Warganegara Malaysia.<br>• Lulus SPM dengan mendapat sekurang-kurangnya <strong>LIMA (5) Kepujian</strong> termasuk Bahasa Melayu.<br>• Lulus Mata Pelajaran <strong>Sejarah</strong> .<br>• Lulus <strong>Ujian Kelayakan Calon Guru (UKCG)</strong> dan temuduga .</p>
+                    </div>
+                    <div class="requirement-box" style="border-left-color: #ffa502;">
+                        <h3 class="section-title" style="color: #ffa502;"><i class="fas fa-chalkboard-user"></i> SYARAT KHAS (SPM)</h3>
+                        <p>• <strong>Bahasa Melayu:</strong> Minimum Gred A (untuk program Ijazah/Diploma Pendidikan).<br>• <strong>LIMA (5) Kepujian</strong> termasuk Bahasa Melayu .<br>• <strong>MUET:</strong> Minimum Band 3 .<br>• <strong>Kepujian dalam bidang pengkhususan</strong> (contoh: Matematik, Sains, Bahasa Inggeris).</p>
+                    </div>
+                </div>
+                <div class="info-card">
+                    <p style="margin-bottom: 15px;"><strong>⚠️ Nota Penting:</strong> Program pendidikan di Institut Pendidikan Guru (IPG) adalah melalui <strong>UPUOnline</strong> dan KPM. Pengambilan lepasan SPM ke Program Ijazah Sarjana Muda Perguruan (PISMP) selama 5 tahun. UKCG dan temuduga adalah WAJIB.</p>
+                    <table>
+                        <thead>
+                            <tr><th>Institusi & Lokasi</th><th>Program Pengajian</th><th>Tempoh</th><th>Yuran</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><span class="uni-name">Institut Pendidikan Guru (IPG) Kampus (Seluruh Malaysia)</span><br><small>Pelbagai lokasi</small></td><td>Program Ijazah Sarjana Muda Perguruan (PISMP)<br><span class="badge">IJAZAH (PISMP)</span></td>
+                            <td>5 Tahun</td>
+                            <td>Percuma (Elaun RM430/bulan) </td>
+                            </tr>
+                            <tr><td><span class="uni-name">UiTM (Pelbagai Kampus)</span><br><small>Seluruh Malaysia</small></td>
+                            <td>Diploma Pendidikan / Ijazah Pendidikan</td>
+                            <td>3-4 Tahun</td>
+                            <td>RM 550 - RM 1,000</td>
+                            </tr>
+                            <tr><td><span class="uni-name">Universiti Malaya (UM)</span><br><small>Kuala Lumpur</small></td>
+                            <td>Ijazah Sarjana Muda Pendidikan</td>
+                            <td>4 Tahun</td>
+                            <td>RM 1,100.00</td>
+                            </tr>
+                            <tr><td><span class="uni-name">Universiti Pendidikan Sultan Idris (UPSI)</span><br><small>Tanjung Malim, Perak</small></td>
+                            <td>Ijazah Sarjana Muda Pendidikan (Pelbagai Bidang)<br><span class="badge">IJAZAH</span></td>
+                            <td>4 Tahun</td>
+                            <td>RM 800.00</td>
+                            </tr>
+                            <tr><td><span class="uni-name">Universiti Utara Malaysia (UUM)</span><br><small>Sintok, Kedah</small></td>
+                            <td>Ijazah Sarjana Muda Pendidikan</td>
+                            <td>4 Tahun</td>
+                            <td>RM 700.00</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL UNTUK KAUNSELOR / PAKAR PSIKOLOGI -->
+    <div id="modalKaunselor" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-hand-holding-heart"></i> INFO UPU: KAUNSELOR / PAKAR PSIKOLOGI</h2>
+                <span class="close-modal" onclick="closeModal('kaunselor')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <button onclick="simpanKeDiari('kaunselor')" class="diary-btn-modal"><i class="fas fa-book"></i> CETAK DIARI</button>
+                <div class="info-grid">
+                    <div class="requirement-box">
+                        <h3 class="section-title"><i class="fas fa-id-card"></i> SYARAT AM (WAJIB)</h3>
+                        <p>• Warganegara Malaysia.<br>• Lulus SPM dengan mendapat sekurang-kurangnya <strong>LIMA (5) Kepujian</strong> termasuk Bahasa Melayu.<br>• Lulus Mata Pelajaran <strong>Sejarah</strong> .</p>
+                    </div>
+                    <div class="requirement-box" style="border-left-color: #ff6b6b;">
+                        <h3 class="section-title" style="color: #ff6b6b;"><i class="fas fa-brain"></i> SYARAT KHAS (SPM)</h3>
+                        <p>• <strong>Bahasa Melayu:</strong> Minimum Gred C.<br>• <strong>Bahasa Inggeris:</strong> Minimum Gred C.<br>• <strong>LIMA (5) Kepujian</strong> termasuk Bahasa Melayu.<br>• MUET: Minimum Band 2.<br>• Lulus temuduga (untuk program tertentu).</p>
+                    </div>
+                </div>
+                <div class="info-card">
+                    <p style="margin-bottom: 15px;"><strong>⚠️ Nota Penting:</strong> Program Psikologi dan Kaunseling di IPTA memerlukan laluan Asasi/Matrikulasi/Diploma terlebih dahulu kerana kebanyakan program adalah di peringkat Ijazah .</p>
+                    <table>
+                        <thead>
+                            <tr><th>Universiti & Lokasi</th><th>Program Pengajian</th><th>Tempoh</th><th>Yuran (Est. Per Sem)</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><span class="uni-name">Universiti Malaya (UM)</span><br><small>Kuala Lumpur</small></td><td>Asasi Sains (Laluan ke Psikologi)</td>
+                            <td>1 Tahun</td>
+                            <td>RM 800.00</td>
+                            </tr>
+                            <tr><td><span class="uni-name">Universiti Kebangsaan Malaysia (UKM)</span><br><small>Bangi, Selangor</small></td>
+                            <td>Asasi Sains (Psikologi)</td>
+                            <td>1 Tahun</td>
+                            <td>RM 750.00</td>
+                            </tr>
+                            <tr><td><span class="uni-name">Universiti Sains Malaysia (USM)</span><br><small>Pulau Pinang</small></td>
+                            <td>Program Matrikulasi (Laluan ke Psikologi)</td>
+                            <td>1 Tahun</td>
+                            <td>RM 500.00</td>
+                            </tr>
+                            <tr><td><span class="uni-name">Universiti Pendidikan Sultan Idris (UPSI)</span><br><small>Tanjung Malim, Perak</small></td>
+                            <td>Diploma Kaunseling</td>
+                            <td>3 Tahun</td>
+                            <td>RM 650.00</td>
+                            </tr>
+                            <tr><td><span class="uni-name">Universiti Teknologi MARA (UiTM)</span><br><small>Shah Alam, Selangor</small></td>
+                            <td>Diploma Psikologi</td>
+                            <td>3 Tahun</td>
+                            <td>RM 550.00</td>
+                            </tr>
+                            <tr>
+                                <td><span class="uni-name">Universiti Utara Malaysia (UUM)</span><br><small>Sintok, Kedah</small></td>
+                                <td>Diploma Psikologi</td>
+                                <td>3 Tahun</td>
+                                <td>RM 520.00</td>
+                             </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL UNTUK JURURAWAT / PEGAWAI KESIHATAN -->
+    <div id="modalJururawat" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-stethoscope"></i> INFO UPU: JURURAWAT / PEGAWAI KESIHATAN</h2>
+                <span class="close-modal" onclick="closeModal('jururawat')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <button onclick="simpanKeDiari('jururawat')" class="diary-btn-modal"><i class="fas fa-book"></i> CETAK DIARI</button>
+                <div class="info-grid">
+                    <div class="requirement-box">
+                        <h3 class="section-title"><i class="fas fa-id-card"></i> SYARAT AM (WAJIB)</h3>
+                        <p>• Warganegara Malaysia.<br>• Lulus SPM dengan mendapat sekurang-kurangnya <strong>LIMA (5) Kepujian</strong> termasuk Bahasa Melayu.<br>• Lulus Mata Pelajaran <strong>Sejarah</strong> .<br>• Sihat tubuh badan (tidak buta warna/halangan fizikal) .</p>
+                    </div>
+                    <div class="requirement-box" style="border-left-color: #ff4757;">
+                        <h3 class="section-title" style="color: #ff4757;"><i class="fas fa-heartbeat"></i> SYARAT KHAS (SPM)</h3>
+                        <p>• <strong>Bahasa Melayu:</strong> Minimum Gred C.<br>• <strong>Bahasa Inggeris:</strong> Minimum Gred C.<br>• <strong>Matematik:</strong> Minimum Gred C.<br>• <strong>Sains / Biologi:</strong> Minimum Gred C (Kelebihan).<br>• <strong>Tahniah :</strong> KKM juga mengambil lepasan SPM ke Program Sijil Kejururawatan (3 tahun) dengan elaun .</p>
+                    </div>
+                </div>
+                <div class="info-card">
+                    <table>
+                        <thead>
+                            <tr><th>Institusi & Lokasi</th><th>Program Pengajian</th><th>Tempoh</th><th>Yuran</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><span class="uni-name">Kementerian Kesihatan Malaysia (KKM) - Kolej/Institut Latihan KKM</span><br><small>Peluruh Malaysia</small></td>
+                            <td>Sijil Kejururawatan (Jururawat Pelatih) </td>
+                            <td>3 Tahun</td>
+                            <td>Percuma + Elaun bulanan (RM600-800)</td>
+                            </tr>
+                            <tr>
+                                <td><span class="uni-name">UiTM (Puncak Alam, Selangor)</span></td>
+                                <td>Diploma Kejururawatan</td>
+                                <td>3 Tahun</td>
+                                <td>RM 600.00</td>
+                             </tr>
+                            <tr>
+                                <td><span class="uni-name">Universiti Sains Malaysia (USM)</span><br><small>Kubang Kerian, Kelantan</small></td>
+                                <td>Diploma Sains Kesihatan (Kejururawatan)</td>
+                                <td>3 Tahun</td>
+                                <td>RM 1,000.00</td>
+                             </tr>
+                            <tr>
+                                <td><span class="uni-name">Universiti Malaya (UM)</span><br><small>Kuala Lumpur</small></td>
+                                <td>Ijazah Kejururawatan (Laluan Asasi/Matrik/Diploma)</td>
+                                <td>4 Tahun</td>
+                                <td>RM 1,200.00</td>
+                             </tr>
+                            <tr>
+                                <td><span class="uni-name">Politeknik Kesihatan KKM</span><br><small>Seluruh Malaysia</small></td>
+                                <td>Diploma Kejururawatan</td>
+                                <td>3 Tahun</td>
+                                <td>Percuma + Elaun</td>
+                             </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL UNTUK PEGAWAI KEBAJIKAN MASYARAKAT -->
+    <div id="modalKebajikan" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-users"></i> INFO UPU: PEGAWAI KEBAJIKAN MASYARAKAT</h2>
+                <span class="close-modal" onclick="closeModal('kebajikan')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <button onclick="simpanKeDiari('kebajikan')" class="diary-btn-modal"><i class="fas fa-book"></i> CETAK DIARI</button>
+                <div class="info-grid">
+                    <div class="requirement-box">
+                        <h3 class="section-title"><i class="fas fa-id-card"></i> SYARAT AM (WAJIB)</h3>
+                        <p>• Warganegara Malaysia.<br>• Lulus SPM dengan mendapat sekurang-kurangnya <strong>LIMA (5) Kepujian</strong> termasuk Bahasa Melayu.<br>• Lulus Mata Pelajaran <strong>Sejarah</strong> .</p>
+                    </div>
+                    <div class="requirement-box" style="border-left-color: #ffa502;">
+                        <h3 class="section-title" style="color: #ffa502;"><i class="fas fa-hand-holding-heart"></i> SYARAT KHAS (SPM)</h3>
+                        <p>• <strong>Bahasa Melayu:</strong> Minimum Gred C.<br>• <strong>Bahasa Inggeris:</strong> Minimum Gred C.<br>• <strong>LIMA (5) Kepujian</strong> termasuk Bahasa Melayu.<br>• MUET: Minimum Band 2.<br>• Berminat dalam kerja sosial/kemanusiaan.</p>
+                    </div>
+                </div>
+                <div class="info-card">
+                    <table>
+                        <thead>
+                            <tr><th>Universiti & Lokasi</th><th>Program Pengajian</th><th>Tempoh</th><th>Yuran (Est. Per Sem)</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><span class="uni-name">Universiti Utara Malaysia (UUM)</span><br><small>Sintok, Kedah</small></td>
+                                <td>Ijazah Sarjana Muda Kerja Sosial (Laluan Asasi/Diploma)</td>
+                                <td>4 Tahun</td>
+                                <td>RM 700.00</td>
+                             </tr>
+                            <tr>
+                                <td><span class="uni-name">Universiti Kebangsaan Malaysia (UKM)</span><br><small>Bangi, Selangor</small></td>
+                                <td>Ijazah Sarjana Muda Sains Kemasyarakatan (Kerja Sosial)</td>
+                                <td>4 Tahun</td>
+                                <td>RM 1,000.00</td>
+                             </tr>
+                            <tr>
+                                <td><span class="uni-name">Universiti Sains Malaysia (USM)</span><br><small>Pulau Pinang</small></td>
+                                <td>Ijazah Sarjana Muda Sains Kemasyarakatan</td>
+                                <td>4 Tahun</td>
+                                <td>RM 900.00</td>
+                             </tr>
+                            <tr>
+                                <td><span class="uni-name">Universiti Teknologi MARA (UiTM)</span><br><small>Shah Alam</small></td>
+                                <td>Diploma Pentadbiran Kesihatan dan Kerja Sosial</td>
+                                <td>3 Tahun</td>
+                                <td>RM 550.00</td>
+                             </tr>
+                            <tr>
+                                <td><span class="uni-name">Politeknik (Pelbagai Kampus)</span><br><small>Seluruh Malaysia</small></td>
+                                <td>Diploma Kerja Sosial/ Pentadbiran Kesihatan</td>
+                                <td>3 Tahun</td>
+                                <td>RM 200.00</td>
+                             </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL UNTUK PEGAWAI PERHUBUNGAN AWAM -->
+    <div id="modalPr" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-comments"></i> INFO UPU: PEGAWAI PERHUBUNGAN AWAM</h2>
+                <span class="close-modal" onclick="closeModal('pr')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <button onclick="simpanKeDiari('pr')" class="diary-btn-modal"><i class="fas fa-book"></i> CETAK DIARI</button>
+                <div class="info-grid">
+                    <div class="requirement-box">
+                        <h3 class="section-title"><i class="fas fa-id-card"></i> SYARAT AM (WAJIB)</h3>
+                        <p>• Warganegara Malaysia.<br>• Lulus SPM dengan mendapat sekurang-kurangnya <strong>LIMA (5) Kepujian</strong> termasuk Bahasa Melayu.<br>• Lulus Mata Pelajaran <strong>Sejarah</strong> .</p>
+                    </div>
+                    <div class="requirement-box" style="border-left-color: #1e90ff;">
+                        <h3 class="section-title" style="color: #1e90ff;"><i class="fas fa-chalkboard"></i> SYARAT KHAS (SPM)</h3>
+                        <p>• <strong>Bahasa Melayu:</strong> Minimum Gred C.<br>• <strong>Bahasa Inggeris:</strong> Minimum Gred C.<br>• <strong>LIMA (5) Kepujian</strong> termasuk BM.<br>• MUET: Minimum Band 2.</p>
+                    </div>
+                </div>
+                <div class="info-card">
+                    <table>
+                        <thead>
+                            <tr><th>Universiti & Lokasi</th><th>Program Pengajian</th><th>Tempoh</th><th>Yuran (Est. Per Sem)</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><span class="uni-name">Universiti Teknologi MARA (UiTM)</span><br><small>Shah Alam</small></td>
+                                <td>Diploma Perhubungan Awam</td>
+                                <td>3 Tahun</td>
+                                <td>RM 550.00</td>
+                             </tr>
+                            <tr>
+                                <td><span class="uni-name">Universiti Utara Malaysia (UUM)</span><br><small>Sintok, Kedah</small></td>
+                                <td>Diploma Komunikasi (Perhubungan Awam)</td>
+                                <td>3 Tahun</td>
+                                <td>RM 520.00</td>
+                             </tr>
+                            <tr>
+                                <td><span class="uni-name">Universiti Malaya (UM)</span><br><small>Kuala Lumpur</small></td>
+                                <td>Ijazah Komunikasi (Perhubungan Awam) - Laluan Asasi/Matrik</td>
+                                <td>4 Tahun</td>
+                                <td>RM 1,100.00</td>
+                             </tr>
+                            <tr>
+                                <td><span class="uni-name">Universiti Putra Malaysia (UPM)</span><br><small>Serdang, Selangor</small></td>
+                                <td>Ijazah Komunikasi (Perhubungan Awam)</td>
+                                <td>4 Tahun</td>
+                                <td>RM 1,000.00</td>
+                             </tr>
+                            <tr>
+                                <td><span class="uni-name">Politeknik (Pelbagai Kampus)</span><br><small>Seluruh Malaysia</small></td>
+                                <td>Diploma Komunikasi Korporat/PR</td>
+                                <td>3 Tahun</td>
+                                <td>RM 200.00</td>
+                             </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL UNTUK PENYELARAS NGO -->
+    <div id="modalNgo" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-hands-helping"></i> INFO UPU: PENYELARAS NGO</h2>
+                <span class="close-modal" onclick="closeModal('ngo')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <button onclick="simpanKeDiari('ngo')" class="diary-btn-modal"><i class="fas fa-book"></i> CETAK DIARI</button>
+                <div class="info-grid">
+                    <div class="requirement-box">
+                        <h3 class="section-title"><i class="fas fa-id-card"></i> SYARAT AM (WAJIB)</h3>
+                        <p>• Warganegara Malaysia.<br>• Lulus SPM dengan mendapat sekurang-kurangnya <strong>LIMA (5) Kepujian</strong> termasuk Bahasa Melayu.<br>• Lulus Mata Pelajaran <strong>Sejarah</strong> .</p>
+                    </div>
+                    <div class="requirement-box" style="border-left-color: #7bed9f;">
+                        <h3 class="section-title" style="color: #7bed9f;"><i class="fas fa-globe"></i> SYARAT KHAS (SPM)</h3>
+                        <p>• <strong>Bahasa Melayu:</strong> Minimum Gred C.<br>• <strong>Bahasa Inggeris:</strong> Minimum Gred C.<br>• <strong>LIMA (5) Kepujian</strong> termasuk BM.<br>• MUET: Minimum Band 2.</p>
+                    </div>
+                </div>
+                <div class="info-card">
+                    <p style="margin-bottom: 15px;"><strong>📌 Nota:</strong> Bidang Pengurusan NGO dan Pembangunan Masyarakat memerlukan latar belakang dalam Kerja Sosial, Pengurusan, atau Komunikasi.</p>
+                    <table>
+                        <thead>
+                            <tr><th>Universiti & Lokasi</th><th>Program Pengajian</th><th>Tempoh</th><th>Yuran (Est. Per Sem)</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><span class="uni-name">Universiti Utara Malaysia (UUM)</span><br><small>Sintok, Kedah</small></td>
+                                <td>Ijazah Sarjana Muda Kerja Sosial / Pengurusan Pembangunan (Laluan Asasi/Diploma)</td>
+                                <td>4 Tahun</td>
+                                <td>RM 700.00</td>
+                             </tr>
+                            <tr>
+                                <td><span class="uni-name">Universiti Teknologi MARA (UiTM)</span><br><small>Shah Alam</small></td>
+                                <td>Diploma Kerja Sosial / Diploma Pentadbiran Pembangunan</span></td>
+                                <td>3 Tahun</span></td>
+                                <td>RM 550.00</span></td>
+                             </tr>
+                            <tr>
+                                <td><span class="uni-name">Universiti Malaya (UM)</span><br><small>Kuala Lumpur</small></td>
+                                <td>Ijazah Sains Sosial (Pentadbiran dan Pembangunan Sosial) (Laluan Asasi/Matrik)</span></td>
+                                <td>4 Tahun</span></td>
+                                <td>RM 1,000.00</span></td>
+                             </tr>
+                            <tr>
+                                <td><span class="uni-name">Politeknik (Pelbagai Kampus)</span><br><small>Seluruh Malaysia</small></td>
+                                <td>Diploma Kerja Sosial / Komunikasi </span></td>
+                                <td>3 Tahun</span></td>
+                                <td>RM 200.00</span></td>
+                             </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Function untuk buka modal
+        function openModal(type) {
+            const modal = document.getElementById(`modal${type.charAt(0).toUpperCase() + type.slice(1)}`);
+            if (modal) modal.style.display = "block";
+            document.body.style.overflow = "hidden";
+        }
+
+        // Function untuk tutup modal
+        function closeModal(type) {
+            const modal = document.getElementById(`modal${type.charAt(0).toUpperCase() + type.slice(1)}`);
+            if (modal) modal.style.display = "none";
+            document.body.style.overflow = "auto";
+        }
+
+        // Tutup modal bila klik luar content
+        window.onclick = function(event) {
+            const modals = document.querySelectorAll('.modal');
+            modals.forEach(modal => {
+                if (event.target === modal) {
+                    modal.style.display = "none";
+                    document.body.style.overflow = "auto";
+                }
+            });
+        }
+
+        // Function simpan ke localStorage dan redirect ke diari.html
+        function simpanKeDiari(jenis) {
+            let data = {};
+
+            switch(jenis) {
+                case 'guru':
+                    data = {
+                        nama: "GURU / PENDIDIK",
+                        am: "Warganegara Malaysia. Lulus SPM LIMA (5) Kepujian termasuk BM. Lulus Sejarah. Lulus UKCG & temuduga.",
+                        khas: "BM (A), MUET Band 3, Kepujian dalam bidang pengkhususan.",
+                        universiti: "1. IPG: PISMP (5 tahun) - Percuma + Elaun<br>2. UPSI: Ijazah Pendidikan<br>3. UM: Ijazah Pendidikan<br>4. UUM: Ijazah Pendidikan"
+                    };
+                    break;
+                case 'kaunselor':
+                    data = {
+                        nama: "KAUNSELOR / PAKAR PSIKOLOGI",
+                        am: "Warganegara Malaysia. Lulus SPM LIMA (5) Kepujian termasuk BM. Lulus Sejarah.",
+                        khas: "BM (C), English (C), MUET Band 2.",
+                        universiti: "1. UiTM: Diploma Psikologi<br>2. UPSI: Diploma Kaunseling<br>3. UUM: Diploma Psikologi"
+                    };
+                    break;
+                case 'jururawat':
+                    data = {
+                        nama: "JURURAWAT / PEGAWAI KESIHATAN",
+                        am: "Warganegara Malaysia. Lulus SPM LIMA (5) Kepujian termasuk BM. Sihat tubuh badan.",
+                        khas: "BM (C), English (C), Math (C), Sains/Biology (C - kelebihan).",
+                        universiti: "1. KKM: Sijil Kejururawatan (3 tahun) - Percuma + Elaun<br>2. UiTM: Diploma Kejururawatan<br>3. Politeknik Kesihatan: Diploma Kejururawatan"
+                    };
+                    break;
+                case 'kebajikan':
+                    data = {
+                        nama: "PEGAWAI KEBAJIKAN MASYARAKAT",
+                        am: "Warganegara Malaysia. Lulus SPM LIMA (5) Kepujian termasuk BM. Lulus Sejarah.",
+                        khas: "BM (C), English (C), MUET Band 2.",
+                        universiti: "1. UKM: Ijazah Kerja Sosial<br>2. UUM: Ijazah Kerja Sosial<br>3. UiTM: Diploma Kerja Sosial"
+                    };
+                    break;
+                case 'pr':
+                    data = {
+                        nama: "PEGAWAI PERHUBUNGAN AWAM",
+                        am: "Warganegara Malaysia. Lulus SPM LIMA (5) Kepujian termasuk BM. Lulus Sejarah.",
+                        khas: "BM (C), English (C), MUET Band 2.",
+                        universiti: "1. UiTM: Diploma Perhubungan Awam<br>2. UUM: Diploma Komunikasi<br>3. Politeknik: Diploma Komunikasi Korporat"
+                    };
+                    break;
+                case 'ngo':
+                    data = {
+                        nama: "PENYELARAS NGO",
+                        am: "Warganegara Malaysia. Lulus SPM LIMA (5) Kepujian termasuk BM. Lulus Sejarah.",
+                        khas: "BM (C), English (C), MUET Band 2.",
+                        universiti: "1. UUM: Ijazah Kerja Sosial<br>2. UiTM: Diploma Kerja Sosial<br>3. UM: Ijazah Sains Sosial"
+                    };
+                    break;
+            }
+
+            localStorage.setItem("pilihanKerjaya", JSON.stringify(data));
+            window.location.href = "diari.html";
+        }
+    </script>
+</body>
+</html>

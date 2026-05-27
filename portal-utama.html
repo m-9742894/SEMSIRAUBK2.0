@@ -2,10 +2,13 @@
 <html lang="ms">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portal Utama - Sistem Hala Tuju Kerjaya</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Portal Utama · E-MindCare SEMSIRA (Guest)</title>
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- AOS -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -14,280 +17,381 @@
         }
 
         body {
-            font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #0a0b1e 0%, #0f1123 100%);
-            color: white;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: linear-gradient(135deg, #f6f9fc 0%, #ecf3fa 100%);
             min-height: 100vh;
+            overflow-x: hidden;
         }
 
-        /* Navbar */
-        .navbar {
-            background: rgba(10, 11, 30, 0.95);
-            backdrop-filter: blur(10px);
-            padding: 15px 40px;
+        /* background animated soft blob */
+        .bg-blobs {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            overflow: hidden;
+        }
+        .blob-soft {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.3;
+            animation: floatBlob 28s infinite alternate ease-in-out;
+        }
+        .blob-soft:nth-child(1) {
+            width: 500px;
+            height: 500px;
+            background: #a5f3fc;
+            top: -100px;
+            left: -150px;
+        }
+        .blob-soft:nth-child(2) {
+            width: 600px;
+            height: 600px;
+            background: #c7d2fe;
+            bottom: -200px;
+            right: -150px;
+            animation-duration: 32s;
+        }
+        .blob-soft:nth-child(3) {
+            width: 400px;
+            height: 400px;
+            background: #fbcfe8;
+            top: 30%;
+            left: 70%;
+            animation-duration: 24s;
+        }
+        @keyframes floatBlob {
+            0% { transform: translate(0,0) scale(1);}
+            100% { transform: translate(30px, -40px) scale(1.2);}
+        }
+
+        /* main container */
+        .portal-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem 2rem 4rem;
+            position: relative;
+            z-index: 4;
+        }
+
+        /* header */
+        .portal-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid rgba(0, 210, 255, 0.3);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            padding-bottom: 0.8rem;
+            border-bottom: 2px solid rgba(79, 70, 229, 0.2);
         }
-
-        .logo {
-            font-size: 1.5rem;
-            font-weight: 700;
-            background: linear-gradient(90deg, #00d2ff, #3a7bd5);
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .logo-icon {
+            background: white;
+            width: 48px;
+            height: 48px;
+            border-radius: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 18px rgba(0,0,0,0.05);
+        }
+        .logo-icon i {
+            font-size: 28px;
+            color: #4f46e5;
+        }
+        .logo-text h1 {
+            font-size: 1.7rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #1e293b, #4f46e5);
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
         }
-
-        .logo i {
-            background: none;
-            -webkit-background-clip: unset;
-            background-clip: unset;
-            color: #00d2ff;
-            margin-right: 8px;
+        .logo-text p {
+            font-size: 0.75rem;
+            color: #5b6e8c;
+        }
+        .guest-badge {
+            background: rgba(79,70,229,0.12);
+            padding: 0.4rem 1.2rem;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: #4f46e5;
+            backdrop-filter: blur(4px);
         }
 
-        .nav-links {
-            display: flex;
-            gap: 30px;
+        /* welcome block */
+        .welcome-block {
+            text-align: center;
+            margin: 1.5rem 0 2.8rem;
         }
-
-        .nav-links a {
-            color: #ddd;
-            text-decoration: none;
-            transition: 0.3s;
+        .welcome-block h2 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #1e2a3e;
+        }
+        .welcome-block span {
+            background: linear-gradient(120deg, #4f46e5, #c084fc);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .sub-welcome {
+            color: #5d6e8a;
+            margin-top: 0.5rem;
             font-weight: 500;
         }
 
-        .nav-links a:hover {
-            color: #00d2ff;
-        }
-
-        /* Hero Section */
-        .hero {
-            text-align: center;
-            padding: 80px 20px;
-            background: radial-gradient(circle at 30% 10%, rgba(0,210,255,0.15), transparent);
-        }
-
-        .hero h1 {
-            font-size: 3rem;
-            margin-bottom: 20px;
-        }
-
-        .hero h1 span {
-            background: linear-gradient(90deg, #00d2ff, #3a7bd5);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-        }
-
-        .hero p {
-            font-size: 1.2rem;
-            color: #ccc;
-            max-width: 700px;
-            margin: 0 auto 30px;
-        }
-
-        /* Cards Container */
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 40px 20px;
-        }
-
-        .section-title {
-            font-size: 2rem;
-            text-align: center;
-            margin-bottom: 40px;
-        }
-
-        .section-title i {
-            color: #00d2ff;
-            margin-right: 10px;
-        }
-
-        .cards-grid {
+        /* menu grid */
+        .menu-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 30px;
+            grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0 3rem;
         }
-
-        .card {
-            background: rgba(255, 255, 255, 0.07);
+        .menu-card {
+            background: rgba(255, 255, 255, 0.88);
             backdrop-filter: blur(10px);
-            border-radius: 25px;
-            padding: 30px 25px;
-            text-align: center;
-            border: 1px solid rgba(0, 210, 255, 0.2);
-            transition: 0.3s;
+            border-radius: 1.8rem;
+            padding: 1.6rem 1.4rem;
+            transition: all 0.35s ease;
             cursor: pointer;
+            border: 1px solid rgba(255,255,245,0.7);
+            box-shadow: 0 12px 28px -12px rgba(0, 0, 0, 0.08);
         }
-
-        .card:hover {
+        .menu-card:hover {
             transform: translateY(-8px);
-            border-color: #00d2ff;
-            box-shadow: 0 10px 30px rgba(0, 210, 255, 0.2);
+            background: white;
+            border-color: #c7d2fe;
+            box-shadow: 0 25px 35px -18px rgba(79, 70, 229, 0.2);
+        }
+        .menu-icon {
+            font-size: 2.5rem;
+            color: #4f46e5;
+            margin-bottom: 1rem;
+            background: #eef2ff;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 24px;
+            transition: 0.2s;
+        }
+        .menu-card:hover .menu-icon {
+            background: #4f46e5;
+            color: white;
+        }
+        .menu-card h3 {
+            font-size: 1.45rem;
+            font-weight: 700;
+            margin: 0.75rem 0 0.5rem;
+            color: #1f2a44;
+        }
+        .menu-desc {
+            font-size: 0.85rem;
+            color: #5b6e8c;
+            line-height: 1.4;
+            margin-bottom: 1rem;
+            border-left: 3px solid #cbd5e1;
+            padding-left: 12px;
+        }
+        .enter-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #4f46e5;
+            background: #f1f5f9;
+            padding: 5px 16px;
+            border-radius: 30px;
+            transition: all 0.2s;
+        }
+        .menu-card:hover .enter-btn {
+            background: #4f46e5;
+            color: white;
+            gap: 12px;
         }
 
-        .card-icon {
-            font-size: 3rem;
-            color: #00d2ff;
-            margin-bottom: 20px;
+        /* back home button */
+        .back-home {
+            text-align: center;
+            margin-top: 2rem;
         }
-
-        .card h3 {
-            font-size: 1.5rem;
-            margin-bottom: 15px;
-        }
-
-        .card p {
-            color: #bbb;
-            line-height: 1.6;
-        }
-
-        /* CTA Button */
-        .cta-button {
-            display: inline-block;
-            background: linear-gradient(90deg, #00d2ff, #3a7bd5);
+        .btn-back {
+            background: #eef2ff;
             border: none;
-            padding: 12px 35px;
+            padding: 0.8rem 2rem;
             border-radius: 50px;
             font-weight: 600;
+            color: #4f46e5;
             cursor: pointer;
-            transition: 0.3s;
-            font-size: 1rem;
+            transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-back:hover {
+            background: #4f46e5;
             color: white;
-            text-decoration: none;
-            margin-top: 10px;
+            transform: scale(1.02);
         }
 
-        .cta-button:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 20px rgba(0, 210, 255, 0.5);
-        }
-
-        /* Footer */
         footer {
+            margin-top: 3rem;
             text-align: center;
-            padding: 30px;
-            border-top: 1px solid rgba(255,255,255,0.1);
-            margin-top: 50px;
-            color: #888;
+            font-size: 0.75rem;
+            color: #6c7289;
+            border-top: 1px solid rgba(0,0,0,0.05);
+            padding-top: 2rem;
         }
 
-        @media (max-width: 768px) {
-            .navbar {
-                flex-direction: column;
-                gap: 15px;
-                padding: 15px;
+        @media (max-width: 720px) {
+            .portal-container {
+                padding: 1.2rem;
             }
-            .hero h1 {
-                font-size: 2rem;
+            .menu-grid {
+                grid-template-columns: 1fr;
+                gap: 1.2rem;
+            }
+            .welcome-block h2 {
+                font-size: 1.6rem;
             }
         }
     </style>
 </head>
 <body>
+<div class="bg-blobs">
+    <div class="blob-soft"></div>
+    <div class="blob-soft"></div>
+    <div class="blob-soft"></div>
+</div>
 
-    <!-- Navbar -->
-    <div class="navbar">
-        <div class="logo">
-            <i class="fas fa-chart-line"></i> HALA TUJU
+<div class="portal-container">
+    <div class="portal-header" data-aos="fade-down">
+        <div class="logo-area">
+            <div class="logo-icon"><i class="fas fa-hands-helping"></i></div>
+            <div class="logo-text">
+                <h1>Portal Guest · E-MindCare</h1>
+                <p>Unit Bimbingan & Kaunseling SMK Syed Sirajuddin</p>
+            </div>
         </div>
-        <div class="nav-links">
-            <a href="#">Utama</a>
-            <a href="#">Tentang</a>
-            <a href="#">Hubungi</a>
+        <div class="guest-badge"><i class="fas fa-user-astronaut"></i> Mod Tetamu</div>
+    </div>
+
+    <div class="welcome-block" data-aos="fade-up">
+        <h2>🌿 <span>Selamat Datang, Tetamu!</span> 🌿</h2>
+        <div class="sub-welcome">Terokai pelbagai ruang sokongan psikologi & perkembangan diri</div>
+    </div>
+
+    <!-- MENU KATEGORI (8 BUTTON) - SEMUA REDIRECT KE PAGE -->
+    <div class="menu-grid" data-aos="fade-up" data-aos-delay="100">
+        <!-- 1. KENALI UBK SEMSIRA -->
+        <div class="menu-card" data-url="ubk-semsira/kenali-ubk.html">
+            <div class="menu-icon"><i class="fas fa-school"></i></div>
+            <h3>Kenali UBK SEMSIRA</h3>
+            <div class="menu-desc">Profil unit, kaunselor & misi membantu insan</div>
+            <div class="enter-btn">Terokai <i class="fas fa-arrow-right"></i></div>
+        </div>
+
+        <!-- 2. MOOD CHECK IN -> folder mood-checkin/ -->
+        <div class="menu-card" data-url="mood-checkin/mood-checkin.html">
+            <div class="menu-icon"><i class="fas fa-smile-beam"></i></div>
+            <h3>Mood Check-in</h3>
+            <div class="menu-desc">Luahkan rasa, tenang di jiwa • Jejak emosi harian</div>
+            <div class="enter-btn">Luahkan <i class="fas fa-arrow-right"></i></div>
+        </div>
+
+        <!-- 3. KENAL PASTI HALA TUJU ANDA -->
+        <!-- 🔥 PERUBAHAN: Sekarang terus ke project-kerjaya/hala-tuju.html -->
+        <div class="menu-card" data-url="project-kerjaya/hala-tuju.html">
+            <div class="menu-icon"><i class="fas fa-compass"></i></div>
+            <h3>Kenal Pasti Hala Tuju Anda</h3>
+            <div class="menu-desc">Refleksi kerjaya, matlamat hidup & potensi diri</div>
+            <div class="enter-btn">Teroka Hala Tuju <i class="fas fa-arrow-right"></i></div>
+        </div>
+
+        <!-- 4. MINDFULNESS ACTIVITY -->
+        <div class="menu-card" data-url="mindfulness.html">
+            <div class="menu-icon"><i class="fas fa-brain"></i></div>
+            <h3>Mindfulness Activity</h3>
+            <div class="menu-desc">Latihan pernafasan, ketenangan & kesedaran penuh</div>
+            <div class="enter-btn">Mulakan <i class="fas fa-arrow-right"></i></div>
+        </div>
+
+        <!-- 5. GALERI AKTIVITI -->
+        <div class="menu-card" data-url="galeri.html">
+            <div class="menu-icon"><i class="fas fa-images"></i></div>
+            <h3>Galeri Aktiviti</h3>
+            <div class="menu-desc">Koleksi momen bimbingan, program & interaksi</div>
+            <div class="enter-btn">Lihat Galeri <i class="fas fa-arrow-right"></i></div>
+        </div>
+
+        <!-- 6. CHATBOX AI -->
+        <div class="menu-card" data-url="chatbox.html">
+            <div class="menu-icon"><i class="fas fa-robot"></i></div>
+            <h3>Chatbox AI</h3>
+            <div class="menu-desc">Ruang bicara mesra AI, sokongan awal 24/7</div>
+            <div class="enter-btn">Bual dengan AI <i class="fas fa-arrow-right"></i></div>
+        </div>
+
+        <!-- 7. UJIAN INVENTORI PSIKOMETRIK -->
+        <div class="menu-card" data-url="psikometrik.html">
+            <div class="menu-icon"><i class="fas fa-chart-line"></i></div>
+            <h3>Ujian Inventori Psikometrik</h3>
+            <div class="menu-desc">Penilaian personaliti, minat kerjaya & kecerdasan emosi</div>
+            <div class="enter-btn">Mulai Ujian <i class="fas fa-arrow-right"></i></div>
+        </div>
+
+        <!-- 8. MATA MERIT PELAJAR -->
+        <div class="menu-card" data-url="mata-merit.html">
+            <div class="menu-icon"><i class="fas fa-star"></i></div>
+            <h3>Mata Merit Pelajar</h3>
+            <div class="menu-desc">Semak ganjaran & pencapaian kokurikulum / sahsiah</div>
+            <div class="enter-btn">Semak Merit <i class="fas fa-arrow-right"></i></div>
         </div>
     </div>
 
-    <!-- Hero Section -->
-    <div class="hero">
-        <h1>Kenali <span>Potensi Diri</span> Anda</h1>
-        <p>Temui hala tuju kerjaya yang tepat berdasarkan personaliti dan minat anda melalui sistem penilaian RIASEK yang terbukti berkesan.</p>
-        <a href="#" class="cta-button" id="btnHalaTujuHero"><i class="fas fa-compass"></i> Mulai Ujian Hala Tuju</a>
+    <div class="back-home">
+        <button class="btn-back" id="backToLandingBtn"><i class="fas fa-arrow-left"></i> Kembali ke Laman Utama</button>
     </div>
-
-    <div class="container">
-        <h2 class="section-title"><i class="fas fa-th-large"></i> Perkhidmatan Kami</h2>
-        <div class="cards-grid">
-            <!-- Kad 1: Hala Tuju Kerjaya -->
-            <div class="card" id="cardHalaTuju">
-                <div class="card-icon"><i class="fas fa-compass"></i></div>
-                <h3>Hala Tuju Kerjaya</h3>
-                <p>Ujian penjajaran kerjaya RIASEK dengan 60 soalan komprehensif. Dapatkan profil minat anda dan cadangan kerjaya yang sesuai.</p>
-                <button class="cta-button" id="btnHalaTujuCard"><i class="fas fa-arrow-right"></i> Ambil Ujian</button>
-            </div>
-            <!-- Kad 2: Koleksi Kerjaya -->
-            <div class="card">
-                <div class="card-icon"><i class="fas fa-briefcase"></i></div>
-                <h3>Koleksi Kerjaya</h3>
-                <p>Terokai pelbagai pilihan kerjaya mengikut kategori RIASEK beserta maklumat gaji, syarat kelayakan dan prospek masa depan.</p>
-                <button class="cta-button" id="btnKoleksiKerjaya" style="background: rgba(255,255,255,0.15);"><i class="fas fa-search"></i> Teroka</button>
-            </div>
-            <!-- Kad 3: Tip Kerjaya -->
-            <div class="card">
-                <div class="card-icon"><i class="fas fa-lightbulb"></i></div>
-                <h3>Tip Kerjaya</h3>
-                <p>Panduan membina resume, temuduga, dan kemahiran insaniah untuk persediaan alam pekerjaan yang kompetitif.</p>
-                <button class="cta-button" id="btnTipKerjaya" style="background: rgba(255,255,255,0.15);"><i class="fas fa-book-open"></i> Baca</button>
-            </div>
-        </div>
-    </div>
-
     <footer>
-        <p>&copy; 2025 Sistem Hala Tuju Kerjaya. Dikuasakan oleh Teknologi RIASEK.</p>
+        <i class="fas fa-heart" style="color:#ec489a;"></i> Ruang Sokongan Psikologi • E-MindCare SEMSIRA
     </footer>
+</div>
 
-    <script>
-        // =====================================================
-        // Fungsi untuk navigasi ke hala-tuju.html
-        // Fail hala-tuju.html berada dalam folder: project-kerjaya/
-        // =====================================================
-        
-        function navigateToHalaTuju() {
-            // Path ke hala-tuju.html dalam folder project-kerjaya
-            // Anda boleh ubah path ini jika struktur folder berbeza
-            const halaTujuPath = "project-kerjaya/hala-tuju.html";
-            
-            // Cuba buka dengan cara biasa
-            window.location.href = halaTujuPath;
-        }
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+    AOS.init({ once: true, duration: 700, offset: 10 });
 
-        // Event listeners untuk semua button dan card yang berkaitan dengan Hala Tuju
-        document.getElementById('btnHalaTujuHero').addEventListener('click', function(e) {
-            e.preventDefault();
-            navigateToHalaTuju();
-        });
-
-        document.getElementById('btnHalaTujuCard').addEventListener('click', function(e) {
-            e.preventDefault();
-            navigateToHalaTuju();
-        });
-
-        // Untuk card itu sendiri (boleh klik pada seluruh card)
-        document.getElementById('cardHalaTuju').addEventListener('click', function(e) {
-            // Elak jika klik pada button (supaya tak double navigate)
-            if (e.target.tagName !== 'BUTTON' && !e.target.closest('.cta-button')) {
-                navigateToHalaTuju();
+    // Fungsi untuk redirect ke page
+    const menuCards = document.querySelectorAll('.menu-card');
+    menuCards.forEach(card => {
+        card.addEventListener('click', (e) => {
+            const targetUrl = card.getAttribute('data-url');
+            if (targetUrl) {
+                window.location.href = targetUrl;
+            } else {
+                alert("Halaman akan dibina selepas ini.");
             }
         });
+    });
 
-        // Button Koleksi Kerjaya (optional - boleh ubah ke page lain nanti)
-        document.getElementById('btnKoleksiKerjaya').addEventListener('click', function() {
-            alert("Halaman Koleksi Kerjaya akan dibina tidak lama lagi.");
-        });
-
-        // Button Tip Kerjaya (optional)
-        document.getElementById('btnTipKerjaya').addEventListener('click', function() {
-            alert("Halaman Tip Kerjaya akan dibina tidak lama lagi.");
-        });
-    </script>
-
+    // Butang kembali ke landing page utama
+    const backBtn = document.getElementById('backToLandingBtn');
+    backBtn.addEventListener('click', () => {
+        window.location.href = 'index.html';
+    });
+</script>
 </body>
 </html>

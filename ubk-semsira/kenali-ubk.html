@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Kenali UBK SEMSIRA | E-MindCare SEMSIRA</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: linear-gradient(135deg, #f0f7ff 0%, #e9f0fa 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        /* Animated Background */
+        .bg-blob {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            overflow: hidden;
+        }
+        .blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.25;
+            animation: floatBlob 25s infinite alternate ease-in-out;
+        }
+        .blob1 { width: 500px; height: 500px; background: #a78bfa; top: -150px; left: -200px; }
+        .blob2 { width: 600px; height: 600px; background: #fbcfe8; bottom: -200px; right: -150px; animation-duration: 30s; }
+        .blob3 { width: 400px; height: 400px; background: #bae6fd; top: 40%; left: 70%; animation-duration: 22s; }
+        @keyframes floatBlob {
+            0% { transform: translate(0,0) scale(1); }
+            100% { transform: translate(40px, -40px) scale(1.2); }
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid rgba(79, 70, 229, 0.15);
+        }
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .logo-icon {
+            background: linear-gradient(145deg, #4f46e5, #7c3aed);
+            width: 50px;
+            height: 50px;
+            border-radius: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .logo-icon i { font-size: 1.8rem; color: white; }
+        .logo-text h1 {
+            font-size: 1.4rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #1e293b, #4f46e5);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .back-btn {
+            background: #eef2ff;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 40px;
+            cursor: pointer;
+            font-weight: 600;
+            color: #4f46e5;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: 0.2s;
+        }
+        .back-btn:hover { background: #4f46e5; color: white; }
+        
+        /* Hero Section */
+        .hero { text-align: center; margin-bottom: 3rem; }
+        .hero h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #1e293b, #4f46e5, #7c3aed);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 0.5rem;
+        }
+        .hero .subtitle { font-size: 1rem; color: #5b6e8c; letter-spacing: 1px; }
+        .hero-divider { width: 80px; height: 4px; background: linear-gradient(90deg, #4f46e5, #c084fc); margin: 1rem auto; border-radius: 4px; }
+        
+        /* Category Cards */
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+        .category-card {
+            background: white;
+            border-radius: 2rem;
+            padding: 2rem 1.5rem;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            box-shadow: 0 15px 35px -12px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(79, 70, 229, 0.1);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .category-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: linear-gradient(90deg, #4f46e5, #c084fc, #f472b6);
+        }
+        .category-card:hover {
+            transform: translateY(-12px);
+            box-shadow: 0 25px 45px -15px rgba(79, 70, 229, 0.25);
+            border-color: rgba(79, 70, 229, 0.3);
+        }
+        .card-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(145deg, #eef2ff, #ffffff);
+            margin: 0 auto 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 32px;
+            font-size: 2.5rem;
+            color: #4f46e5;
+            transition: 0.3s;
+        }
+        .category-card:hover .card-icon {
+            background: linear-gradient(145deg, #4f46e5, #7c3aed);
+            color: white;
+            transform: scale(1.05);
+        }
+        .category-card h3 { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem; color: #1e293b; }
+        .category-card p { font-size: 0.85rem; color: #6c7289; margin-bottom: 1rem; line-height: 1.5; }
+        .card-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #f1f5f9;
+            padding: 0.5rem 1.5rem;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            color: #4f46e5;
+            transition: 0.2s;
+        }
+        .category-card:hover .card-btn { background: #4f46e5; color: white; gap: 12px; }
+        
+        .footer-info {
+            text-align: center;
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(0,0,0,0.05);
+            color: #7c7f9e;
+            font-size: 0.75rem;
+        }
+        
+        @media (max-width: 700px) {
+            .container { padding: 1rem; }
+            .hero h1 { font-size: 1.8rem; }
+            .category-grid { gap: 1rem; }
+            .category-card { padding: 1.5rem 1rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="bg-blob">
+    <div class="blob blob1"></div>
+    <div class="blob blob2"></div>
+    <div class="blob blob3"></div>
+</div>
+
+<div class="container">
+    <div class="header">
+        <div class="logo-area">
+            <div class="logo-icon"><i class="fas fa-hand-holding-heart"></i></div>
+            <div class="logo-text"><h1>E-MindCare SEMSIRA</h1></div>
+        </div>
+        <a href="../portal-utama.html" class="back-btn"><i class="fas fa-arrow-left"></i> Kembali ke Portal</a>
+    </div>
+    
+    <div class="hero" data-aos="fade-up">
+        <h1><i class="fas fa-heart"></i> KENALI KAMI</h1>
+        <div class="hero-divider"></div>
+        <div class="subtitle"><i class="fas fa-school"></i> SMK SYED SIRAJUDDIN</div>
+    </div>
+    
+    <div class="category-grid" data-aos="fade-up" data-aos-delay="100">
+        <div class="category-card" onclick="window.location.href='latar-belakang.html'">
+            <div class="card-icon"><i class="fas fa-history"></i></div>
+            <h3>Latar Belakang</h3>
+            <p>Sejarah penubuhan Unit Bimbingan & Kaunseling SMK Syed Sirajuddin</p>
+            <div class="card-btn">Baca Selengkapnya <i class="fas fa-arrow-right"></i></div>
+        </div>
+        
+        <div class="category-card" onclick="window.location.href='profil-gbk.html'">
+            <div class="card-icon"><i class="fas fa-user-graduate"></i></div>
+            <h3>Profil GBK</h3>
+            <p>Kenali guru bimbingan & kaunseling sekolah yang berdedikasi</p>
+            <div class="card-btn">Kenali Mereka <i class="fas fa-arrow-right"></i></div>
+        </div>
+        
+        <div class="category-card" onclick="window.location.href='visi-misi.html'">
+            <div class="card-icon"><i class="fas fa-bullseye"></i></div>
+            <h3>Visi & Misi</h3>
+            <p>Matlamat dan aspirasi Unit Bimbingan & Kaunseling</p>
+            <div class="card-btn">Ketahui Visi Misi <i class="fas fa-arrow-right"></i></div>
+        </div>
+    </div>
+    
+    <div class="footer-info">
+        <i class="fas fa-heart" style="color:#ec489a;"></i> Unit Bimbingan & Kaunseling SMK Syed Sirajuddin — Sentiasa Bersama Anda
+    </div>
+</div>
+
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+    AOS.init({ once: true, duration: 800, offset: 20 });
+</script>
+</body>
+</html>

@@ -179,13 +179,14 @@
         .nav-btn-primary { background: linear-gradient(95deg, #2563eb, #7c3aed); color: white; }
         .nav-btn-primary:hover { transform: translateY(-2px); }
         .nav-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        
+        /* Result Card Styles */
         .result-card {
             background: white;
             border-radius: 1.5rem;
             padding: 1.5rem;
             margin-top: 1.5rem;
             box-shadow: 0 8px 20px -8px rgba(0,0,0,0.1);
-            text-align: center;
         }
         .result-title {
             font-size: 1.3rem;
@@ -225,7 +226,7 @@
         .dominant-color {
             background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
             border-radius: 1rem;
-            padding: 1.5rem;
+            padding: 1.2rem;
             text-align: center;
             margin: 1rem 0;
         }
@@ -234,17 +235,17 @@
             padding: 0.5rem 1.5rem;
             border-radius: 40px;
             font-weight: 700;
-            font-size: 1.2rem;
-            margin-bottom: 1rem;
+            font-size: 1.1rem;
+            margin-bottom: 0.8rem;
         }
         .color-emas { background: #fbbf24; color: #78350f; }
         .color-biru { background: #3b82f6; color: white; }
         .color-hijau { background: #10b981; color: white; }
         .color-jingga { background: #f97316; color: white; }
         .color-desc {
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             color: #1e293b;
-            line-height: 1.6;
+            line-height: 1.5;
         }
         .btn-submit {
             width: 100%;
@@ -467,6 +468,13 @@
     
     const catColors = {
         EMAS: "#fbbf24", BIRU: "#3b82f6", HIJAU: "#10b981", JINGGA: "#f97316"
+    };
+    
+    const colorDescriptions = {
+        EMAS: "Personaliti EMAS melambangkan individu yang bertanggungjawab, teratur, disiplin, dan menghargai tradisi. Anda adalah seorang yang boleh diharapkan, suka membantu, dan sentiasa mematuhi peraturan. Anda cenderung menjadi tulang belakang dalam sesebuah organisasi.",
+        BIRU: "Personaliti BIRU melambangkan individu yang kreatif, ekspresif, dan berperasaan. Anda seorang yang idealistik, suka membantu orang lain, dan mempunyai empati yang tinggi. Anda menghargai hubungan yang bermakna dan sering menjadi pendengar yang baik.",
+        HIJAU: "Personaliti HIJAU melambangkan individu yang analitikal, logikal, dan berfikiran strategik. Anda seorang yang ingin tahu, suka menyelesaikan masalah, dan sentiasa mencari ilmu pengetahuan baru. Anda cemerlang dalam bidang yang memerlukan pemikiran kritikal.",
+        JINGGA: "Personaliti JINGGA melambangkan individu yang bertenaga, spontan, dan suka mencabar. Anda seorang yang berani, suka pengembaraan, dan tidak takut mengambil risiko. Anda cemerlang dalam situasi yang memerlukan tindakan pantas dan kebolehan menyesuaikan diri."
     };
     
     function showToast(message) {
@@ -701,41 +709,28 @@
                 dominant = color;
             }
         }
-        return { dominant, score: highest };
-    }
-    
-    function getColorDescription(color) {
-        const descriptions = {
-            EMAS: "Personaliti EMAS melambangkan individu yang bertanggungjawab, teratur, disiplin, dan menghargai tradisi. Anda adalah seorang yang boleh diharapkan, suka membantu, dan sentiasa mematuhi peraturan. Anda cenderung menjadi tulang belakang dalam sesebuah organisasi.",
-            BIRU: "Personaliti BIRU melambangkan individu yang kreatif, ekspresif, dan berperasaan. Anda seorang yang idealistik, suka membantu orang lain, dan mempunyai empati yang tinggi. Anda menghargai hubungan yang bermakna dan sering menjadi pendengar yang baik.",
-            HIJAU: "Personaliti HIJAU melambangkan individu yang analitikal, logikal, dan berfikiran strategik. Anda seorang yang ingin tahu, suka menyelesaikan masalah, dan sentiasa mencari ilmu pengetahuan baru. Anda cemerlang dalam bidang yang memerlukan pemikiran kritikal.",
-            JINGGA: "Personaliti JINGGA melambangkan individu yang bertenaga, spontan, dan suka mencabar. Anda seorang yang berani, suka pengembaraan, dan tidak takut mengambil risiko. Anda cemerlang dalam situasi yang memerlukan tindakan pantas dan kebolehan menyesuaikan diri."
-        };
-        return descriptions[dominant] || "";
+        return { dominant, score: highest, total: 25 };
     }
     
     function renderResult() {
-        const { dominant, score } = getDominantColor();
-        const percent = (score / 25) * 100;
-        
-        const colorName = {
-            EMAS: "EMAS", BIRU: "BIRU", HIJAU: "HIJAU", JINGGA: "JINGGA"
-        };
+        const { dominant, score, total } = getDominantColor();
+        const percent = (score / total) * 100;
         
         const colorClass = {
             EMAS: "color-emas", BIRU: "color-biru", HIJAU: "color-hijau", JINGGA: "color-jingga"
         };
         
-        // Bar chart for all colors
+        // Sort colors by score (highest to lowest) for bar chart
+        const sortedColors = Object.entries(scores).sort((a, b) => b[1] - a[1]);
+        
         let barsHtml = '';
-        const sorted = Object.entries(scores).sort((a,b) => b[1] - a[1]);
-        for (let [color, sc] of sorted) {
-            const perc = (sc / 25) * 100;
+        for (let [color, sc] of sortedColors) {
+            const perc = (sc / total) * 100;
             barsHtml += `
                 <div class="result-bar">
                     <div class="result-bar-label">
                         <span><strong>${color}</strong></span>
-                        <span>${sc} / 25</span>
+                        <span>${sc} / ${total}</span>
                     </div>
                     <div class="result-bar-fill">
                         <span style="width: ${perc}%; background: ${catColors[color]};"></span>
@@ -753,13 +748,13 @@
                 
                 <div class="dominant-color">
                     <div class="dominant-badge ${colorClass[dominant]}">
-                        🎨 WARNA DOMINAN: ${colorName[dominant]}
+                        🎨 WARNA DOMINAN: ${dominant}
                     </div>
                     <div class="color-desc">
-                        ${getColorDescription(dominant)}
+                        ${colorDescriptions[dominant]}
                     </div>
                     <p style="margin-top: 1rem; font-size: 0.8rem; color: #64748b;">
-                        Skor anda: ${score}/25 (${Math.round(percent)}%)
+                        Skor anda: ${score}/${total} (${Math.round(percent)}%)
                     </p>
                 </div>
                 

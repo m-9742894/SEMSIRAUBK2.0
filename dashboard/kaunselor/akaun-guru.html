@@ -70,6 +70,71 @@
     }
     .stats span { font-weight: 800; color: #4f46e5; font-size: 1.3rem; }
     
+    /* Notifikasi Card */
+    .notification-card {
+      background: linear-gradient(135deg, #fff7ed, #ffedd5);
+      border-radius: 1.2rem;
+      padding: 1rem 1.5rem;
+      margin-bottom: 1.5rem;
+      border-left: 5px solid #f59e0b;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .notification-card:hover {
+      transform: translateX(5px);
+      background: #fffbeb;
+    }
+    .notification-left {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .notification-icon {
+      background: #fef3c7;
+      width: 50px;
+      height: 50px;
+      border-radius: 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .notification-icon i {
+      font-size: 1.5rem;
+      color: #f59e0b;
+    }
+    .notification-info h4 {
+      font-size: 0.9rem;
+      color: #92400e;
+      margin-bottom: 0.2rem;
+    }
+    .notification-info p {
+      font-size: 0.7rem;
+      color: #b45309;
+    }
+    .notification-badge {
+      background: #f59e0b;
+      color: white;
+      padding: 0.2rem 0.8rem;
+      border-radius: 2rem;
+      font-weight: 700;
+      font-size: 1.2rem;
+    }
+    .no-notification {
+      background: #f1f5f9;
+      border-left-color: #94a3b8;
+    }
+    .no-notification .notification-icon i {
+      color: #94a3b8;
+    }
+    .no-notification .notification-info h4 {
+      color: #64748b;
+    }
+    
     /* Search Section */
     .search-section {
       background: white;
@@ -101,9 +166,7 @@
       border-color: #4f46e5;
       box-shadow: 0 0 0 3px rgba(79,70,229,0.1);
     }
-    .search-box i {
-      color: #94a3b8;
-    }
+    .search-box i { color: #94a3b8; }
     .search-box input {
       flex: 1;
       border: none;
@@ -132,9 +195,7 @@
       border-bottom: 1px solid #f1f5f9;
       transition: 0.2s;
     }
-    .suggestions-list div:hover {
-      background: #f1f5f9;
-    }
+    .suggestions-list div:hover { background: #f1f5f9; }
     .suggestions-list div .suggestion-name {
       font-weight: 700;
       color: #1e293b;
@@ -153,9 +214,7 @@
       font-weight: 600;
       transition: 0.2s;
     }
-    .refresh-btn:hover {
-      background: #e2e8f0;
-    }
+    .refresh-btn:hover { background: #e2e8f0; }
     .clear-search {
       background: none;
       border: none;
@@ -164,9 +223,7 @@
       padding: 0 8px;
       display: none;
     }
-    .clear-search:hover {
-      color: #ef4444;
-    }
+    .clear-search:hover { color: #ef4444; }
     
     .card {
       background: white;
@@ -273,64 +330,115 @@
       margin-bottom: 1rem;
       display: none;
     }
+    
+    /* Modal untuk pendaftar guru baru */
     .modal {
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(0,0,0,0.5);
-      z-index: 1000;
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(4px);
+      z-index: 2000;
       display: flex;
       align-items: center;
       justify-content: center;
-      overflow-y: auto;
-      padding: 2rem;
+      padding: 20px;
     }
     .modal-content {
-      max-width: 700px;
+      max-width: 500px;
       width: 100%;
       background: white;
-      border-radius: 2rem;
-      max-height: 90vh;
+      border-radius: 1.5rem;
+      max-height: 85vh;
       overflow-y: auto;
+      animation: modalFadeIn 0.3s ease;
+    }
+    @keyframes modalFadeIn {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
     }
     .modal-header {
-      padding: 1.5rem;
+      padding: 1.2rem 1.5rem;
       border-bottom: 1px solid #e2e8f0;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      position: sticky;
+      top: 0;
+      background: white;
+      border-radius: 1.5rem 1.5rem 0 0;
     }
-    .modal-header h2 { color: #1e293b; }
+    .modal-header h3 { color: #1e293b; font-size: 1.2rem; }
+    .modal-header h3 i { color: #f59e0b; margin-right: 8px; }
     .modal-close {
       background: none;
       border: none;
       font-size: 1.5rem;
       cursor: pointer;
+      color: #94a3b8;
+      transition: 0.2s;
     }
+    .modal-close:hover { color: #dc2626; }
     .modal-body { padding: 1.5rem; }
-    .edit-section {
-      background: #f8fafc;
-      border-radius: 1rem;
-      padding: 1rem;
-      margin-bottom: 1.5rem;
-    }
-    .student-list-modal {
-      max-height: 300px;
-      overflow-y: auto;
-    }
-    .student-item-modal {
-      background: #f1f5f9;
-      border-radius: 0.8rem;
-      padding: 0.8rem;
-      margin-bottom: 0.5rem;
+    
+    .info-row {
       display: flex;
       justify-content: space-between;
-      align-items: center;
+      padding: 0.8rem 0;
+      border-bottom: 1px solid #e2e8f0;
     }
+    .info-row span:first-child {
+      font-weight: 600;
+      color: #64748b;
+    }
+    .info-row span:last-child {
+      font-weight: 600;
+      color: #1e293b;
+    }
+    .modal-buttons {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+    .btn-accept {
+      flex: 1;
+      background: #10b981;
+      color: white;
+      border: none;
+      padding: 0.8rem;
+      border-radius: 2rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .btn-accept:hover { background: #059669; transform: translateY(-2px); }
+    .btn-reject {
+      flex: 1;
+      background: #ef4444;
+      color: white;
+      border: none;
+      padding: 0.8rem;
+      border-radius: 2rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .btn-reject:hover { background: #dc2626; transform: translateY(-2px); }
+    
     @media (max-width: 900px) {
       body { padding: 1rem; }
+      .notification-card { flex-direction: column; text-align: center; }
+      .notification-left { flex-direction: column; }
     }
   </style>
 </head>
@@ -351,9 +459,21 @@
     <i class="fas fa-user-tie"></i> Jumlah Guru: <span id="totalTeachers">0</span>
   </div>
 
-  <div id="successMsg" class="success-msg"></div>
+  <!-- NOTIFICATION CARD - PENDAFTAR GURU BARU -->
+  <div id="notificationCard" class="notification-card" onclick="openPendingTeachersModal()">
+    <div class="notification-left">
+      <div class="notification-icon">
+        <i class="fas fa-user-plus"></i>
+      </div>
+      <div class="notification-info">
+        <h4>Pendaftar Guru Baru</h4>
+        <p>Terdapat guru baru yang mendaftar</p>
+      </div>
+    </div>
+    <div class="notification-badge" id="pendingCount">0</div>
+  </div>
 
-  <!-- SEARCH SECTION WITH AUTO SUGGESTION -->
+  <!-- SEARCH SECTION -->
   <div class="search-section">
     <div class="search-wrapper">
       <div class="search-box">
@@ -400,7 +520,6 @@
 </div>
 
 <script type="module">
-  // Import Firebase SDK
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
   import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
   
@@ -415,44 +534,165 @@
     measurementId: "G-3CJVKWGEXV"
   };
 
-  // Initialize Firebase
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
   const teachersCollection = collection(db, "teachers");
-  const studentsCollection = collection(db, "students");
-
-  // ==================== GLOBAL VARIABLES ====================
+  const pendingTeachersCollection = collection(db, "pending_teachers");
+  
   let teachers = [];
-  let allTeachers = []; // For search filtering
-  let students = [];
-  let currentEditTeacherId = null;
+  let allTeachers = [];
+  let pendingTeachers = [];
+  let currentSelectedPendingId = null;
 
-  // ==================== HELPER FUNCTIONS ====================
-  function escapeHtml(str) {
-    if (!str) return '';
-    return str.replace(/[&<>]/g, function(m) {
-      if (m === '&') return '&amp;';
-      if (m === '<') return '&lt;';
-      if (m === '>') return '&gt;';
-      return m;
-    });
+  // ==================== LOAD PENDING TEACHERS ====================
+  async function loadPendingTeachers() {
+    try {
+      const querySnapshot = await getDocs(pendingTeachersCollection);
+      pendingTeachers = [];
+      querySnapshot.forEach((doc) => {
+        pendingTeachers.push({ id: doc.id, ...doc.data() });
+      });
+      updatePendingNotification();
+      console.log("Pending teachers loaded:", pendingTeachers.length);
+    } catch (error) {
+      console.error("Error loading pending teachers:", error);
+    }
   }
 
-  function showMessage(msg, type) {
-    const msgDiv = document.getElementById('successMsg');
-    msgDiv.textContent = msg;
-    msgDiv.style.backgroundColor = type === 'success' ? '#dcfce7' : '#fee2e2';
-    msgDiv.style.color = type === 'success' ? '#166534' : '#991b1b';
-    msgDiv.style.display = 'block';
-    setTimeout(() => { msgDiv.style.display = 'none'; }, 4000);
+  function updatePendingNotification() {
+    const count = pendingTeachers.length;
+    const badge = document.getElementById('pendingCount');
+    const notificationCard = document.getElementById('notificationCard');
+    
+    badge.innerText = count;
+    
+    if (count === 0) {
+      notificationCard.classList.add('no-notification');
+      const infoDiv = notificationCard.querySelector('.notification-info');
+      if (infoDiv) {
+        infoDiv.innerHTML = '<h4>Tiada Pendaftar Baru</h4><p>Semua pendaftar telah diproses</p>';
+      }
+    } else {
+      notificationCard.classList.remove('no-notification');
+      const infoDiv = notificationCard.querySelector('.notification-info');
+      if (infoDiv) {
+        infoDiv.innerHTML = '<h4>Pendaftar Guru Baru</h4><p>Terdapat guru baru yang mendaftar</p>';
+      }
+    }
   }
 
-  function closeModal() {
-    const modal = document.getElementById('teacherModal');
+  // ==================== MODAL UNTUK PENDAFTAR ====================
+  window.openPendingTeachersModal = function() {
+    if (pendingTeachers.length === 0) {
+      alert("Tiada pendaftar guru baru pada masa ini.");
+      return;
+    }
+    
+    let modalHtml = `
+      <div id="pendingModal" class="modal">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h3><i class="fas fa-user-clock"></i> Senarai Pendaftar Guru Baru</h3>
+            <button class="modal-close" onclick="closePendingModal()">&times;</button>
+          </div>
+          <div class="modal-body">
+    `;
+    
+    if (pendingTeachers.length === 0) {
+      modalHtml += `<p style="text-align:center; color:#94a3b8;">Tiada pendaftar baru.</p>`;
+    } else {
+      for (const teacher of pendingTeachers) {
+        modalHtml += `
+          <div style="background:#f8fafc; border-radius:1rem; padding:1rem; margin-bottom:1rem; border-left:4px solid #f59e0b;">
+            <div class="info-row"><span>Nama:</span><span>${escapeHtml(teacher.fullname)}</span></div>
+            <div class="info-row"><span>No. IC:</span><span>${escapeHtml(teacher.icNumber)}</span></div>
+            <div class="info-row"><span>Kelas Ajar:</span><span>${escapeHtml(teacher.teacherClass || '-')}</span></div>
+            <div class="info-row"><span>Tahun:</span><span>${escapeHtml(teacher.year || '2026')}</span></div>
+            <div class="info-row"><span>Tarikh Daftar:</span><span>${teacher.createdAt ? new Date(teacher.createdAt).toLocaleDateString('ms-MY') : '-'}</span></div>
+            <div class="modal-buttons" style="margin-top:1rem;">
+              <button class="btn-accept" onclick="acceptPendingTeacher('${teacher.id}', '${escapeHtml(teacher.fullname)}', '${escapeHtml(teacher.icNumber)}', '${escapeHtml(teacher.teacherClass || '')}', '${teacher.year || '2026'}')">
+                <i class="fas fa-check"></i> Terima
+              </button>
+              <button class="btn-reject" onclick="rejectPendingTeacher('${teacher.id}', '${escapeHtml(teacher.fullname)}')">
+                <i class="fas fa-times"></i> Tolak
+              </button>
+            </div>
+          </div>
+        `;
+      }
+    }
+    
+    modalHtml += `
+          </div>
+        </div>
+      </div>
+    `;
+    
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+  };
+  
+  window.closePendingModal = function() {
+    const modal = document.getElementById('pendingModal');
     if (modal) modal.remove();
-  }
+  };
+  
+  // ==================== TERIMA PENDAFTAR GURU ====================
+  window.acceptPendingTeacher = async function(id, fullname, icNumber, teacherClass, year) {
+    if (!confirm(`Terima pendaftar "${fullname}" sebagai guru?`)) return;
+    
+    try {
+      // Check if teacher already exists
+      const q = query(teachersCollection, where("icNumber", "==", icNumber));
+      const existing = await getDocs(q);
+      
+      if (!existing.empty) {
+        alert(`❌ Guru dengan No. IC ${icNumber} sudah wujud dalam sistem!`);
+        return;
+      }
+      
+      // Add to teachers collection
+      const newTeacher = {
+        fullname: fullname,
+        icNumber: icNumber,
+        teacherClass: teacherClass || "-",
+        year: year || "2026",
+        createdAt: new Date().toISOString(),
+        acceptedFrom: "pending_registration"
+      };
+      
+      await addDoc(teachersCollection, newTeacher);
+      
+      // Delete from pending_teachers
+      await deleteDoc(doc(db, "pending_teachers", id));
+      
+      // Refresh data
+      await loadPendingTeachers();
+      await loadTeachers();
+      closePendingModal();
+      
+      alert(`✅ Guru "${fullname}" berjaya didaftarkan!`);
+    } catch (error) {
+      console.error("Error accepting teacher:", error);
+      alert("❌ Gagal menerima pendaftar. Sila cuba lagi.");
+    }
+  };
+  
+  // ==================== TOLAK PENDAFTAR GURU ====================
+  window.rejectPendingTeacher = async function(id, fullname) {
+    if (!confirm(`Tolak pendaftar "${fullname}"? Data akan dipadam secara kekal.`)) return;
+    
+    try {
+      await deleteDoc(doc(db, "pending_teachers", id));
+      await loadPendingTeachers();
+      closePendingModal();
+      alert(`✅ Pendaftar "${fullname}" telah ditolak dan data dipadam.`);
+    } catch (error) {
+      console.error("Error rejecting teacher:", error);
+      alert("❌ Gagal menolak pendaftar. Sila cuba lagi.");
+    }
+  };
 
-  // ==================== LOAD DATA ====================
+  // ==================== LOAD TEACHERS ====================
   async function loadTeachers() {
     try {
       const querySnapshot = await getDocs(teachersCollection);
@@ -466,23 +706,11 @@
       console.log("Teachers loaded from Firebase:", teachers.length);
     } catch (error) {
       console.error("Error loading teachers:", error);
-      showMessage("Gagal memuat data guru dari Firebase.", "error");
+      document.getElementById('teacherListContainer').innerHTML = '<div class="empty-state">Gagal memuat data guru.</div>';
     }
   }
 
-  async function loadAllStudents() {
-    try {
-      const querySnapshot = await getDocs(studentsCollection);
-      students = [];
-      querySnapshot.forEach((doc) => {
-        students.push({ id: doc.id, ...doc.data() });
-      });
-    } catch (error) {
-      console.error("Error loading students:", error);
-    }
-  }
-
-  // ==================== TEACHER CRUD ====================
+  // ==================== ADD TEACHER ====================
   async function addTeacherToFirebase(fullname, icNumber, teacherClass, year) {
     try {
       const q = query(teachersCollection, where("icNumber", "==", icNumber));
@@ -506,7 +734,6 @@
       allTeachers = [...teachers];
       renderTeacherList(teachers);
       updateTotalCount();
-      showMessage(`✅ Guru ${fullname} berjaya didaftarkan!`, "success");
       return { success: true };
     } catch (error) {
       console.error("Error adding teacher:", error);
@@ -514,6 +741,7 @@
     }
   }
 
+  // ==================== DELETE TEACHER ====================
   async function deleteTeacherFromFirebase(id, teacherName) {
     if (!confirm(`Padam guru "${teacherName}"?`)) return;
     
@@ -523,13 +751,14 @@
       allTeachers = [...teachers];
       renderTeacherList(teachers);
       updateTotalCount();
-      showMessage("Guru berjaya dipadam.", "success");
+      alert("Guru berjaya dipadam.");
     } catch (error) {
       console.error("Error deleting teacher:", error);
-      showMessage("Gagal memadam guru: " + error.message, "error");
+      alert("Gagal memadam guru: " + error.message);
     }
   }
 
+  // ==================== EDIT TEACHER ====================
   async function editTeacherFullInFirebase(id, newFullname, newIcNumber, newTeacherClass, newYear) {
     try {
       if (newIcNumber) {
@@ -540,7 +769,7 @@
           if (docSnap.id !== id) icExists = true;
         });
         if (icExists) {
-          showMessage(`❌ No. IC ${newIcNumber} sudah wujud untuk guru lain!`, "error");
+          alert(`❌ No. IC ${newIcNumber} sudah wujud untuk guru lain!`);
           return false;
         }
       }
@@ -564,73 +793,21 @@
       
       allTeachers = [...teachers];
       renderTeacherList(teachers);
-      showMessage("✅ Maklumat guru berjaya dikemaskini!", "success");
+      alert("✅ Maklumat guru berjaya dikemaskini!");
       return true;
     } catch (error) {
       console.error("Error editing teacher:", error);
-      showMessage("Gagal mengemaskini guru: " + error.message, "error");
+      alert("Gagal mengemaskini guru: " + error.message);
       return false;
     }
   }
 
-  async function editStudentFromModal(id, currentName, currentIc, currentClass, currentSession) {
-    const newName = prompt("✏️ Edit Nama Pelajar:", currentName);
-    if (newName === null) return;
-    if (newName.trim() === "") { showMessage("Nama tidak boleh kosong!", "error"); return; }
-    
-    const newIc = prompt("✏️ Edit No. Kad Pengenalan:", currentIc);
-    if (newIc === null) return;
-    if (newIc.trim() === "") { showMessage("No. Kad Pengenalan tidak boleh kosong!", "error"); return; }
-    
-    const newClass = prompt("✏️ Edit Kelas:", currentClass);
-    if (newClass === null) return;
-    
-    const newSession = prompt("✏️ Edit Tahun:", currentSession);
-    if (newSession === null) return;
-    
-    try {
-      const studentRef = doc(db, "students", id);
-      await updateDoc(studentRef, {
-        fullname: newName.trim(),
-        icNumber: newIc.trim(),
-        class: newClass.trim() || "-",
-        session: newSession.trim() || "2026"
-      });
-      
-      const student = students.find(s => s.id === id);
-      if (student) {
-        student.fullname = newName.trim();
-        student.icNumber = newIc.trim();
-        student.class = newClass.trim() || "-";
-        student.session = newSession.trim() || "2026";
-      }
-      
-      showMessage("✅ Pelajar berjaya dikemaskini!", "success");
-      
-      // Refresh modal if open
-      if (currentEditTeacherId) {
-        const teacher = teachers.find(t => t.id === currentEditTeacherId);
-        if (teacher) {
-          const updatedStudents = students.filter(s => s.class === teacher.teacherClass);
-          const listContainer = document.getElementById('classStudentList');
-          if (listContainer) {
-            listContainer.innerHTML = renderStudentListForModal(updatedStudents);
-          }
-        }
-      }
-    } catch (error) {
-      console.error("Error editing student:", error);
-      showMessage("Gagal mengemaskini pelajar: " + error.message, "error");
-    }
-  }
-
-  // ==================== SEARCH & AUTO SUGGESTION FUNCTIONS ====================
+  // ==================== SEARCH & AUTO SUGGESTION ====================
   function filterTeachers(searchTerm) {
     if (!searchTerm.trim()) {
       renderTeacherList(allTeachers);
       return;
     }
-    
     const term = searchTerm.toLowerCase();
     const filtered = allTeachers.filter(teacher => 
       teacher.fullname?.toLowerCase().includes(term) ||
@@ -697,83 +874,22 @@
     renderTeacherList(allTeachers);
   }
 
-  // ==================== RENDER FUNCTIONS ====================
-  function renderStudentListForModal(classStudents) {
-    if (classStudents.length === 0) {
-      return '<div style="text-align:center;padding:2rem;color:#94a3b8;"><i class="fas fa-user-slash"></i><p>Tiada pelajar dalam kelas ini.</p></div>';
-    }
-    
-    return classStudents.map(student => `
-      <div class="student-item-modal">
-        <div>
-          <div style="font-weight:600;">${escapeHtml(student.fullname)}</div>
-          <div style="font-size:0.7rem;color:#5b6e8c;"><i class="fas fa-id-card"></i> ${escapeHtml(student.icNumber)}</div>
-        </div>
-        <button onclick="window.editStudentFromModal('${student.id}', '${escapeHtml(student.fullname)}', '${escapeHtml(student.icNumber)}', '${escapeHtml(student.class)}', '${student.session}')" style="background:#e0e7ff;border:none;padding:0.3rem 0.8rem;border-radius:2rem;cursor:pointer;color:#4f46e5;">
-          <i class="fas fa-edit"></i> Edit
-        </button>
-      </div>
-    `).join('');
-  }
-
   function openTeacherDetailDialog(id, teacherName, teacherIc, teacherClass, teacherYear) {
-    currentEditTeacherId = id;
-    const classStudents = students.filter(s => s.class === teacherClass);
+    const newName = prompt("✏️ Edit Nama Penuh:", teacherName);
+    if (newName === null) return;
+    if (newName.trim() === "") { alert("Nama tidak boleh kosong!"); return; }
     
-    const modalHtml = `
-      <div id="teacherModal" class="modal">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h2><i class="fas fa-chalkboard-user"></i> Profil Guru</h2>
-            <button class="modal-close" onclick="closeModal()">&times;</button>
-          </div>
-          <div class="modal-body">
-            <div class="edit-section">
-              <h3 style="margin-bottom:1rem;color:#4f46e5;"><i class="fas fa-edit"></i> Edit Maklumat Guru</h3>
-              <div style="margin-bottom:0.8rem;">
-                <label style="display:block;font-weight:600;font-size:0.8rem;">Nama Penuh</label>
-                <input type="text" id="editFullname" value="${escapeHtml(teacherName)}" style="width:100%;padding:0.6rem;border-radius:0.8rem;border:1px solid #e2e8f0;">
-              </div>
-              <div style="margin-bottom:0.8rem;">
-                <label style="display:block;font-weight:600;font-size:0.8rem;">No. Kad Pengenalan</label>
-                <input type="text" id="editIc" value="${escapeHtml(teacherIc)}" style="width:100%;padding:0.6rem;border-radius:0.8rem;border:1px solid #e2e8f0;">
-              </div>
-              <div style="margin-bottom:0.8rem;">
-                <label style="display:block;font-weight:600;font-size:0.8rem;">Kelas / Tingkatan Ajar</label>
-                <input type="text" id="editClass" value="${escapeHtml(teacherClass)}" style="width:100%;padding:0.6rem;border-radius:0.8rem;border:1px solid #e2e8f0;">
-              </div>
-              <div style="margin-bottom:0.8rem;">
-                <label style="display:block;font-weight:600;font-size:0.8rem;">Tahun</label>
-                <input type="text" id="editYear" value="${escapeHtml(teacherYear)}" style="width:100%;padding:0.6rem;border-radius:0.8rem;border:1px solid #e2e8f0;">
-              </div>
-              <button onclick="saveTeacherEdit()" style="width:100%;background:#4f46e5;color:white;padding:0.6rem;border-radius:2rem;border:none;font-weight:600;cursor:pointer;">💾 Simpan Perubahan Guru</button>
-            </div>
-            
-            <div>
-              <h3 style="margin-bottom:1rem;color:#10b981;"><i class="fas fa-users"></i> Senarai Pelajar Kelas ${escapeHtml(teacherClass)}</h3>
-              <div id="classStudentList" class="student-list-modal">
-                ${renderStudentListForModal(classStudents)}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    `;
+    const newIc = prompt("✏️ Edit No. Kad Pengenalan:", teacherIc);
+    if (newIc === null) return;
+    if (newIc.trim() === "") { alert("No. IC tidak boleh kosong!"); return; }
     
-    document.body.insertAdjacentHTML('beforeend', modalHtml);
-  }
-
-  async function saveTeacherEdit() {
-    const newName = document.getElementById('editFullname').value;
-    const newIc = document.getElementById('editIc').value;
-    const newClass = document.getElementById('editClass').value;
-    const newYear = document.getElementById('editYear').value;
+    const newClass = prompt("✏️ Edit Kelas / Tingkatan Ajar:", teacherClass);
+    if (newClass === null) return;
     
-    if (!newName.trim()) { showMessage("Nama tidak boleh kosong!", "error"); return; }
-    if (!newIc.trim()) { showMessage("No. IC tidak boleh kosong!", "error"); return; }
+    const newYear = prompt("✏️ Edit Tahun:", teacherYear);
+    if (newYear === null) return;
     
-    await editTeacherFullInFirebase(currentEditTeacherId, newName, newIc, newClass, newYear);
-    closeModal();
+    editTeacherFullInFirebase(id, newName, newIc, newClass, newYear);
   }
 
   function renderTeacherList(teachersToRender) {
@@ -799,7 +915,7 @@
         </div>
         <div>
           <button class="btn-edit-full" onclick="openTeacherDetailDialog('${teacher.id}', '${escapeHtml(teacher.fullname)}', '${escapeHtml(teacher.icNumber)}', '${escapeHtml(teacher.teacherClass)}', '${teacher.year}')">
-            <i class="fas fa-edit"></i> Edit & Lihat Pelajar
+            <i class="fas fa-edit"></i> Edit
           </button>
           <button class="btn-delete" onclick="deleteTeacherFromFirebase('${teacher.id}', '${escapeHtml(teacher.fullname)}')">
             <i class="fas fa-trash-alt"></i> Hapus
@@ -811,6 +927,16 @@
 
   function updateTotalCount() {
     document.getElementById('totalTeachers').innerText = teachers.length;
+  }
+
+  function escapeHtml(str) {
+    if (!str) return '';
+    return str.replace(/[&<>]/g, function(m) {
+      if (m === '&') return '&amp;';
+      if (m === '<') return '&lt;';
+      if (m === '>') return '&gt;';
+      return m;
+    });
   }
 
   // ==================== EVENT LISTENERS ====================
@@ -829,32 +955,27 @@
     if (result.success) {
       addForm.reset();
       document.getElementById('year').value = '2026';
+      alert(`✅ Guru ${fullname} berjaya didaftarkan!`);
     } else {
-      showMessage(`❌ Gagal: ${result.message}`, "error");
+      alert(`❌ Gagal: ${result.message}`);
     }
   });
 
-  // Search input event
   const searchInput = document.getElementById('searchInput');
   searchInput.addEventListener('input', (e) => {
-    const value = e.target.value;
-    updateSuggestions(value);
-    filterTeachers(value);
+    updateSuggestions(e.target.value);
+    filterTeachers(e.target.value);
   });
   
-  // Clear search button
   document.getElementById('clearSearchBtn').addEventListener('click', clearSearch);
-  
-  // Refresh button
   document.getElementById('refreshBtn').addEventListener('click', async () => {
     await loadTeachers();
-    await loadAllStudents();
+    await loadPendingTeachers();
     searchInput.value = '';
     clearSearch();
-    showMessage("Data berjaya dimuat semula!", "success");
+    alert("Data berjaya dimuat semula!");
   });
   
-  // Close suggestions when clicking outside
   document.addEventListener('click', function(e) {
     const wrapper = document.querySelector('.search-wrapper');
     if (wrapper && !wrapper.contains(e.target)) {
@@ -865,14 +986,11 @@
   // Make functions global for onclick
   window.openTeacherDetailDialog = openTeacherDetailDialog;
   window.deleteTeacherFromFirebase = deleteTeacherFromFirebase;
-  window.saveTeacherEdit = saveTeacherEdit;
-  window.closeModal = closeModal;
-  window.editStudentFromModal = editStudentFromModal;
-  window.selectSuggestion = selectSuggestion;
+  window.editTeacherFullInFirebase = editTeacherFullInFirebase;
 
   // Initialize
-  await loadAllStudents();
   await loadTeachers();
+  await loadPendingTeachers();
 </script>
 </body>
 </html>

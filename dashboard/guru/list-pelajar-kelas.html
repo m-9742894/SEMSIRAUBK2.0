@@ -113,6 +113,44 @@
         }
         .edit-class-btn:hover { background: #2563eb; color: white; }
         
+        /* Access Denied Card */
+        .access-denied {
+            background: linear-gradient(135deg, #fee2e2, #fecaca);
+            border-radius: 1.2rem;
+            padding: 2rem;
+            text-align: center;
+            margin-bottom: 1.5rem;
+            border: 1px solid #fca5a5;
+        }
+        .access-denied i {
+            font-size: 3rem;
+            color: #dc2626;
+            margin-bottom: 1rem;
+        }
+        .access-denied h3 {
+            color: #991b1b;
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+        }
+        .access-denied p {
+            color: #7f1d1d;
+            margin-bottom: 1rem;
+        }
+        .access-denied .btn-change-view {
+            background: #dc2626;
+            color: white;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 2rem;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.2s;
+        }
+        .access-denied .btn-change-view:hover {
+            background: #b91c1c;
+            transform: translateY(-2px);
+        }
+        
         .stats {
             background: white;
             border-radius: 1rem;
@@ -446,21 +484,35 @@
         <div class="stat-card"><i class="fas fa-trophy"></i><div class="number" id="averageMerit">0</div><div class="label">Purata Merit</div></div>
     </div>
     
-    <div class="action-bar">
-        <button class="btn-add" id="addStudentBtn"><i class="fas fa-plus"></i> Tambah Pelajar Baru</button>
-        <button class="btn-transfer" id="transferStudentsBtn"><i class="fas fa-exchange-alt"></i> Pindah Pelajar ke Tahun Baru</button>
+    <!-- Access Denied Section - will show if teacher not assigned to this class/year -->
+    <div id="accessDeniedCard" class="access-denied" style="display: none;">
+        <i class="fas fa-lock"></i>
+        <h3>Akses Tidak Dibenarkan</h3>
+        <p>Anda bukan guru kelas untuk <strong id="deniedClass">-</strong> pada tahun <strong id="deniedYear">-</strong>.</p>
+        <p>Hanya guru kelas yang dilantik boleh melihat senarai pelajar untuk kelas ini.</p>
+        <button class="btn-change-view" onclick="document.getElementById('editClassYearBtn').click()">
+            <i class="fas fa-edit"></i> Tukar Paparan Kelas / Tahun
+        </button>
     </div>
     
-    <div class="search-bar">
-        <input type="text" id="searchInput" placeholder="🔍 Cari nama atau No. Kad Pengenalan...">
-    </div>
-    
-    <div id="studentsContainer">
-        <div class="empty-state"><i class="fas fa-spinner fa-pulse"></i> Memuatkan...</div>
+    <!-- Main Content - only visible if teacher is class teacher -->
+    <div id="mainContent" style="display: none;">
+        <div class="action-bar">
+            <button class="btn-add" id="addStudentBtn"><i class="fas fa-plus"></i> Tambah Pelajar Baru</button>
+            <button class="btn-transfer" id="transferStudentsBtn"><i class="fas fa-exchange-alt"></i> Pindah Pelajar ke Tahun Baru</button>
+        </div>
+        
+        <div class="search-bar">
+            <input type="text" id="searchInput" placeholder="🔍 Cari nama atau No. Kad Pengenalan...">
+        </div>
+        
+        <div id="studentsContainer">
+            <div class="empty-state"><i class="fas fa-spinner fa-pulse"></i> Memuatkan...</div>
+        </div>
     </div>
 </div>
 
-<!-- Modal Edit Class & Year - INPUT TEXT untuk tahun -->
+<!-- Modal Edit Class & Year -->
 <div id="editClassModal" class="modal" style="display: none;">
     <div class="modal-content">
         <div class="modal-header">
@@ -485,7 +537,7 @@
     </div>
 </div>
 
-<!-- Modal Transfer Students to New Year - INPUT TEXT untuk tahun -->
+<!-- Modal Transfer Students to New Year -->
 <div id="transferModal" class="modal" style="display: none;">
     <div class="modal-content">
         <div class="modal-header">
@@ -563,6 +615,7 @@
     // Current view settings
     let currentClass = sessionStorage.getItem('teacherClass') || '';
     let currentYear = sessionStorage.getItem('teacherYear') || '2026';
+    let teacherId = sessionStorage.getItem('teacherId') || '';
     
     let studentsList = [];
     let allMeritRecords = [];
@@ -571,6 +624,11 @@
     // Store current student to delete
     let pendingDeleteId = null;
     let pendingDeleteName = null;
+    
+    // Check if teacher is allowed to view this class/year
+    // For now, if currentClass is empty, allow access (view all students)
+    // If currentClass is not empty, check if teacher is assigned as class teacher
+    let isAccessAllowed = true;
     
     function showAlert(msg, type) {
         const alertDiv = document.getElementById('alertMessage');
@@ -584,7 +642,66 @@
         return str.replace(/[&<>]/g, m => m==='&'?'&amp;':m==='<'?'&lt;':'&gt;'); 
     }
     
+    // Check if teacher is class teacher for current class/year
+    // This function checks if the teacher's assigned class matches the current class
+    // If currentClass is empty, always allow access
+    function checkAccessRights() {
+        // If no class filter (view all students), always allow
+        if (!currentClass || currentClass.trim() === "") {
+            isAccessAllowed = true;
+            return true;
+        }
+        
+        // Get teacher's assigned class from session
+        const teacherAssignedClass = sessionStorage.getItem('teacherAssignedClass') || sessionStorage.getItem('teacherClass') || '';
+        const teacherAssignedYear = sessionStorage.getItem('teacherAssignedYear') || sessionStorage.getItem('teacherYear') || '';
+        
+        // Check if teacher is assigned to this exact class AND year
+        if (teacherAssignedClass && teacherAssignedClass === currentClass && teacherAssignedYear === currentYear) {
+            isAccessAllowed = true;
+            return true;
+        }
+        
+        // If teacher is not assigned to this class/year
+        isAccessAllowed = false;
+        return false;
+    }
+    
+    function updateUIBasedOnAccess() {
+        const accessDeniedCard = document.getElementById('accessDeniedCard');
+        const mainContent = document.getElementById('mainContent');
+        const stats = document.querySelector('.stats');
+        
+        if (!isAccessAllowed) {
+            // Show access denied message
+            accessDeniedCard.style.display = 'block';
+            mainContent.style.display = 'none';
+            document.getElementById('deniedClass').innerText = currentClass;
+            document.getElementById('deniedYear').innerText = currentYear;
+            // Hide stats or show zero
+            if (stats) stats.style.opacity = '0.5';
+        } else {
+            // Show main content
+            accessDeniedCard.style.display = 'none';
+            mainContent.style.display = 'block';
+            if (stats) stats.style.opacity = '1';
+        }
+    }
+    
     async function loadAllData() {
+        // First check access rights
+        checkAccessRights();
+        updateUIBasedOnAccess();
+        
+        if (!isAccessAllowed) {
+            // Don't load data if access denied
+            document.getElementById('studentsContainer').innerHTML = `<div class="empty-state"><i class="fas fa-lock" style="font-size: 2rem;"></i><p>Akses tidak dibenarkan untuk kelas ini.</p></div>`;
+            document.getElementById('totalStudents').innerText = '0';
+            document.getElementById('totalClassMerit').innerText = '0';
+            document.getElementById('averageMerit').innerText = '0';
+            return;
+        }
+        
         try {
             // Build query - if class is empty, don't filter by class
             let q;

@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Ujian Inventori Minat Kerjaya (RIASEC) | E-MindCare SEMSIRA</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: linear-gradient(135deg, #e0e7ff 0%, #f3e8ff 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            border-radius: 1.2rem;
+            padding: 1rem 1.5rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .logo-icon {
+            background: linear-gradient(145deg, #4f46e5, #7c3aed);
+            width: 45px;
+            height: 45px;
+            border-radius: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .logo-icon i {
+            font-size: 1.5rem;
+            color: white;
+        }
+        .logo-text h1 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #1e293b;
+        }
+        .logo-text p {
+            font-size: 0.65rem;
+            color: #64748b;
+        }
+        .back-btn {
+            background: #eef2ff;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 40px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.75rem;
+            color: #4f46e5;
+            text-decoration: none;
+            transition: 0.2s;
+        }
+        .back-btn:hover {
+            background: #4f46e5;
+            color: white;
+        }
+
+        /* Profile Card */
+        .profile-card {
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            border-radius: 1.2rem;
+            padding: 1.2rem;
+            margin-bottom: 1.5rem;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .profile-info h3 {
+            font-size: 1.1rem;
+            margin-bottom: 0.3rem;
+        }
+        .profile-info p {
+            font-size: 0.75rem;
+            opacity: 0.9;
+            margin: 0.2rem 0;
+        }
+        .date-info {
+            text-align: right;
+            font-size: 0.7rem;
+            opacity: 0.8;
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            background: white;
+            border-radius: 1rem;
+            padding: 0.8rem 1rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        .progress-text {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #1e293b;
+        }
+        .progress-bar-wrapper {
+            flex: 1;
+            height: 10px;
+            background: #e2e8f0;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .progress-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #4f46e5, #7c3aed);
+            transition: width 0.3s ease;
+        }
+
+        /* Question Card */
+        .question-card {
+            background: white;
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            box-shadow: 0 8px 20px -8px rgba(0,0,0,0.1);
+            margin-bottom: 1.5rem;
+        }
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .question-number {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #4f46e5;
+            background: #eef2ff;
+            padding: 0.2rem 0.8rem;
+            border-radius: 20px;
+        }
+        .question-category {
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+        }
+        .category-R { background: #dbeafe; color: #2563eb; }
+        .category-I { background: #dcfce7; color: #16a34a; }
+        .category-A { background: #fef3c7; color: #d97706; }
+        .category-S { background: #fce7f3; color: #db2777; }
+        .category-E { background: #e0e7ff; color: #4f46e5; }
+        .category-K { background: #fed7aa; color: #ea580c; }
+        
+        .question-text {
+            font-size: 1rem;
+            font-weight: 500;
+            color: #1e293b;
+            margin: 1rem 0;
+            line-height: 1.4;
+        }
+        
+        .options {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+        .opt-btn {
+            flex: 1;
+            padding: 0.8rem;
+            border-radius: 2rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 0.9rem;
+        }
+        .opt-yes {
+            background: #10b981;
+            color: white;
+        }
+        .opt-yes:hover {
+            background: #059669;
+            transform: translateY(-2px);
+        }
+        .opt-no {
+            background: #ef4444;
+            color: white;
+        }
+        .opt-no:hover {
+            background: #dc2626;
+            transform: translateY(-2px);
+        }
+
+        /* Result Card */
+        .result-card {
+            background: white;
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 8px 20px -8px rgba(0,0,0,0.1);
+        }
+        .result-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #1e293b;
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+        .result-badge {
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            color: white;
+            padding: 1rem;
+            border-radius: 1rem;
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+        .result-badge h2 {
+            font-size: 2rem;
+            letter-spacing: 2px;
+        }
+        .result-badge p {
+            font-size: 0.8rem;
+            opacity: 0.9;
+        }
+        .category-result {
+            margin: 1rem 0;
+            padding: 0.8rem;
+            border-radius: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .category-name {
+            font-weight: 600;
+        }
+        .category-score {
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+        .result-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+        .btn-done {
+            flex: 1;
+            background: #4f46e5;
+            color: white;
+            border: none;
+            padding: 0.8rem;
+            border-radius: 2rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            text-align: center;
+        }
+        .btn-done:hover {
+            background: #4338ca;
+        }
+
+        /* Locked Card */
+        .locked-card {
+            background: white;
+            border-radius: 1.5rem;
+            padding: 2rem;
+            text-align: center;
+        }
+        .locked-card i {
+            font-size: 3rem;
+            color: #f59e0b;
+            margin-bottom: 1rem;
+        }
+        .locked-card h3 {
+            color: #1e293b;
+            margin-bottom: 0.5rem;
+        }
+        .locked-card p {
+            color: #64748b;
+            margin-bottom: 1rem;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        footer {
+            text-align: center;
+            padding: 1rem;
+            color: #94a3b8;
+            font-size: 0.7rem;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <div class="logo-area">
+            <div class="logo-icon"><i class="fas fa-chart-line"></i></div>
+            <div class="logo-text">
+                <h1>Inventori Minat Kerjaya</h1>
+                <p>Teori RIASEC oleh John Holland</p>
+            </div>
+        </div>
+        <a href="psikometrik.html" class="back-btn"><i class="fas fa-arrow-left"></i> Kembali</a>
+    </div>
+
+    <div id="mainContent">
+        <!-- Akan diisi oleh JavaScript -->
+    </div>
+    <footer>
+        <i class="fas fa-shield-alt"></i> Jawapan anda akan disimpan dan hanya boleh dilihat oleh kaunselor.
+    </footer>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, collection, doc, getDoc, setDoc, updateDoc, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    
+    const firebaseConfig = {
+        apiKey: "AIzaSyCfu7XC8pXtpDyQ-9Cjdg4AobA-EVEwWcc",
+        authDomain: "e-mindcare.firebaseapp.com",
+        projectId: "e-mindcare",
+        storageBucket: "e-mindcare.firebasestorage.app",
+        messagingSenderId: "1021883944936",
+        appId: "1:1021883944936:web:39c75a0c98d19a37afde5d",
+        measurementId: "G-3CJVKWGEXV"
+    };
+    
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const ujianResultsCollection = collection(db, "ujian_minat_kerjaya_results");
+    
+    // ==================== SOALAN ====================
+    // Urutan: R,I,A,S,E,K berulang (5 soalan setiap kategori = 30 soalan)
+    const questions = [
+        // Kitaran 1 (Soalan 1-6)
+        { text: "menghasilkan model binaan", cat: "R", group: 1 },
+        { text: "memerhati fasa bulan", cat: "I", group: 1 },
+        { text: "mengikuti rancangan hiburan", cat: "A", group: 1 },
+        { text: "menyertai aktiviti perkhemahan", cat: "S", group: 1 },
+        { text: "MENGUSAHAKAN PERNIAGAAN", cat: "E", group: 1 },
+        { text: "merekod setiap perbelanjaan", cat: "K", group: 1 },
+        
+        // Kitaran 2 (Soalan 7-12)
+        { text: "belajar cara-cara penjagaan haiwan", cat: "R", group: 2 },
+        { text: "mengetahui salah silah keluarga", cat: "I", group: 2 },
+        { text: "menggayakan fesyen terkini", cat: "A", group: 2 },
+        { text: "bergotong-royong membersihkan kawasan sekolah", cat: "S", group: 2 },
+        { text: "MENJADI KETUA", cat: "E", group: 2 },
+        { text: "menyusun sijil dalam fail", cat: "K", group: 2 },
+        
+        // Kitaran 3 (Soalan 13-18)
+        { text: "bermain permainan video", cat: "R", group: 3 },
+        { text: "mencari perkataan tersembunyi", cat: "I", group: 3 },
+        { text: "mendengar muzik", cat: "A", group: 3 },
+        { text: "menolong rakan yang ditimpa kesusahan", cat: "S", group: 3 },
+        { text: "MENCARI PELUANG", cat: "E", group: 3 },
+        { text: "membuat senarai barang yang hendak dibeli", cat: "K", group: 3 },
+        
+        // Kitaran 4 (Soalan 19-24)
+        { text: "menyertai aktiviti sukan", cat: "R", group: 4 },
+        { text: "aktiviti STEM", cat: "I", group: 4 },
+        { text: "mengambil gambar", cat: "A", group: 4 },
+        { text: "berada dalam kumpulan", cat: "S", group: 4 },
+        { text: "MEMENANGI PERTANDINGAN", cat: "E", group: 4 },
+        { text: "menyusun barang-barang peribadi", cat: "K", group: 4 },
+        
+        // Kitaran 5 (Soalan 25-30)
+        { text: "melakukan aktiviti lasak", cat: "R", group: 5 },
+        { text: "aktiviti penyelesaian masalah", cat: "I", group: 5 },
+        { text: "aktiviti keceriaan", cat: "A", group: 5 },
+        { text: "beramah mesra", cat: "S", group: 5 },
+        { text: "MEMIMPIN LAFIZ IKRAR", cat: "E", group: 5 },
+        { text: "mengutamakan kekemasan", cat: "K", group: 5 }
+    ];
+    
+    const categoryNames = {
+        R: "REALISTIK (Praktikal)",
+        I: "INVESTIGATIF (Sains)",
+        A: "ARTISTIK (Kreatif)",
+        S: "SOSIAL (Membantu)",
+        E: "ENTERPRISING (Memimpin)",
+        K: "KONVENSIONAL (Teratur)"
+    };
+    
+    const categoryColors = {
+        R: "#2563eb", I: "#16a34a", A: "#d97706", S: "#db2777", E: "#4f46e5", K: "#ea580c"
+    };
+    
+    let studentData = null;
+    let answers = { R: 0, I: 0, A: 0, S: 0, E: 0, K: 0 };
+    let currentQuestionIndex = 0;
+    let userAnswers = []; // Store answers for each question
+    
+    // Get student from session
+    function getStudentData() {
+        return {
+            name: sessionStorage.getItem('studentName') || localStorage.getItem('studentName') || 'Pelajar',
+            ic: sessionStorage.getItem('studentIC') || localStorage.getItem('studentIC') || '-',
+            class: sessionStorage.getItem('studentClass') || localStorage.getItem('studentClass') || '-',
+            session: sessionStorage.getItem('studentSession') || localStorage.getItem('studentSession') || '2026'
+        };
+    }
+    
+    function getCurrentDateTime() {
+        const now = new Date();
+        const days = ['Ahad', 'Isnin', 'Selasa', 'Rabu', 'Khamis', 'Jumaat', 'Sabtu'];
+        return {
+            tarikh: now.toLocaleDateString('ms-MY'),
+            masa: now.toLocaleTimeString('ms-MY', { hour: '2-digit', minute: '2-digit' }),
+            hari: days[now.getDay()]
+        };
+    }
+    
+    // Check if student already completed this test
+    async function hasCompletedTest(studentIC) {
+        try {
+            const q = query(ujianResultsCollection, where("studentIC", "==", studentIC));
+            const snapshot = await getDocs(q);
+            return !snapshot.empty;
+        } catch (error) {
+            console.error("Error checking completion:", error);
+            return false;
+        }
+    }
+    
+    // Save result to Firestore
+    async function saveResult(score, topCategories) {
+        const now = new Date();
+        const resultData = {
+            studentName: studentData.name,
+            studentIC: studentData.ic,
+            studentClass: studentData.class,
+            studentSession: studentData.session,
+            scores: score,
+            topCategories: topCategories,
+            totalQuestions: 30,
+            completedAt: now.toISOString(),
+            completedDate: now.toLocaleDateString('ms-MY'),
+            completedTime: now.toLocaleTimeString('ms-MY'),
+            completedDay: ['Ahad', 'Isnin', 'Selasa', 'Rabu', 'Khamis', 'Jumaat', 'Sabtu'][now.getDay()],
+            answers: userAnswers
+        };
+        
+        try {
+            const docRef = doc(db, "ujian_minat_kerjaya_results", studentData.ic);
+            await setDoc(docRef, resultData);
+            console.log("Result saved to Firestore");
+            return true;
+        } catch (error) {
+            console.error("Error saving result:", error);
+            return false;
+        }
+    }
+    
+    // Render profile and start test or show locked
+    async function renderMain() {
+        studentData = getStudentData();
+        const dateTime = getCurrentDateTime();
+        const completed = await hasCompletedTest(studentData.ic);
+        
+        const mainContainer = document.getElementById('mainContent');
+        
+        if (completed) {
+            // Show locked message
+            mainContainer.innerHTML = `
+                <div class="locked-card">
+                    <i class="fas fa-lock"></i>
+                    <h3>⚠️ Anda Telah Menjawap Ujian Ini</h3>
+                    <p>Anda telah pun melengkapkan Inventori Minat Kerjaya pada tarikh sebelum ini.</p>
+                    <p>Sila rujuk kaunselor jika ingin menjawap semula.</p>
+                    <a href="psikometrik.html" class="btn-done" style="display: inline-block; margin-top: 1rem;">Kembali ke Pusat Ujian</a>
+                </div>
+            `;
+            return;
+        }
+        
+        // Show profile and start test
+        mainContainer.innerHTML = `
+            <div class="profile-card">
+                <div class="profile-info">
+                    <h3><i class="fas fa-user-graduate"></i> ${escapeHtml(studentData.name)}</h3>
+                    <p><i class="fas fa-id-card"></i> ${escapeHtml(studentData.ic)} &nbsp;|&nbsp; <i class="fas fa-school"></i> Kelas: ${escapeHtml(studentData.class)}</p>
+                </div>
+                <div class="date-info">
+                    <p><i class="fas fa-calendar"></i> ${dateTime.tarikh}</p>
+                    <p><i class="fas fa-clock"></i> ${dateTime.masa}</p>
+                    <p><i class="fas fa-calendar-week"></i> ${dateTime.hari}</p>
+                </div>
+            </div>
+            <div class="progress-container">
+                <span class="progress-text">Soalan <span id="currentQ">1</span>/30</span>
+                <div class="progress-bar-wrapper"><div class="progress-bar-fill" id="progressFill"></div></div>
+            </div>
+            <div id="questionContainer"></div>
+        `;
+        
+        renderQuestion();
+    }
+    
+    function getQuestionGroupText(groupNum) {
+        if (groupNum === 1) return "SAYA SUKA...";
+        if (groupNum === 2) return "SAYA SUKA...";
+        if (groupNum === 3) return "SAYA SUKA...";
+        if (groupNum === 4) return "SAYA BERMINAT MENJADI...";
+        if (groupNum === 5) return "SAYA BOLEH...";
+        return "SAYA...";
+    }
+    
+    function renderQuestion() {
+        if (currentQuestionIndex >= questions.length) {
+            finishTest();
+            return;
+        }
+        
+        const q = questions[currentQuestionIndex];
+        const groupText = getQuestionGroupText(q.group);
+        
+        const container = document.getElementById('questionContainer');
+        container.innerHTML = `
+            <div class="question-card">
+                <div class="question-header">
+                    <span class="question-number">Soalan ${currentQuestionIndex + 1}/30</span>
+                    <span class="question-category category-${q.cat}">${categoryNames[q.cat].split(' ')[0]}</span>
+                </div>
+                <div class="question-text">
+                    <span style="font-size:0.85rem; color:#64748b; display:block; margin-bottom:0.5rem;">${groupText}</span>
+                    ${escapeHtml(q.text)}
+                </div>
+                <div class="options">
+                    <button class="opt-btn opt-yes" onclick="answerQuestion('yes')">
+                        <i class="fas fa-check-circle"></i> YA
+                    </button>
+                    <button class="opt-btn opt-no" onclick="answerQuestion('no')">
+                        <i class="fas fa-times-circle"></i> TIDAK
+                    </button>
+                </div>
+            </div>
+        `;
+        
+        // Update progress
+        const progress = ((currentQuestionIndex) / questions.length) * 100;
+        document.getElementById('progressFill').style.width = progress + '%';
+        document.getElementById('currentQ').innerText = currentQuestionIndex + 1;
+    }
+    
+    window.answerQuestion = function(answer) {
+        const q = questions[currentQuestionIndex];
+        const isYes = (answer === 'yes');
+        
+        // Store answer
+        userAnswers.push({
+            questionNo: currentQuestionIndex + 1,
+            text: q.text,
+            category: q.cat,
+            answer: isYes ? 'Ya' : 'Tidak'
+        });
+        
+        if (isYes) {
+            answers[q.cat]++;
+        }
+        
+        currentQuestionIndex++;
+        renderQuestion();
+    };
+    
+    async function finishTest() {
+        // Calculate top 3 categories
+        const sorted = Object.entries(answers).sort((a,b) => b[1] - a[1]);
+        const top3 = sorted.slice(0, 3);
+        const hollandCode = top3.map(t => t[0]).join('');
+        
+        const dateTime = getCurrentDateTime();
+        
+        // Save to Firestore
+        await saveResult(answers, top3);
+        
+        // Build result HTML
+        let categoriesHtml = '';
+        for (let [cat, score] of Object.entries(answers)) {
+            const percentage = Math.round((score / 5) * 100);
+            categoriesHtml += `
+                <div class="category-result" style="border-left: 5px solid ${categoryColors[cat]}; background: ${categoryColors[cat]}10;">
+                    <span class="category-name">${categoryNames[cat]}</span>
+                    <span class="category-score" style="color: ${categoryColors[cat]};">${score}/5 (${percentage}%)</span>
+                </div>
+            `;
+        }
+        
+        const container = document.getElementById('mainContent');
+        container.innerHTML = `
+            <div class="result-card">
+                <div class="result-title">
+                    <i class="fas fa-chart-simple"></i> Keputusan Inventori Minat Kerjaya
+                </div>
+                <div class="profile-card" style="background: #f1f5f9; color: #1e293b;">
+                    <div class="profile-info">
+                        <h3><i class="fas fa-user-graduate"></i> ${escapeHtml(studentData.name)}</h3>
+                        <p><i class="fas fa-id-card"></i> ${escapeHtml(studentData.ic)}</p>
+                        <p><i class="fas fa-school"></i> Kelas: ${escapeHtml(studentData.class)}</p>
+                    </div>
+                    <div class="date-info">
+                        <p><i class="fas fa-calendar"></i> ${dateTime.tarikh}</p>
+                        <p><i class="fas fa-clock"></i> ${dateTime.masa}</p>
+                        <p><i class="fas fa-calendar-week"></i> ${dateTime.hari}</p>
+                    </div>
+                </div>
+                <div class="result-badge">
+                    <h2>${hollandCode}</h2>
+                    <p>Kod Holland Anda (3 kategori tertinggi)</p>
+                </div>
+                ${categoriesHtml}
+                <div class="result-actions">
+                    <a href="psikometrik.html" class="btn-done"><i class="fas fa-home"></i> Kembali ke Pusat Ujian</a>
+                </div>
+            </div>
+        `;
+    }
+    
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
+    
+    // Check login status
+    function checkLoginStatus() {
+        const studentName = sessionStorage.getItem('studentName') || localStorage.getItem('studentName');
+        const studentIC = sessionStorage.getItem('studentIC') || localStorage.getItem('studentIC');
+        
+        if (!studentName || !studentIC) {
+            window.location.href = 'page-pelajar.html';
+            return false;
+        }
+        return true;
+    }
+    
+    // Initialize
+    if (checkLoginStatus()) {
+        renderMain();
+    }
+</script>
+</body>
+</html>

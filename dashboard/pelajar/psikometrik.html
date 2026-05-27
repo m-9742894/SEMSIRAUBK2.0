@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Pusat Ujian Psikometrik | E-MindCare SEMSIRA</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: linear-gradient(135deg, #e8f0fe 0%, #dfe7f5 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid rgba(37,99,235,0.2);
+        }
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .logo-icon {
+            background: linear-gradient(145deg, #2563eb, #7c3aed);
+            width: 50px;
+            height: 50px;
+            border-radius: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .logo-icon i {
+            font-size: 1.8rem;
+            color: white;
+        }
+        .logo-text h1 {
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #1e293b, #2563eb);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .logo-text p {
+            font-size: 0.7rem;
+            color: #5b6e8c;
+        }
+        .back-btn {
+            background: #eef2ff;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 40px;
+            cursor: pointer;
+            font-weight: 600;
+            color: #2563eb;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: 0.2s;
+        }
+        .back-btn:hover {
+            background: #2563eb;
+            color: white;
+        }
+
+        /* Profile Card */
+        .profile-card {
+            background: white;
+            border-radius: 1.2rem;
+            padding: 1rem 1.5rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        .profile-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .profile-avatar {
+            background: linear-gradient(145deg, #2563eb, #7c3aed);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .profile-avatar i {
+            font-size: 1.5rem;
+            color: white;
+        }
+        .profile-text h3 {
+            font-size: 1rem;
+            color: #1e293b;
+        }
+        .profile-text p {
+            font-size: 0.7rem;
+            color: #64748b;
+        }
+        .logout-btn {
+            background: #fee2e2;
+            color: #dc2626;
+            border: none;
+            padding: 0.4rem 1rem;
+            border-radius: 40px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.75rem;
+        }
+
+        /* Welcome Banner */
+        .welcome-banner {
+            background: linear-gradient(135deg, #2563eb, #7c3aed);
+            border-radius: 1.2rem;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            color: white;
+        }
+        .welcome-banner h2 {
+            font-size: 1.3rem;
+            margin-bottom: 0.3rem;
+        }
+        .welcome-banner p {
+            font-size: 0.8rem;
+            opacity: 0.9;
+        }
+
+        /* Section Title */
+        .section-title {
+            margin-bottom: 1.5rem;
+        }
+        .section-title h3 {
+            font-size: 1.2rem;
+            color: #1e293b;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .section-title h3 i {
+            color: #2563eb;
+        }
+
+        /* Ujian Grid */
+        .ujian-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .ujian-card {
+            background: white;
+            border-radius: 1.2rem;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            border: 1px solid rgba(37,99,235,0.1);
+            position: relative;
+        }
+        .ujian-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 24px -12px rgba(0,0,0,0.15);
+        }
+        .ujian-card.locked {
+            opacity: 0.6;
+            filter: grayscale(0.2);
+        }
+        .ujian-card.locked:hover {
+            transform: none;
+        }
+        .ujian-icon {
+            width: 60px;
+            height: 60px;
+            background: #eef2ff;
+            border-radius: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
+        .ujian-icon i {
+            font-size: 1.8rem;
+            color: #2563eb;
+        }
+        .ujian-card h3 {
+            font-size: 1.1rem;
+            color: #1e293b;
+            margin-bottom: 0.5rem;
+        }
+        .ujian-card p {
+            font-size: 0.75rem;
+            color: #64748b;
+            margin-bottom: 1rem;
+            line-height: 1.4;
+        }
+        .ujian-status {
+            display: inline-block;
+            font-size: 0.65rem;
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+            margin-bottom: 1rem;
+        }
+        .status-open {
+            background: #dcfce7;
+            color: #166534;
+        }
+        .status-closed {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        .btn-mulai {
+            width: 100%;
+            padding: 0.6rem;
+            border-radius: 2rem;
+            font-weight: 600;
+            font-size: 0.75rem;
+            cursor: pointer;
+            border: none;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .btn-mulai-active {
+            background: linear-gradient(95deg, #2563eb, #7c3aed);
+            color: white;
+        }
+        .btn-mulai-active:hover {
+            transform: translateY(-2px);
+        }
+        .btn-mulai-disabled {
+            background: #e2e8f0;
+            color: #94a3b8;
+            cursor: not-allowed;
+        }
+        .lock-badge {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: #f1f5f9;
+            padding: 0.3rem;
+            border-radius: 50%;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .lock-badge i {
+            font-size: 0.8rem;
+            color: #94a3b8;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 1.5rem;
+            color: #94a3b8;
+            font-size: 0.7rem;
+            border-top: 1px solid #e2e8f0;
+            margin-top: 2rem;
+        }
+
+        @media (max-width: 700px) {
+            body { padding: 1rem; }
+            .ujian-grid { grid-template-columns: 1fr; }
+            .profile-card { flex-direction: column; text-align: center; }
+            .profile-info { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <div class="logo-area">
+            <div class="logo-icon"><i class="fas fa-chart-line"></i></div>
+            <div class="logo-text">
+                <h1>Pusat Ujian Psikometrik</h1>
+                <p>E-MindCare SEMSIRA • SMK Syed Sirajuddin</p>
+            </div>
+        </div>
+        <a href="dashboard-pelajar.html" class="back-btn"><i class="fas fa-arrow-left"></i> Kembali ke Dashboard</a>
+    </div>
+
+    <!-- Profile Card -->
+    <div class="profile-card">
+        <div class="profile-info">
+            <div class="profile-avatar">
+                <i class="fas fa-user-graduate"></i>
+            </div>
+            <div class="profile-text">
+                <h3 id="studentName">-</h3>
+                <p><i class="fas fa-id-card"></i> <span id="studentIC">-</span> &nbsp;|&nbsp; <i class="fas fa-school"></i> <span id="studentClass">-</span></p>
+            </div>
+        </div>
+        <button class="logout-btn" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Log Keluar</button>
+    </div>
+
+    <!-- Welcome Banner -->
+    <div class="welcome-banner">
+        <h2><i class="fas fa-clipboard-list"></i> Ujian Inventori Psikometrik</h2>
+        <p>Sila pilih ujian yang ingin anda lakukan. Setiap ujian membantu mengenal pasti potensi diri anda.</p>
+    </div>
+
+    <!-- Section Title -->
+    <div class="section-title">
+        <h3><i class="fas fa-folder-open"></i> Senarai Ujian Tersedia</h3>
+    </div>
+
+    <!-- Ujian Grid -->
+    <div class="ujian-grid" id="ujianGrid">
+        <!-- Cards akan dijana oleh JavaScript -->
+        <div class="empty-state" style="text-align:center; padding:2rem;">Memuatkan senarai ujian...</div>
+    </div>
+
+    <div class="footer">
+        <i class="fas fa-shield-alt"></i> Semua ujian adalah sulit dan hanya untuk tujuan bimbingan & kaunseling.
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, collection, doc, getDoc, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    
+    const firebaseConfig = {
+        apiKey: "AIzaSyCfu7XC8pXtpDyQ-9Cjdg4AobA-EVEwWcc",
+        authDomain: "e-mindcare.firebaseapp.com",
+        projectId: "e-mindcare",
+        storageBucket: "e-mindcare.firebasestorage.app",
+        messagingSenderId: "1021883944936",
+        appId: "1:1021883944936:web:39c75a0c98d19a37afde5d",
+        measurementId: "G-3CJVKWGEXV"
+    };
+    
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const ujianSettingsCollection = collection(db, "ujian_psikometrik_settings");
+    
+    // Senarai ujian dengan maklumat asas
+    const ujianList = [
+        {
+            id: "minat_kerjaya",
+            name: "Inventori Minat Kerjaya",
+            icon: "fas fa-briefcase",
+            description: "Kenal pasti bidang kerjaya yang sesuai dengan minat dan personaliti anda berdasarkan teori RIASEC.",
+            color: "#2563eb",
+            pageUrl: "ujian-minat-kerjaya.html"
+        },
+        {
+            id: "tret_personaliti",
+            name: "Inventori Tret Personaliti",
+            icon: "fas fa-user-check",
+            description: "Mengenal pasti ciri-ciri personaliti utama seperti ekstrovert, introvert, dan lain-lain.",
+            color: "#10b981",
+            pageUrl: "ujian-tret-personaliti.html"
+        },
+        {
+            id: "personaliti_warna",
+            name: "Inventori Personaliti Warna",
+            icon: "fas fa-palette",
+            description: "Analisis personaliti berdasarkan warna kegemaran dan makna psikologi warna.",
+            color: "#f59e0b",
+            pageUrl: "ujian-personaliti-warna.html"
+        },
+        {
+            id: "gaya_belajar",
+            name: "Inventori Gaya Belajar",
+            icon: "fas fa-graduation-cap",
+            description: "Kenal pasti gaya pembelajaran yang paling sesuai untuk anda (Visual, Auditori, Kinestetik).",
+            color: "#ec489a",
+            pageUrl: "ujian-gaya-belajar.html"
+        }
+    ];
+    
+    let ujianSettings = {};
+    
+    // Load student data from session storage
+    function loadStudentData() {
+        const studentName = sessionStorage.getItem('studentName') || localStorage.getItem('studentName') || 'Pelajar';
+        const studentIC = sessionStorage.getItem('studentIC') || localStorage.getItem('studentIC') || '-';
+        const studentClass = sessionStorage.getItem('studentClass') || localStorage.getItem('studentClass') || '-';
+        
+        document.getElementById('studentName').innerText = studentName;
+        document.getElementById('studentIC').innerText = studentIC;
+        document.getElementById('studentClass').innerText = studentClass;
+    }
+    
+    // Load ujian settings from Firestore
+    async function loadUjianSettings() {
+        try {
+            const querySnapshot = await getDocs(ujianSettingsCollection);
+            ujianSettings = {};
+            querySnapshot.forEach((doc) => {
+                ujianSettings[doc.id] = doc.data();
+            });
+            console.log("Ujian settings loaded:", ujianSettings);
+        } catch (error) {
+            console.error("Error loading ujian settings:", error);
+            // If no settings, set default all open
+            ujianList.forEach(ujian => {
+                ujianSettings[ujian.id] = { status: "open", updatedAt: new Date().toISOString() };
+            });
+        }
+        renderUjianCards();
+    }
+    
+    // Get status for a ujian
+    function getUjianStatus(ujianId) {
+        if (ujianSettings[ujianId]) {
+            return ujianSettings[ujianId].status || "open";
+        }
+        return "open"; // Default open
+    }
+    
+    // Render ujian cards based on settings
+    function renderUjianCards() {
+        const grid = document.getElementById('ujianGrid');
+        
+        let html = '';
+        for (const ujian of ujianList) {
+            const status = getUjianStatus(ujian.id);
+            const isOpen = status === "open";
+            const statusText = isOpen ? "Tersedia" : "Ditutup Sementara";
+            const statusClass = isOpen ? "status-open" : "status-closed";
+            
+            html += `
+                <div class="ujian-card ${!isOpen ? 'locked' : ''}">
+                    ${!isOpen ? `<div class="lock-badge"><i class="fas fa-lock"></i></div>` : ''}
+                    <div class="ujian-icon" style="background: ${ujian.color}20;">
+                        <i class="${ujian.icon}" style="color: ${ujian.color};"></i>
+                    </div>
+                    <h3>${ujian.name}</h3>
+                    <p>${ujian.description}</p>
+                    <div class="ujian-status ${statusClass}">
+                        <i class="fas ${isOpen ? 'fa-check-circle' : 'fa-clock'}"></i> ${statusText}
+                    </div>
+                    <button class="btn-mulai ${isOpen ? 'btn-mulai-active' : 'btn-mulai-disabled'}" 
+                            ${!isOpen ? 'disabled' : `onclick="startUjian('${ujian.id}', '${ujian.pageUrl}')"`}>
+                        <i class="fas ${isOpen ? 'fa-play' : 'fa-lock'}"></i> 
+                        ${isOpen ? 'Mulai Ujian' : 'Tidak Tersedia'}
+                    </button>
+                </div>
+            `;
+        }
+        
+        grid.innerHTML = html;
+    }
+    
+    // Start ujian function (global for onclick)
+    window.startUjian = function(ujianId, pageUrl) {
+        const status = getUjianStatus(ujianId);
+        if (status !== "open") {
+            alert("Maaf, ujian ini sedang ditutup oleh kaunselor. Sila cuba pada masa lain.");
+            return;
+        }
+        
+        // Save current ujian info to session
+        sessionStorage.setItem('currentUjian', ujianId);
+        sessionStorage.setItem('currentUjianName', ujianList.find(u => u.id === ujianId)?.name || '');
+        
+        // Redirect to the specific ujian page
+        window.location.href = pageUrl;
+    };
+    
+    // Logout function
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+        sessionStorage.clear();
+        localStorage.removeItem('studentName');
+        localStorage.removeItem('studentIC');
+        localStorage.removeItem('studentClass');
+        window.location.href = 'page-pelajar.html';
+    });
+    
+    // Check login status
+    function checkLoginStatus() {
+        const studentName = sessionStorage.getItem('studentName') || localStorage.getItem('studentName');
+        const studentIC = sessionStorage.getItem('studentIC') || localStorage.getItem('studentIC');
+        
+        if (!studentName || !studentIC) {
+            window.location.href = 'page-pelajar.html';
+            return false;
+        }
+        return true;
+    }
+    
+    // Initialize
+    if (checkLoginStatus()) {
+        loadStudentData();
+        loadUjianSettings();
+    }
+</script>
+</body>
+</html>

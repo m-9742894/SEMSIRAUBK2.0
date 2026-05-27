@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Ujian Inventori Gaya Belajar | E-MindCare SEMSIRA</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: linear-gradient(135deg, #e8f0fe 0%, #dfe7f5 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container { max-width: 800px; margin: 0 auto; }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid rgba(37,99,235,0.2);
+        }
+        .logo-area { display: flex; align-items: center; gap: 1rem; }
+        .logo-icon {
+            background: linear-gradient(145deg, #2563eb, #7c3aed);
+            width: 45px; height: 45px;
+            border-radius: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .logo-icon i { font-size: 1.5rem; color: white; }
+        .logo-text h1 {
+            font-size: 1.2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #1e293b, #2563eb);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .back-btn {
+            background: #eef2ff;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 40px;
+            cursor: pointer;
+            font-weight: 600;
+            color: #2563eb;
+            text-decoration: none;
+            font-size: 0.8rem;
+        }
+        .profile-card {
+            background: white;
+            border-radius: 1rem;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        .profile-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            justify-content: space-between;
+        }
+        .profile-item { flex: 1; min-width: 150px; }
+        .profile-item .label { font-size: 0.7rem; color: #64748b; }
+        .profile-item .value { font-weight: 700; color: #1e293b; font-size: 0.9rem; }
+        .progress-container {
+            background: #e2e8f0;
+            border-radius: 20px;
+            height: 10px;
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+        }
+        .progress-bar {
+            background: linear-gradient(95deg, #2563eb, #7c3aed);
+            width: 0%;
+            height: 100%;
+            transition: width 0.3s ease;
+        }
+        .progress-text {
+            text-align: right;
+            font-size: 0.7rem;
+            color: #64748b;
+            margin-top: -1rem;
+            margin-bottom: 1rem;
+        }
+        .question-card {
+            background: white;
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 8px 20px -8px rgba(0,0,0,0.1);
+        }
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .question-num {
+            background: #e0e7ff;
+            padding: 0.2rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: #2563eb;
+        }
+        .question-text {
+            font-size: 1rem;
+            font-weight: 500;
+            color: #1e293b;
+            margin-bottom: 1.5rem;
+            line-height: 1.5;
+        }
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+        .option-btn {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0.8rem 1rem;
+            border-radius: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            border: 1px solid #e2e8f0;
+            background: #f8fafc;
+            transition: 0.2s;
+            font-size: 0.9rem;
+        }
+        .option-btn:hover {
+            background: #eef2ff;
+            border-color: #2563eb;
+            transform: translateX(5px);
+        }
+        .option-selected {
+            background: #e0e7ff;
+            border-color: #2563eb;
+            border-left: 4px solid #2563eb;
+        }
+        .option-letter {
+            font-weight: 800;
+            font-size: 1.2rem;
+            color: #2563eb;
+            width: 35px;
+        }
+        .option-text {
+            flex: 1;
+        }
+        .nav-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: space-between;
+            margin-top: 1rem;
+        }
+        .nav-btn {
+            padding: 0.7rem 1.5rem;
+            border-radius: 2rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: 0.2s;
+            background: #e2e8f0;
+            color: #1e293b;
+        }
+        .nav-btn-primary { background: linear-gradient(95deg, #2563eb, #7c3aed); color: white; }
+        .nav-btn-primary:hover { transform: translateY(-2px); }
+        .nav-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        
+        /* Result Card Styles */
+        .result-card {
+            background: white;
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+            box-shadow: 0 8px 20px -8px rgba(0,0,0,0.1);
+        }
+        .result-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #1e293b;
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+        .result-chart { margin: 1.5rem 0; }
+        .result-bar { margin-bottom: 1rem; }
+        .result-bar-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.3rem;
+            font-size: 0.8rem;
+        }
+        .result-bar-fill {
+            background: #e2e8f0;
+            border-radius: 10px;
+            height: 25px;
+            overflow: hidden;
+        }
+        .result-bar-fill span {
+            display: block;
+            height: 100%;
+            border-radius: 10px;
+            width: 0%;
+            transition: width 1s ease;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 8px;
+            color: white;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+        .dominant-style {
+            background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
+            border-radius: 1rem;
+            padding: 1.2rem;
+            text-align: center;
+            margin: 1rem 0;
+        }
+        .dominant-badge {
+            display: inline-block;
+            padding: 0.5rem 1.5rem;
+            border-radius: 40px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-bottom: 0.8rem;
+        }
+        .badge-visual { background: #8b5cf6; color: white; }
+        .badge-auditori { background: #3b82f6; color: white; }
+        .badge-bacaan { background: #10b981; color: white; }
+        .badge-kinestetik { background: #f97316; color: white; }
+        .style-desc {
+            font-size: 0.85rem;
+            color: #1e293b;
+            line-height: 1.5;
+            text-align: left;
+        }
+        .btn-submit {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(95deg, #10b981, #059669);
+            color: white;
+            border: none;
+            border-radius: 3rem;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.2s;
+            margin-top: 1rem;
+        }
+        .btn-submit:hover { transform: translateY(-2px); }
+        .locked-message {
+            text-align: center;
+            padding: 2rem;
+            background: #fef3c7;
+            border-radius: 1rem;
+            color: #92400e;
+        }
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #1e293b;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 10px;
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
+        }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @media (max-width: 600px) {
+            body { padding: 10px; }
+            .question-text { font-size: 0.85rem; }
+            .option-btn { font-size: 0.8rem; padding: 0.6rem; }
+            .profile-grid { flex-direction: column; gap: 0.5rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <div class="logo-area">
+            <div class="logo-icon"><i class="fas fa-graduation-cap"></i></div>
+            <div class="logo-text"><h1>Inventori Gaya Belajar</h1></div>
+        </div>
+        <a href="psikometrik.html" class="back-btn"><i class="fas fa-arrow-left"></i> Kembali</a>
+    </div>
+    <div id="contentArea">
+        <div class="loading-state" style="text-align:center; padding:2rem;">
+            <i class="fas fa-spinner fa-pulse"></i> Memuatkan...
+        </div>
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, collection, doc, getDoc, getDocs, setDoc, updateDoc, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    
+    const firebaseConfig = {
+        apiKey: "AIzaSyCfu7XC8pXtpDyQ-9Cjdg4AobA-EVEwWcc",
+        authDomain: "e-mindcare.firebaseapp.com",
+        projectId: "e-mindcare",
+        storageBucket: "e-mindcare.firebasestorage.app",
+        messagingSenderId: "1021883944936",
+        appId: "1:1021883944936:web:39c75a0c98d19a37afde5d",
+        measurementId: "G-3CJVKWGEXV"
+    };
+    
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const ujianResultsCollection = collection(db, "ujian_gaya_belajar");
+    
+    // Student data
+    const studentName = sessionStorage.getItem('studentName') || localStorage.getItem('studentName') || 'Pelajar';
+    const studentIC = sessionStorage.getItem('studentIC') || localStorage.getItem('studentIC') || '-';
+    const studentClass = sessionStorage.getItem('studentClass') || localStorage.getItem('studentClass') || '-';
+    const studentSession = sessionStorage.getItem('studentSession') || localStorage.getItem('studentSession') || '2026';
+    
+    // Date & Time
+    const now = new Date();
+    const currentDate = now.toLocaleDateString('ms-MY', { day: 'numeric', month: 'long', year: 'numeric' });
+    const currentTime = now.toLocaleTimeString('ms-MY', { hour: '2-digit', minute: '2-digit' });
+    const currentDay = now.toLocaleDateString('ms-MY', { weekday: 'long' });
+    
+    // ==================== SOALAN GAYA BELAJAR (15 SOALAN) ====================
+    const soalanList = [
+        {
+            text: "Anda sedang membantu seorang yang ingin ke lapangan terbang, pusat bandar atau stesen keretapi di bandar anda. anda akan:",
+            options: [
+                { letter: "K", text: "Membawanya ke tempat yang ditujui." },
+                { letter: "A", text: "Memberi tunjuk arah secara lisan ke tempat itu." },
+                { letter: "R", text: "Menulis tunjuk arah ke tempat itu (tanpa peta)." },
+                { letter: "V", text: "Melukis, atau beri peta kepadanya." }
+            ]
+        },
+        {
+            text: "Anda tidak pasti sama ada perkataan berikut dieja 'Dependent' atau 'Dependant'. Anda akan:",
+            options: [
+                { letter: "V", text: "Bayangkan perkataan tersebut dan memilih mengikut rupanya. Mana yang nampak sesuai." },
+                { letter: "A", text: "Perkataan terbunyikan sebut dalam minda anda dan pilih salah satu." },
+                { letter: "R", text: "Rujuk pada kamus." },
+                { letter: "K", text: "Tulis kedua-dua perkataan tersebut dan pilih satu." }
+            ]
+        },
+        {
+            text: "Anda sedang merancang percutian bagi suatu kumpulan. Anda inginkan maklum balas daripada mereka mengenai rancangan itu. Anda akan:",
+            options: [
+                { letter: "K", text: "Menerangkan acara-acara kemuncak." },
+                { letter: "V", text: "Guna peta atau laman web untuk menunjukkan tempat-tempat." },
+                { letter: "R", text: "Memberi mereka salinan bercetak jadual pelancongan (itinerary)." },
+                { letter: "A", text: "Telefon, sms atau emel mereka." }
+            ]
+        },
+        {
+            text: "Anda ingin masak sesuatu yang istimewa untuk keluarga anda. Anda akan:",
+            options: [
+                { letter: "K", text: "Memasak sesuatu yang anda sedia tahu tanpa memerlukan tatacaranya." },
+                { letter: "A", text: "Minta cadangan daripada kawan-kawan." },
+                { letter: "V", text: "Merujuk kepada buku resepi masakan untuk mencari idea berpandukan gambar." },
+                { letter: "R", text: "Merujuk kepada buku masakan yang anda tahu terdapat resepi istimewa." }
+            ]
+        },
+        {
+            text: "Sekumpulan pelancong ingin mempelajari tentang taman-taman atau hutan:",
+            options: [
+                { letter: "A", text: "Memberi taklimat atau aturkan ceramah mengenai taman-taman atau hutan simpanan bagi kehidupan liar." },
+                { letter: "V", text: "Tunjukan gambar dari internet, foto atau buku bergambar." },
+                { letter: "K", text: "Membawa mereka ke taman atau hutan simpanan bagi kehidupan liar dan berjalan bersama mereka." },
+                { letter: "R", text: "Berikan kepada mereka buku atau risalah-risalah tentang taman-taman atau hutan simpanan bagi kehidupan liar." }
+            ]
+        },
+        {
+            text: "Anda hampir membeli kamera digital atau telefon bimbit. Selain daripada harga, apakah akan mempengaruhi keputusan anda?",
+            options: [
+                { letter: "K", text: "Mencuba atau mengujinya." },
+                { letter: "R", text: "Membaca keterangan tentang ciri-ciri produk tersebut." },
+                { letter: "V", text: "Rekabentuknya moden dan bergaya." },
+                { letter: "A", text: "Jurujual menerangkan ciri-ciri produk itu kepada saya." }
+            ]
+        },
+        {
+            text: "Imbas kembali pada suatu ketika anda mempelajari sesuatu yang baru. Elak memilih kemahiran fizikal seperti menunggang basikal. Anda mempelajari sungguh baik dengan:",
+            options: [
+                { letter: "K", text: "Melihat tunjuk-ajar (demonstrasi)." },
+                { letter: "A", text: "Mendengar seorang menerangkannya dan bertanya soalan." },
+                { letter: "V", text: "Gambar rajah dan carta - tanda-tanda visual." },
+                { letter: "R", text: "Panduan bertulis - contoh manual atau buku teks." }
+            ]
+        },
+        {
+            text: "Anda menghadapi masalah pada lutut anda. Anda lebih suka doktor:",
+            options: [
+                { letter: "R", text: "Memberi alamat laman web atau bahan bacaan berkaitan nya." },
+                { letter: "K", text: "Mengunakan model lutut plastik untuk menunjukkan masalahnya." },
+                { letter: "A", text: "Menerangkan masalahnya." },
+                { letter: "V", text: "Menunjukkan gambar-rajah yang menerangkan masalahnya." }
+            ]
+        },
+        {
+            text: "Anda ingin mempelajari sesuatu program baru, kemahiran atau permainan melalui komputer. Anda akan:",
+            options: [
+                { letter: "R", text: "Membaca arahan bertulis yang dibekalkan bersama program itu." },
+                { letter: "A", text: "Berbincang dengan orang yang mengenali program itu." },
+                { letter: "K", text: "Mengunakan alat kawalan atau papan kunci." },
+                { letter: "V", text: "Mengikut gambar rajah dalam buku panduan yang dibekalkan dengannya." }
+            ]
+        },
+        {
+            text: "Saya gemar laman web yang ada:",
+            options: [
+                { letter: "K", text: "Benda-benda untuk saya klik, anjak, atau mencuba." },
+                { letter: "V", text: "Rekabentuk yang menarik dan ciri-ciri visual." },
+                { letter: "R", text: "Huraian-huraian menarik bertulis, senarai-senarai dan penerangan." },
+                { letter: "A", text: "Saluran-saluran audio di mana saya boleh mendengar muzik, rancangan radio atau temubual." }
+            ]
+        },
+        {
+            text: "Selain daripada harga, apakah akan paling mempengaruhi keputusan anda untuk membeli sesuatu buku bukan fiksyen yang baru?",
+            options: [
+                { letter: "V", text: "Rupanya menarik." },
+                { letter: "R", text: "Membacanya sepintas lalu." },
+                { letter: "A", text: "Seorang kawan bercakap mengenainya dan mencadangnya." },
+                { letter: "K", text: "Ia mengandungi cerita-cerita kisah benar, pengalaman-pengalaman dan contoh-contoh." }
+            ]
+        },
+        {
+            text: "Anda menggunakan sebuah buku, CD atau laman web bagi mempelajari cara mengambil gambar dengan kamera digital baru anda. Anda mahu:",
+            options: [
+                { letter: "A", text: "Satu peluang untuk bertanya soalan dan bercakap tentang kamera dan ciri-cirinya." },
+                { letter: "R", text: "Arahan bertulis yang jelas dengan senarai-senarai dan urutan tatacara pengunaan." },
+                { letter: "V", text: "Paparan gambar rajah kamera berserta fungsi tiap-tiap satu bahagian." },
+                { letter: "K", text: "Banyak contoh gambar-gambar baik serta yang kurang baik dan cara membaikinya." }
+            ]
+        },
+        {
+            text: "Anda suka seorang guru atau penceramah yang menggunakan:",
+            options: [
+                { letter: "K", text: "Demonstrasi, model atau sesi amali." },
+                { letter: "A", text: "Soal-jawab, ceramah, perbincangan dalam kumpulan, penceramah jemputan." },
+                { letter: "R", text: "Nota-edaran, buku atau bahan bacaan." },
+                { letter: "V", text: "Gambar-rajah, carta, atau graf." }
+            ]
+        },
+        {
+            text: "Anda baru selesai sesuatu pertandingan atau ujian dan ingin mendapat maklumbalas. Corak maklumbalas yang anda ingin merupakan:",
+            options: [
+                { letter: "K", text: "Guna contoh-contoh daripada apa yang anda telah lakukan." },
+                { letter: "A", text: "Guna penerangan bertulis mengenai keputusan anda." },
+                { letter: "R", text: "Daripada seseorang yang membincangkannya dengan anda." },
+                { letter: "V", text: "Graf yang menunjukkan pencapaian anda." }
+            ]
+        },
+        {
+            text: "Anda sedang memilih makanan di sebuah restoran atau kafe. Anda akan:",
+            options: [
+                { letter: "K", text: "Memilih sajian yang anda pernah makan dahulu di situ." },
+                { letter: "A", text: "Mendengar cadangan pelayan atau bertanya kepada kawan-kawan untuk mencadangkan pilihan." },
+                { letter: "R", text: "Memilih berdasarkan penerangan dalam menu." },
+                { letter: "V", text: "Melihat apa orang lain sedang makan atau melihat gambar setiap sajian." }
+            ]
+        },
+        {
+            text: "Anda dikehendaki memberi suatu ucapan penting dalam satu persidangan atau upacara khas. Anda membuat persediaan:",
+            options: [
+                { letter: "V", text: "Melukis gambar rajah atau graf untuk memberi penjelasan." },
+                { letter: "A", text: "Menulis beberapa perkataan penting dan mengulangi latihan penyampaian ucapan itu." },
+                { letter: "R", text: "Menulis ucapan anda dengan lengkap dan menghafalnya dengan membacanya berulang kali." },
+                { letter: "K", text: "Mengumpul banyak contoh dan cerita untuk menjadikan ucapan anda lebih realistik dan praktikal." }
+            ]
+        }
+    ];
+    
+    let answers = {};
+    let currentIndex = 0;
+    let scores = { V: 0, A: 0, R: 0, K: 0 };
+    let hasCompleted = false;
+    let existingResultId = null;
+    
+    const gayaColors = {
+        V: "#8b5cf6", A: "#3b82f6", R: "#10b981", K: "#f97316"
+    };
+    
+    const gayaNames = {
+        V: "VISUAL",
+        A: "AUDITORI",
+        R: "BACAAN / PENULISAN",
+        K: "KINESTETIK"
+    };
+    
+    const gayaDescriptions = {
+        V: "Gaya pembelajaran VISUAL menunjukkan anda lebih mudah memahami maklumat melalui gambar rajah, carta, peta, warna, dan bahan visual yang lain. Anda cenderung mengingati apa yang dilihat berbanding apa yang didengar. Untuk meningkatkan pembelajaran, gunakan peta minda, highlight warna, dan tonton video pembelajaran.",
+        A: "Gaya pembelajaran AUDITORI menunjukkan anda lebih mudah memahami maklumat melalui pendengaran. Anda belajar terbaik dengan mendengar kuliah, perbincangan, atau rakaman audio. Anda cenderung mengingati apa yang didengar dan suka membaca dengan kuat. Gunakan rakaman suara, bercakap dengan rakan, dan dengar podcast untuk belajar.",
+        R: "Gaya pembelajaran BACAAN/PENULISAN menunjukkan anda lebih mudah memahami maklumat melalui teks bertulis. Anda gemar membaca nota, membuat senarai, dan menulis semula maklumat untuk mengingatinya. Anda cenderung belajar dengan baik melalui buku teks, artikel, dan nota ringkas. Gunakan teknik menulis semula, buat ringkasan, dan baca nota dengan teliti.",
+        K: "Gaya pembelajaran KINESTETIK menunjukkan anda lebih mudah memahami maklumat melalui pengalaman fizikal dan amali. Anda belajar terbaik dengan melakukan sesuatu secara langsung, bergerak, dan melibatkan diri dalam aktiviti hands-on. Anda cenderung mengingati apa yang dilakukan. Gunakan simulasi, praktikal, dan belajar sambil bergerak untuk meningkatkan pemahaman."
+    };
+    
+    function showToast(message) {
+        const toast = document.createElement('div');
+        toast.className = 'toast';
+        toast.innerHTML = `<i class="fas fa-info-circle"></i> ${message}`;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 3000);
+    }
+    
+    function saveProgress() {
+        localStorage.setItem('gaya_belajar_progress', JSON.stringify({
+            currentIndex, answers, scores, hasCompleted
+        }));
+    }
+    
+    function loadProgress() {
+        const saved = localStorage.getItem('gaya_belajar_progress');
+        if (saved) {
+            try {
+                const data = JSON.parse(saved);
+                if (!data.hasCompleted) {
+                    currentIndex = data.currentIndex;
+                    answers = data.answers;
+                    scores = data.scores;
+                    hasCompleted = data.hasCompleted;
+                }
+            } catch(e) {}
+        }
+    }
+    
+    async function checkExistingResult() {
+        try {
+            const q = query(ujianResultsCollection, where("studentIC", "==", studentIC));
+            const querySnapshot = await getDocs(q);
+            if (!querySnapshot.empty) {
+                querySnapshot.forEach((doc) => {
+                    hasCompleted = true;
+                    existingResultId = doc.id;
+                });
+                return true;
+            }
+            return false;
+        } catch (error) {
+            console.error("Error checking existing result:", error);
+            return false;
+        }
+    }
+    
+    async function saveResultToFirestore() {
+        let dominantStyle = "V";
+        let highestScore = 0;
+        for (const [style, score] of Object.entries(scores)) {
+            if (score > highestScore) {
+                highestScore = score;
+                dominantStyle = style;
+            }
+        }
+        
+        const resultData = {
+            studentName: studentName,
+            studentIC: studentIC,
+            studentClass: studentClass,
+            studentSession: studentSession,
+            date: currentDate,
+            time: currentTime,
+            day: currentDay,
+            scores: scores,
+            dominantStyle: dominantStyle,
+            dominantScore: highestScore,
+            totalQuestions: soalanList.length,
+            completedAt: new Date().toISOString(),
+            status: "completed"
+        };
+        
+        try {
+            if (existingResultId) {
+                await updateDoc(doc(db, "ujian_gaya_belajar", existingResultId), resultData);
+            } else {
+                await setDoc(doc(db, "ujian_gaya_belajar", `${studentIC}_${Date.now()}`), resultData);
+            }
+            showToast("✅ Jawapan anda telah disimpan!");
+            return true;
+        } catch (error) {
+            console.error("Error saving result:", error);
+            showToast("❌ Gagal menyimpan jawapan");
+            return false;
+        }
+    }
+    
+    function renderProfile() {
+        return `
+            <div class="profile-card">
+                <div class="profile-grid">
+                    <div class="profile-item"><div class="label">Nama Penuh</div><div class="value">${studentName}</div></div>
+                    <div class="profile-item"><div class="label">No. Kad Pengenalan</div><div class="value">${studentIC}</div></div>
+                    <div class="profile-item"><div class="label">Kelas</div><div class="value">${studentClass}</div></div>
+                    <div class="profile-item"><div class="label">Tarikh / Masa</div><div class="value">${currentDate} • ${currentTime}</div></div>
+                    <div class="profile-item"><div class="label">Hari</div><div class="value">${currentDay}</div></div>
+                </div>
+            </div>
+        `;
+    }
+    
+    function renderProgress() {
+        const percent = (currentIndex / soalanList.length) * 100;
+        return `
+            <div class="progress-container">
+                <div class="progress-bar" style="width: ${percent}%;"></div>
+            </div>
+            <div class="progress-text">Soalan ${currentIndex + 1} / ${soalanList.length}</div>
+        `;
+    }
+    
+    function renderQuestion() {
+        if (currentIndex >= soalanList.length) {
+            renderResult();
+            return;
+        }
+        
+        const q = soalanList[currentIndex];
+        const selected = answers[currentIndex];
+        
+        let optionsHtml = '';
+        for (const opt of q.options) {
+            const isSelected = selected === opt.letter;
+            optionsHtml += `
+                <div class="option-btn ${isSelected ? 'option-selected' : ''}" onclick="answerQuestion('${opt.letter}')">
+                    <span class="option-letter">${opt.letter}</span>
+                    <span class="option-text">${opt.text}</span>
+                </div>
+            `;
+        }
+        
+        const html = `
+            ${renderProfile()}
+            ${renderProgress()}
+            <div class="question-card">
+                <div class="question-header">
+                    <span class="question-num">Soalan ${currentIndex + 1}</span>
+                </div>
+                <div class="question-text">${q.text}</div>
+                <div class="options">
+                    ${optionsHtml}
+                </div>
+            </div>
+            <div class="nav-buttons">
+                <button class="nav-btn" onclick="prevQuestion()" ${currentIndex === 0 ? 'disabled' : ''}>
+                    <i class="fas fa-arrow-left"></i> Sebelum
+                </button>
+                <button class="nav-btn nav-btn-primary" onclick="nextQuestion()">
+                    ${currentIndex === soalanList.length - 1 ? 'Selesai' : 'Seterusnya'} <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+        `;
+        
+        document.getElementById('contentArea').innerHTML = html;
+    }
+    
+    window.answerQuestion = function(answer) {
+        answers[currentIndex] = answer;
+        scores[answer]++;
+        saveProgress();
+        renderQuestion();
+    };
+    
+    window.nextQuestion = function() {
+        if (answers[currentIndex] === undefined) {
+            showToast("Sila pilih jawapan terlebih dahulu");
+            return;
+        }
+        
+        if (currentIndex < soalanList.length - 1) {
+            currentIndex++;
+            saveProgress();
+            renderQuestion();
+        } else {
+            submitUjian();
+        }
+    };
+    
+    window.prevQuestion = function() {
+        if (currentIndex > 0) {
+            currentIndex--;
+            saveProgress();
+            renderQuestion();
+        }
+    };
+    
+    async function submitUjian() {
+        const totalAnswered = Object.keys(answers).length;
+        if (totalAnswered < soalanList.length) {
+            showToast(`Sila jawab semua soalan (${soalanList.length - totalAnswered} soalan lagi)`);
+            return;
+        }
+        
+        await saveResultToFirestore();
+        hasCompleted = true;
+        localStorage.removeItem('gaya_belajar_progress');
+        renderResult();
+    }
+    
+    function getDominantStyle() {
+        let dominant = "V";
+        let highest = 0;
+        for (const [style, score] of Object.entries(scores)) {
+            if (score > highest) {
+                highest = score;
+                dominant = style;
+            }
+        }
+        return { dominant, score: highest, total: soalanList.length };
+    }
+    
+    function renderResult() {
+        const { dominant, score, total } = getDominantStyle();
+        const percent = (score / total) * 100;
+        
+        const badgeClass = {
+            V: "badge-visual", A: "badge-auditori", R: "badge-bacaan", K: "badge-kinestetik"
+        };
+        
+        const sortedStyles = Object.entries(scores).sort((a, b) => b[1] - a[1]);
+        
+        let barsHtml = '';
+        for (let [style, sc] of sortedStyles) {
+            const perc = (sc / total) * 100;
+            barsHtml += `
+                <div class="result-bar">
+                    <div class="result-bar-label">
+                        <span><strong>${gayaNames[style]}</strong></span>
+                        <span>${sc} / ${total}</span>
+                    </div>
+                    <div class="result-bar-fill">
+                        <span style="width: ${perc}%; background: ${gayaColors[style]};"></span>
+                    </div>
+                </div>
+            `;
+        }
+        
+        const html = `
+            ${renderProfile()}
+            <div class="result-card">
+                <div class="result-title">
+                    <i class="fas fa-graduation-cap"></i> KEPUTUSAN INVENTORI GAYA BELAJAR
+                </div>
+                
+                <div class="dominant-style">
+                    <div class="dominant-badge ${badgeClass[dominant]}">
+                        📚 GAYA BELAJAR DOMINAN: ${gayaNames[dominant]}
+                    </div>
+                    <div class="style-desc">
+                        ${gayaDescriptions[dominant]}
+                    </div>
+                    <p style="margin-top: 1rem; font-size: 0.8rem; color: #64748b;">
+                        Skor anda: ${score}/${total} (${Math.round(percent)}%)
+                    </p>
+                </div>
+                
+                <div class="result-chart">
+                    <h4 style="margin-bottom: 1rem;">📊 Perincian Skor Setiap Gaya Belajar</h4>
+                    ${barsHtml}
+                </div>
+                
+                <div style="background: #f1f5f9; border-radius: 1rem; padding: 1rem; margin-top: 1rem;">
+                    <p style="font-size: 0.8rem; color: #64748b; text-align: center;">
+                        <i class="fas fa-info-circle"></i> Kenali gaya belajar dominan anda untuk meningkatkan keberkesanan pembelajaran.
+                    </p>
+                    <p style="font-size: 0.7rem; color: #94a3b8; text-align: center; margin-top: 0.5rem;">
+                        Tarikh: ${currentDate} | Masa: ${currentTime} | Hari: ${currentDay}
+                    </p>
+                </div>
+                
+                <button class="btn-submit" onclick="window.location.href='psikometrik.html'">
+                    <i class="fas fa-check-circle"></i> Selesai & Kembali
+                </button>
+            </div>
+        `;
+        
+        document.getElementById('contentArea').innerHTML = html;
+    }
+    
+    function renderLocked() {
+        const html = `
+            ${renderProfile()}
+            <div class="locked-message">
+                <i class="fas fa-lock" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+                <h3>Ujian Telah Selesai</h3>
+                <p>Anda telah pun menjawab Inventori Gaya Belajar ini.</p>
+                <p>Sila rujuk kaunselor untuk reset ujian jika perlu.</p>
+                <button class="btn-submit" style="background: #64748b; margin-top: 1rem;" onclick="window.location.href='psikometrik.html'">
+                    <i class="fas fa-arrow-left"></i> Kembali ke Senarai Ujian
+                </button>
+            </div>
+        `;
+        document.getElementById('contentArea').innerHTML = html;
+    }
+    
+    async function init() {
+        const exists = await checkExistingResult();
+        if (exists) {
+            renderLocked();
+        } else {
+            loadProgress();
+            if (hasCompleted) {
+                renderResult();
+            } else {
+                renderQuestion();
+            }
+        }
+    }
+    
+    window.answerQuestion = answerQuestion;
+    window.nextQuestion = nextQuestion;
+    window.prevQuestion = prevQuestion;
+    
+    init();
+</script>
+</body>
+</html>

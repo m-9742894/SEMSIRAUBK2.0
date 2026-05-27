@@ -339,13 +339,7 @@
       </div>
       <div class="input-group">
         <label><i class="fas fa-calendar"></i> Tahun Pendaftaran <span style="color:#dc2626;">*</span></label>
-        <select class="input-field" id="regYear">
-          <option value="2024">2024</option>
-          <option value="2025">2025</option>
-          <option value="2026" selected>2026</option>
-          <option value="2027">2027</option>
-          <option value="2028">2028</option>
-        </select>
+        <input type="text" class="input-field" id="regYear" placeholder="cth: 2024, 2025, 2026" value="2026" autocomplete="off">
       </div>
       
       <button type="submit" class="register-btn" id="registerBtn">
@@ -487,6 +481,12 @@
       // Format IC tanpa sempang
       const formattedIc = icNumber.replace(/-/g, '');
       
+      // Validate year
+      if (!year || year.trim() === "") {
+        alert("❌ Sila masukkan Tahun Pendaftaran.");
+        return false;
+      }
+      
       // Semak sama ada IC sudah wujud dalam teachers (sudah diluluskan)
       const existingTeachers = query(teachersCollection, where("icNumber", "==", formattedIc));
       const teachersSnap = await getDocs(existingTeachers);
@@ -510,7 +510,7 @@
         fullname: fullname.toUpperCase().trim(),
         icNumber: formattedIc,
         teacherClass: teacherClass.trim() || "-",
-        year: year || "2026",
+        year: year.trim(),
         status: "pending",
         createdAt: new Date().toISOString(),
         registerDate: new Date().toLocaleDateString('ms-MY'),
@@ -561,7 +561,7 @@
     let fullname = regFullname.value.trim();
     let icNumber = regIcNumber.value.trim();
     const teacherClass = regTeacherClass.value.trim();
-    const year = regYear.value;
+    const year = regYear.value.trim();
     
     // Validation
     if (fullname === "") {
@@ -586,6 +586,19 @@
     if (!/^\d{12}$/.test(icNumber)) {
       alert("❌ No. Kad Pengenalan mestilah 12 digit nombor (tanpa sempang).\nContoh: 800101011234");
       regIcNumber.focus();
+      return;
+    }
+    
+    if (year === "") {
+      alert("❌ Sila masukkan Tahun Pendaftaran.\nContoh: 2024, 2025, 2026");
+      regYear.focus();
+      return;
+    }
+    
+    // Validate year format (4 digit)
+    if (!/^\d{4}$/.test(year)) {
+      alert("❌ Tahun Pendaftaran mestilah 4 digit nombor.\nContoh: 2024, 2025, 2026");
+      regYear.focus();
       return;
     }
     

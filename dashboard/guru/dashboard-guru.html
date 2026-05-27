@@ -162,6 +162,7 @@
       flex-wrap: wrap;
       box-shadow: 0 8px 20px -8px rgba(0, 0, 0, 0.08);
       border: 1px solid rgba(37, 99, 235, 0.1);
+      position: relative;
     }
     .profile-avatar {
       background: linear-gradient(145deg, #2563eb, #7c3aed);
@@ -175,6 +176,9 @@
     .profile-avatar i {
       font-size: 3rem;
       color: white;
+    }
+    .profile-info {
+      flex: 1;
     }
     .profile-info h3 {
       font-size: 1.3rem;
@@ -194,6 +198,24 @@
       color: #2563eb;
       display: inline-block;
       margin-top: 0.5rem;
+    }
+    .edit-profile-btn {
+      background: #e0e7ff;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 2rem;
+      cursor: pointer;
+      font-weight: 600;
+      color: #2563eb;
+      transition: 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.8rem;
+    }
+    .edit-profile-btn:hover {
+      background: #2563eb;
+      color: white;
     }
 
     /* section divider */
@@ -297,6 +319,109 @@
       font-size: 0.75rem;
     }
 
+    /* Modal Styles */
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(4px);
+      z-index: 2000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .modal-content {
+      max-width: 500px;
+      width: 100%;
+      background: white;
+      border-radius: 1.5rem;
+      max-height: 85vh;
+      overflow-y: auto;
+      animation: modalFadeIn 0.3s ease;
+    }
+    @keyframes modalFadeIn {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .modal-header {
+      padding: 1.2rem 1.5rem;
+      border-bottom: 1px solid #e2e8f0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      background: white;
+      border-radius: 1.5rem 1.5rem 0 0;
+    }
+    .modal-header h3 { color: #1e293b; font-size: 1.2rem; }
+    .modal-header h3 i { color: #2563eb; margin-right: 8px; }
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: #94a3b8;
+      transition: 0.2s;
+    }
+    .modal-close:hover { color: #dc2626; }
+    .modal-body { padding: 1.5rem; }
+    
+    .form-group { margin-bottom: 1rem; }
+    .form-group label {
+      display: block;
+      font-weight: 600;
+      font-size: 0.85rem;
+      color: #1e293b;
+      margin-bottom: 0.5rem;
+    }
+    .form-group label i { color: #2563eb; margin-right: 6px; }
+    .form-group input, .form-group select {
+      width: 100%;
+      padding: 0.8rem 1rem;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 1rem;
+      font-family: inherit;
+      outline: none;
+      font-size: 0.9rem;
+    }
+    .form-group input:focus, .form-group select:focus {
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+    }
+    .modal-btn {
+      width: 100%;
+      padding: 0.8rem;
+      background: linear-gradient(95deg, #2563eb, #7c3aed);
+      color: white;
+      border: none;
+      border-radius: 2rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.2s;
+      margin-top: 0.5rem;
+    }
+    .modal-btn:hover { transform: translateY(-2px); }
+    
+    .alert {
+      padding: 12px;
+      border-radius: 12px;
+      margin-bottom: 15px;
+      font-size: 0.8rem;
+      display: none;
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 2100;
+    }
+    .alert.success { background: #dcfce7; color: #166534; display: block; }
+    .alert.error { background: #fee2e2; color: #dc2626; display: block; }
+    .alert.info { background: #dbeafe; color: #1e40af; display: block; }
+
     @media (max-width: 700px) {
       .dashboard-container {
         padding: 1rem;
@@ -310,6 +435,9 @@
       }
       .logo-text h1 {
         font-size: 1.2rem;
+      }
+      .edit-profile-btn {
+        margin-top: 0.5rem;
       }
     }
   </style>
@@ -340,7 +468,7 @@
     </div>
   </div>
 
-  <!-- Profile Card -->
+  <!-- Profile Card with Edit Button -->
   <div class="profile-card" id="profileCard">
     <div class="profile-avatar">
       <i class="fas fa-chalkboard-user"></i>
@@ -352,6 +480,9 @@
       <p><i class="fas fa-calendar"></i> Tahun/Sesi: <span id="profileYear">-</span></p>
       <div class="badge"><i class="fas fa-check-circle"></i> Guru Aktif</div>
     </div>
+    <button class="edit-profile-btn" id="editProfileBtn">
+      <i class="fas fa-user-edit"></i> Edit Profil
+    </button>
   </div>
 
   <!-- ==================== SECTION 1: URUSAN KELAS ==================== -->
@@ -423,10 +554,43 @@
   </div>
 </div>
 
+<!-- Modal Edit Profile -->
+<div id="editProfileModal" class="modal" style="display: none;">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3><i class="fas fa-user-edit"></i> Edit Profil Guru</h3>
+      <button class="modal-close" onclick="closeEditModal()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <form id="editProfileForm">
+        <div class="form-group">
+          <label><i class="fas fa-user"></i> Nama Penuh</label>
+          <input type="text" id="editFullname" placeholder="Nama Penuh" required>
+          <p style="font-size:0.65rem; color:#64748b; margin-top:0.3rem;">Gunakan HURUF BESAR</p>
+        </div>
+        <div class="form-group">
+          <label><i class="fas fa-id-card"></i> No. Kad Pengenalan</label>
+          <input type="text" id="editIc" placeholder="cth: 800101011234" required>
+          <p style="font-size:0.65rem; color:#64748b; margin-top:0.3rem;">12 digit nombor (tanpa sempang)</p>
+        </div>
+        <div class="form-group">
+          <label><i class="fas fa-school"></i> Mengajar Kelas</label>
+          <input type="text" id="editClass" placeholder="cth: 5 Cemerlang">
+        </div>
+        <div class="form-group">
+          <label><i class="fas fa-calendar"></i> Tahun / Sesi</label>
+          <input type="text" id="editYear" placeholder="cth: 2026" value="2026">
+        </div>
+        <button type="submit" class="modal-btn"><i class="fas fa-save"></i> Simpan Perubahan</button>
+      </form>
+    </div>
+  </div>
+</div>
+
 <script type="module">
   // Import Firebase SDK
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-  import { getFirestore, collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+  import { getFirestore, collection, getDocs, query, where, updateDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
   
   // Firebase configuration
   const firebaseConfig = {
@@ -445,6 +609,9 @@
   const teachersCollection = collection(db, "teachers");
   const studentsCollection = collection(db, "students");
 
+  let currentTeacherId = null;
+  let currentTeacherData = {};
+
   // ==================== CHECK LOGIN STATUS ====================
   function checkLoginStatus() {
     const teacherName = sessionStorage.getItem('teacherName');
@@ -455,6 +622,17 @@
       return false;
     }
     return true;
+  }
+
+  // ==================== SHOW ALERT ====================
+  function showAlert(message, type) {
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert ${type}`;
+    alertDiv.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i> ${message}`;
+    document.body.appendChild(alertDiv);
+    setTimeout(() => {
+      alertDiv.remove();
+    }, 4000);
   }
 
   // ==================== LOAD TEACHER DATA ====================
@@ -476,6 +654,9 @@
         if (!querySnapshot.empty) {
           querySnapshot.forEach((doc) => {
             const teacherData = doc.data();
+            currentTeacherId = doc.id;
+            currentTeacherData = teacherData;
+            
             const teacherClass = teacherData.teacherClass || '-';
             const teacherYear = teacherData.year || '-';
             
@@ -497,6 +678,67 @@
     }
   }
 
+  // ==================== UPDATE TEACHER PROFILE IN FIRESTORE ====================
+  async function updateTeacherProfile(fullname, icNumber, teacherClass, year) {
+    if (!currentTeacherId) {
+      showAlert('ID guru tidak ditemui', 'error');
+      return false;
+    }
+    
+    try {
+      // Format IC without dashes
+      const formattedIc = icNumber.replace(/-/g, '');
+      
+      // Check if IC already exists for another teacher
+      if (formattedIc !== sessionStorage.getItem('teacherIC')) {
+        const q = query(teachersCollection, where("icNumber", "==", formattedIc));
+        const querySnapshot = await getDocs(q);
+        let icExists = false;
+        querySnapshot.forEach((docSnap) => {
+          if (docSnap.id !== currentTeacherId) {
+            icExists = true;
+          }
+        });
+        if (icExists) {
+          showAlert(`❌ No. IC ${formattedIc} sudah wujud untuk guru lain!`, 'error');
+          return false;
+        }
+      }
+      
+      const teacherRef = doc(db, "teachers", currentTeacherId);
+      const updateData = {
+        fullname: fullname.toUpperCase().trim(),
+        icNumber: formattedIc,
+        teacherClass: teacherClass.trim() || "-",
+        year: year.trim() || "2026",
+        updatedAt: new Date().toISOString()
+      };
+      
+      await updateDoc(teacherRef, updateData);
+      
+      // Update session storage
+      sessionStorage.setItem('teacherName', updateData.fullname);
+      sessionStorage.setItem('teacherIC', updateData.icNumber);
+      sessionStorage.setItem('teacherClass', updateData.teacherClass);
+      sessionStorage.setItem('teacherYear', updateData.year);
+      
+      // Update UI
+      document.getElementById('teacherNameDisplay').innerText = updateData.fullname;
+      document.getElementById('profileName').innerText = updateData.fullname;
+      document.getElementById('profileIC').innerText = updateData.icNumber;
+      document.getElementById('profileClass').innerText = updateData.teacherClass;
+      document.getElementById('profileYear').innerText = updateData.year;
+      
+      showAlert('✅ Profil guru berjaya dikemaskini!', 'success');
+      return true;
+      
+    } catch (error) {
+      console.error("Error updating teacher profile:", error);
+      showAlert('❌ Gagal mengemaskini profil. Sila cuba lagi.', 'error');
+      return false;
+    }
+  }
+
   // ==================== LOAD STUDENT COUNT ====================
   async function loadStudentCount() {
     const teacherClass = sessionStorage.getItem('teacherClass');
@@ -511,6 +753,70 @@
     }
   }
 
+  // ==================== EDIT PROFILE MODAL ====================
+  function openEditModal() {
+    const currentName = sessionStorage.getItem('teacherName') || '';
+    const currentIc = sessionStorage.getItem('teacherIC') || '';
+    const currentClass = sessionStorage.getItem('teacherClass') || '';
+    const currentYear = sessionStorage.getItem('teacherYear') || '2026';
+    
+    document.getElementById('editFullname').value = currentName;
+    document.getElementById('editIc').value = currentIc;
+    document.getElementById('editClass').value = currentClass;
+    document.getElementById('editYear').value = currentYear;
+    
+    document.getElementById('editProfileModal').style.display = 'flex';
+  }
+  
+  window.closeEditModal = function() {
+    document.getElementById('editProfileModal').style.display = 'none';
+  };
+  
+  // Handle edit profile form submit
+  document.getElementById('editProfileForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const fullname = document.getElementById('editFullname').value.trim();
+    const icNumber = document.getElementById('editIc').value.trim();
+    const teacherClass = document.getElementById('editClass').value.trim();
+    const year = document.getElementById('editYear').value.trim();
+    
+    if (!fullname) {
+      showAlert('Sila masukkan Nama Penuh', 'error');
+      return;
+    }
+    
+    if (!icNumber) {
+      showAlert('Sila masukkan No. Kad Pengenalan', 'error');
+      return;
+    }
+    
+    // Validate IC format (12 digit)
+    const cleanIc = icNumber.replace(/-/g, '');
+    if (!/^\d{12}$/.test(cleanIc)) {
+      showAlert('❌ No. Kad Pengenalan mestilah 12 digit nombor', 'error');
+      return;
+    }
+    
+    if (!year || !/^\d{4}$/.test(year)) {
+      showAlert('Sila masukkan tahun yang sah (4 digit, cth: 2026)', 'error');
+      return;
+    }
+    
+    // Disable button while processing
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    const originalText = submitBtn.innerHTML;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
+    submitBtn.disabled = true;
+    
+    await updateTeacherProfile(fullname, cleanIc, teacherClass, year);
+    
+    submitBtn.innerHTML = originalText;
+    submitBtn.disabled = false;
+    
+    closeEditModal();
+  });
+
   // ==================== MENU NAVIGATION ====================
   function openMenuPage(menuType) {
     let targetUrl = '';
@@ -521,7 +827,6 @@
         targetUrl = 'list-pelajar-kelas.html';
         break;
       case 'mata-merit':
-        // ✅ TUKAR KE mata-merit.html
         targetUrl = 'mata-merit.html';
         break;
       case 'daftar-merit':
@@ -561,6 +866,9 @@
       openMenuPage(menuType);
     });
   });
+  
+  // Edit profile button
+  document.getElementById('editProfileBtn').addEventListener('click', openEditModal);
   
   // Logout button
   const logoutBtn = document.getElementById('logoutBtn');

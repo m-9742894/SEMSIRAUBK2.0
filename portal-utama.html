@@ -256,6 +256,106 @@
             padding-top: 2rem;
         }
 
+        /* Modal Styles */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .modal-content {
+            background: white;
+            border-radius: 1.5rem;
+            max-width: 400px;
+            width: 100%;
+            animation: modalFadeIn 0.3s ease;
+            overflow: hidden;
+        }
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .modal-header {
+            padding: 1.2rem;
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            color: white;
+            text-align: center;
+        }
+        .modal-header h3 {
+            margin: 0;
+            font-size: 1.2rem;
+        }
+        .modal-body {
+            padding: 1.5rem;
+        }
+        .modal-close {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: white;
+            transition: 0.2s;
+        }
+        .modal-close:hover {
+            color: #f1f5f9;
+        }
+        .login-option {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 1rem;
+            cursor: pointer;
+            transition: 0.2s;
+            border: 1px solid #e2e8f0;
+            background: #f8fafc;
+        }
+        .login-option:hover {
+            background: #eef2ff;
+            border-color: #4f46e5;
+            transform: translateX(5px);
+        }
+        .login-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+        .icon-pelajar {
+            background: #dbeafe;
+            color: #2563eb;
+        }
+        .icon-guru {
+            background: #dcfce7;
+            color: #10b981;
+        }
+        .icon-kaunselor {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+        .login-info h4 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #1e293b;
+        }
+        .login-info p {
+            font-size: 0.7rem;
+            color: #64748b;
+        }
+
         @media (max-width: 720px) {
             .portal-container {
                 padding: 1.2rem;
@@ -352,8 +452,8 @@
             <div class="enter-btn">Mulai Ujian <i class="fas fa-arrow-right"></i></div>
         </div>
 
-        <!-- 8. MATA MERIT PELAJAR -->
-        <div class="menu-card" data-url="mata-merit.html">
+        <!-- 8. MATA MERIT PELAJAR - BUKA MODAL -->
+        <div class="menu-card" id="mataMeritCard">
             <div class="menu-icon"><i class="fas fa-star"></i></div>
             <h3>Mata Merit Pelajar</h3>
             <div class="menu-desc">Semak ganjaran & pencapaian kokurikulum / sahsiah</div>
@@ -373,9 +473,12 @@
 <script>
     AOS.init({ once: true, duration: 700, offset: 10 });
 
-    // Fungsi untuk redirect ke page
+    // Fungsi untuk redirect ke page (untuk menu biasa)
     const menuCards = document.querySelectorAll('.menu-card');
     menuCards.forEach(card => {
+        // Kecualikan menu Mata Merit Pelajar (guna modal)
+        if (card.id === 'mataMeritCard') return;
+        
         card.addEventListener('click', (e) => {
             const targetUrl = card.getAttribute('data-url');
             if (targetUrl) {
@@ -384,6 +487,86 @@
                 alert("Halaman akan dibina selepas ini.");
             }
         });
+    });
+
+    // ==================== MODAL UNTUK MATA MERIT PELAJAR ====================
+    const mataMeritCard = document.getElementById('mataMeritCard');
+    
+    function openLoginModal() {
+        // Cek jika modal sudah wujud
+        if (document.getElementById('loginModal')) return;
+        
+        const modalHtml = `
+            <div id="loginModal" class="modal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3><i class="fas fa-star"></i> Pilih Akses</h3>
+                        <span class="modal-close" onclick="closeLoginModal()">&times;</span>
+                    </div>
+                    <div class="modal-body">
+                        <div class="login-option" onclick="redirectTo('pelajar')">
+                            <div class="login-icon icon-pelajar">
+                                <i class="fas fa-user-graduate"></i>
+                            </div>
+                            <div class="login-info">
+                                <h4>Login sebagai Pelajar</h4>
+                                <p>Semak mata merit dan pencapaian peribadi anda</p>
+                            </div>
+                        </div>
+                        <div class="login-option" onclick="redirectTo('guru')">
+                            <div class="login-icon icon-guru">
+                                <i class="fas fa-chalkboard-user"></i>
+                            </div>
+                            <div class="login-info">
+                                <h4>Login sebagai Guru</h4>
+                                <p>Urus mata merit pelajar dalam kelas anda</p>
+                            </div>
+                        </div>
+                        <div class="login-option" onclick="redirectTo('kaunselor')">
+                            <div class="login-icon icon-kaunselor">
+                                <i class="fas fa-user-shield"></i>
+                            </div>
+                            <div class="login-info">
+                                <h4>Login sebagai Kaunselor</h4>
+                                <p>Urus mata merit semua pelajar & laporan</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+    }
+    
+    window.closeLoginModal = function() {
+        const modal = document.getElementById('loginModal');
+        if (modal) modal.remove();
+    };
+    
+    window.redirectTo = function(role) {
+        let url = '';
+        if (role === 'pelajar') {
+            url = 'https://m-9742894.github.io/SEMSIRAUBK2.0/dashboard/page-pelajar.html';
+        } else if (role === 'guru') {
+            url = 'https://m-9742894.github.io/SEMSIRAUBK2.0/dashboard/page-guru.html';
+        } else if (role === 'kaunselor') {
+            url = 'https://m-9742894.github.io/SEMSIRAUBK2.0/dashboard/page-kaunselor.html';
+        }
+        window.location.href = url;
+    };
+    
+    // Event untuk Mata Merit Pelajar
+    mataMeritCard.addEventListener('click', (e) => {
+        openLoginModal();
+    });
+    
+    // Tutup modal bila klik luar content
+    document.addEventListener('click', function(e) {
+        const modal = document.getElementById('loginModal');
+        if (modal && e.target === modal) {
+            closeLoginModal();
+        }
     });
 
     // Butang kembali ke landing page utama

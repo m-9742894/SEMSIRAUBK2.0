@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Ujian Inventori Tret Personaliti | E-MindCare SEMSIRA</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: linear-gradient(135deg, #e8f0fe 0%, #dfe7f5 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container { max-width: 800px; margin: 0 auto; }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid rgba(37,99,235,0.2);
+        }
+        .logo-area { display: flex; align-items: center; gap: 1rem; }
+        .logo-icon {
+            background: linear-gradient(145deg, #2563eb, #7c3aed);
+            width: 45px; height: 45px;
+            border-radius: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .logo-icon i { font-size: 1.5rem; color: white; }
+        .logo-text h1 {
+            font-size: 1.2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #1e293b, #2563eb);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .back-btn {
+            background: #eef2ff;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 40px;
+            cursor: pointer;
+            font-weight: 600;
+            color: #2563eb;
+            text-decoration: none;
+            font-size: 0.8rem;
+        }
+        .profile-card {
+            background: white;
+            border-radius: 1rem;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        .profile-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            justify-content: space-between;
+        }
+        .profile-item { flex: 1; min-width: 150px; }
+        .profile-item .label { font-size: 0.7rem; color: #64748b; }
+        .profile-item .value { font-weight: 700; color: #1e293b; font-size: 0.9rem; }
+        .progress-container {
+            background: #e2e8f0;
+            border-radius: 20px;
+            height: 10px;
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+        }
+        .progress-bar {
+            background: linear-gradient(95deg, #2563eb, #7c3aed);
+            width: 0%;
+            height: 100%;
+            transition: width 0.3s ease;
+        }
+        .progress-text {
+            text-align: right;
+            font-size: 0.7rem;
+            color: #64748b;
+            margin-top: -1rem;
+            margin-bottom: 1rem;
+        }
+        .question-card {
+            background: white;
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 8px 20px -8px rgba(0,0,0,0.1);
+        }
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .question-num {
+            background: #e0e7ff;
+            padding: 0.2rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: #2563eb;
+        }
+        .question-cat {
+            font-size: 0.7rem;
+            color: #64748b;
+        }
+        .question-text {
+            font-size: 1rem;
+            font-weight: 500;
+            color: #1e293b;
+            margin-bottom: 1.5rem;
+            line-height: 1.4;
+        }
+        .options {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+        .option-btn {
+            flex: 1;
+            padding: 0.8rem;
+            border-radius: 3rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 1rem;
+        }
+        .option-yes { background: #10b981; color: white; }
+        .option-yes:hover { background: #059669; transform: scale(1.02); }
+        .option-no { background: #ef4444; color: white; }
+        .option-no:hover { background: #dc2626; transform: scale(1.02); }
+        .option-selected-yes { background: #059669; box-shadow: 0 0 0 3px rgba(16,185,129,0.3); }
+        .option-selected-no { background: #dc2626; box-shadow: 0 0 0 3px rgba(220,38,38,0.3); }
+        .nav-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: space-between;
+            margin-top: 1rem;
+        }
+        .nav-btn {
+            padding: 0.7rem 1.5rem;
+            border-radius: 2rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: 0.2s;
+            background: #e2e8f0;
+            color: #1e293b;
+        }
+        .nav-btn-primary { background: linear-gradient(95deg, #2563eb, #7c3aed); color: white; }
+        .nav-btn-primary:hover { transform: translateY(-2px); }
+        .nav-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .result-card {
+            background: white;
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+            box-shadow: 0 8px 20px -8px rgba(0,0,0,0.1);
+        }
+        .result-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #1e293b;
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+        .result-chart { margin: 1.5rem 0; }
+        .result-bar { margin-bottom: 1rem; }
+        .result-bar-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.3rem;
+            font-size: 0.8rem;
+        }
+        .result-bar-fill {
+            background: #e2e8f0;
+            border-radius: 10px;
+            height: 25px;
+            overflow: hidden;
+        }
+        .result-bar-fill span {
+            display: block;
+            height: 100%;
+            border-radius: 10px;
+            width: 0%;
+            transition: width 1s ease;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 8px;
+            color: white;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+        .top-categories {
+            background: #f1f5f9;
+            border-radius: 1rem;
+            padding: 1rem;
+            text-align: center;
+            margin: 1rem 0;
+        }
+        .top-categories h4 { color: #2563eb; margin-bottom: 0.5rem; }
+        .top-badge {
+            display: inline-block;
+            background: #2563eb;
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            margin: 0.2rem;
+            font-weight: 600;
+        }
+        .btn-submit {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(95deg, #10b981, #059669);
+            color: white;
+            border: none;
+            border-radius: 3rem;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.2s;
+            margin-top: 1rem;
+        }
+        .btn-submit:hover { transform: translateY(-2px); }
+        .locked-message {
+            text-align: center;
+            padding: 2rem;
+            background: #fef3c7;
+            border-radius: 1rem;
+            color: #92400e;
+        }
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #1e293b;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 10px;
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
+        }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @media (max-width: 600px) {
+            body { padding: 10px; }
+            .question-text { font-size: 0.9rem; }
+            .option-btn { padding: 0.6rem; font-size: 0.9rem; }
+            .profile-grid { flex-direction: column; gap: 0.5rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <div class="logo-area">
+            <div class="logo-icon"><i class="fas fa-user-check"></i></div>
+            <div class="logo-text"><h1>Inventori Tret Personaliti</h1></div>
+        </div>
+        <a href="psikometrik.html" class="back-btn"><i class="fas fa-arrow-left"></i> Kembali</a>
+    </div>
+    <div id="contentArea">
+        <div class="loading-state" style="text-align:center; padding:2rem;">
+            <i class="fas fa-spinner fa-pulse"></i> Memuatkan...
+        </div>
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, collection, doc, getDoc, getDocs, setDoc, updateDoc, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    
+    const firebaseConfig = {
+        apiKey: "AIzaSyCfu7XC8pXtpDyQ-9Cjdg4AobA-EVEwWcc",
+        authDomain: "e-mindcare.firebaseapp.com",
+        projectId: "e-mindcare",
+        storageBucket: "e-mindcare.firebasestorage.app",
+        messagingSenderId: "1021883944936",
+        appId: "1:1021883944936:web:39c75a0c98d19a37afde5d",
+        measurementId: "G-3CJVKWGEXV"
+    };
+    
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const ujianResultsCollection = collection(db, "ujian_tret_personaliti");
+    
+    // Student data
+    const studentName = sessionStorage.getItem('studentName') || localStorage.getItem('studentName') || 'Pelajar';
+    const studentIC = sessionStorage.getItem('studentIC') || localStorage.getItem('studentIC') || '-';
+    const studentClass = sessionStorage.getItem('studentClass') || localStorage.getItem('studentClass') || '-';
+    const studentSession = sessionStorage.getItem('studentSession') || localStorage.getItem('studentSession') || '2026';
+    
+    // Date & Time
+    const now = new Date();
+    const currentDate = now.toLocaleDateString('ms-MY', { day: 'numeric', month: 'long', year: 'numeric' });
+    const currentTime = now.toLocaleTimeString('ms-MY', { hour: '2-digit', minute: '2-digit' });
+    const currentDay = now.toLocaleDateString('ms-MY', { weekday: 'long' });
+    
+    // ==================== SOALAN TRET PERSONALITI (12 KATEGORI x 10 SOALAN = 120 SOALAN) ====================
+    // Kategori dan soalan
+    const kategoriSoalan = {
+        "AUTONOMI": [
+            "SAYA SELESA MELAKUKAN KERJA TANPA BANTUAN ORANG LAIN",
+            "SAYA MEMILIH MAKANAN MENGIKUT SELERA SENDIRI",
+            "SAYA TIDAK SUKA DI KONGKONG",
+            "SAYA TIDAK PERLU PEMANTAUAN UNTUK SELESAIKAN TUGAS",
+            "SAYA SUKA MENENTUKAN PILHAN SAYA SENDIRI",
+            "SAYA SUKA BEKERJA SECARA BERSENDIRIAN",
+            "SAYA TIDAK SUKA DI ARAH",
+            "SAYA SUKA KEBEBASAN",
+            "SAYA ADA CARA TERSENDIRI UNTUK MENYELSAIKAN MASALAH SAYA",
+            "SAYA MENGAMBIL SESUATU KEPUTUSAN MENGIKUT KEYAKINAN DIRI"
+        ],
+        "KREATIF": [
+            "SAYA SEORANG YANG KREATIF",
+            "SAYA MUDAH TERANSANG DENGAN IDEA-IDEA KREATIF",
+            "SAYA SELALU MENCUBA PERKARA BARU",
+            "SAYA BOLEH MENGHASILKAN KARYA KREATIF",
+            "SAYA MEMPUNYAI KEUPAYAAN UNTUK MENCIPTA",
+            "SAYA MENGHARGAI CIPTAAN BARU",
+            "SAYA MEMPUNYAI DAYA IMAGINASI YANG TINGGI",
+            "SAYA SUKA PENULISAN KREATIF",
+            "KAWAN-KAWAN MENGGAP SAYA SEORANG YANG KREATIF",
+            "SAYA SUKA MENGHASILKAN SESUATU YANG ORIGINAL"
+        ],
+        "AGRESIF": [
+            "SAYA BERANI MENYUARAKAN PENDAPAT",
+            "SAYA BERTERUS TERANG MENEGUR KESALAHAN ORANG LAIN",
+            "SAYA TIADA MASALAH MENYATAKAN PANDANGAN YANG BERCAKAP DENGAN RAKAN-RAKAN",
+            "SAYA MAHU RAKAN-RAKAN MENDENGAR PENDAPATAN SAYA",
+            "SAYA SELALU MEMPERTAHAN HAK SAYA",
+            "RAKAN MENGATAKAN SAYA SEORANG YANG AGRESIF",
+            "SAYA AKAN BERTINDAK BALAS PADA ORANG YANG MENINDAS SAYA",
+            "SAYA LANTANG MEMBERI PENDAPAT",
+            "SAYA AKAN MENEGUR JIRAN YANG MENGGANGGU KETENTERAMAN",
+            "SAYA BERANI MENENGUR ORANG YANG MEMBUANG SAMPAH MERATA TEMPAT"
+        ],
+        "EKSTROVERT": [
+            "SAYA SUKA BERUCAP DI KHALAYAK RAMAI",
+            "SAYA SUKA MENGHADIRI MAJLIS KERAMAIAN",
+            "SAYA SELESA MEMULAKAN PERBUALAN DENGAN ORANG YANG SAYA TIDAK KENALI",
+            "SAYA TIDAK SENANG HATI APABILA KESEORANGAN",
+            "SAYA SEORANG YANG SUKA SUASANA YANG MERIAH",
+            "SAYA SEORANG YANG PERAMAH",
+            "SAYA MUDAH DI DAMPINGI",
+            "SAYA SUKA BERSOSIAL",
+            "SAYA RESAH APABILA BERSENDIRIAN",
+            "SAYA CENDERUNG BERCAKAP LEBIH BANYAK BERBANDING ORANG LAIN"
+        ],
+        "PENCAPAIAN": [
+            "SAYA SEORANG YANG BERCITA-CITA TINGGI",
+            "SAYA BERUSAHA BERSUNGGUH-SUNGGUH UNTUK MENCAPAI KEJAYAAN",
+            "AKTIVITI MENCABAR RANSANG SAY UNTUK CEMERLANG",
+            "SAYA SANGAT FOKUS KEPADA TUGAS UNTUK MENCAPAI KEJAYAAN",
+            "SAYA SUKA BERKAWAN DENGAN ORANG YANG BERJAYA",
+            "KEJAYAAN BAGI SAYA TIADA BATASNYA",
+            "SAYA BENCI AKAN KEGAGALAN",
+            "SAYA BERMOTIVASI TINGGI",
+            "SAINGAN MENINGKATKAN PRESTASI SAYA",
+            "SAYA SUKA BEKERJA DALAM PERSAINGAN"
+        ],
+        "KEPELBAGAIAN": [
+            "SAYA SUKA MAKAN MAKANAN YANG PELBAGAI",
+            "SAYA TIDAK SUKA MEMBUAT PERKARA YANG SAMA",
+            "SAYA MEMPUNYAI HOBI YANG PELBAGAI",
+            "SAYA SUKA AKTIVITI YANG PELBAGAI",
+            "PENAMPILAN SAYA BERBEZA-BEZA",
+            "SAYA SUKA SUASANA KEHIDUPAN YANG BERUBAH-RUBAH",
+            "SAYA CEPAT BOSAN APABILA BERADA DALAM SITUASI YANG SAMA",
+            "SAYA SUKA BELAJAR DI TEMPAT YANG BERBEZA-BEZA",
+            "SAYA SELESA DENGAN SITUASI YANG BARU",
+            "SAYA TIDAK SUKA TERIKAT DENGAN JADUAL YANG KETAT"
+        ],
+        "INTELEKTUAL": [
+            "SAYA SUKA MEMBACA BAHAN ILMIAH",
+            "SAYA SUKA MENONTON RANCANGAN DOKUMENTARI",
+            "SAYA SUKA BERMAIN TEKA SILANG KATA",
+            "SAYA TIDAK SUKA BERBUAL-BUAL KOSONG",
+            "SAYA SUKA BERDEPAT ISU SEMASA",
+            "SAYA SUKA AKTIVITI MENCABAR MINDA",
+            "SAYA SUKA BERBINCANG PERKARA ILMIAH",
+            "SAYA SELALU PERGI KE PERPUSTAKAAN UNTUK MEMBUAT RUJUKAN",
+            "SAYA SERING MEMIKIRKAN PUNCA SESUATU KEJADIAN",
+            "SAYA MEMPUNYAI PERASAAN INGIN TAHU YANG TINGGI"
+        ],
+        "KEPEMIMPINAN": [
+            "SAYA BERCITA-CITA MENJADI PENGAWAS SEKOLAH",
+            "SAYA MAHU RAKAN-RAKAN MELIHAT SAYA SEBAGAI KETUA",
+            "SAYA SUKA DILANTIK SEBAGAI KETUA",
+            "SAYA MAHU ARAHAN SAYA DITERIMA",
+            "SAYA TEGAS DALAM MEMIMPIN KUMPULAN",
+            "SAYA SUKA MEMBUAT KEPUTUSAN DALAM KUMPULAN",
+            "SAYA MENJADI PENGGERAK PERBINCANGAN DALAM KUMPULAN",
+            "SAYA BOLEH MEMPENGARUHI PEMIKIRAN RAKAN-RAKAN",
+            "SAYA TIDAK SELESA MENERIMA ARAHAN",
+            "SAYA GEMAR MEMBIMING RAKAN UNTUK MELAKUKAN AKTIVITI"
+        ],
+        "STRUKTUR": [
+            "SAYA MEMENTINGKAN PENGURUSAN MASA",
+            "SAYA ADA JADUAL WAKTU PERSENDIRIAN",
+            "SAYA MENYENARAIKAN PERKARA YANG PERLU DI LAKUKAN",
+            "SAYA SUKA SUASANA YANG TERATUR",
+            "SAYA SENTIASA MEMATUHI PERATURAN",
+            "SAYA TIDAK SUKA MELANGGAR PERATURAN SEKOLAH",
+            "SAYA MEMATUHI ATURAN KERJA",
+            "SAYA MENGEMAS BILIK SEBELUM SAYA KE SEKOLAH",
+            "TEMPAT BELAJAR SAYA SENTIASA KEMAS",
+            "KEMEMASAN TULISAN SAYA SERING DIPUJI"
+        ],
+        "RESILEN": [
+            "SAYA KOMITET TERHADAP KERJA SAYA",
+            "SAYA AKAN MENYIAPKAN KERJA SEKOLAH SEBELUM BERMAIN",
+            "SAYA BERUSAHA SEDAYA UPAYA KERJA SEKOLAH WALUPUN SUSAH",
+            "SAYA SELALU TIDUR LEWAT UNTUK MENYIAPKAN KERJA SEKOLAH",
+            "SAYA TIDAK SUKA BERTANGGUH",
+            "SAYA TIDAK MUDAH BEKERJA DALAM JANGKA MASA YANG LAMA",
+            "SAYA TIDAK MUDAH PUTUS ASA",
+            "SAYA TAHAN CABARAN",
+            "SAYA BOLEH MEMBUAT KERJA YANG SAYA TIDAK SUKA",
+            "SAYA TIDAK AKAN MEMBIARKAN SESUATU KERJA TERBENGKALAI"
+        ],
+        "MENOLONG": [
+            "SAYA SENTIASA MENGAMALKAN SIKAP MENOLONG",
+            "SAYA SEORANG YANG SENTIASA BERSEDIA UNTUK MENOLONG",
+            "SAYA AKAN MENOLONG ORANG TANPA MENGHARAPKAN PEMBALASAN",
+            "MEMBANTU ORANG IALAH PRINSIP HIDUP SAYA",
+            "SAYA AKAN MENCUBA SEDAYA UPAYA UNTUK MEMBANTU ORANG LAIN",
+            "SAYA SUKA MEMBIMBING RAKAN SAYA YANG LEMAH DALAM AKADEMIK",
+            "SAYA BERSIMPATI DENGAN ORANG YANG KURNG BERNASIB BAIK",
+            "SAYA AKAN MEMIMPIN ORANG TUA MELINTAS JALAN",
+            "SAYA SUKA MENJADI SUKARELAWAN SEKOLAH",
+            "SAYA RELA MENGORBANKAN MASA UNTUK BERGOTONG-ROYONG"
+        ],
+        "ANALITIKAL": [
+            "SAYA PERCAYA SESUATU PERKARA ITU JIKA ADA FAKTA",
+            "SAYA SANGAT BERHATI-HATI DALAM MEBUAT SUATU KEPUTUSAN",
+            "SAYA SUKA AKAN MATAPELAJARAN MATEMATIK",
+            "SAYA BERFIKIR DAHULA SEBELUM BERTINDAK",
+            "SAYA SUKA MENCARI PENYELESAIAN KEPADA SUATU MASALAH YANG RUMIT",
+            "SAYA SENSITIF TERHADAP PERUBAHAN PERSEKITARAN",
+            "SAYA TIDAK AKAN PERCAYA SESUATU TANPA BUKTI",
+            "SAYA SUKA MENJALANKAN UJIKAJI",
+            "SAYA SUKA MENCARI PUNCA KEJADIAN SESUATU MASALAH",
+            "SAYA SUKA MENILAI KUALITI SESUATU BARANG"
+        ],
+        "KRITIK DIRI": [
+            "SAYA SEORANG YANG TIDAK YAKIN",
+            "SAYA SEORANG YANG RENDAH DIRI",
+            "SAYA PERCAYA BAHAWA ORANG LAIN LEBIH BERJAYA DARI SAYA",
+            "SAYA SERING MENYALAHKAN DIRI SENDIRI",
+            "SAYA BERASA KECEWAN TERHADAP PENCAPAIAN SAYA",
+            "SAYA BERTINDAK MENGIKUT PERASAAN",
+            "SAYA TIDAK SEPANDAI RAKAN SAYA",
+            "SAYA TIDAK YAKIN BOLEH BERJAYA DALAM HIDUP INI",
+            "SAYA SERING MEMBUAT PILIHAN YANG SALAH",
+            "SAYA SELALU TIDAK BERNASIB BAIK"
+        ],
+        "WAWASAN": [
+            "SAYA DAPAT MEMBAYANGKAN MASA HADAPAN SAYA DENGAN JELAS",
+            "SAYA MERANCANG HALA TUJU MASA HADAPAN SAYA",
+            "SAYA TAHU PELUANG UNTUK MELANJUTKAN PELAJRAN",
+            "SAYA MELAKUKAN KERJA YANG DI LUAR JANGKAWAN RAKAN-RAKAN",
+            "SAYA MENYIMPAN DUIT SETIAP HARI UNTUK MASA HADAPAN",
+            "SAYA DAPAT MELIHAT BAKAT RAKAN-RAKAN TANPA MEREKA SEDARI",
+            "SAYA MEMIKIRKAN SUMBANGAN YANG BOLEH SAYA LAKUKAN UNTUK SEKOLAH",
+            "SAYA DAPAT MENJANGKA AKIBAT SESUATU KEPUTUSAN YANG SAYA AMBIL",
+            "GURU-GURU MENGANGGAP SAYA SEORANG YANG BERCITA-CITA TINGGI",
+            "SAYA TELAH MEMIKIRKAN HALA TUJU KERJAYA SEJAK DARI SEKOLAH RENDAH LAGI"
+        ],
+        "KETELUSAN": [
+            "HIDUP SAYA SENTIASA GEMBIRA DAN SERONOK",
+            "SAYA TIDAK PERNAH DIKEJUT UNTUK BANGUN PAGI",
+            "SAYA TIDAK PERNAH JATUH HATI DENGAN SESIAPA SAJA",
+            "SAYA TIDAK PERNAH BERKECIL HATI",
+            "SAYA TIDAK PERNAH BERSELISIH PAHAM DENGAN RAKAN-RAKAN",
+            "SAYA TIDAK INGKAR ARAHAN GURU",
+            "SAYA SETIASA AKUR DENGAN NASIHAT IBU BAPA",
+            "SAYA SENTIASA JUJUR DALAM TINGKAH LAKU SAYA",
+            "SAYA TIDAK PERNAH CEMBURU DENGAN KEJAYAAN RAKAN-RAKAN",
+            "SAYA TIDAK PERNAH BERCAKAP BOHONG"
+        ]
+    };
+    
+    // Build questions array
+    const kategoriList = Object.keys(kategoriSoalan);
+    let allQuestions = [];
+    for (const kat of kategoriList) {
+        for (const soalan of kategoriSoalan[kat]) {
+            allQuestions.push({ text: soalan, cat: kat });
+        }
+    }
+    console.log("Total soalan:", allQuestions.length); // 12 x 10 = 120
+    
+    let answers = {};
+    let currentIndex = 0;
+    let scores = {};
+    for (const kat of kategoriList) { scores[kat] = 0; }
+    let hasCompleted = false;
+    let existingResultId = null;
+    
+    function showToast(message) {
+        const toast = document.createElement('div');
+        toast.className = 'toast';
+        toast.innerHTML = `<i class="fas fa-info-circle"></i> ${message}`;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 3000);
+    }
+    
+    function saveProgress() {
+        localStorage.setItem('tret_personaliti_progress', JSON.stringify({
+            currentIndex, answers, scores, hasCompleted
+        }));
+    }
+    
+    function loadProgress() {
+        const saved = localStorage.getItem('tret_personaliti_progress');
+        if (saved) {
+            try {
+                const data = JSON.parse(saved);
+                if (!data.hasCompleted) {
+                    currentIndex = data.currentIndex;
+                    answers = data.answers;
+                    scores = data.scores;
+                    hasCompleted = data.hasCompleted;
+                }
+            } catch(e) {}
+        }
+    }
+    
+    async function checkExistingResult() {
+        try {
+            const q = query(ujianResultsCollection, where("studentIC", "==", studentIC));
+            const querySnapshot = await getDocs(q);
+            if (!querySnapshot.empty) {
+                querySnapshot.forEach((doc) => {
+                    hasCompleted = true;
+                    existingResultId = doc.id;
+                });
+                return true;
+            }
+            return false;
+        } catch (error) {
+            console.error("Error checking existing result:", error);
+            return false;
+        }
+    }
+    
+    async function saveResultToFirestore() {
+        const totalScore = Object.values(scores).reduce((a,b) => a + b, 0);
+        const sorted = Object.entries(scores).sort((a,b) => b[1] - a[1]);
+        const top3 = sorted.slice(0,3).map(([cat, score]) => `${cat} (${score})`).join(", ");
+        const top3Codes = sorted.slice(0,3).map(([cat]) => cat).join(", ");
+        
+        const resultData = {
+            studentName: studentName,
+            studentIC: studentIC,
+            studentClass: studentClass,
+            studentSession: studentSession,
+            date: currentDate,
+            time: currentTime,
+            day: currentDay,
+            scores: scores,
+            totalScore: totalScore,
+            topCategories: top3,
+            topCategoriesList: sorted.slice(0,3).map(([cat, score]) => ({ cat, score })),
+            completedAt: new Date().toISOString(),
+            status: "completed"
+        };
+        
+        try {
+            if (existingResultId) {
+                await updateDoc(doc(db, "ujian_tret_personaliti", existingResultId), resultData);
+            } else {
+                await setDoc(doc(db, "ujian_tret_personaliti", `${studentIC}_${Date.now()}`), resultData);
+            }
+            showToast("✅ Jawapan anda telah disimpan!");
+            return true;
+        } catch (error) {
+            console.error("Error saving result:", error);
+            showToast("❌ Gagal menyimpan jawapan");
+            return false;
+        }
+    }
+    
+    function renderProfile() {
+        return `
+            <div class="profile-card">
+                <div class="profile-grid">
+                    <div class="profile-item"><div class="label">Nama Penuh</div><div class="value">${studentName}</div></div>
+                    <div class="profile-item"><div class="label">No. Kad Pengenalan</div><div class="value">${studentIC}</div></div>
+                    <div class="profile-item"><div class="label">Kelas</div><div class="value">${studentClass}</div></div>
+                    <div class="profile-item"><div class="label">Tarikh / Masa</div><div class="value">${currentDate} • ${currentTime}</div></div>
+                    <div class="profile-item"><div class="label">Hari</div><div class="value">${currentDay}</div></div>
+                </div>
+            </div>
+        `;
+    }
+    
+    function renderProgress() {
+        const percent = (currentIndex / allQuestions.length) * 100;
+        return `
+            <div class="progress-container">
+                <div class="progress-bar" style="width: ${percent}%;"></div>
+            </div>
+            <div class="progress-text">Soalan ${currentIndex + 1} / ${allQuestions.length}</div>
+        `;
+    }
+    
+    function renderQuestion() {
+        if (currentIndex >= allQuestions.length) {
+            renderResult();
+            return;
+        }
+        
+        const q = allQuestions[currentIndex];
+        const selected = answers[currentIndex];
+        
+        const html = `
+            ${renderProfile()}
+            ${renderProgress()}
+            <div class="question-card">
+                <div class="question-header">
+                    <span class="question-num">Soalan ${currentIndex + 1}</span>
+                    <span class="question-cat">Kategori: ${q.cat}</span>
+                </div>
+                <div class="question-text">${q.text}</div>
+                <div class="options">
+                    <button class="option-btn option-yes ${selected === true ? 'option-selected-yes' : ''}" onclick="answerQuestion(true)">
+                        <i class="fas fa-check-circle"></i> YA
+                    </button>
+                    <button class="option-btn option-no ${selected === false ? 'option-selected-no' : ''}" onclick="answerQuestion(false)">
+                        <i class="fas fa-times-circle"></i> TIDAK
+                    </button>
+                </div>
+            </div>
+            <div class="nav-buttons">
+                <button class="nav-btn" onclick="prevQuestion()" ${currentIndex === 0 ? 'disabled' : ''}>
+                    <i class="fas fa-arrow-left"></i> Sebelum
+                </button>
+                <button class="nav-btn nav-btn-primary" onclick="nextQuestion()">
+                    ${currentIndex === allQuestions.length - 1 ? 'Selesai' : 'Seterusnya'} <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+        `;
+        
+        document.getElementById('contentArea').innerHTML = html;
+    }
+    
+    window.answerQuestion = function(answer) {
+        const q = allQuestions[currentIndex];
+        const previousAnswer = answers[currentIndex];
+        
+        if (previousAnswer !== undefined) {
+            if (previousAnswer === true) scores[q.cat]--;
+        }
+        
+        answers[currentIndex] = answer;
+        if (answer === true) {
+            scores[q.cat]++;
+        }
+        
+        saveProgress();
+        
+        const yesBtn = document.querySelector('.option-yes');
+        const noBtn = document.querySelector('.option-no');
+        if (yesBtn && noBtn) {
+            if (answer === true) {
+                yesBtn.classList.add('option-selected-yes');
+                noBtn.classList.remove('option-selected-no');
+            } else {
+                noBtn.classList.add('option-selected-no');
+                yesBtn.classList.remove('option-selected-yes');
+            }
+        }
+    };
+    
+    window.nextQuestion = function() {
+        if (answers[currentIndex] === undefined) {
+            showToast("Sila jawab soalan ini terlebih dahulu");
+            return;
+        }
+        
+        if (currentIndex < allQuestions.length - 1) {
+            currentIndex++;
+            saveProgress();
+            renderQuestion();
+        } else {
+            submitUjian();
+        }
+    };
+    
+    window.prevQuestion = function() {
+        if (currentIndex > 0) {
+            currentIndex--;
+            saveProgress();
+            renderQuestion();
+        }
+    };
+    
+    async function submitUjian() {
+        const totalAnswered = Object.keys(answers).length;
+        if (totalAnswered < allQuestions.length) {
+            showToast(`Sila jawab semua soalan (${allQuestions.length - totalAnswered} soalan lagi)`);
+            return;
+        }
+        
+        await saveResultToFirestore();
+        hasCompleted = true;
+        localStorage.removeItem('tret_personaliti_progress');
+        renderResult();
+    }
+    
+    function getTopCategories(scores) {
+        const entries = Object.entries(scores);
+        entries.sort((a, b) => b[1] - a[1]);
+        return entries.slice(0, 3);
+    }
+    
+    function renderResult() {
+        const sorted = Object.entries(scores).sort((a, b) => b[1] - a[1]);
+        const top3 = sorted.slice(0, 3);
+        
+        const kategoriColors = {
+            "AUTONOMI": "#e17055", "KREATIF": "#6c5ce7", "AGRESIF": "#dc2626",
+            "EKSTROVERT": "#fdcb6e", "PENCAPAIAN": "#10b981", "KEPELBAGAIAN": "#a29bfe",
+            "INTELEKTUAL": "#00d2ff", "KEPEMIMPINAN": "#f59e0b", "STRUKTUR": "#64748b",
+            "RESILEN": "#06b6d4", "MENOLONG": "#ec489a", "ANALITIKAL": "#3b82f6",
+            "KRITIK DIRI": "#ef4444", "WAWASAN": "#8b5cf6", "KETELUSAN": "#34d399"
+        };
+        
+        let barsHtml = '';
+        for (let [cat, score] of sorted) {
+            const percent = (score / 10) * 100;
+            barsHtml += `
+                <div class="result-bar">
+                    <div class="result-bar-label">
+                        <span><strong>${cat}</strong></span>
+                        <span>${score} / 10</span>
+                    </div>
+                    <div class="result-bar-fill">
+                        <span style="width: ${percent}%; background: ${kategoriColors[cat] || '#4f46e5'};"></span>
+                    </div>
+                </div>
+            `;
+        }
+        
+        const topBadgesHtml = top3.map(([cat, score]) => 
+            `<span class="top-badge">${cat} (${score}/10)</span>`
+        ).join('');
+        
+        const html = `
+            ${renderProfile()}
+            <div class="result-card">
+                <div class="result-title">
+                    <i class="fas fa-chart-pie"></i> KEPUTUSAN INVENTORI TRET PERSONALITI
+                </div>
+                
+                <div class="top-categories">
+                    <h4>🏆 3 TRET PERSONALITI TERTINGGI ANDA 🏆</h4>
+                    <div>${topBadgesHtml}</div>
+                </div>
+                
+                <div class="result-chart">
+                    ${barsHtml}
+                </div>
+                
+                <div style="background: #f1f5f9; border-radius: 1rem; padding: 1rem; margin-top: 1rem;">
+                    <p style="font-size: 0.8rem; color: #64748b; text-align: center;">
+                        <i class="fas fa-info-circle"></i> Tret personaliti tertinggi menunjukkan kecenderungan semula jadi anda.
+                    </p>
+                    <p style="font-size: 0.7rem; color: #94a3b8; text-align: center; margin-top: 0.5rem;">
+                        Tarikh: ${currentDate} | Masa: ${currentTime} | Hari: ${currentDay}
+                    </p>
+                </div>
+                
+                <button class="btn-submit" onclick="window.location.href='psikometrik.html'">
+                    <i class="fas fa-check-circle"></i> Selesai & Kembali
+                </button>
+            </div>
+        `;
+        
+        document.getElementById('contentArea').innerHTML = html;
+    }
+    
+    function renderLocked() {
+        const html = `
+            ${renderProfile()}
+            <div class="locked-message">
+                <i class="fas fa-lock" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+                <h3>Ujian Telah Selesai</h3>
+                <p>Anda telah pun menjawab Inventori Tret Personaliti ini.</p>
+                <p>Sila rujuk kaunselor untuk reset ujian jika perlu.</p>
+                <button class="btn-submit" style="background: #64748b; margin-top: 1rem;" onclick="window.location.href='psikometrik.html'">
+                    <i class="fas fa-arrow-left"></i> Kembali ke Senarai Ujian
+                </button>
+            </div>
+        `;
+        document.getElementById('contentArea').innerHTML = html;
+    }
+    
+    async function init() {
+        const exists = await checkExistingResult();
+        if (exists) {
+            renderLocked();
+        } else {
+            loadProgress();
+            if (hasCompleted) {
+                renderResult();
+            } else {
+                renderQuestion();
+            }
+        }
+    }
+    
+    window.answerQuestion = answerQuestion;
+    window.nextQuestion = nextQuestion;
+    window.prevQuestion = prevQuestion;
+    
+    init();
+</script>
+</body>
+</html>

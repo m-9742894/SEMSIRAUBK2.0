@@ -274,6 +274,25 @@
             to { transform: rotate(360deg); }
         }
 
+        .toast-success {
+            position: fixed;
+            bottom: 100px;
+            right: 30px;
+            background: #10b981;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-weight: bold;
+            z-index: 2000;
+            animation: fadeOut 3s forwards;
+        }
+
+        @keyframes fadeOut {
+            0% { opacity: 1; }
+            70% { opacity: 1; }
+            100% { opacity: 0; visibility: hidden; }
+        }
+
         @media print {
             .control-panel, #form-overlay, #receipt-overlay { display: none !important; }
             body { background: white; }
@@ -397,9 +416,9 @@
                     <tr><th width="20%">UJIAN</th><th>BM</th><th>BI</th><th>SEJ</th><th>MATE</th><th>ELEKTIF 1</th><th>ELEKTIF 2</th></tr>
                 </thead>
                 <tbody>
-                    <tr><td><strong>UJIAN 1</strong></span></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                    <tr><td><strong>UJIAN 2</strong></span></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                    <tr><td><strong>UJIAN 3</strong></span></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                    <tr><td><strong>UJIAN 1</strong></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                    <tr><td><strong>UJIAN 2</strong></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                    <tr><td><strong>UJIAN 3</strong></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
                 </tbody>
             </table>
         </div>
@@ -432,25 +451,20 @@
 
     <script>
         // ==================== KONFIGURASI FIREBASE ====================
-        // Gantikan dengan konfigurasi Firebase anda sendiri
         const firebaseConfig = {
-            apiKey: "YOUR_API_KEY",
-            authDomain: "YOUR_AUTH_DOMAIN",
-            projectId: "YOUR_PROJECT_ID",
-            storageBucket: "YOUR_STORAGE_BUCKET",
-            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-            appId: "YOUR_APP_ID"
+            apiKey: "AIzaSyCfu7XC8pXtpDyQ-9Cjdg4AobA-EVEwWcc",
+            authDomain: "e-mindcare.firebaseapp.com",
+            projectId: "e-mindcare",
+            storageBucket: "e-mindcare.firebasestorage.app",
+            messagingSenderId: "1021883944936",
+            appId: "1:1021883944936:web:39c75a0c98d19a37afde5d",
+            measurementId: "G-3CJVKWGEXV"
         };
 
         // Initialize Firebase
-        let db = null;
-        try {
-            firebase.initializeApp(firebaseConfig);
-            db = firebase.firestore();
-            console.log("Firebase connected");
-        } catch (e) {
-            console.warn("Firebase not configured:", e);
-        }
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        console.log("Firebase connected to e-mindcare project");
 
         // ==================== DATA DARI LOCALSTORAGE ====================
         const namaPelajar = localStorage.getItem("namaPelajar") || "PELAJAR";
@@ -508,7 +522,7 @@
                             <td>${progInfo.includes('Dip') ? 'DIPLOMA' : (progInfo.includes('Ijazah') ? 'IJAZAH' : 'ASASI')}</span></td>
                             <td>3-4 TAHUN</span></td>
                             <td>RM 200-900</span></td>
-                        </tr>`;
+                        </td>`;
                         tbody.innerHTML += row;
                     }
                 });
@@ -526,6 +540,15 @@
         
         function closeReceipt() {
             document.getElementById("receipt-overlay").style.display = "none";
+        }
+        
+        function showToast(message, isSuccess = true) {
+            const toast = document.createElement('div');
+            toast.className = 'toast-success';
+            toast.style.backgroundColor = isSuccess ? '#10b981' : '#ef4444';
+            toast.innerHTML = `<i class="fas ${isSuccess ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i> ${message}`;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
         }
         
         // Generate nombor tempahan unik
@@ -556,13 +579,14 @@
             submitBtn.disabled = true;
             
             const receiptNo = generateReceiptNo();
-            const tarikh = new Date().toLocaleString('ms-MY', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+            const tarikhDisplay = new Date().toLocaleString('ms-MY', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' });
             const kerjayaNama = pilihan ? pilihan.nama : "Tidak dipilih";
             
             // Data tempahan
             const tempahanData = {
                 receiptNo: receiptNo,
                 tarikh: new Date().toISOString(),
+                tarikhDisplay: tarikhDisplay,
                 nama: namaPelajar,
                 kelas: kelas,
                 telefon: telefon,
@@ -570,24 +594,24 @@
                 unitDominan: unitFullName[highestUnit],
                 harga: 2.00,
                 status: "MENUNGGU PENGESAHAN",
-                createdAt: firebase.firestore ? firebase.firestore.FieldValue.serverTimestamp() : new Date()
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
             };
             
-            // Simpan ke Firestore jika ada
+            // Simpan ke Firestore
             let savedToFirebase = false;
-            if(db) {
-                try {
-                    await db.collection("tempahanDiari").add(tempahanData);
-                    savedToFirebase = true;
-                    console.log("Data disimpan ke Firebase");
-                } catch(err) {
-                    console.error("Firestore error:", err);
-                }
+            try {
+                await db.collection("tempahanDiari").add(tempahanData);
+                savedToFirebase = true;
+                console.log("Data disimpan ke Firebase - collection: tempahanDiari");
+                showToast("✅ Tempahan berjaya disimpan!", true);
+            } catch(err) {
+                console.error("Firestore error:", err);
+                showToast("❌ Gagal menyimpan tempahan. Sila cuba lagi.", false);
             }
             
             // Papar resit
             document.getElementById("receiptNo").innerText = receiptNo;
-            document.getElementById("receiptTarikh").innerText = tarikh;
+            document.getElementById("receiptTarikh").innerText = tarikhDisplay;
             document.getElementById("receiptNama").innerText = namaPelajar;
             document.getElementById("receiptKelas").innerText = kelas;
             document.getElementById("receiptTelefon").innerText = telefon;
@@ -599,12 +623,6 @@
             
             submitBtn.innerHTML = originalText;
             submitBtn.disabled = false;
-            
-            if(savedToFirebase) {
-                console.log("✅ Tempahan berjaya disimpan!");
-            } else {
-                console.warn("⚠️ Firebase tidak dikonfigurasi. Data tidak disimpan ke pangkalan data.");
-            }
         });
         
         // ==================== FUNGSI DOWNLOAD RESIT PDF ====================
@@ -612,7 +630,7 @@
             const receiptElement = document.getElementById("receiptContent");
             const opt = {
                 margin: [10, 10, 10, 10],
-                filename: `RESIT_TEMPAHAN_${namaPelajar}.pdf`,
+                filename: `RESIT_TEMPAHAN_${namaPelajar.replace(/\s/g, '_')}.pdf`,
                 image: { type: 'jpeg', quality: 0.98 },
                 html2canvas: { scale: 2, letterRendering: true },
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }

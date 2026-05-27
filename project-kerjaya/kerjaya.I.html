@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kerjaya Investigatif - SEMSIRA</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;700&family=Orbitron:wght@500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #0a0b1e;
+            color: white;
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .background {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at center, #1b2735 0%, #08090a 100%);
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header-section {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            color: #3a7bd5;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #ccc;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .career-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+
+        .career-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(58, 123, 213, 0.2);
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            transition: 0.3s;
+            backdrop-filter: blur(10px);
+            cursor: pointer;
+        }
+
+        .career-card:hover {
+            transform: translateY(-10px);
+            background: rgba(58, 123, 213, 0.15);
+            border-color: #3a7bd5;
+            box-shadow: 0 0 20px rgba(58, 123, 213, 0.4);
+        }
+
+        .career-card i {
+            font-size: 3rem;
+            color: #3a7bd5;
+            margin-bottom: 20px;
+        }
+
+        .career-card h3 {
+            font-family: 'Orbitron', sans-serif;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+            color: #3a7bd5;
+        }
+
+        .career-card p {
+            font-size: 0.9rem;
+            color: #bbb;
+            line-height: 1.5;
+            flex-grow: 1;
+        }
+
+        .click-hint {
+            display: block;
+            margin-top: 15px;
+            font-size: 0.7rem;
+            color: #3a7bd5;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        .back-btn {
+            display: inline-block;
+            margin-top: 50px;
+            padding: 12px 30px;
+            background: transparent;
+            border: 1px solid #3a7bd5;
+            color: #3a7bd5;
+            text-decoration: none;
+            border-radius: 5px;
+            font-family: 'Orbitron', sans-serif;
+            transition: 0.3s;
+        }
+
+        .back-btn:hover {
+            background: #3a7bd5;
+            color: #000;
+        }
+
+        /* MODAL STYLES */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.85);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #0f1123 0%, #0a0b1e 100%);
+            margin: 30px auto;
+            padding: 0;
+            border: 1px solid #3a7bd5;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 1100px;
+            max-height: 85vh;
+            overflow-y: auto;
+            position: relative;
+            animation: modalFadeIn 0.3s;
+        }
+
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .modal-header {
+            background: rgba(58, 123, 213, 0.15);
+            padding: 20px;
+            border-radius: 20px 20px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #3a7bd5;
+        }
+
+        .modal-header h2 {
+            font-family: 'Orbitron', sans-serif;
+            color: #3a7bd5;
+            margin: 0;
+        }
+
+        .close-modal {
+            color: #fff;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .close-modal:hover {
+            color: #3a7bd5;
+        }
+
+        .modal-body {
+            padding: 25px;
+        }
+
+        .diary-btn-modal {
+            background: #3a7bd5;
+            color: #000;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: bold;
+            font-size: 0.8rem;
+            transition: 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            border: none;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+
+        .diary-btn-modal:hover {
+            background: #fff;
+            box-shadow: 0 0 15px #3a7bd5;
+            transform: translateY(-2px);
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .requirement-box {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 15px;
+            border-left: 5px solid #3a7bd5;
+            backdrop-filter: blur(10px);
+        }
+
+        .section-title {
+            font-family: 'Orbitron', sans-serif;
+            color: #3a7bd5;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+        }
+
+        .info-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            border: 1px solid rgba(58, 123, 213, 0.3);
+            padding: 20px;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 700px;
+        }
+
+        th {
+            background: rgba(58, 123, 213, 0.2);
+            color: #3a7bd5;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            padding: 12px;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .uni-name {
+            color: #fff;
+            font-weight: bold;
+        }
+
+        .badge {
+            background: #3a7bd5;
+            color: #000;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 0.65rem;
+            display: inline-block;
+            margin-top: 5px;
+        }
+
+        @media (max-width: 768px) {
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+            .modal-content {
+                margin: 20px auto;
+                width: 95%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="background"></div>
+
+    <div class="container">
+        <div class="header-section">
+            <p class="subtitle">Eksplorasi Kerjaya</p>
+            <h1>UNIT INVESTIGATIF (I)</h1>
+            <p>Pilih kerjaya di bawah untuk melihat syarat UPU & Universiti.</p>
+        </div>
+
+        <div class="career-grid">
+            <!-- 6 KERJAYA DALAM UNIT INVESTIGATIF -->
+            <div class="career-card" onclick="openModal('saintis')">
+                <i class="fas fa-microscope"></i>
+                <h3>Saintis Penyelidik</h3>
+                <p>Menjalankan eksperimen di makmal untuk mencari penemuan baru dalam bidang perubatan atau teknologi.</p>
+                <span class="click-hint">KLIK UNTUK INFO UPU</span>
+            </div>
+
+            <div class="career-card" onclick="openModal('doktor')">
+                <i class="fas fa-user-md"></i>
+                <h3>Doktor Pakar / Pakar Bedah</h3>
+                <p>Mendiagnosis penyakit yang kompleks dan mencari kaedah rawatan yang paling berkesan untuk pesakit.</p>
+                <span class="click-hint">KLIK UNTUK INFO UPU</span>
+            </div>
+
+            <div class="career-card" onclick="openModal('data')">
+                <i class="fas fa-database"></i>
+                <h3>Pakar Analisis Data</h3>
+                <p>Mengkaji ribuan data digital untuk meramal trend masa hadapan dan membantu membuat keputusan besar.</p>
+                <span class="click-hint">KLIK UNTUK INFO UPU</span>
+            </div>
+
+            <div class="career-card" onclick="openModal('forensik')">
+                <i class="fas fa-fingerprint"></i>
+                <h3>Pakar Forensik</h3>
+                <p>Menggunakan sains untuk menganalisis bahan bukti di tempat kejadian bagi membantu menyelesaikan kes jenayah.</p>
+                <span class="click-hint">KLIK UNTUK INFO UPU</span>
+            </div>
+
+            <div class="career-card" onclick="openModal('siber')">
+                <i class="fas fa-user-secret"></i>
+                <h3>Pakar Keselamatan Siber</h3>
+                <p>Menyiasat pencerobohan sistem komputer dan membina sistem pertahanan digital yang tidak boleh ditembus.</p>
+                <span class="click-hint">KLIK UNTUK INFO UPU</span>
+            </div>
+
+            <div class="career-card" onclick="openModal('farmasi')">
+                <i class="fas fa-vial"></i>
+                <h3>Ahli Farmasi</h3>
+                <p>Mengkaji komposisi ubat-ubatan dan memastikan penggunaan bahan kimia adalah selamat untuk kesihatan manusia.</p>
+                <span class="click-hint">KLIK UNTUK INFO UPU</span>
+            </div>
+        </div>
+
+        <div style="text-align: center;">
+            <a href="keputusan.html" class="back-btn"><i class="fas fa-arrow-left"></i> KEMBALI KE KEPUTUSAN</a>
+        </div>
+    </div>
+
+    <!-- MODAL UNTUK SAINTIS PENYELIDIK -->
+    <div id="modalSaintis" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-microscope"></i> INFO UPU: SAINTIS PENYELIDIK</h2>
+                <span class="close-modal" onclick="closeModal('saintis')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <button onclick="simpanKeDiari('saintis')" class="diary-btn-modal"><i class="fas fa-book"></i> CETAK DIARI</button>
+                <div class="info-grid">
+                    <div class="requirement-box">
+                        <h3 class="section-title"><i class="fas fa-id-card"></i> SYARAT AM (WAJIB)</h3>
+                        <p>• Warganegara Malaysia [citation:4].<br>• Lulus SPM dengan mendapat sekurang-kurangnya <strong>LIMA (5) Kepujian</strong> termasuk Bahasa Melayu [citation:5][citation:8].<br>• Lulus Mata Pelajaran <strong>Sejarah</strong> [citation:5][citation:8].</p>
+                    </div>
+                    <div class="requirement-box" style="border-left-color: #f093fb;">
+                        <h3 class="section-title" style="color: #f093fb;"><i class="fas fa-flask"></i> SYARAT KHAS (SPM)</h3>
+                        <p>• <strong>Matematik:</strong> Minimum Gred A.<br>• <strong>Kimia:</strong> Minimum Gred B.<br>• <strong>Biologi / Fizik:</strong> Minimum Gred B.<br>• <strong>Bahasa Inggeris:</strong> Minimum Gred C.<br>• MUET: Minimum Band 2 [citation:10].</p>
+                    </div>
+                </div>
+                <div class="info-card">
+                    <table>
+                        <thead>
+                            <tr><th>Universiti & Lokasi</th><th>Program Pengajian</th><th>Tempoh</th><th>Yuran (Est. Per Sem)</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><span class="uni-name">Universiti Sains Malaysia (USM)</span><br><small>Kubang Kerian, Kelantan</small></td><td>Ijazah Sarjana Muda Sains (Biologi Perubatan)<br><span class="badge">IJAZAH (Laluan Asasi/Matrik)</span></td><td>4 Tahun</td><td>RM 900.00</td></tr>
+                            <tr><td><span class="uni-name">Universiti Putra Malaysia (UPM)</span><br><small>Serdang, Selangor</small></td><td>Ijazah Sarjana Muda Sains (Biokimia)<br><span class="badge">IJAZAH (Laluan Asasi/Matrik)</span></td><td>4 Tahun</td><td>RM 850.00</td></tr>
+                            <tr><td><span class="uni-name">UiTM Shah Alam</span><br><small>Selangor</small></td><td>Diploma Sains Gunaan (Biologi)<br><span class="badge">DIPLOMA</span></td><td>3 Tahun</td><td>RM 520.00</td></tr>
+                            <tr><td><span class="uni-name">UTHM Pagoh</span><br><small>Johor</small></td><td>Diploma Sains Gunaan [citation:6]<br><span class="badge">DIPLOMA</span></td><td>3 Tahun</td><td>RM 700.00</td></tr>
+                            <tr><td><span class="uni-name">Politeknik Sultan Salahuddin Abdul Aziz Shah</span><br><small>Shah Alam, Selangor</small></td><td>Diploma Sains Gunaan<br><span class="badge">DIPLOMA</span></td><td>3 Tahun</td><td>RM 200.00</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL UNTUK DOKTOR PAKAR -->
+    <div id="modalDoktor" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-user-md"></i> INFO UPU: DOKTOR PAKAR / PAKAR BEDAH</h2>
+                <span class="close-modal" onclick="closeModal('doktor')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <button onclick="simpanKeDiari('doktor')" class="diary-btn-modal"><i class="fas fa-book"></i> CETAK DIARI</button>
+                <div class="info-grid">
+                    <div class="requirement-box">
+                        <h3 class="section-title"><i class="fas fa-id-card"></i> SYARAT AM (WAJIB)</h3>
+                        <p>• Warganegara Malaysia [citation:4].<br>• Lulus SPM dengan mendapat sekurang-kurangnya <strong>LIMA (5) Kepujian</strong> termasuk Bahasa Melayu [citation:5][citation:8].<br>• Lulus Mata Pelajaran <strong>Sejarah</strong> [citation:5][citation:8].</p>
+                    </div>
+                    <div class="requirement-box" style="border-left-color: #ff6b6b;">
+                        <h3 class="section-title" style="color: #ff6b6b;"><i class="fas fa-heartbeat"></i> SYARAT KHAS (SPM)</h3>
+                        <p>• <strong>Biologi:</strong> Minimum Gred A.<br>• <strong>Kimia:</strong> Minimum Gred A.<br>• <strong>Fizik / Matematik Tambahan:</strong> Minimum Gred A.<br>• <strong>Bahasa Inggeris:</strong> Minimum Gred A.<br>• MUET: Minimum Band 3 [citation:10].<br>• Menduduki Ujian MEdSI (untuk program pendidikan perubatan) [citation:10].</p>
+                    </div>
+                </div>
+                <div class="info-card">
+                    <p style="margin-bottom: 15px;"><strong>⚠️ Nota Penting:</strong> Program perubatan di IPTA adalah <strong>program Ijazah Sarjana Muda (bukan Diploma)</strong>. Laluan selepas SPM: Asasi/Matrikulasi (1 tahun) → Ijazah Perubatan (5 tahun) [citation:3][citation:8].</p>
+                    <table>
+                        <thead>
+                            <tr><th>Universiti & Lokasi</th><th>Program Pengajian</th><th>Tempoh</th><th>Yuran (Est. Per Sem)</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><span class="uni-name">Universiti Malaya (UM)</span><br><small>Kuala Lumpur</small></td><td>Ijazah Doktor Perubatan (Laluan Asasi/Matrik)<br><span class="badge">IJAZAH</span></td><td>5 Tahun</td><td>RM 1,500.00</td></tr>
+                            <tr><td><span class="uni-name">Universiti Kebangsaan Malaysia (UKM)</span><br><small>Kuala Lumpur</small></td><td>Ijazah Doktor Perubatan (Laluan Asasi/Matrik)<br><span class="badge">IJAZAH</span></td><td>5 Tahun</td><td>RM 1,400.00</td></tr>
+                            <tr><td><span class="uni-name">Universiti Sains Malaysia (USM)</span><br><small>Kubang Kerian, Kelantan</small></td><td>Ijazah Doktor Perubatan (Laluan Asasi/Matrik)<br><span class="badge">IJAZAH</span></td><td>5 Tahun</td><td>RM 900.00</td></tr>
+                            <tr><td><span class="uni-name">Universiti Putra Malaysia (UPM)</span><br><small>Serdang, Selangor</small></td><td>Ijazah Doktor Perubatan (Laluan Asasi/Matrik)<br><span class="badge">IJAZAH</span></td><td>5 Tahun</td><td>RM 1,200.00</td></tr>
+                            <tr><td><span class="uni-name">Universiti Malaysia Sabah (UMS)</span><br><small>Kota Kinabalu, Sabah</small></td><td>Ijazah Doktor Perubatan (Laluan Asasi/Matrik)<br><span class="badge">IJAZAH</span></td><td>5 Tahun</td><td>RM 1,000.00</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL UNTUK PAKAR ANALISIS DATA -->
+    <div id="modalData" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-database"></i> INFO UPU: PAKAR ANALISIS DATA</h2>
+                <span class="close-modal" onclick="closeModal('data')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <button onclick="simpanKeDiari('data')" class="diary-btn-modal"><i class="fas fa-book"></i> CETAK DIARI</button>
+                <div class="info-grid">
+                    <div class="requirement-box">
+                        <h3 class="section-title"><i class="fas fa-id-card"></i> SYARAT AM (WAJIB)</h3>
+                        <p>• Warganegara Malaysia [citation:4].<br>• Lulus SPM dengan mendapat sekurang-kurangnya <strong>LIMA (5) Kepujian</strong> termasuk Bahasa Melayu [citation:5][citation:8].<br>• Lulus Mata Pelajaran <strong>Sejarah</strong> [citation:5][citation:8].</p>
+                    </div>
+                    <div class="requirement-box" style="border-left-color: #00d2ff;">
+                        <h3 class="section-title" style="color: #00d2ff;"><i class="fas fa-chart-line"></i> SYARAT KHAS (SPM)</h3>
+                        <p>• <strong>Matematik:</strong> Minimum Gred A.<br>• <strong>Matematik Tambahan:</strong> Minimum Gred C.<br>• <strong>Bahasa Inggeris:</strong> Minimum Gred C.<br>• <strong>Teknologi Maklumat / Sains Komputer:</strong> Lulus.<br>• MUET: Minimum Band 2 [citation:10].</p>
+                    </div>
+                </div>
+                <div class="info-card">
+                    <table>
+                        <thead>
+                            <tr><th>Universiti & Lokasi</th><th>Program Pengajian</th><th>Tempoh</th><th>Yuran (Est. Per Sem)</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><span class="uni-name">UTM Skudai</span><br><small>Johor</small></td><td>Diploma Sains Komputer (Data Sains)<br><span class="badge">DIPLOMA</span></td><td>3 Tahun</td><td>RM 850.00</td></tr>
+                            <tr><td><span class="uni-name">Universiti Malaysia Pahang Al-Sultan Abdullah (UMPSA)</span><br><small>Pekan, Pahang</small></td><td>Diploma Sains Komputer [citation:2]<br><span class="badge">DIPLOMA</span></td><td>3 Tahun</td><td>RM 800.00</td></tr>
+                            <tr><td><span class="uni-name">UiTM Shah Alam</span><br><small>Selangor</small></td><td>Diploma Sains Komputer (Teknologi Maklumat)<br><span class="badge">DIPLOMA</span></td><td>3 Tahun</td><td>RM 520.00</td></tr>
+                            <tr><td><span class="uni-name">UTHM Pagoh</span><br><small>Johor</small></td><td>Diploma Teknologi Maklumat [citation:6]<br><span class="badge">DIPLOMA</span></td><td>3 Tahun</td><td>RM 700.00</td></tr>
+                            <tr><td><span class="uni-name">Politeknik Ibrahim Sultan</span><br><small>Pasir Gudang, Johor</small></td><td>Diploma Teknologi Maklumat (Data Sains)<br><span class="badge">DIPLOMA</span></td><td>3 Tahun</td><td>RM 200.00</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL UNTUK PAKAR FORENSIK -->
+    <div id="modalForensik" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-fingerprint"></i> INFO UPU: PAKAR FORENSIK</h2>
+                <span class="close-modal" onclick="closeModal('forensik')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <button onclick="simpanKeDiari('forensik')" class="diary-btn-modal"><i class="fas fa-book"></i> CETAK DIARI</button>
+                <div class="info-grid">
+                    <div class="requirement-box">
+                        <h3 class="section-title"><i class="fas fa-id-card"></i> SYARAT AM (WAJIB)</h3>
+                        <p>• Warganegara Malaysia [citation:4].<br>• Lulus SPM dengan mendapat sekurang-kurangnya <strong>LIMA (5) Kepujian</strong> termasuk Bahasa Melayu [citation:5][citation:8].<br>• Lulus Mata Pelajaran <strong>Sejarah</strong> [citation:5][citation:8].</p>
+                    </div>
+                    <div class="requirement-box" style="border-left-color: #c084fc;">
+                        <h3 class="section-title" style="color: #c084fc;"><i class="fas fa-dna"></i> SYARAT KHAS (SPM)</h3>
+                        <p>• <strong>Biologi:</strong> Minimum Gred C.<br>• <strong>Kimia:</strong> Minimum Gred C.<br>• <strong>Matematik:</strong> Minimum Gred B.<br>• <strong>Bahasa Inggeris:</strong> Minimum Gred C.<br>• MUET: Minimum Band 2 [citation:10].</p>
+                    </div>
+                </div>
+                <div class="info-card">
+                    <p style="margin-bottom: 15px;"><strong>⚠️ Nota Penting:</strong> Program Sains Forensik sepenuh masa hanya di peringkat Ijazah. Laluan selepas SPM: Asasi/Matrikulasi/Diploma (1-3 tahun) → Ijazah Sains Forensik (3-4 tahun).</p>
+                    <table>
+                        <thead>
+                            <tr><th>Universiti & Lokasi</th><th>Program Pengajian</th><th>Tempoh</th><th>Yuran (Est. Per Sem)</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><span class="uni-name">Universiti Kebangsaan Malaysia (UKM)</span><br><small>Bangi, Selangor</small></td><td>Ijazah Sains Forensik (Laluan Asasi/Diploma)<br><span class="badge">IJAZAH</span></td><td>4 Tahun</td><td>RM 1,200.00</td></tr>
+                            <tr><td><span class="uni-name">Universiti Malaya (UM)</span><br><small>Kuala Lumpur</small></td><td>Ijazah Sains Forensik (Laluan Asasi/Diploma)<br><span class="badge">IJAZAH</span></td><td>4 Tahun</td><td>RM 1,100.00</td></tr>
+                            <tr><td><span class="uni-name">UiTM Shah Alam</span><br><small>Selangor</small></td><td>Diploma Sains Gunaan (Forensik)<br><span class="badge">DIPLOMA</span></td><td>3 Tahun</td><td>RM 520.00</td></tr>
+                            <tr><td><span class="uni-name">Politeknik Sultan Salahuddin Abdul Aziz Shah</span><br><small>Shah Alam, Selangor</small></td><td>Diploma Sains Gunaan<br><span class="badge">DIPLOMA</span></td><td>3 Tahun</td><td>RM 200.00</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL UNTUK PAKAR KESELAMATAN SIBER -->
+    <div id="modalSiber" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-user-secret"></i> INFO UPU: PAKAR KESELAMATAN SIBER</h2>
+                <span class="close-modal" onclick="closeModal('siber')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <button onclick="simpanKeDiari('siber')" class="diary-btn-modal"><i class="fas fa-book"></i> CETAK DIARI</button>
+                <div class="info-grid">
+                    <div class="requirement-box">
+                        <h3 class="section-title"><i class="fas fa-id-card"></i> SYARAT AM (WAJIB)</h3>
+                        <p>• Warganegara Malaysia [citation:4].<br>• Lulus SPM dengan mendapat sekurang-kurangnya <strong>LIMA (5) Kepujian</strong> termasuk Bahasa Melayu [citation:5][citation:8].<br>• Lulus Mata Pelajaran <strong>Sejarah</strong> [citation:5][citation:8].</p>
+                    </div>
+                    <div class="requirement-box" style="border-left-color: #ff4757;">
+                        <h3 class="section-title" style="color: #ff4757;"><i class="fas fa-shield-alt"></i> SYARAT KHAS (SPM)</h3>
+                        <p>• <strong>Matematik:</strong> Minimum Gred B.<br>• <strong>Teknologi Maklumat / Sains Komputer:</strong> Lulus.<br>• <strong>Bahasa Inggeris:</strong> Minimum Gred C.<br>• <strong>Matematik Tambahan:</strong> Kelebihan.<br>• MUET: Minimum Band 2 [citation:10].</p>
+                    </div>
+                </div>
+                <div class="info-card">
+                    <table>
+                        <thead>
+                            <tr><th>Universiti & Lokasi</th><th>Program Pengajian</th><th>Tempoh</th><th>Yuran (Est. Per Sem)</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><span class="uni-name">Universiti Malaysia Pahang Al-Sultan Abdullah (UMPSA)</span><br><small>Pekan, Pahang</small></td><td>Ijazah Sains Komputer (Keselamatan Siber) [citation:2]<br><span class="badge">IJAZAH (Laluan Asasi/Diploma)</span></td><td>4 Tahun</td><td>RM 900.00</td></tr>
+                            <tr><td><span class="uni-name">UTM Skudai</span><br><small>Johor</small></td><td>Diploma Sains Komputer (Keselamatan Siber)<br><span class="badge">DIPLOMA</span></td><td>3 Tahun</td><td>RM 850.00</td></tr>
+                            <tr><td><span class="uni-name">UiTM Shah Alam</span><br><small>Selangor</small></td><td>Diploma Sains Komputer (Teknologi Maklumat)<br><span class="badge">DIPLOMA</span></td><td>3 Tahun</td><td>RM 520.00</td></tr>
+                            <tr><td><span class="uni-name">UTHM Pagoh</span><br><small>Johor</small></td><td>Diploma Teknologi Maklumat (Keselamatan Siber)<br><span class="badge">DIPLOMA</span></td><td>3 Tahun</td><td>RM 700.00</td></tr>
+                            <tr><td><span class="uni-name">Politeknik Seberang Perai</span><br><small>Pulau Pinang</small></td><td>Diploma Keselamatan Siber<br><span class="badge">DIPLOMA</span></td><td>3 Tahun</td><td>RM 200.00</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL UNTUK AHLI FARMASI -->
+    <div id="modalFarmasi" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-vial"></i> INFO UPU: AHLI FARMASI</h2>
+                <span class="close-modal" onclick="closeModal('farmasi')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <button onclick="simpanKeDiari('farmasi')" class="diary-btn-modal"><i class="fas fa-book"></i> CETAK DIARI</button>
+                <div class="info-grid">
+                    <div class="requirement-box">
+                        <h3 class="section-title"><i class="fas fa-id-card"></i> SYARAT AM (WAJIB)</h3>
+                        <p>• Warganegara Malaysia [citation:4].<br>• Lulus SPM dengan mendapat sekurang-kurangnya <strong>LIMA (5) Kepujian</strong> termasuk Bahasa Melayu [citation:5][citation:8].<br>• Lulus Mata Pelajaran <strong>Sejarah</strong> [citation:5][citation:8].</p>
+                    </div>
+                    <div class="requirement-box" style="border-left-color: #ffa502;">
+                        <h3 class="section-title" style="color: #ffa502;"><i class="fas fa-capsules"></i> SYARAT KHAS (SPM)</h3>
+                        <p>• <strong>Kimia:</strong> Minimum Gred B.<br>• <strong>Biologi:</strong> Minimum Gred B.<br>• <strong>Matematik:</strong> Minimum Gred B.<br>• <strong>Bahasa Inggeris:</strong> Minimum Gred C.<br>• <strong>Fizik / Matematik Tambahan:</strong> Kelebihan.<br>• MUET: Minimum Band 3 [citation:10].</p>
+                    </div>
+                </div>
+                <div class="info-card">
+                    <p style="margin-bottom: 15px;"><strong>⚠️ Nota Penting:</strong> Program Farmasi di IPTA adalah <strong>program Ijazah Sarjana Muda (bukan Diploma)</strong>. Laluan selepas SPM: Asasi/Matrikulasi (1 tahun) → Ijazah Farmasi (4 tahun) [citation:3][citation:8]. Program farmasi termasuk dalam <strong>10 kursus paling kompetitif</strong> di IPTA [citation:3].</p>
+                    <table>
+                        <thead>
+                            <tr><th>Universiti & Lokasi</th><th>Program Pengajian</th><th>Tempoh</th><th>Yuran (Est. Per Sem)</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><span class="uni-name">Universiti Malaya (UM)</span><br><small>Kuala Lumpur</small></td><td>Ijazah Sarjana Muda Farmasi (Laluan Asasi/Matrik)<br><span class="badge">IJAZAH</span></td>
+                            <td>4 Tahun</td>
+                            <td>RM 1,300.00</td>
+                            </tr>
+                            <tr><td><span class="uni-name">Universiti Kebangsaan Malaysia (UKM)</span><br><small>Kuala Lumpur</small></td>
+                            <td>Ijazah Sarjana Muda Farmasi (Laluan Asasi/Matrik)<br><span class="badge">IJAZAH</span></td>
+                            <td>4 Tahun</td>
+                            <td>RM 1,200.00</td>
+                            </tr>
+                            <tr><td><span class="uni-name">Universiti Sains Malaysia (USM)</span><br><small>Pulau Pinang</small></td>
+                            <td>Ijazah Sarjana Muda Farmasi (Laluan Asasi/Matrik)<br><span class="badge">IJAZAH</span></td>
+                            <td>4 Tahun</td>
+                            <td>RM 900.00</td>
+                            </tr>
+                            <tr><td><span class="uni-name">Universiti Teknologi MARA (UiTM)</span><br><small>Puncak Alam, Selangor</small></td>
+                            <td>Ijazah Sarjana Muda Farmasi (Laluan Asasi/Matrik)<br><span class="badge">IJAZAH</span></td>
+                            <td>4 Tahun</td>
+                            <td>RM 550.00</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Function untuk buka modal
+        function openModal(type) {
+            const modal = document.getElementById(`modal${type.charAt(0).toUpperCase() + type.slice(1)}`);
+            if (modal) modal.style.display = "block";
+            document.body.style.overflow = "hidden";
+        }
+
+        // Function untuk tutup modal
+        function closeModal(type) {
+            const modal = document.getElementById(`modal${type.charAt(0).toUpperCase() + type.slice(1)}`);
+            if (modal) modal.style.display = "none";
+            document.body.style.overflow = "auto";
+        }
+
+        // Tutup modal bila klik luar content
+        window.onclick = function(event) {
+            const modals = document.querySelectorAll('.modal');
+            modals.forEach(modal => {
+                if (event.target === modal) {
+                    modal.style.display = "none";
+                    document.body.style.overflow = "auto";
+                }
+            });
+        }
+
+        // Function simpan ke localStorage dan redirect ke diari.html
+        function simpanKeDiari(jenis) {
+            let data = {};
+
+            switch(jenis) {
+                case 'saintis':
+                    data = {
+                        nama: "SAINTIS PENYELIDIK",
+                        am: "Warganegara Malaysia. Lulus SPM LIMA (5) Kepujian termasuk BM. Lulus Sejarah.",
+                        khas: "Matematik (A), Kimia (B), Biologi/Fizik (B), English (C). MUET Band 2.",
+                        universiti: "1. USM: Ijazah Sains (Biologi Perubatan)<br>2. UPM: Ijazah Sains (Biokimia)<br>3. UiTM: Diploma Sains Gunaan<br>4. UTHM: Diploma Sains Gunaan<br>5. Politeknik: Diploma Sains Gunaan"
+                    };
+                    break;
+                case 'doktor':
+                    data = {
+                        nama: "DOKTOR PAKAR / PAKAR BEDAH",
+                        am: "Warganegara Malaysia. Lulus SPM LIMA (5) Kepujian termasuk BM. Lulus Sejarah.",
+                        khas: "Biologi (A), Kimia (A), Fizik/MT (A), English (A). MUET Band 3.",
+                        universiti: "1. UM: Ijazah Perubatan (5 tahun)<br>2. UKM: Ijazah Perubatan (5 tahun)<br>3. USM: Ijazah Perubatan (5 tahun)<br>4. UPM: Ijazah Perubatan (5 tahun)<br>5. UMS: Ijazah Perubatan (5 tahun)"
+                    };
+                    break;
+                case 'data':
+                    data = {
+                        nama: "PAKAR ANALISIS DATA",
+                        am: "Warganegara Malaysia. Lulus SPM LIMA (5) Kepujian termasuk BM. Lulus Sejarah.",
+                        khas: "Matematik (A), Matematik Tambahan (C), English (C). MUET Band 2.",
+                        universiti: "1. UTM: Diploma Sains Komputer (Data Sains)<br>2. UMPSA: Diploma Sains Komputer<br>3. UiTM: Diploma Sains Komputer<br>4. UTHM: Diploma Teknologi Maklumat<br>5. Politeknik: Diploma Teknologi Maklumat"
+                    };
+                    break;
+                case 'forensik':
+                    data = {
+                        nama: "PAKAR FORENSIK",
+                        am: "Warganegara Malaysia. Lulus SPM LIMA (5) Kepujian termasuk BM. Lulus Sejarah.",
+                        khas: "Biologi (C), Kimia (C), Matematik (B), English (C). MUET Band 2.",
+                        universiti: "1. UKM: Ijazah Sains Forensik<br>2. UM: Ijazah Sains Forensik<br>3. UiTM: Diploma Sains Gunaan (Forensik)<br>4. Politeknik: Diploma Sains Gunaan"
+                    };
+                    break;
+                case 'siber':
+                    data = {
+                        nama: "PAKAR KESELAMATAN SIBER",
+                        am: "Warganegara Malaysia. Lulus SPM LIMA (5) Kepujian termasuk BM. Lulus Sejarah.",
+                        khas: "Matematik (B), IT/Sains Komputer (Lulus), English (C). MUET Band 2.",
+                        universiti: "1. UMPSA: Ijazah Sains Komputer (Keselamatan Siber)<br>2. UTM: Diploma Sains Komputer (Keselamatan Siber)<br>3. UiTM: Diploma Sains Komputer<br>4. UTHM: Diploma Teknologi Maklumat<br>5. Politeknik: Diploma Keselamatan Siber"
+                    };
+                    break;
+                case 'farmasi':
+                    data = {
+                        nama: "AHLI FARMASI",
+                        am: "Warganegara Malaysia. Lulus SPM LIMA (5) Kepujian termasuk BM. Lulus Sejarah.",
+                        khas: "Kimia (B), Biologi (B), Matematik (B), English (C). MUET Band 3.",
+                        universiti: "1. UM: Ijazah Farmasi (4 tahun)<br>2. UKM: Ijazah Farmasi (4 tahun)<br>3. USM: Ijazah Farmasi (4 tahun)<br>4. UiTM: Ijazah Farmasi (4 tahun)"
+                    };
+                    break;
+            }
+
+            localStorage.setItem("pilihanKerjaya", JSON.stringify(data));
+            window.location.href = "diari.html";
+        }
+    </script>
+
+</body>
+</html>

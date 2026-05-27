@@ -30,7 +30,6 @@
             margin: 0 auto;
         }
 
-        /* Header */
         .header {
             display: flex;
             justify-content: space-between;
@@ -79,7 +78,6 @@
             font-size: 0.8rem;
         }
 
-        /* Profile Card */
         .profile-card {
             background: white;
             border-radius: 1rem;
@@ -107,7 +105,6 @@
             font-size: 0.9rem;
         }
 
-        /* Progress Bar */
         .progress-container {
             background: #e2e8f0;
             border-radius: 20px;
@@ -122,7 +119,6 @@
             transition: width 0.3s ease;
         }
 
-        /* Question Card */
         .question-card {
             background: white;
             border-radius: 1.5rem;
@@ -156,6 +152,11 @@
             color: #1e293b;
             margin-bottom: 1.5rem;
             line-height: 1.4;
+        }
+        .question-prefix {
+            color: #2563eb;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
         }
         .options {
             display: flex;
@@ -201,7 +202,6 @@
             box-shadow: 0 0 0 3px rgba(220,38,38,0.3);
         }
 
-        /* Navigation Buttons */
         .nav-buttons {
             display: flex;
             gap: 1rem;
@@ -230,7 +230,6 @@
             cursor: not-allowed;
         }
 
-        /* Result Card */
         .result-card {
             background: white;
             border-radius: 1.5rem;
@@ -266,7 +265,6 @@
         .result-bar-fill span {
             display: block;
             height: 100%;
-            background: linear-gradient(95deg, #2563eb, #7c3aed);
             border-radius: 10px;
             width: 0%;
             transition: width 1s ease;
@@ -360,7 +358,6 @@
     </div>
 
     <div id="contentArea">
-        <!-- Content will be loaded here -->
         <div class="loading-state" style="text-align:center; padding:2rem;">
             <i class="fas fa-spinner fa-pulse"></i> Memuatkan...
         </div>
@@ -398,55 +395,7 @@
     const currentDay = now.toLocaleDateString('ms-MY', { weekday: 'long' });
     
     // ==================== SOALAN ====================
-    // Soalan dalam urutan R,I,A,S,E,K berulang (5 soalan setiap kategori x 6 = 30 soalan)
-    const soalanList = [
-        // Kitaran 1 (Soalan 1-6): R,I,A,S,E,K
-        { q: "menghasilkan model binaan", cat: "R", group: 1 },
-        { q: "memerhati fasa bulan", cat: "I", group: 1 },
-        { q: "mengikuti rancangan hiburan", cat: "A", group: 1 },
-        { q: "menyertai aktiviti perkhemahan", cat: "S", group: 1 },
-        { q: "mengusahakan perniagaan", cat: "E", group: 1 },
-        { q: "merekod setiap perbelanjaan", cat: "K", group: 1 },
-        // Kitaran 2 (Soalan 7-12)
-        { q: "belajar cara-cara penjagaan haiwan", cat: "R", group: 2 },
-        { q: "mengetahui salah silah keluarga", cat: "I", group: 2 },
-        { q: "menggayakan fesyen terkini", cat: "A", group: 2 },
-        { q: "bergotong-royong membersihkan kawasan sekolah", cat: "S", group: 2 },
-        { q: "menjadi ketua", cat: "E", group: 2 },
-        { q: "menyusun sijil dalam fail", cat: "K", group: 2 },
-        // Kitaran 3 (Soalan 13-18)
-        { q: "bermain permainan video", cat: "R", group: 3 },
-        { q: "mencari perkataan tersembunyi", cat: "I", group: 3 },
-        { q: "mendengar muzik", cat: "A", group: 3 },
-        { q: "menolong rakan yang ditimpa kesusahan", cat: "S", group: 3 },
-        { q: "mencari peluang", cat: "E", group: 3 },
-        { q: "membuat senarai barang yang hendak dibeli", cat: "K", group: 3 },
-        // Kitaran 4 (Soalan 19-24)
-        { q: "menyertai aktiviti sukan", cat: "R", group: 4 },
-        { q: "aktiviti STEM", cat: "I", group: 4 },
-        { q: "mengambil gambar", cat: "A", group: 4 },
-        { q: "berada dalam kumpulan", cat: "S", group: 4 },
-        { q: "memenangi pertandingan", cat: "E", group: 4 },
-        { q: "menyusun barang-barang peribadi", cat: "K", group: 4 },
-        // Kitaran 5 (Soalan 25-30)
-        { q: "melakukan aktiviti lasak", cat: "R", group: 5 },
-        { q: "aktiviti penyelesaian masalah", cat: "I", group: 5 },
-        { q: "aktiviti keceriaan", cat: "A", group: 5 },
-        { q: "beramah mesra", cat: "S", group: 5 },
-        { q: "memimpin lafaz ikrar", cat: "E", group: 5 },
-        { q: "mengutamakan kekemasan", cat: "K", group: 5 }
-    ];
-    
-    // Add remaining soalan (soalan 31-150 from your list)
-    // For brevity, I'll continue the pattern with the remaining questions
-    // Since you have 30 questions per category (150 total), I'll create 150 questions
-    // But for this implementation, we'll use the 30 questions as per your request
-    
-    // For complete 150 questions, we need to add more. Let me create a comprehensive list.
-    // Actually from your input: 30 soalan R, 30 I, 30 A, 30 S, 30 E, 30 K = 180 total
-    // But you asked for pattern: 1-R,2-I,3-A,4-S,5-E,6-K repeated until finish
-    
-    // Create complete 180 questions (30 per category = 180 total)
+    // 30 soalan untuk setiap kategori R, I, A, S, E, K (180 soalan total)
     const rSoalan = [
         "menghasilkan model binaan", "belajar cara-cara penjagaan haiwan", "bermain permainan video", "menyertai aktiviti sukan", "melakukan aktiviti lasak",
         "mencantas tanaman hiasan", "membaiki peralatan yang rosak", "menggunakan peralatan dalam bengkel", "menggunakan komputer untuk mencari maklumat", "menonton acara sukan",
@@ -501,7 +450,7 @@
         "bekerja secara sistematik", "melakukan tugasan mengikut arahan", "menepati masa", "mengurus perbelanjaan harian", "merekod wang simpanan"
     ];
     
-    // Build complete questions array: R,I,A,S,E,K repeated
+    // Build complete questions array: R,I,A,S,E,K repeated (30 cycles = 180 soalan)
     let allQuestions = [];
     for (let i = 0; i < 30; i++) {
         allQuestions.push({ q: rSoalan[i], cat: "R" });
@@ -511,12 +460,17 @@
         allQuestions.push({ q: eSoalan[i], cat: "E" });
         allQuestions.push({ q: kSoalan[i], cat: "K" });
     }
-    // 30 x 6 = 180 soalan
+    // 30 cycles * 6 = 180 soalan
     
-    // Question groups for header
-    function getQuestionHeader(index) {
-        if (index < 10) return "SAYA SUKA...";
-        if (index < 20) return "SAYA BERMINAT MENJADI...";
+    // Function to get prefix based on question index (0-based)
+    // Soalan 1-10 (index 0-9) -> "SAYA SUKA"
+    // Soalan 11-20 (index 10-19) -> "SAYA BERMINAT MENJADI"
+    // Soalan 21-30 (index 20-29) -> "SAYA BOLEH"
+    // Pattern repeats every 30 questions
+    function getQuestionPrefix(index) {
+        const positionInCycle = index % 30;
+        if (positionInCycle < 10) return "SAYA SUKA...";
+        if (positionInCycle < 20) return "SAYA BERMINAT MENJADI...";
         return "SAYA BOLEH...";
     }
     
@@ -576,7 +530,6 @@
     async function saveResultToFirestore() {
         const totalScore = Object.values(scores).reduce((a,b) => a + b, 0);
         
-        // Get top 3 categories
         const sorted = Object.entries(scores).sort((a,b) => b[1] - a[1]);
         const top3 = sorted.slice(0,3).map(([cat, score]) => `${cat} (${score})`).join(", ");
         
@@ -658,7 +611,7 @@
         }
         
         const q = allQuestions[currentIndex];
-        const header = getQuestionHeader(currentIndex);
+        const prefix = getQuestionPrefix(currentIndex);
         const selected = answers[currentIndex];
         
         const html = `
@@ -669,9 +622,9 @@
                     <span class="question-num">Soalan ${currentIndex + 1}</span>
                     <span class="question-cat">Kategori: ${q.cat}</span>
                 </div>
+                <div class="question-prefix">${prefix}</div>
                 <div class="question-text">
-                    ${header}<br>
-                    <span style="font-weight: 400;">${q.q}</span>
+                    ${q.q}
                 </div>
                 <div class="options">
                     <button class="option-btn option-yes ${selected === true ? 'option-selected-yes' : ''}" onclick="answerQuestion(true)">
@@ -701,7 +654,6 @@
         
         if (previousAnswer !== undefined) {
             if (previousAnswer === true) scores[q.cat]--;
-            else if (previousAnswer === false) {}
         }
         
         answers[currentIndex] = answer;
@@ -711,7 +663,6 @@
         
         saveProgress();
         
-        // Update button styles
         const yesBtn = document.querySelector('.option-yes');
         const noBtn = document.querySelector('.option-no');
         if (yesBtn && noBtn) {
@@ -736,7 +687,6 @@
             saveProgress();
             renderQuestion();
         } else {
-            // Complete ujian
             submitUjian();
         }
     };
@@ -865,7 +815,6 @@
         }
     }
     
-    // Make functions global
     window.answerQuestion = answerQuestion;
     window.nextQuestion = nextQuestion;
     window.prevQuestion = prevQuestion;

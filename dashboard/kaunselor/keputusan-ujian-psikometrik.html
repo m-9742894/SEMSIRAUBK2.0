@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Keputusan Ujian Psikometrik | Dashboard Kaunselor</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: linear-gradient(135deg, #f0f4ff 0%, #e9eef6 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid rgba(79, 70, 229, 0.2);
+        }
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .logo-icon {
+            background: linear-gradient(145deg, #4f46e5, #7c3aed);
+            width: 50px;
+            height: 50px;
+            border-radius: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .logo-icon i {
+            font-size: 1.8rem;
+            color: white;
+        }
+        .logo-text h1 {
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #1e293b, #4f46e5);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .logo-text p {
+            font-size: 0.7rem;
+            color: #5b6e8c;
+        }
+        .back-btn {
+            background: #eef2ff;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 40px;
+            cursor: pointer;
+            font-weight: 600;
+            color: #4f46e5;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: 0.2s;
+        }
+        .back-btn:hover {
+            background: #4f46e5;
+            color: white;
+        }
+
+        /* Stats Banner */
+        .stats-banner {
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            border-radius: 1.2rem;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .stats-banner h2 {
+            font-size: 1.2rem;
+        }
+        .stats-banner p {
+            font-size: 0.8rem;
+            opacity: 0.9;
+        }
+        .refresh-btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            color: white;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.2s;
+        }
+        .refresh-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        /* Section Title */
+        .section-title {
+            margin-bottom: 1.5rem;
+        }
+        .section-title h3 {
+            font-size: 1.2rem;
+            color: #1e293b;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .section-title h3 i {
+            color: #4f46e5;
+        }
+
+        /* Ujian Grid */
+        .ujian-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .ujian-card {
+            background: white;
+            border-radius: 1.2rem;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            border: 1px solid rgba(79,70,229,0.1);
+        }
+        .ujian-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 24px -12px rgba(0,0,0,0.15);
+        }
+        .ujian-icon {
+            width: 60px;
+            height: 60px;
+            background: #eef2ff;
+            border-radius: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
+        .ujian-icon i {
+            font-size: 1.8rem;
+            color: #4f46e5;
+        }
+        .ujian-card h3 {
+            font-size: 1.1rem;
+            color: #1e293b;
+            margin-bottom: 0.5rem;
+        }
+        .ujian-card p {
+            font-size: 0.75rem;
+            color: #64748b;
+            margin-bottom: 1rem;
+            line-height: 1.4;
+        }
+
+        /* Status Badge */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.7rem;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            margin-bottom: 1rem;
+        }
+        .status-open {
+            background: #dcfce7;
+            color: #166534;
+        }
+        .status-closed {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        /* Control Buttons */
+        .control-group {
+            display: flex;
+            gap: 0.8rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+        .btn-toggle {
+            flex: 1;
+            padding: 0.6rem;
+            border-radius: 2rem;
+            font-weight: 600;
+            font-size: 0.7rem;
+            cursor: pointer;
+            border: none;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+        .btn-open {
+            background: #10b981;
+            color: white;
+        }
+        .btn-open:hover {
+            background: #059669;
+            transform: translateY(-2px);
+        }
+        .btn-close {
+            background: #ef4444;
+            color: white;
+        }
+        .btn-close:hover {
+            background: #dc2626;
+            transform: translateY(-2px);
+        }
+        .btn-view {
+            background: #e0e7ff;
+            color: #4f46e5;
+            flex: 1;
+            padding: 0.6rem;
+            border-radius: 2rem;
+            font-weight: 600;
+            font-size: 0.7rem;
+            cursor: pointer;
+            border: none;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            text-decoration: none;
+        }
+        .btn-view:hover {
+            background: #4f46e5;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        /* Toast Message */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #1e293b;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 10px;
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
+        }
+        .toast.success { background: #10b981; }
+        .toast.error { background: #ef4444; }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .footer {
+            text-align: center;
+            padding: 1.5rem;
+            color: #94a3b8;
+            font-size: 0.7rem;
+            border-top: 1px solid #e2e8f0;
+            margin-top: 2rem;
+        }
+
+        @media (max-width: 700px) {
+            body { padding: 1rem; }
+            .ujian-grid { grid-template-columns: 1fr; }
+            .control-group { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <div class="logo-area">
+            <div class="logo-icon"><i class="fas fa-chart-line"></i></div>
+            <div class="logo-text">
+                <h1>Keputusan Ujian Psikometrik</h1>
+                <p>Kawal selia ujian & lihat keputusan pelajar</p>
+            </div>
+        </div>
+        <a href="dashboard-kaunselor.html" class="back-btn"><i class="fas fa-arrow-left"></i> Kembali ke Dashboard</a>
+    </div>
+
+    <!-- Stats Banner -->
+    <div class="stats-banner">
+        <div>
+            <h2><i class="fas fa-sliders-h"></i> Kawalan Ujian Psikometrik</h2>
+            <p>Buka atau tutup akses ujian untuk pelajar. Pelajar hanya boleh menjawab ujian yang berstatus <strong>TERBUKA</strong>.</p>
+        </div>
+        <button class="refresh-btn" id="refreshBtn"><i class="fas fa-sync-alt"></i> Muat Semula</button>
+    </div>
+
+    <!-- Section Title -->
+    <div class="section-title">
+        <h3><i class="fas fa-folder-open"></i> Senarai Ujian Psikometrik</h3>
+    </div>
+
+    <!-- Ujian Grid -->
+    <div class="ujian-grid" id="ujianGrid">
+        <!-- Cards akan dijana oleh JavaScript -->
+        <div class="empty-state" style="text-align:center; padding:2rem;">Memuatkan senarai ujian...</div>
+    </div>
+
+    <div class="footer">
+        <i class="fas fa-shield-alt"></i> Kawalan ini akan menjejaskan akses pelajar kepada ujian psikometrik.
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, collection, doc, getDoc, getDocs, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    
+    const firebaseConfig = {
+        apiKey: "AIzaSyCfu7XC8pXtpDyQ-9Cjdg4AobA-EVEwWcc",
+        authDomain: "e-mindcare.firebaseapp.com",
+        projectId: "e-mindcare",
+        storageBucket: "e-mindcare.firebasestorage.app",
+        messagingSenderId: "1021883944936",
+        appId: "1:1021883944936:web:39c75a0c98d19a37afde5d",
+        measurementId: "G-3CJVKWGEXV"
+    };
+    
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const ujianSettingsCollection = collection(db, "ujian_psikometrik_settings");
+    
+    // Senarai ujian dengan maklumat asas
+    const ujianList = [
+        {
+            id: "minat_kerjaya",
+            name: "Inventori Minat Kerjaya",
+            icon: "fas fa-briefcase",
+            description: "Mengenal pasti bidang kerjaya yang sesuai dengan minat dan personaliti pelajar berdasarkan teori RIASEC.",
+            color: "#2563eb",
+            resultPage: "keputusan-minat-kerjaya.html"
+        },
+        {
+            id: "tret_personaliti",
+            name: "Inventori Tret Personaliti",
+            icon: "fas fa-user-check",
+            description: "Mengenal pasti ciri-ciri personaliti utama seperti ekstrovert, introvert, dan sifat-sifat lain.",
+            color: "#10b981",
+            resultPage: "keputusan-tret-personaliti.html"
+        },
+        {
+            id: "personaliti_warna",
+            name: "Inventori Personaliti Warna",
+            icon: "fas fa-palette",
+            description: "Analisis personaliti berdasarkan warna kegemaran dan makna psikologi warna.",
+            color: "#f59e0b",
+            resultPage: "keputusan-personaliti-warna.html"
+        },
+        {
+            id: "gaya_belajar",
+            name: "Inventori Gaya Belajar",
+            icon: "fas fa-graduation-cap",
+            description: "Mengenal pasti gaya pembelajaran yang paling sesuai (Visual, Auditori, Kinestetik).",
+            color: "#ec489a",
+            resultPage: "keputusan-gaya-belajar.html"
+        }
+    ];
+    
+    let ujianSettings = {};
+    
+    // ==================== TOAST FUNCTION ====================
+    function showToast(message, type = 'success') {
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        toast.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i> ${message}`;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 3000);
+    }
+    
+    // ==================== LOAD SETTINGS FROM FIRESTORE ====================
+    async function loadUjianSettings() {
+        try {
+            const querySnapshot = await getDocs(ujianSettingsCollection);
+            ujianSettings = {};
+            querySnapshot.forEach((doc) => {
+                ujianSettings[doc.id] = doc.data();
+            });
+            console.log("Ujian settings loaded:", ujianSettings);
+        } catch (error) {
+            console.error("Error loading ujian settings:", error);
+        }
+        renderUjianCards();
+    }
+    
+    // ==================== GET CURRENT STATUS ====================
+    function getUjianStatus(ujianId) {
+        if (ujianSettings[ujianId]) {
+            return ujianSettings[ujianId].status || "open";
+        }
+        return "open"; // Default open
+    }
+    
+    // ==================== UPDATE STATUS IN FIRESTORE ====================
+    async function updateUjianStatus(ujianId, newStatus) {
+        try {
+            const docRef = doc(db, "ujian_psikometrik_settings", ujianId);
+            const docSnap = await getDoc(docRef);
+            
+            const updateData = {
+                status: newStatus,
+                updatedAt: new Date().toISOString(),
+                updatedBy: "Kaunselor"
+            };
+            
+            if (docSnap.exists()) {
+                await updateDoc(docRef, updateData);
+            } else {
+                await setDoc(docRef, {
+                    ...updateData,
+                    createdAt: new Date().toISOString()
+                });
+            }
+            
+            // Update local cache
+            ujianSettings[ujianId] = { status: newStatus, updatedAt: new Date().toISOString() };
+            
+            const statusText = newStatus === "open" ? "DIBUKA" : "DITUTUP";
+            showToast(`✅ Ujian ${statusText} untuk pelajar`, "success");
+            
+            renderUjianCards();
+        } catch (error) {
+            console.error("Error updating ujian status:", error);
+            showToast("❌ Gagal mengemaskini status ujian", "error");
+        }
+    }
+    
+    // ==================== OPEN UJIAN ====================
+    function openUjian(ujianId) {
+        updateUjianStatus(ujianId, "open");
+    }
+    
+    // ==================== CLOSE UJIAN ====================
+    function closeUjian(ujianId) {
+        updateUjianStatus(ujianId, "closed");
+    }
+    
+    // ==================== VIEW RESULTS ====================
+    function viewResults(ujianId, resultPage) {
+        // Simpan ID ujian ke session untuk rujukan
+        sessionStorage.setItem('viewUjianId', ujianId);
+        sessionStorage.setItem('viewUjianName', ujianList.find(u => u.id === ujianId)?.name || '');
+        window.location.href = resultPage;
+    }
+    
+    // ==================== RENDER UIJAN CARDS ====================
+    function renderUjianCards() {
+        const grid = document.getElementById('ujianGrid');
+        
+        let html = '';
+        for (const ujian of ujianList) {
+            const status = getUjianStatus(ujian.id);
+            const isOpen = status === "open";
+            const statusText = isOpen ? "TERBUKA" : "DITUTUP";
+            const statusClass = isOpen ? "status-open" : "status-closed";
+            
+            html += `
+                <div class="ujian-card">
+                    <div class="ujian-icon" style="background: ${ujian.color}20;">
+                        <i class="${ujian.icon}" style="color: ${ujian.color};"></i>
+                    </div>
+                    <h3>${ujian.name}</h3>
+                    <p>${ujian.description}</p>
+                    <div class="status-badge ${statusClass}">
+                        <i class="fas ${isOpen ? 'fa-unlock-alt' : 'fa-lock'}"></i> Status: ${statusText}
+                    </div>
+                    <div class="control-group">
+                        <button class="btn-toggle btn-open" onclick="openUjian('${ujian.id}')" ${isOpen ? 'disabled style="opacity:0.5;"' : ''}>
+                            <i class="fas fa-unlock-alt"></i> Buka Ujian
+                        </button>
+                        <button class="btn-toggle btn-close" onclick="closeUjian('${ujian.id}')" ${!isOpen ? 'disabled style="opacity:0.5;"' : ''}>
+                            <i class="fas fa-lock"></i> Tutup Ujian
+                        </button>
+                        <button class="btn-view" onclick="viewResults('${ujian.id}', '${ujian.resultPage}')">
+                            <i class="fas fa-chart-simple"></i> Lihat Keputusan
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+        
+        grid.innerHTML = html;
+    }
+    
+    // ==================== REFRESH DATA ====================
+    async function refreshData() {
+        document.getElementById('ujianGrid').innerHTML = '<div class="empty-state" style="text-align:center; padding:2rem;"><i class="fas fa-spinner fa-spin"></i> Memuatkan...</div>';
+        await loadUjianSettings();
+        showToast("Data berjaya dimuat semula", "success");
+    }
+    
+    // Make functions global for onclick
+    window.openUjian = openUjian;
+    window.closeUjian = closeUjian;
+    window.viewResults = viewResults;
+    
+    // Event listeners
+    document.getElementById('refreshBtn').addEventListener('click', refreshData);
+    
+    // Initialize
+    loadUjianSettings();
+</script>
+</body>
+</html>

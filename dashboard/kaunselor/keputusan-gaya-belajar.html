@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Keputusan Inventori Gaya Belajar | Kaunselor SEMSIRA</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: linear-gradient(135deg, #f0f4ff 0%, #e9eef6 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container { max-width: 1400px; margin: 0 auto; }
+        
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid rgba(79,70,229,0.2);
+        }
+        .logo-area { display: flex; align-items: center; gap: 1rem; }
+        .logo-icon {
+            background: linear-gradient(145deg, #4f46e5, #7c3aed);
+            width: 50px; height: 50px;
+            border-radius: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .logo-icon i { font-size: 1.8rem; color: white; }
+        .logo-text h1 {
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #1e293b, #4f46e5);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .logo-text p { font-size: 0.7rem; color: #5b6e8c; }
+        .back-btn {
+            background: #eef2ff;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 40px;
+            cursor: pointer;
+            font-weight: 600;
+            color: #4f46e5;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: 0.2s;
+        }
+        .back-btn:hover { background: #4f46e5; color: white; }
+        
+        /* Stats Banner */
+        .stats-banner {
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            border-radius: 1.2rem;
+            padding: 1.2rem 1.5rem;
+            margin-bottom: 1.5rem;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .stats-banner h2 { font-size: 1.2rem; }
+        .stats-banner p { font-size: 0.8rem; opacity: 0.9; }
+        .total-count { background: rgba(255,255,255,0.2); padding: 0.3rem 1rem; border-radius: 2rem; font-weight: 600; }
+        
+        /* Search & Filter Section */
+        .search-section {
+            background: white;
+            border-radius: 1.2rem;
+            padding: 1.2rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .search-wrapper {
+            flex: 2;
+            position: relative;
+        }
+        .search-box {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #f8fafc;
+            padding: 0.7rem 1rem;
+            border-radius: 50px;
+            border: 1px solid #e2e8f0;
+        }
+        .search-box i { color: #94a3b8; }
+        .search-box input {
+            flex: 1;
+            border: none;
+            background: transparent;
+            outline: none;
+            font-size: 0.9rem;
+        }
+        .suggestions-list {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border-radius: 1rem;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+            max-height: 250px;
+            overflow-y: auto;
+            z-index: 100;
+            margin-top: 8px;
+            display: none;
+            border: 1px solid #e2e8f0;
+        }
+        .suggestions-list div {
+            padding: 0.8rem 1rem;
+            cursor: pointer;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        .suggestions-list div:hover { background: #f1f5f9; }
+        .filter-group {
+            display: flex;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+        }
+        .filter-select {
+            padding: 0.7rem 1rem;
+            border-radius: 2rem;
+            border: 1px solid #e2e8f0;
+            background: #f8fafc;
+            font-family: inherit;
+            font-weight: 500;
+            cursor: pointer;
+            min-width: 150px;
+        }
+        .btn-refresh {
+            background: #f1f5f9;
+            border: 1px solid #e2e8f0;
+            padding: 0.7rem 1rem;
+            border-radius: 2rem;
+            cursor: pointer;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-refresh:hover { background: #e2e8f0; }
+        .btn-print {
+            background: #10b981;
+            color: white;
+            border: none;
+            padding: 0.7rem 1.2rem;
+            border-radius: 2rem;
+            cursor: pointer;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-print:hover { background: #059669; transform: translateY(-2px); }
+        .btn-delete-all {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 0.7rem 1.2rem;
+            border-radius: 2rem;
+            cursor: pointer;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-delete-all:hover { background: #dc2626; transform: translateY(-2px); }
+        
+        /* Selection Bar */
+        .selection-bar {
+            background: linear-gradient(135deg, #eef2ff, #e0e7ff);
+            border-radius: 1rem;
+            padding: 0.8rem 1.2rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            display: none;
+            border: 1px solid #c7d2fe;
+        }
+        .selection-bar.show { display: flex; }
+        .selection-info {
+            font-weight: 600;
+            color: #4f46e5;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .selection-info i { font-size: 1.2rem; }
+        .selection-actions {
+            display: flex;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+        }
+        .btn-select-all {
+            background: #4f46e5;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            cursor: pointer;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn-select-all:hover { background: #4338ca; transform: translateY(-2px); }
+        .btn-delete-selected {
+            background: #dc2626;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            cursor: pointer;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn-delete-selected:hover { background: #b91c1c; transform: translateY(-2px); }
+        .btn-cancel {
+            background: #e2e8f0;
+            color: #1e293b;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            cursor: pointer;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn-cancel:hover { background: #cbd5e1; transform: translateY(-2px); }
+        
+        /* Results Grid */
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+            gap: 1.2rem;
+        }
+        .result-card {
+            background: white;
+            border-radius: 1.2rem;
+            padding: 1.2rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            border: 1px solid rgba(79,70,229,0.1);
+            position: relative;
+        }
+        .result-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 24px -12px rgba(0,0,0,0.15);
+        }
+        .result-card.selected {
+            background: #eef2ff;
+            border: 2px solid #4f46e5;
+        }
+        .checkbox-select {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: #4f46e5;
+        }
+        .student-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .student-avatar {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(145deg, #eef2ff, #ffffff);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .student-avatar i { font-size: 1.5rem; color: #4f46e5; }
+        .student-info h3 { font-size: 1rem; color: #1e293b; }
+        .student-info p { font-size: 0.7rem; color: #64748b; }
+        
+        /* Style Badge */
+        .style-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 0.3rem 0.8rem;
+            border-radius: 2rem;
+            margin-bottom: 0.8rem;
+        }
+        .badge-visual { background: #ede9fe; color: #6d28d9; }
+        .badge-auditori { background: #dbeafe; color: #1d4ed8; }
+        .badge-bacaan { background: #dcfce7; color: #166534; }
+        .badge-kinestetik { background: #ffedd5; color: #9a3412; }
+        
+        .scores-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.5rem;
+            margin: 1rem 0;
+        }
+        .score-item {
+            background: #f8fafc;
+            border-radius: 0.8rem;
+            padding: 0.4rem;
+            text-align: center;
+        }
+        .score-cat {
+            font-weight: 700;
+            font-size: 0.7rem;
+        }
+        .score-value {
+            font-size: 0.85rem;
+            font-weight: 800;
+        }
+        .score-visual { color: #8b5cf6; }
+        .score-auditori { color: #3b82f6; }
+        .score-bacaan { color: #10b981; }
+        .score-kinestetik { color: #f97316; }
+        
+        .date-info {
+            font-size: 0.6rem;
+            color: #94a3b8;
+            margin-top: 0.5rem;
+            text-align: right;
+        }
+        .empty-state { text-align: center; padding: 3rem; color: #94a3b8; }
+        
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #1e293b;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 10px;
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
+        }
+        .toast.success { background: #10b981; }
+        .toast.error { background: #ef4444; }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        @media (max-width: 700px) {
+            .results-grid { grid-template-columns: 1fr; }
+            .scores-grid { grid-template-columns: repeat(2, 1fr); }
+            .selection-actions { width: 100%; justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <div class="logo-area">
+            <div class="logo-icon"><i class="fas fa-graduation-cap"></i></div>
+            <div class="logo-text">
+                <h1>Keputusan Inventori Gaya Belajar</h1>
+                <p>Analisis Gaya Pembelajaran Pelajar (VARK)</p>
+            </div>
+        </div>
+        <a href="keputusan-ujian-psikometrik.html" class="back-btn"><i class="fas fa-arrow-left"></i> Kembali</a>
+    </div>
+
+    <!-- Stats Banner -->
+    <div class="stats-banner">
+        <div>
+            <h2><i class="fas fa-graduation-cap"></i> Keputusan Ujian Gaya Belajar</h2>
+            <p>Senarai pelajar yang telah menjawab Inventori Gaya Belajar (VARK)</p>
+        </div>
+        <div class="total-count" id="totalCount">0 Pelajar</div>
+    </div>
+
+    <!-- Search & Filter -->
+    <div class="search-section">
+        <div class="search-wrapper">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" placeholder="Cari nama pelajar atau No. IC..." autocomplete="off">
+            </div>
+            <div id="suggestionsList" class="suggestions-list"></div>
+        </div>
+        <div class="filter-group">
+            <select id="tingkatanFilter" class="filter-select">
+                <option value="">Semua Tingkatan</option>
+                <option value="1">Tingkatan 1</option>
+                <option value="2">Tingkatan 2</option>
+                <option value="3">Tingkatan 3</option>
+                <option value="4">Tingkatan 4</option>
+                <option value="5">Tingkatan 5</option>
+                <option value="6">Tingkatan 6</option>
+            </select>
+            <select id="kelasFilter" class="filter-select">
+                <option value="">Semua Kelas</option>
+            </select>
+            <select id="gayaFilter" class="filter-select">
+                <option value="">Semua Gaya</option>
+                <option value="V">VISUAL (V)</option>
+                <option value="A">AUDITORI (A)</option>
+                <option value="R">BACAAN/PENULISAN (R)</option>
+                <option value="K">KINESTETIK (K)</option>
+            </select>
+        </div>
+        <div class="filter-group">
+            <button id="refreshBtn" class="btn-refresh"><i class="fas fa-sync-alt"></i> Muat Semula</button>
+            <button id="printBtn" class="btn-print"><i class="fas fa-print"></i> Cetak Report</button>
+            <button id="deleteAllBtn" class="btn-delete-all"><i class="fas fa-trash-alt"></i> Hapus Semua</button>
+        </div>
+    </div>
+
+    <!-- Selection Bar -->
+    <div id="selectionBar" class="selection-bar">
+        <div class="selection-info">
+            <i class="fas fa-check-circle"></i> <span id="selectedCount">0</span> pelajar dipilih
+        </div>
+        <div class="selection-actions">
+            <button id="selectAllBtn" class="btn-select-all"><i class="fas fa-check-double"></i> Pilih Semua</button>
+            <button id="deleteSelectedBtn" class="btn-delete-selected"><i class="fas fa-trash-alt"></i> Hapus Terpilih</button>
+            <button id="cancelSelectionBtn" class="btn-cancel"><i class="fas fa-times"></i> Batal</button>
+        </div>
+    </div>
+
+    <!-- Results Container -->
+    <div id="resultsContainer">
+        <div class="empty-state"><i class="fas fa-spinner fa-pulse"></i> Memuatkan data...</div>
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, collection, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    
+    const firebaseConfig = {
+        apiKey: "AIzaSyCfu7XC8pXtpDyQ-9Cjdg4AobA-EVEwWcc",
+        authDomain: "e-mindcare.firebaseapp.com",
+        projectId: "e-mindcare",
+        storageBucket: "e-mindcare.firebasestorage.app",
+        messagingSenderId: "1021883944936",
+        appId: "1:1021883944936:web:39c75a0c98d19a37afde5d",
+        measurementId: "G-3CJVKWGEXV"
+    };
+    
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const ujianCollection = collection(db, "ujian_gaya_belajar");
+    
+    let allResults = [];
+    let filteredResults = [];
+    let selectedIds = new Set();
+    let currentSearch = "";
+    let currentTingkatan = "";
+    let currentKelas = "";
+    let currentGaya = "";
+    
+    // Style configurations
+    const gayaConfig = {
+        V: { name: "VISUAL", full: "Visual", icon: "fa-eye", badge: "badge-visual", color: "#8b5cf6" },
+        A: { name: "AUDITORI", full: "Auditori", icon: "fa-ear-listen", badge: "badge-auditori", color: "#3b82f6" },
+        R: { name: "BACAAN", full: "Bacaan/Penulisan", icon: "fa-book", badge: "badge-bacaan", color: "#10b981" },
+        K: { name: "KINESTETIK", full: "Kinestetik", icon: "fa-hand-peace", badge: "badge-kinestetik", color: "#f97316" }
+    };
+    
+    function showToast(msg, type = 'success') {
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        toast.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i> ${msg}`;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 3000);
+    }
+    
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, m => m === '&' ? '&amp;' : m === '<' ? '&lt;' : '&gt;');
+    }
+    
+    function extractTingkatan(className) {
+        if (!className) return '';
+        const match = className.match(/^\d+/);
+        return match ? match[0] : '';
+    }
+    
+    async function loadData() {
+        try {
+            const querySnapshot = await getDocs(ujianCollection);
+            allResults = [];
+            querySnapshot.forEach((doc) => {
+                allResults.push({ id: doc.id, ...doc.data() });
+            });
+            allResults.sort((a, b) => (a.studentName || '').localeCompare(b.studentName || ''));
+            
+            updateClassFilter();
+            applyFilters();
+            
+            document.getElementById('totalCount').innerHTML = `${allResults.length} Pelajar`;
+            console.log(`Loaded ${allResults.length} results`);
+        } catch (error) {
+            console.error("Error loading data:", error);
+            document.getElementById('resultsContainer').innerHTML = `<div class="empty-state"><i class="fas fa-exclamation-triangle"></i> Gagal memuat data</div>`;
+        }
+    }
+    
+    function updateClassFilter() {
+        const classes = [...new Set(allResults.map(r => r.studentClass).filter(c => c && c !== '-'))];
+        classes.sort();
+        const select = document.getElementById('kelasFilter');
+        select.innerHTML = '<option value="">Semua Kelas</option>' + 
+            classes.map(c => `<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`).join('');
+    }
+    
+    function applyFilters() {
+        filteredResults = [...allResults];
+        
+        if (currentSearch) {
+            const term = currentSearch.toLowerCase();
+            filteredResults = filteredResults.filter(r => 
+                (r.studentName || '').toLowerCase().includes(term) || 
+                (r.studentIC || '').includes(term)
+            );
+        }
+        
+        if (currentTingkatan) {
+            filteredResults = filteredResults.filter(r => {
+                const tingkatan = extractTingkatan(r.studentClass);
+                return tingkatan === currentTingkatan;
+            });
+        }
+        
+        if (currentKelas) {
+            filteredResults = filteredResults.filter(r => r.studentClass === currentKelas);
+        }
+        
+        if (currentGaya) {
+            filteredResults = filteredResults.filter(r => r.dominantStyle === currentGaya);
+        }
+        
+        renderResults();
+    }
+    
+    function renderResults() {
+        const container = document.getElementById('resultsContainer');
+        
+        if (filteredResults.length === 0) {
+            container.innerHTML = `<div class="empty-state"><i class="fas fa-user-slash" style="font-size: 2rem;"></i><p>Tiada keputusan ujian dijumpai.</p></div>`;
+            document.getElementById('totalCount').innerHTML = `${allResults.length} Pelajar | Ditapis: 0`;
+            return;
+        }
+        
+        let html = `<div class="results-grid">`;
+        for (const result of filteredResults) {
+            const scores = result.scores || { V: 0, A: 0, R: 0, K: 0 };
+            const dominant = result.dominantStyle || "V";
+            const totalQ = result.totalQuestions || 15;
+            const isSelected = selectedIds.has(result.id);
+            
+            const gayaInfo = gayaConfig[dominant] || gayaConfig.V;
+            const badgeClass = gayaInfo.badge;
+            
+            html += `
+                <div class="result-card ${isSelected ? 'selected' : ''}" data-id="${result.id}">
+                    <input type="checkbox" class="checkbox-select" ${isSelected ? 'checked' : ''} onchange="toggleSelect('${result.id}')">
+                    <div class="student-header">
+                        <div class="student-avatar">
+                            <i class="fas fa-user-graduate"></i>
+                        </div>
+                        <div class="student-info">
+                            <h3>${escapeHtml(result.studentName)}</h3>
+                            <p><i class="fas fa-id-card"></i> ${escapeHtml(result.studentIC)} &nbsp;|&nbsp; <i class="fas fa-school"></i> ${escapeHtml(result.studentClass)}</p>
+                        </div>
+                    </div>
+                    <div class="style-badge ${badgeClass}">
+                        <i class="fas ${gayaInfo.icon}"></i> GAYA DOMINAN: ${gayaInfo.name}
+                    </div>
+                    <div class="scores-grid">
+                        <div class="score-item">
+                            <div class="score-cat score-visual">VISUAL (V)</div>
+                            <div class="score-value score-visual">${scores.V || 0} / ${totalQ}</div>
+                        </div>
+                        <div class="score-item">
+                            <div class="score-cat score-auditori">AUDITORI (A)</div>
+                            <div class="score-value score-auditori">${scores.A || 0} / ${totalQ}</div>
+                        </div>
+                        <div class="score-item">
+                            <div class="score-cat score-bacaan">BACAAN (R)</div>
+                            <div class="score-value score-bacaan">${scores.R || 0} / ${totalQ}</div>
+                        </div>
+                        <div class="score-item">
+                            <div class="score-cat score-kinestetik">KINESTETIK (K)</div>
+                            <div class="score-value score-kinestetik">${scores.K || 0} / ${totalQ}</div>
+                        </div>
+                    </div>
+                    <div class="date-info">
+                        <i class="fas fa-calendar"></i> ${result.date || '-'} | ${result.time || '-'}
+                    </div>
+                </div>
+            `;
+        }
+        html += `</div>`;
+        container.innerHTML = html;
+        
+        const filterText = (currentSearch || currentTingkatan || currentKelas || currentGaya) ? ` | Ditapis: ${filteredResults.length}` : '';
+        document.getElementById('totalCount').innerHTML = `${allResults.length} Pelajar${filterText}`;
+        
+        const selectionBar = document.getElementById('selectionBar');
+        if (selectedIds.size > 0) {
+            selectionBar.classList.add('show');
+            document.getElementById('selectedCount').innerText = selectedIds.size;
+        } else {
+            selectionBar.classList.remove('show');
+        }
+    }
+    
+    window.toggleSelect = function(id) {
+        if (selectedIds.has(id)) {
+            selectedIds.delete(id);
+        } else {
+            selectedIds.add(id);
+        }
+        renderResults();
+    };
+    
+    function selectAll() {
+        for (const result of filteredResults) {
+            selectedIds.add(result.id);
+        }
+        renderResults();
+        showToast(`${selectedIds.size} pelajar dipilih`, 'success');
+    }
+    
+    function cancelSelection() {
+        selectedIds.clear();
+        renderResults();
+    }
+    
+    async function deleteSelected() {
+        if (selectedIds.size === 0) {
+            showToast('Tiada pelajar dipilih', 'error');
+            return;
+        }
+        
+        if (confirm(`⚠️ PERHATIAN!\n\nAnda akan memadam rekod ${selectedIds.size} pelajar.\n\nTindakan ini TIDAK BOLEH DIBATALKAN!\n\nTeruskan?`)) {
+            let deleted = 0;
+            for (const id of selectedIds) {
+                try {
+                    await deleteDoc(doc(db, "ujian_gaya_belajar", id));
+                    deleted++;
+                } catch (e) {
+                    console.error("Error deleting:", e);
+                }
+            }
+            selectedIds.clear();
+            await loadData();
+            showToast(`✅ ${deleted} rekod telah dipadam`, 'success');
+        }
+    }
+    
+    async function deleteAll() {
+        if (allResults.length === 0) {
+            showToast('Tiada data untuk dipadam', 'error');
+            return;
+        }
+        
+        if (confirm(`⚠️ PERHATIAN!\n\nAnda akan memadam SEMUA rekod (${allResults.length} pelajar).\n\nTindakan ini TIDAK BOLEH DIBATALKAN!\n\nTeruskan?`)) {
+            let deleted = 0;
+            for (const result of allResults) {
+                try {
+                    await deleteDoc(doc(db, "ujian_gaya_belajar", result.id));
+                    deleted++;
+                } catch (e) {
+                    console.error("Error deleting:", e);
+                }
+            }
+            await loadData();
+            showToast(`✅ ${deleted} rekod telah dipadam`, 'success');
+        }
+    }
+    
+    function updateSuggestions(searchTerm) {
+        const suggestionsDiv = document.getElementById('suggestionsList');
+        if (!searchTerm.trim()) {
+            suggestionsDiv.style.display = 'none';
+            return;
+        }
+        const term = searchTerm.toLowerCase();
+        const matches = allResults.filter(r => 
+            (r.studentName || '').toLowerCase().includes(term) || 
+            (r.studentIC || '').includes(term)
+        ).slice(0, 8);
+        
+        if (matches.length === 0) {
+            suggestionsDiv.style.display = 'none';
+            return;
+        }
+        
+        suggestionsDiv.innerHTML = matches.map(match => `
+            <div onclick="selectSuggestion('${match.id}')">
+                <div style="font-weight:700;">${escapeHtml(match.studentName)}</div>
+                <div style="font-size:0.7rem; color:#64748b;">${escapeHtml(match.studentIC)} • ${escapeHtml(match.studentClass)}</div>
+            </div>
+        `).join('');
+        suggestionsDiv.style.display = 'block';
+    }
+    
+    window.selectSuggestion = function(id) {
+        const result = allResults.find(r => r.id === id);
+        if (result) {
+            document.getElementById('searchInput').value = result.studentName;
+            document.getElementById('suggestionsList').style.display = 'none';
+            currentSearch = result.studentName;
+            applyFilters();
+        }
+    };
+    
+    async function printReport() {
+        const resultsToPrint = filteredResults.length > 0 ? filteredResults : allResults;
+        
+        if (resultsToPrint.length === 0) {
+            showToast('Tiada data untuk dicetak', 'error');
+            return;
+        }
+        
+        const printHtml = `
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta charset="UTF-8">
+                <title>Laporan Keputusan Inventori Gaya Belajar</title>
+                <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+                <style>
+                    * { margin: 0; padding: 0; box-sizing: border-box; }
+                    body { font-family: 'Plus Jakarta Sans', sans-serif; padding: 40px; background: white; }
+                    .header { text-align: center; margin-bottom: 30px; }
+                    .header h1 { color: #4f46e5; margin-bottom: 5px; }
+                    .header p { color: #64748b; }
+                    table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 12px; }
+                    th { background: #4f46e5; color: white; padding: 10px; text-align: left; }
+                    td { padding: 8px; border-bottom: 1px solid #e2e8f0; }
+                    .footer { margin-top: 30px; text-align: center; font-size: 12px; color: #94a3b8; }
+                    .badge { display: inline-block; padding: 2px 8px; border-radius: 20px; font-size: 10px; font-weight: 600; }
+                    .badge-V { background: #ede9fe; color: #6d28d9; }
+                    .badge-A { background: #dbeafe; color: #1d4ed8; }
+                    .badge-R { background: #dcfce7; color: #166534; }
+                    .badge-K { background: #ffedd5; color: #9a3412; }
+                </style>
+            </head>
+            <body>
+                <div class="header">
+                    <h1>LAPORAN KEPUTUSAN INVENTORI GAYA BELAJAR (VARK)</h1>
+                    <p>E-MindCare SEMSIRA • SMK Syed Sirajuddin</p>
+                    <p>Tarikh: ${new Date().toLocaleDateString('ms-MY')} | Masa: ${new Date().toLocaleTimeString('ms-MY')}</p>
+                </div>
+                <table>
+                    <thead>
+                        <tr><th>Bil</th><th>Nama Pelajar</th><th>No. IC</th><th>Kelas</th>
+                        <th>Visual (V)</th><th>Auditori (A)</th><th>Bacaan (R)</th><th>Kinestetik (K)</th><th>Gaya Dominan</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        ${resultsToPrint.map((r, i) => {
+                            const scores = r.scores || { V: 0, A: 0, R: 0, K: 0 };
+                            const dominant = r.dominantStyle || "V";
+                            const totalQ = r.totalQuestions || 15;
+                            return `<tr>
+                                <td>${i+1}</td>
+                                <td>${escapeHtml(r.studentName)}</span></td>
+                                <td>${escapeHtml(r.studentIC)}</span></td>
+                                <td>${escapeHtml(r.studentClass)}</span></td>
+                                <td>${scores.V || 0}/${totalQ}</span></td>
+                                <td>${scores.A || 0}/${totalQ}</span></td>
+                                <td>${scores.R || 0}/${totalQ}</span></td>
+                                <td>${scores.K || 0}/${totalQ}</span></td>
+                                <td><span class="badge badge-${dominant}">${gayaConfig[dominant]?.name || dominant}</span></span></td>
+                            </tr>`;
+                        }).join('')}
+                    </tbody>
+                </table>
+                <div class="footer">
+                    <p>Laporan ini dihasilkan secara automatik oleh sistem E-MindCare SEMSIRA.</p>
+                </div>
+            </body>
+            </html>
+        `;
+        
+        const printWindow = window.open('', '_blank');
+        printWindow.document.write(printHtml);
+        printWindow.document.close();
+        printWindow.print();
+    }
+    
+    // Event listeners
+    document.getElementById('searchInput').addEventListener('input', (e) => {
+        currentSearch = e.target.value;
+        updateSuggestions(currentSearch);
+        applyFilters();
+    });
+    
+    document.getElementById('tingkatanFilter').addEventListener('change', (e) => {
+        currentTingkatan = e.target.value;
+        applyFilters();
+    });
+    
+    document.getElementById('kelasFilter').addEventListener('change', (e) => {
+        currentKelas = e.target.value;
+        applyFilters();
+    });
+    
+    document.getElementById('gayaFilter').addEventListener('change', (e) => {
+        currentGaya = e.target.value;
+        applyFilters();
+    });
+    
+    document.getElementById('refreshBtn').addEventListener('click', async () => {
+        await loadData();
+        showToast('Data dimuat semula', 'success');
+    });
+    
+    document.getElementById('printBtn').addEventListener('click', printReport);
+    document.getElementById('deleteAllBtn').addEventListener('click', deleteAll);
+    document.getElementById('selectAllBtn').addEventListener('click', selectAll);
+    document.getElementById('deleteSelectedBtn').addEventListener('click', deleteSelected);
+    document.getElementById('cancelSelectionBtn').addEventListener('click', cancelSelection);
+    
+    document.addEventListener('click', function(e) {
+        const wrapper = document.querySelector('.search-wrapper');
+        if (wrapper && !wrapper.contains(e.target)) {
+            document.getElementById('suggestionsList').style.display = 'none';
+        }
+    });
+    
+    window.toggleSelect = toggleSelect;
+    window.selectSuggestion = selectSuggestion;
+    
+    loadData();
+</script>
+</body>
+</html>

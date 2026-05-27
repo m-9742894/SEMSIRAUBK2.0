@@ -20,7 +20,7 @@
 
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
-            background: linear-gradient(135deg, #e0e7ff 0%, #f3e8ff 100%);
+            background: linear-gradient(135deg, #e8f0fe 0%, #dfe7f5 100%);
             min-height: 100vh;
             padding: 20px;
         }
@@ -32,16 +32,14 @@
 
         /* Header */
         .header {
-            background: white;
-            border-radius: 1.2rem;
-            padding: 1rem 1.5rem;
-            margin-bottom: 1.5rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
             gap: 1rem;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid rgba(37,99,235,0.2);
         }
         .logo-area {
             display: flex;
@@ -49,7 +47,7 @@
             gap: 1rem;
         }
         .logo-icon {
-            background: linear-gradient(145deg, #4f46e5, #7c3aed);
+            background: linear-gradient(145deg, #2563eb, #7c3aed);
             width: 45px;
             height: 45px;
             border-radius: 28px;
@@ -63,12 +61,11 @@
         }
         .logo-text h1 {
             font-size: 1.2rem;
-            font-weight: 700;
-            color: #1e293b;
-        }
-        .logo-text p {
-            font-size: 0.65rem;
-            color: #64748b;
+            font-weight: 800;
+            background: linear-gradient(135deg, #1e293b, #2563eb);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
         }
         .back-btn {
             background: #eef2ff;
@@ -77,70 +74,51 @@
             border-radius: 40px;
             cursor: pointer;
             font-weight: 600;
-            font-size: 0.75rem;
-            color: #4f46e5;
+            color: #2563eb;
             text-decoration: none;
-            transition: 0.2s;
-        }
-        .back-btn:hover {
-            background: #4f46e5;
-            color: white;
+            font-size: 0.8rem;
         }
 
         /* Profile Card */
         .profile-card {
-            background: linear-gradient(135deg, #4f46e5, #7c3aed);
-            border-radius: 1.2rem;
-            padding: 1.2rem;
+            background: white;
+            border-radius: 1rem;
+            padding: 1rem;
             margin-bottom: 1.5rem;
-            color: white;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        .profile-grid {
             display: flex;
-            justify-content: space-between;
             flex-wrap: wrap;
             gap: 1rem;
+            justify-content: space-between;
         }
-        .profile-info h3 {
-            font-size: 1.1rem;
-            margin-bottom: 0.3rem;
+        .profile-item {
+            flex: 1;
+            min-width: 150px;
         }
-        .profile-info p {
-            font-size: 0.75rem;
-            opacity: 0.9;
-            margin: 0.2rem 0;
-        }
-        .date-info {
-            text-align: right;
+        .profile-item .label {
             font-size: 0.7rem;
-            opacity: 0.8;
+            color: #64748b;
+        }
+        .profile-item .value {
+            font-weight: 700;
+            color: #1e293b;
+            font-size: 0.9rem;
         }
 
         /* Progress Bar */
         .progress-container {
-            background: white;
-            border-radius: 1rem;
-            padding: 0.8rem 1rem;
-            margin-bottom: 1.5rem;
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            flex-wrap: wrap;
-        }
-        .progress-text {
-            font-size: 0.8rem;
-            font-weight: 600;
-            color: #1e293b;
-        }
-        .progress-bar-wrapper {
-            flex: 1;
-            height: 10px;
             background: #e2e8f0;
-            border-radius: 10px;
+            border-radius: 20px;
+            height: 10px;
+            margin-bottom: 1.5rem;
             overflow: hidden;
         }
-        .progress-bar-fill {
-            height: 100%;
+        .progress-bar {
+            background: linear-gradient(95deg, #2563eb, #7c3aed);
             width: 0%;
-            background: linear-gradient(90deg, #4f46e5, #7c3aed);
+            height: 100%;
             transition: width 0.3s ease;
         }
 
@@ -149,8 +127,8 @@
             background: white;
             border-radius: 1.5rem;
             padding: 1.5rem;
-            box-shadow: 0 8px 20px -8px rgba(0,0,0,0.1);
             margin-bottom: 1.5rem;
+            box-shadow: 0 8px 20px -8px rgba(0,0,0,0.1);
         }
         .question-header {
             display: flex;
@@ -160,44 +138,34 @@
             padding-bottom: 0.5rem;
             border-bottom: 1px solid #e2e8f0;
         }
-        .question-number {
-            font-size: 0.8rem;
-            font-weight: 600;
-            color: #4f46e5;
-            background: #eef2ff;
+        .question-num {
+            background: #e0e7ff;
             padding: 0.2rem 0.8rem;
             border-radius: 20px;
-        }
-        .question-category {
             font-size: 0.7rem;
             font-weight: 600;
-            padding: 0.2rem 0.6rem;
-            border-radius: 20px;
+            color: #2563eb;
         }
-        .category-R { background: #dbeafe; color: #2563eb; }
-        .category-I { background: #dcfce7; color: #16a34a; }
-        .category-A { background: #fef3c7; color: #d97706; }
-        .category-S { background: #fce7f3; color: #db2777; }
-        .category-E { background: #e0e7ff; color: #4f46e5; }
-        .category-K { background: #fed7aa; color: #ea580c; }
-        
+        .question-cat {
+            font-size: 0.7rem;
+            color: #64748b;
+        }
         .question-text {
-            font-size: 1rem;
-            font-weight: 500;
+            font-size: 1.1rem;
+            font-weight: 600;
             color: #1e293b;
-            margin: 1rem 0;
+            margin-bottom: 1.5rem;
             line-height: 1.4;
         }
-        
         .options {
             display: flex;
             gap: 1rem;
             justify-content: center;
         }
-        .opt-btn {
+        .option-btn {
             flex: 1;
             padding: 0.8rem;
-            border-radius: 2rem;
+            border-radius: 3rem;
             font-weight: 600;
             cursor: pointer;
             border: none;
@@ -206,23 +174,60 @@
             align-items: center;
             justify-content: center;
             gap: 8px;
-            font-size: 0.9rem;
+            font-size: 1rem;
         }
-        .opt-yes {
+        .option-yes {
             background: #10b981;
             color: white;
         }
-        .opt-yes:hover {
+        .option-yes:hover {
             background: #059669;
-            transform: translateY(-2px);
+            transform: scale(1.02);
         }
-        .opt-no {
+        .option-no {
             background: #ef4444;
             color: white;
         }
-        .opt-no:hover {
+        .option-no:hover {
             background: #dc2626;
+            transform: scale(1.02);
+        }
+        .option-selected-yes {
+            background: #059669;
+            box-shadow: 0 0 0 3px rgba(16,185,129,0.3);
+        }
+        .option-selected-no {
+            background: #dc2626;
+            box-shadow: 0 0 0 3px rgba(220,38,38,0.3);
+        }
+
+        /* Navigation Buttons */
+        .nav-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: space-between;
+            margin-top: 1rem;
+        }
+        .nav-btn {
+            padding: 0.7rem 1.5rem;
+            border-radius: 2rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: 0.2s;
+            background: #e2e8f0;
+            color: #1e293b;
+        }
+        .nav-btn-primary {
+            background: linear-gradient(95deg, #2563eb, #7c3aed);
+            color: white;
+        }
+        .nav-btn-primary:hover {
             transform: translateY(-2px);
+        }
+        .nav-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
         }
 
         /* Result Card */
@@ -230,7 +235,7 @@
             background: white;
             border-radius: 1.5rem;
             padding: 1.5rem;
-            margin-bottom: 1.5rem;
+            margin-top: 1.5rem;
             box-shadow: 0 8px 20px -8px rgba(0,0,0,0.1);
         }
         .result-title {
@@ -240,88 +245,105 @@
             text-align: center;
             margin-bottom: 1rem;
         }
-        .result-badge {
-            background: linear-gradient(135deg, #4f46e5, #7c3aed);
-            color: white;
-            padding: 1rem;
-            border-radius: 1rem;
-            text-align: center;
-            margin-bottom: 1.5rem;
+        .result-chart {
+            margin: 1.5rem 0;
         }
-        .result-badge h2 {
-            font-size: 2rem;
-            letter-spacing: 2px;
+        .result-bar {
+            margin-bottom: 1rem;
         }
-        .result-badge p {
-            font-size: 0.8rem;
-            opacity: 0.9;
-        }
-        .category-result {
-            margin: 1rem 0;
-            padding: 0.8rem;
-            border-radius: 1rem;
+        .result-bar-label {
             display: flex;
             justify-content: space-between;
-            align-items: center;
+            margin-bottom: 0.3rem;
+            font-size: 0.8rem;
         }
-        .category-name {
-            font-weight: 600;
+        .result-bar-fill {
+            background: #e2e8f0;
+            border-radius: 10px;
+            height: 25px;
+            overflow: hidden;
         }
-        .category-score {
-            font-weight: 700;
-            font-size: 1.1rem;
-        }
-        .result-actions {
+        .result-bar-fill span {
+            display: block;
+            height: 100%;
+            background: linear-gradient(95deg, #2563eb, #7c3aed);
+            border-radius: 10px;
+            width: 0%;
+            transition: width 1s ease;
             display: flex;
-            gap: 1rem;
-            margin-top: 1.5rem;
-        }
-        .btn-done {
-            flex: 1;
-            background: #4f46e5;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 8px;
             color: white;
-            border: none;
-            padding: 0.8rem;
-            border-radius: 2rem;
+            font-size: 0.7rem;
             font-weight: 600;
-            cursor: pointer;
-            text-decoration: none;
+        }
+        .top-categories {
+            background: #f1f5f9;
+            border-radius: 1rem;
+            padding: 1rem;
             text-align: center;
+            margin: 1rem 0;
         }
-        .btn-done:hover {
-            background: #4338ca;
-        }
-
-        /* Locked Card */
-        .locked-card {
-            background: white;
-            border-radius: 1.5rem;
-            padding: 2rem;
-            text-align: center;
-        }
-        .locked-card i {
-            font-size: 3rem;
-            color: #f59e0b;
-            margin-bottom: 1rem;
-        }
-        .locked-card h3 {
-            color: #1e293b;
+        .top-categories h4 {
+            color: #2563eb;
             margin-bottom: 0.5rem;
         }
-        .locked-card p {
-            color: #64748b;
-            margin-bottom: 1rem;
+        .top-badge {
+            display: inline-block;
+            background: #2563eb;
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            margin: 0.2rem;
+            font-weight: 600;
         }
-
-        .hidden {
-            display: none;
-        }
-
-        footer {
-            text-align: center;
+        .btn-submit {
+            width: 100%;
             padding: 1rem;
-            color: #94a3b8;
-            font-size: 0.7rem;
+            background: linear-gradient(95deg, #10b981, #059669);
+            color: white;
+            border: none;
+            border-radius: 3rem;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.2s;
+            margin-top: 1rem;
+        }
+        .btn-submit:hover {
+            transform: translateY(-2px);
+        }
+
+        .locked-message {
+            text-align: center;
+            padding: 2rem;
+            background: #fef3c7;
+            border-radius: 1rem;
+            color: #92400e;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #1e293b;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 10px;
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
+        }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @media (max-width: 600px) {
+            body { padding: 10px; }
+            .question-text { font-size: 0.95rem; }
+            .option-btn { padding: 0.6rem; font-size: 0.9rem; }
+            .profile-grid { flex-direction: column; gap: 0.5rem; }
         }
     </style>
 </head>
@@ -332,23 +354,22 @@
             <div class="logo-icon"><i class="fas fa-chart-line"></i></div>
             <div class="logo-text">
                 <h1>Inventori Minat Kerjaya</h1>
-                <p>Teori RIASEC oleh John Holland</p>
             </div>
         </div>
         <a href="psikometrik.html" class="back-btn"><i class="fas fa-arrow-left"></i> Kembali</a>
     </div>
 
-    <div id="mainContent">
-        <!-- Akan diisi oleh JavaScript -->
+    <div id="contentArea">
+        <!-- Content will be loaded here -->
+        <div class="loading-state" style="text-align:center; padding:2rem;">
+            <i class="fas fa-spinner fa-pulse"></i> Memuatkan...
+        </div>
     </div>
-    <footer>
-        <i class="fas fa-shield-alt"></i> Jawapan anda akan disimpan dan hanya boleh dilihat oleh kaunselor.
-    </footer>
 </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, collection, doc, getDoc, setDoc, updateDoc, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, collection, doc, getDoc, getDocs, setDoc, updateDoc, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
     
     const firebaseConfig = {
         apiKey: "AIzaSyCfu7XC8pXtpDyQ-9Cjdg4AobA-EVEwWcc",
@@ -362,321 +383,494 @@
     
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
-    const ujianResultsCollection = collection(db, "ujian_minat_kerjaya_results");
+    const ujianResultsCollection = collection(db, "ujian_minat_kerjaya");
+    
+    // Get student data from session storage
+    const studentName = sessionStorage.getItem('studentName') || localStorage.getItem('studentName') || 'Pelajar';
+    const studentIC = sessionStorage.getItem('studentIC') || localStorage.getItem('studentIC') || '-';
+    const studentClass = sessionStorage.getItem('studentClass') || localStorage.getItem('studentClass') || '-';
+    const studentSession = sessionStorage.getItem('studentSession') || localStorage.getItem('studentSession') || '2026';
+    
+    // Current date, time, day
+    const now = new Date();
+    const currentDate = now.toLocaleDateString('ms-MY', { day: 'numeric', month: 'long', year: 'numeric' });
+    const currentTime = now.toLocaleTimeString('ms-MY', { hour: '2-digit', minute: '2-digit' });
+    const currentDay = now.toLocaleDateString('ms-MY', { weekday: 'long' });
     
     // ==================== SOALAN ====================
-    // Urutan: R,I,A,S,E,K berulang (5 soalan setiap kategori = 30 soalan)
-    const questions = [
-        // Kitaran 1 (Soalan 1-6)
-        { text: "menghasilkan model binaan", cat: "R", group: 1 },
-        { text: "memerhati fasa bulan", cat: "I", group: 1 },
-        { text: "mengikuti rancangan hiburan", cat: "A", group: 1 },
-        { text: "menyertai aktiviti perkhemahan", cat: "S", group: 1 },
-        { text: "MENGUSAHAKAN PERNIAGAAN", cat: "E", group: 1 },
-        { text: "merekod setiap perbelanjaan", cat: "K", group: 1 },
-        
+    // Soalan dalam urutan R,I,A,S,E,K berulang (5 soalan setiap kategori x 6 = 30 soalan)
+    const soalanList = [
+        // Kitaran 1 (Soalan 1-6): R,I,A,S,E,K
+        { q: "menghasilkan model binaan", cat: "R", group: 1 },
+        { q: "memerhati fasa bulan", cat: "I", group: 1 },
+        { q: "mengikuti rancangan hiburan", cat: "A", group: 1 },
+        { q: "menyertai aktiviti perkhemahan", cat: "S", group: 1 },
+        { q: "mengusahakan perniagaan", cat: "E", group: 1 },
+        { q: "merekod setiap perbelanjaan", cat: "K", group: 1 },
         // Kitaran 2 (Soalan 7-12)
-        { text: "belajar cara-cara penjagaan haiwan", cat: "R", group: 2 },
-        { text: "mengetahui salah silah keluarga", cat: "I", group: 2 },
-        { text: "menggayakan fesyen terkini", cat: "A", group: 2 },
-        { text: "bergotong-royong membersihkan kawasan sekolah", cat: "S", group: 2 },
-        { text: "MENJADI KETUA", cat: "E", group: 2 },
-        { text: "menyusun sijil dalam fail", cat: "K", group: 2 },
-        
+        { q: "belajar cara-cara penjagaan haiwan", cat: "R", group: 2 },
+        { q: "mengetahui salah silah keluarga", cat: "I", group: 2 },
+        { q: "menggayakan fesyen terkini", cat: "A", group: 2 },
+        { q: "bergotong-royong membersihkan kawasan sekolah", cat: "S", group: 2 },
+        { q: "menjadi ketua", cat: "E", group: 2 },
+        { q: "menyusun sijil dalam fail", cat: "K", group: 2 },
         // Kitaran 3 (Soalan 13-18)
-        { text: "bermain permainan video", cat: "R", group: 3 },
-        { text: "mencari perkataan tersembunyi", cat: "I", group: 3 },
-        { text: "mendengar muzik", cat: "A", group: 3 },
-        { text: "menolong rakan yang ditimpa kesusahan", cat: "S", group: 3 },
-        { text: "MENCARI PELUANG", cat: "E", group: 3 },
-        { text: "membuat senarai barang yang hendak dibeli", cat: "K", group: 3 },
-        
+        { q: "bermain permainan video", cat: "R", group: 3 },
+        { q: "mencari perkataan tersembunyi", cat: "I", group: 3 },
+        { q: "mendengar muzik", cat: "A", group: 3 },
+        { q: "menolong rakan yang ditimpa kesusahan", cat: "S", group: 3 },
+        { q: "mencari peluang", cat: "E", group: 3 },
+        { q: "membuat senarai barang yang hendak dibeli", cat: "K", group: 3 },
         // Kitaran 4 (Soalan 19-24)
-        { text: "menyertai aktiviti sukan", cat: "R", group: 4 },
-        { text: "aktiviti STEM", cat: "I", group: 4 },
-        { text: "mengambil gambar", cat: "A", group: 4 },
-        { text: "berada dalam kumpulan", cat: "S", group: 4 },
-        { text: "MEMENANGI PERTANDINGAN", cat: "E", group: 4 },
-        { text: "menyusun barang-barang peribadi", cat: "K", group: 4 },
-        
+        { q: "menyertai aktiviti sukan", cat: "R", group: 4 },
+        { q: "aktiviti STEM", cat: "I", group: 4 },
+        { q: "mengambil gambar", cat: "A", group: 4 },
+        { q: "berada dalam kumpulan", cat: "S", group: 4 },
+        { q: "memenangi pertandingan", cat: "E", group: 4 },
+        { q: "menyusun barang-barang peribadi", cat: "K", group: 4 },
         // Kitaran 5 (Soalan 25-30)
-        { text: "melakukan aktiviti lasak", cat: "R", group: 5 },
-        { text: "aktiviti penyelesaian masalah", cat: "I", group: 5 },
-        { text: "aktiviti keceriaan", cat: "A", group: 5 },
-        { text: "beramah mesra", cat: "S", group: 5 },
-        { text: "MEMIMPIN LAFIZ IKRAR", cat: "E", group: 5 },
-        { text: "mengutamakan kekemasan", cat: "K", group: 5 }
+        { q: "melakukan aktiviti lasak", cat: "R", group: 5 },
+        { q: "aktiviti penyelesaian masalah", cat: "I", group: 5 },
+        { q: "aktiviti keceriaan", cat: "A", group: 5 },
+        { q: "beramah mesra", cat: "S", group: 5 },
+        { q: "memimpin lafaz ikrar", cat: "E", group: 5 },
+        { q: "mengutamakan kekemasan", cat: "K", group: 5 }
     ];
     
-    const categoryNames = {
-        R: "REALISTIK (Praktikal)",
-        I: "INVESTIGATIF (Sains)",
-        A: "ARTISTIK (Kreatif)",
-        S: "SOSIAL (Membantu)",
-        E: "ENTERPRISING (Memimpin)",
-        K: "KONVENSIONAL (Teratur)"
-    };
+    // Add remaining soalan (soalan 31-150 from your list)
+    // For brevity, I'll continue the pattern with the remaining questions
+    // Since you have 30 questions per category (150 total), I'll create 150 questions
+    // But for this implementation, we'll use the 30 questions as per your request
     
-    const categoryColors = {
-        R: "#2563eb", I: "#16a34a", A: "#d97706", S: "#db2777", E: "#4f46e5", K: "#ea580c"
-    };
+    // For complete 150 questions, we need to add more. Let me create a comprehensive list.
+    // Actually from your input: 30 soalan R, 30 I, 30 A, 30 S, 30 E, 30 K = 180 total
+    // But you asked for pattern: 1-R,2-I,3-A,4-S,5-E,6-K repeated until finish
     
-    let studentData = null;
-    let answers = { R: 0, I: 0, A: 0, S: 0, E: 0, K: 0 };
-    let currentQuestionIndex = 0;
-    let userAnswers = []; // Store answers for each question
+    // Create complete 180 questions (30 per category = 180 total)
+    const rSoalan = [
+        "menghasilkan model binaan", "belajar cara-cara penjagaan haiwan", "bermain permainan video", "menyertai aktiviti sukan", "melakukan aktiviti lasak",
+        "mencantas tanaman hiasan", "membaiki peralatan yang rosak", "menggunakan peralatan dalam bengkel", "menggunakan komputer untuk mencari maklumat", "menonton acara sukan",
+        "pereka peralatan", "kontraktor binaan", "jurukimpal", "jurulatih kecergasan", "pemandu e-hailing",
+        "juruteknik", "jurutera", "ahli sukan esports", "arkitek", "pembuat pastri",
+        "menukar tayar basikal", "menyusun atur perabot", "memasang alat permainan berpandukan manual", "menghasilkan animasi", "membaiki kerosakan alat elektrik yang mudah",
+        "menggunakan mesin", "menggunakan perisian komputer", "menjaga haiwan peliharaan", "membuat keputusan mengikut situasi", "menggunakan peralatan sukan"
+    ];
     
-    // Get student from session
-    function getStudentData() {
-        return {
-            name: sessionStorage.getItem('studentName') || localStorage.getItem('studentName') || 'Pelajar',
-            ic: sessionStorage.getItem('studentIC') || localStorage.getItem('studentIC') || '-',
-            class: sessionStorage.getItem('studentClass') || localStorage.getItem('studentClass') || '-',
-            session: sessionStorage.getItem('studentSession') || localStorage.getItem('studentSession') || '2026'
-        };
+    const iSoalan = [
+        "memerhati fasa bulan", "mengetahui salah silah keluarga", "mencari perkataan tersembunyi", "aktiviti STEM", "aktiviti penyelesaian masalah",
+        "menggunakan alat bantu navigasi", "mengkaji budaya kaum lain", "mengelaskan bahan kimia", "mengambil tahu perkembangan teknologi", "mengetahui kandungan bahan dalam makanan",
+        "ahli biologi marin", "ahli kaji bumi", "ahli astronomi", "angkasawan", "pakar bedah",
+        "pegawai penyiasat", "ahli farmasi", "ahli arkeologi", "pakar ekonomi", "ahli forensik",
+        "mengenal pasti kandungan nutrisi makanan", "menggunakan kalkulator saintifik", "memahami fenomena alam semula jadi", "menjalankan eksperimen untuk membuktikan sesuatu teori", "menggunakan formula yang mudah",
+        "mencari penyelesaian suatu tugasan", "menyelesaikan soalan yang menguji minda", "mengaplikasi pengetahuan sains dalam aktiviti harian", "bertanya soalan untuk mendapatkan maklumat", "menganalisis fakta"
+    ];
+    
+    const aSoalan = [
+        "mengikuti rancangan hiburan", "menggayakan fesyen terkini", "mendengar muzik", "mengambil gambar", "aktiviti keceriaan",
+        "bertindak mengikut gerak hati", "mengikuti siri animasi", "menghasilkan karya digital", "membuat rakaman kreatif", "menghayati pemandangan yang indah",
+        "penggubah lagu", "penyanyi", "pelakon", "juruhias", "jurusolek",
+        "pereka fesyen", "pereka tari", "jurufoto", "pengarah filem", "content creator",
+        "membuat persembahan kebudayaan", "melukis", "mengukir", "menghasilkan poster", "menghasilkan penulisan kreatif",
+        "berimaginasi tinggi", "meluahkan perasaan melalui aktiviti seni", "menghayati pelbagai emosi", "menghasilkan nota dengan pelbagai cara", "bertindak mengikut kemahuan diri"
+    ];
+    
+    const sSoalan = [
+        "menyertai aktiviti perkhemahan", "bergotong-royong membersihkan kawasan sekolah", "menolong rakan yang ditimpa kesusahan", "berada dalam kumpulan", "beramah mesra",
+        "mengambil berat terhadap orang sekeliling", "belajar pelbagai bahasa", "meraikan rakan-rakan", "berkongsi idea dengan orang lain", "melibatkan diri dengan aktiviti khidmat sosial",
+        "guru", "pendakwah", "jururawat", "penyambut tetamu", "pakar motivasi",
+        "pegawai tadbir diplomatik", "pegawai kebajikan masyarakat", "pensyarah", "wartawan", "pelayan kapal terbang",
+        "berinteraksi dengan ramai orang", "bekerjasama dengan orang lain", "menyertai acara sukan", "mendapatkan sumbangan", "memujuk orang yang dalam kesedihan",
+        "beramah mesra dengan orang yang baru dikenali", "memberi bantuan kepada orang yang memerlukan", "didekati oleh ramai orang", "menolong orang yang dalam kesusahan", "menjadi sukarelawan"
+    ];
+    
+    const eSoalan = [
+        "mengusahakan perniagaan", "menjadi ketua", "mencari peluang", "memenangi pertandingan", "memimpin lafaz ikrar",
+        "aktiviti yang mencabar", "dikenali ramai", "menarik perhatian orang lain", "mengetuai persembahan", "berniaga",
+        "peguam", "pakar runding", "pengurus bank", "pengarah syarikat", "agen insurans",
+        "pengusaha restoran", "pegawai pemasaran", "ahli politik", "broker saham", "usahawan",
+        "menyelia kerja-kerja orang lain", "mempengaruhi orang lain", "menjadi jurujual", "mewakili kumpulan dalam pembentangan", "berniaga kecil-kecilan",
+        "menjadi pemimpin", "meyakinkan orang lain menerima idea saya", "mengendalikan majlis", "mempengaruhi rakan-rakan menyertai sesuatu aktiviti", "merancang matlamat dengan jelas"
+    ];
+    
+    const kSoalan = [
+        "merekod setiap perbelanjaan", "menyusun sijil dalam fail", "membuat senarai barang yang hendak dibeli", "menyusun barang-barang peribadi", "mengutamakan kekemasan",
+        "melaksanakan tugasan secara terperinci", "bertugas mengikut jadual", "menyiapkan tugasan tepat pada masanya", "membuat kerja secara sistematik", "mematuhi peraturan",
+        "pegawai bank", "akauntan", "juruwang", "setiausaha", "juruaudit",
+        "pengaturcara komputer", "pustakawan", "pengurup wang", "penilai harta", "kerani",
+        "menguruskan dokumen dengan sistematik", "menggunakan perisian komputer", "menyelesaikan tugasan secara terperinci", "menyusun aktiviti harian", "menyimpan dokumen dengan rapi",
+        "bekerja secara sistematik", "melakukan tugasan mengikut arahan", "menepati masa", "mengurus perbelanjaan harian", "merekod wang simpanan"
+    ];
+    
+    // Build complete questions array: R,I,A,S,E,K repeated
+    let allQuestions = [];
+    for (let i = 0; i < 30; i++) {
+        allQuestions.push({ q: rSoalan[i], cat: "R" });
+        allQuestions.push({ q: iSoalan[i], cat: "I" });
+        allQuestions.push({ q: aSoalan[i], cat: "A" });
+        allQuestions.push({ q: sSoalan[i], cat: "S" });
+        allQuestions.push({ q: eSoalan[i], cat: "E" });
+        allQuestions.push({ q: kSoalan[i], cat: "K" });
+    }
+    // 30 x 6 = 180 soalan
+    
+    // Question groups for header
+    function getQuestionHeader(index) {
+        if (index < 10) return "SAYA SUKA...";
+        if (index < 20) return "SAYA BERMINAT MENJADI...";
+        return "SAYA BOLEH...";
     }
     
-    function getCurrentDateTime() {
-        const now = new Date();
-        const days = ['Ahad', 'Isnin', 'Selasa', 'Rabu', 'Khamis', 'Jumaat', 'Sabtu'];
-        return {
-            tarikh: now.toLocaleDateString('ms-MY'),
-            masa: now.toLocaleTimeString('ms-MY', { hour: '2-digit', minute: '2-digit' }),
-            hari: days[now.getDay()]
-        };
+    let answers = {};
+    let currentIndex = 0;
+    let scores = { R: 0, I: 0, A: 0, S: 0, E: 0, K: 0 };
+    let hasCompleted = false;
+    let existingResultId = null;
+    
+    function showToast(message) {
+        const toast = document.createElement('div');
+        toast.className = 'toast';
+        toast.innerHTML = `<i class="fas fa-info-circle"></i> ${message}`;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 3000);
     }
     
-    // Check if student already completed this test
-    async function hasCompletedTest(studentIC) {
+    function saveProgress() {
+        localStorage.setItem('imk_progress', JSON.stringify({
+            currentIndex, answers, scores, hasCompleted
+        }));
+    }
+    
+    function loadProgress() {
+        const saved = localStorage.getItem('imk_progress');
+        if (saved) {
+            try {
+                const data = JSON.parse(saved);
+                if (!data.hasCompleted) {
+                    currentIndex = data.currentIndex;
+                    answers = data.answers;
+                    scores = data.scores;
+                    hasCompleted = data.hasCompleted;
+                }
+            } catch(e) {}
+        }
+    }
+    
+    async function checkExistingResult() {
         try {
             const q = query(ujianResultsCollection, where("studentIC", "==", studentIC));
-            const snapshot = await getDocs(q);
-            return !snapshot.empty;
+            const querySnapshot = await getDocs(q);
+            if (!querySnapshot.empty) {
+                querySnapshot.forEach((doc) => {
+                    hasCompleted = true;
+                    existingResultId = doc.id;
+                });
+                return true;
+            }
+            return false;
         } catch (error) {
-            console.error("Error checking completion:", error);
+            console.error("Error checking existing result:", error);
             return false;
         }
     }
     
-    // Save result to Firestore
-    async function saveResult(score, topCategories) {
-        const now = new Date();
+    async function saveResultToFirestore() {
+        const totalScore = Object.values(scores).reduce((a,b) => a + b, 0);
+        
+        // Get top 3 categories
+        const sorted = Object.entries(scores).sort((a,b) => b[1] - a[1]);
+        const top3 = sorted.slice(0,3).map(([cat, score]) => `${cat} (${score})`).join(", ");
+        
         const resultData = {
-            studentName: studentData.name,
-            studentIC: studentData.ic,
-            studentClass: studentData.class,
-            studentSession: studentData.session,
-            scores: score,
-            topCategories: topCategories,
-            totalQuestions: 30,
-            completedAt: now.toISOString(),
-            completedDate: now.toLocaleDateString('ms-MY'),
-            completedTime: now.toLocaleTimeString('ms-MY'),
-            completedDay: ['Ahad', 'Isnin', 'Selasa', 'Rabu', 'Khamis', 'Jumaat', 'Sabtu'][now.getDay()],
-            answers: userAnswers
+            studentName: studentName,
+            studentIC: studentIC,
+            studentClass: studentClass,
+            studentSession: studentSession,
+            date: currentDate,
+            time: currentTime,
+            day: currentDay,
+            scores: scores,
+            totalScore: totalScore,
+            topCategories: top3,
+            completedAt: new Date().toISOString(),
+            status: "completed"
         };
         
         try {
-            const docRef = doc(db, "ujian_minat_kerjaya_results", studentData.ic);
-            await setDoc(docRef, resultData);
-            console.log("Result saved to Firestore");
+            if (existingResultId) {
+                await updateDoc(doc(db, "ujian_minat_kerjaya", existingResultId), resultData);
+            } else {
+                await setDoc(doc(db, "ujian_minat_kerjaya", `${studentIC}_${Date.now()}`), resultData);
+            }
+            showToast("✅ Jawapan anda telah disimpan!");
             return true;
         } catch (error) {
             console.error("Error saving result:", error);
+            showToast("❌ Gagal menyimpan jawapan");
             return false;
         }
     }
     
-    // Render profile and start test or show locked
-    async function renderMain() {
-        studentData = getStudentData();
-        const dateTime = getCurrentDateTime();
-        const completed = await hasCompletedTest(studentData.ic);
-        
-        const mainContainer = document.getElementById('mainContent');
-        
-        if (completed) {
-            // Show locked message
-            mainContainer.innerHTML = `
-                <div class="locked-card">
-                    <i class="fas fa-lock"></i>
-                    <h3>⚠️ Anda Telah Menjawap Ujian Ini</h3>
-                    <p>Anda telah pun melengkapkan Inventori Minat Kerjaya pada tarikh sebelum ini.</p>
-                    <p>Sila rujuk kaunselor jika ingin menjawap semula.</p>
-                    <a href="psikometrik.html" class="btn-done" style="display: inline-block; margin-top: 1rem;">Kembali ke Pusat Ujian</a>
-                </div>
-            `;
-            return;
-        }
-        
-        // Show profile and start test
-        mainContainer.innerHTML = `
+    function renderProfile() {
+        return `
             <div class="profile-card">
-                <div class="profile-info">
-                    <h3><i class="fas fa-user-graduate"></i> ${escapeHtml(studentData.name)}</h3>
-                    <p><i class="fas fa-id-card"></i> ${escapeHtml(studentData.ic)} &nbsp;|&nbsp; <i class="fas fa-school"></i> Kelas: ${escapeHtml(studentData.class)}</p>
-                </div>
-                <div class="date-info">
-                    <p><i class="fas fa-calendar"></i> ${dateTime.tarikh}</p>
-                    <p><i class="fas fa-clock"></i> ${dateTime.masa}</p>
-                    <p><i class="fas fa-calendar-week"></i> ${dateTime.hari}</p>
+                <div class="profile-grid">
+                    <div class="profile-item">
+                        <div class="label">Nama Penuh</div>
+                        <div class="value">${studentName}</div>
+                    </div>
+                    <div class="profile-item">
+                        <div class="label">No. Kad Pengenalan</div>
+                        <div class="value">${studentIC}</div>
+                    </div>
+                    <div class="profile-item">
+                        <div class="label">Kelas</div>
+                        <div class="value">${studentClass}</div>
+                    </div>
+                    <div class="profile-item">
+                        <div class="label">Tarikh / Masa</div>
+                        <div class="value">${currentDate} • ${currentTime}</div>
+                    </div>
+                    <div class="profile-item">
+                        <div class="label">Hari</div>
+                        <div class="value">${currentDay}</div>
+                    </div>
                 </div>
             </div>
-            <div class="progress-container">
-                <span class="progress-text">Soalan <span id="currentQ">1</span>/30</span>
-                <div class="progress-bar-wrapper"><div class="progress-bar-fill" id="progressFill"></div></div>
-            </div>
-            <div id="questionContainer"></div>
         `;
-        
-        renderQuestion();
     }
     
-    function getQuestionGroupText(groupNum) {
-        if (groupNum === 1) return "SAYA SUKA...";
-        if (groupNum === 2) return "SAYA SUKA...";
-        if (groupNum === 3) return "SAYA SUKA...";
-        if (groupNum === 4) return "SAYA BERMINAT MENJADI...";
-        if (groupNum === 5) return "SAYA BOLEH...";
-        return "SAYA...";
+    function renderProgress() {
+        const percent = (currentIndex / allQuestions.length) * 100;
+        return `
+            <div class="progress-container">
+                <div class="progress-bar" style="width: ${percent}%;"></div>
+            </div>
+            <div style="text-align: right; font-size: 0.7rem; color: #64748b; margin-top: -1rem; margin-bottom: 1rem;">
+                Soalan ${currentIndex + 1} / ${allQuestions.length}
+            </div>
+        `;
     }
     
     function renderQuestion() {
-        if (currentQuestionIndex >= questions.length) {
-            finishTest();
+        if (currentIndex >= allQuestions.length) {
+            renderResult();
             return;
         }
         
-        const q = questions[currentQuestionIndex];
-        const groupText = getQuestionGroupText(q.group);
+        const q = allQuestions[currentIndex];
+        const header = getQuestionHeader(currentIndex);
+        const selected = answers[currentIndex];
         
-        const container = document.getElementById('questionContainer');
-        container.innerHTML = `
+        const html = `
+            ${renderProfile()}
+            ${renderProgress()}
             <div class="question-card">
                 <div class="question-header">
-                    <span class="question-number">Soalan ${currentQuestionIndex + 1}/30</span>
-                    <span class="question-category category-${q.cat}">${categoryNames[q.cat].split(' ')[0]}</span>
+                    <span class="question-num">Soalan ${currentIndex + 1}</span>
+                    <span class="question-cat">Kategori: ${q.cat}</span>
                 </div>
                 <div class="question-text">
-                    <span style="font-size:0.85rem; color:#64748b; display:block; margin-bottom:0.5rem;">${groupText}</span>
-                    ${escapeHtml(q.text)}
+                    ${header}<br>
+                    <span style="font-weight: 400;">${q.q}</span>
                 </div>
                 <div class="options">
-                    <button class="opt-btn opt-yes" onclick="answerQuestion('yes')">
+                    <button class="option-btn option-yes ${selected === true ? 'option-selected-yes' : ''}" onclick="answerQuestion(true)">
                         <i class="fas fa-check-circle"></i> YA
                     </button>
-                    <button class="opt-btn opt-no" onclick="answerQuestion('no')">
+                    <button class="option-btn option-no ${selected === false ? 'option-selected-no' : ''}" onclick="answerQuestion(false)">
                         <i class="fas fa-times-circle"></i> TIDAK
                     </button>
                 </div>
             </div>
+            <div class="nav-buttons">
+                <button class="nav-btn" onclick="prevQuestion()" ${currentIndex === 0 ? 'disabled' : ''}>
+                    <i class="fas fa-arrow-left"></i> Sebelum
+                </button>
+                <button class="nav-btn nav-btn-primary" onclick="nextQuestion()">
+                    ${currentIndex === allQuestions.length - 1 ? 'Selesai' : 'Seterusnya'} <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
         `;
         
-        // Update progress
-        const progress = ((currentQuestionIndex) / questions.length) * 100;
-        document.getElementById('progressFill').style.width = progress + '%';
-        document.getElementById('currentQ').innerText = currentQuestionIndex + 1;
+        document.getElementById('contentArea').innerHTML = html;
     }
     
     window.answerQuestion = function(answer) {
-        const q = questions[currentQuestionIndex];
-        const isYes = (answer === 'yes');
+        const q = allQuestions[currentIndex];
+        const previousAnswer = answers[currentIndex];
         
-        // Store answer
-        userAnswers.push({
-            questionNo: currentQuestionIndex + 1,
-            text: q.text,
-            category: q.cat,
-            answer: isYes ? 'Ya' : 'Tidak'
-        });
-        
-        if (isYes) {
-            answers[q.cat]++;
+        if (previousAnswer !== undefined) {
+            if (previousAnswer === true) scores[q.cat]--;
+            else if (previousAnswer === false) {}
         }
         
-        currentQuestionIndex++;
-        renderQuestion();
+        answers[currentIndex] = answer;
+        if (answer === true) {
+            scores[q.cat]++;
+        }
+        
+        saveProgress();
+        
+        // Update button styles
+        const yesBtn = document.querySelector('.option-yes');
+        const noBtn = document.querySelector('.option-no');
+        if (yesBtn && noBtn) {
+            if (answer === true) {
+                yesBtn.classList.add('option-selected-yes');
+                noBtn.classList.remove('option-selected-no');
+            } else {
+                noBtn.classList.add('option-selected-no');
+                yesBtn.classList.remove('option-selected-yes');
+            }
+        }
     };
     
-    async function finishTest() {
-        // Calculate top 3 categories
-        const sorted = Object.entries(answers).sort((a,b) => b[1] - a[1]);
-        const top3 = sorted.slice(0, 3);
-        const hollandCode = top3.map(t => t[0]).join('');
+    window.nextQuestion = function() {
+        if (answers[currentIndex] === undefined) {
+            showToast("Sila jawab soalan ini terlebih dahulu");
+            return;
+        }
         
-        const dateTime = getCurrentDateTime();
+        if (currentIndex < allQuestions.length - 1) {
+            currentIndex++;
+            saveProgress();
+            renderQuestion();
+        } else {
+            // Complete ujian
+            submitUjian();
+        }
+    };
+    
+    window.prevQuestion = function() {
+        if (currentIndex > 0) {
+            currentIndex--;
+            saveProgress();
+            renderQuestion();
+        }
+    };
+    
+    async function submitUjian() {
+        const totalAnswered = Object.keys(answers).length;
+        if (totalAnswered < allQuestions.length) {
+            showToast(`Sila jawab semua soalan (${allQuestions.length - totalAnswered} soalan lagi)`);
+            return;
+        }
         
-        // Save to Firestore
-        await saveResult(answers, top3);
+        await saveResultToFirestore();
+        hasCompleted = true;
+        localStorage.removeItem('imk_progress');
+        renderResult();
+    }
+    
+    function renderResult() {
+        const total = Object.values(scores).reduce((a,b) => a + b, 0);
+        const sorted = Object.entries(scores).sort((a,b) => b[1] - a[1]);
+        const top3 = sorted.slice(0,3);
         
-        // Build result HTML
-        let categoriesHtml = '';
-        for (let [cat, score] of Object.entries(answers)) {
-            const percentage = Math.round((score / 5) * 100);
-            categoriesHtml += `
-                <div class="category-result" style="border-left: 5px solid ${categoryColors[cat]}; background: ${categoryColors[cat]}10;">
-                    <span class="category-name">${categoryNames[cat]}</span>
-                    <span class="category-score" style="color: ${categoryColors[cat]};">${score}/5 (${percentage}%)</span>
+        const categoryNames = {
+            R: "REALISTIK (R) - Praktikal / Kerja Fizikal",
+            I: "INVESTIGATIF (I) - Sains / Penyelidikan",
+            A: "ARTISTIK (A) - Kreatif / Ekspresi Diri",
+            S: "SOSIAL (S) - Membantu / Berkomunikasi",
+            E: "ENTERPRISING (E) - Memimpin / Berniaga",
+            K: "KONVENSIONAL (K) - Teratur / Sistematik"
+        };
+        
+        const categoryColors = {
+            R: "#00d2ff", I: "#3a7bd5", A: "#6c5ce7", S: "#00b894", E: "#fdcb6e", K: "#e17055"
+        };
+        
+        let barsHtml = '';
+        for (let [cat, score] of sorted) {
+            const percent = (score / 30) * 100;
+            barsHtml += `
+                <div class="result-bar">
+                    <div class="result-bar-label">
+                        <span><strong>${cat}</strong> - ${categoryNames[cat].split(' - ')[0]}</span>
+                        <span>${score} / 30</span>
+                    </div>
+                    <div class="result-bar-fill">
+                        <span style="width: ${percent}%; background: ${categoryColors[cat]};"></span>
+                    </div>
                 </div>
             `;
         }
         
-        const container = document.getElementById('mainContent');
-        container.innerHTML = `
+        const topBadgesHtml = top3.map(([cat, score]) => 
+            `<span class="top-badge" style="background: ${categoryColors[cat]};">${cat} - ${categoryNames[cat].split(' - ')[0]} (${score})</span>`
+        ).join('');
+        
+        const html = `
+            ${renderProfile()}
             <div class="result-card">
                 <div class="result-title">
-                    <i class="fas fa-chart-simple"></i> Keputusan Inventori Minat Kerjaya
+                    <i class="fas fa-chart-pie"></i> KEPUTUSAN INVENTORI MINAT KERJAYA
                 </div>
-                <div class="profile-card" style="background: #f1f5f9; color: #1e293b;">
-                    <div class="profile-info">
-                        <h3><i class="fas fa-user-graduate"></i> ${escapeHtml(studentData.name)}</h3>
-                        <p><i class="fas fa-id-card"></i> ${escapeHtml(studentData.ic)}</p>
-                        <p><i class="fas fa-school"></i> Kelas: ${escapeHtml(studentData.class)}</p>
-                    </div>
-                    <div class="date-info">
-                        <p><i class="fas fa-calendar"></i> ${dateTime.tarikh}</p>
-                        <p><i class="fas fa-clock"></i> ${dateTime.masa}</p>
-                        <p><i class="fas fa-calendar-week"></i> ${dateTime.hari}</p>
-                    </div>
+                
+                <div class="top-categories">
+                    <h4>🏆 3 KATEGORI TERTINGGI ANDA 🏆</h4>
+                    <div>${topBadgesHtml}</div>
                 </div>
-                <div class="result-badge">
-                    <h2>${hollandCode}</h2>
-                    <p>Kod Holland Anda (3 kategori tertinggi)</p>
+                
+                <div class="result-chart">
+                    ${barsHtml}
                 </div>
-                ${categoriesHtml}
-                <div class="result-actions">
-                    <a href="psikometrik.html" class="btn-done"><i class="fas fa-home"></i> Kembali ke Pusat Ujian</a>
+                
+                <div style="background: #f1f5f9; border-radius: 1rem; padding: 1rem; margin-top: 1rem;">
+                    <p style="font-size: 0.8rem; color: #64748b; text-align: center;">
+                        <i class="fas fa-info-circle"></i> Kod Holland anda adalah gabungan tiga kategori tertinggi.<br>
+                        Contoh: Jika R, I, A tertinggi → Kod Holland anda adalah <strong>RIA</strong>
+                    </p>
+                    <p style="font-size: 0.7rem; color: #94a3b8; text-align: center; margin-top: 0.5rem;">
+                        Tarikh: ${currentDate} | Masa: ${currentTime} | Hari: ${currentDay}
+                    </p>
                 </div>
+                
+                <button class="btn-submit" onclick="window.location.href='psikometrik.html'">
+                    <i class="fas fa-check-circle"></i> Selesai & Kembali
+                </button>
             </div>
         `;
-    }
-    
-    function escapeHtml(str) {
-        if (!str) return '';
-        return str.replace(/[&<>]/g, function(m) {
-            if (m === '&') return '&amp;';
-            if (m === '<') return '&lt;';
-            if (m === '>') return '&gt;';
-            return m;
-        });
-    }
-    
-    // Check login status
-    function checkLoginStatus() {
-        const studentName = sessionStorage.getItem('studentName') || localStorage.getItem('studentName');
-        const studentIC = sessionStorage.getItem('studentIC') || localStorage.getItem('studentIC');
         
-        if (!studentName || !studentIC) {
-            window.location.href = 'page-pelajar.html';
-            return false;
-        }
-        return true;
+        document.getElementById('contentArea').innerHTML = html;
     }
     
-    // Initialize
-    if (checkLoginStatus()) {
-        renderMain();
+    function renderLocked() {
+        const html = `
+            ${renderProfile()}
+            <div class="locked-message">
+                <i class="fas fa-lock" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+                <h3>Ujian Telah Selesai</h3>
+                <p>Anda telah pun menjawab Inventori Minat Kerjaya ini.</p>
+                <p>Sila rujuk kaunselor untuk reset ujian jika perlu.</p>
+                <button class="btn-submit" style="background: #64748b; margin-top: 1rem;" onclick="window.location.href='psikometrik.html'">
+                    <i class="fas fa-arrow-left"></i> Kembali ke Senarai Ujian
+                </button>
+            </div>
+        `;
+        document.getElementById('contentArea').innerHTML = html;
     }
+    
+    async function init() {
+        const exists = await checkExistingResult();
+        if (exists) {
+            renderLocked();
+        } else {
+            loadProgress();
+            if (hasCompleted) {
+                renderResult();
+            } else {
+                renderQuestion();
+            }
+        }
+    }
+    
+    // Make functions global
+    window.answerQuestion = answerQuestion;
+    window.nextQuestion = nextQuestion;
+    window.prevQuestion = prevQuestion;
+    
+    init();
 </script>
 </body>
 </html>

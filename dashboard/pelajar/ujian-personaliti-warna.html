@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Ujian Inventori Personaliti Warna | E-MindCare SEMSIRA</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: linear-gradient(135deg, #e8f0fe 0%, #dfe7f5 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container { max-width: 800px; margin: 0 auto; }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid rgba(37,99,235,0.2);
+        }
+        .logo-area { display: flex; align-items: center; gap: 1rem; }
+        .logo-icon {
+            background: linear-gradient(145deg, #2563eb, #7c3aed);
+            width: 45px; height: 45px;
+            border-radius: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .logo-icon i { font-size: 1.5rem; color: white; }
+        .logo-text h1 {
+            font-size: 1.2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #1e293b, #2563eb);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .back-btn {
+            background: #eef2ff;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 40px;
+            cursor: pointer;
+            font-weight: 600;
+            color: #2563eb;
+            text-decoration: none;
+            font-size: 0.8rem;
+        }
+        .profile-card {
+            background: white;
+            border-radius: 1rem;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        .profile-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            justify-content: space-between;
+        }
+        .profile-item { flex: 1; min-width: 150px; }
+        .profile-item .label { font-size: 0.7rem; color: #64748b; }
+        .profile-item .value { font-weight: 700; color: #1e293b; font-size: 0.9rem; }
+        .progress-container {
+            background: #e2e8f0;
+            border-radius: 20px;
+            height: 10px;
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+        }
+        .progress-bar {
+            background: linear-gradient(95deg, #2563eb, #7c3aed);
+            width: 0%;
+            height: 100%;
+            transition: width 0.3s ease;
+        }
+        .progress-text {
+            text-align: right;
+            font-size: 0.7rem;
+            color: #64748b;
+            margin-top: -1rem;
+            margin-bottom: 1rem;
+        }
+        .question-card {
+            background: white;
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 8px 20px -8px rgba(0,0,0,0.1);
+        }
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .question-num {
+            background: #e0e7ff;
+            padding: 0.2rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: #2563eb;
+        }
+        .question-cat {
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+        }
+        .cat-emas { background: #fef3c7; color: #d97706; }
+        .cat-biru { background: #dbeafe; color: #2563eb; }
+        .cat-hijau { background: #dcfce7; color: #166534; }
+        .cat-jingga { background: #ffedd5; color: #ea580c; }
+        .question-text {
+            font-size: 1rem;
+            font-weight: 500;
+            color: #1e293b;
+            margin-bottom: 1.5rem;
+            line-height: 1.4;
+        }
+        .options {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+        .option-btn {
+            flex: 1;
+            padding: 0.8rem;
+            border-radius: 3rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 1rem;
+        }
+        .option-yes { background: #10b981; color: white; }
+        .option-yes:hover { background: #059669; transform: scale(1.02); }
+        .option-no { background: #ef4444; color: white; }
+        .option-no:hover { background: #dc2626; transform: scale(1.02); }
+        .option-selected-yes { background: #059669; box-shadow: 0 0 0 3px rgba(16,185,129,0.3); }
+        .option-selected-no { background: #dc2626; box-shadow: 0 0 0 3px rgba(220,38,38,0.3); }
+        .nav-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: space-between;
+            margin-top: 1rem;
+        }
+        .nav-btn {
+            padding: 0.7rem 1.5rem;
+            border-radius: 2rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: 0.2s;
+            background: #e2e8f0;
+            color: #1e293b;
+        }
+        .nav-btn-primary { background: linear-gradient(95deg, #2563eb, #7c3aed); color: white; }
+        .nav-btn-primary:hover { transform: translateY(-2px); }
+        .nav-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .result-card {
+            background: white;
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+            box-shadow: 0 8px 20px -8px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .result-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #1e293b;
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+        .result-chart { margin: 1.5rem 0; }
+        .result-bar { margin-bottom: 1rem; }
+        .result-bar-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.3rem;
+            font-size: 0.8rem;
+        }
+        .result-bar-fill {
+            background: #e2e8f0;
+            border-radius: 10px;
+            height: 25px;
+            overflow: hidden;
+        }
+        .result-bar-fill span {
+            display: block;
+            height: 100%;
+            border-radius: 10px;
+            width: 0%;
+            transition: width 1s ease;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 8px;
+            color: white;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+        .dominant-color {
+            background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            text-align: center;
+            margin: 1rem 0;
+        }
+        .dominant-badge {
+            display: inline-block;
+            padding: 0.5rem 1.5rem;
+            border-radius: 40px;
+            font-weight: 700;
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+        }
+        .color-emas { background: #fbbf24; color: #78350f; }
+        .color-biru { background: #3b82f6; color: white; }
+        .color-hijau { background: #10b981; color: white; }
+        .color-jingga { background: #f97316; color: white; }
+        .color-desc {
+            font-size: 0.9rem;
+            color: #1e293b;
+            line-height: 1.6;
+        }
+        .btn-submit {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(95deg, #10b981, #059669);
+            color: white;
+            border: none;
+            border-radius: 3rem;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.2s;
+            margin-top: 1rem;
+        }
+        .btn-submit:hover { transform: translateY(-2px); }
+        .locked-message {
+            text-align: center;
+            padding: 2rem;
+            background: #fef3c7;
+            border-radius: 1rem;
+            color: #92400e;
+        }
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #1e293b;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 10px;
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
+        }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @media (max-width: 600px) {
+            body { padding: 10px; }
+            .question-text { font-size: 0.9rem; }
+            .option-btn { padding: 0.6rem; font-size: 0.9rem; }
+            .profile-grid { flex-direction: column; gap: 0.5rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <div class="logo-area">
+            <div class="logo-icon"><i class="fas fa-palette"></i></div>
+            <div class="logo-text"><h1>Inventori Personaliti Warna</h1></div>
+        </div>
+        <a href="psikometrik.html" class="back-btn"><i class="fas fa-arrow-left"></i> Kembali</a>
+    </div>
+    <div id="contentArea">
+        <div class="loading-state" style="text-align:center; padding:2rem;">
+            <i class="fas fa-spinner fa-pulse"></i> Memuatkan...
+        </div>
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, collection, doc, getDoc, getDocs, setDoc, updateDoc, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    
+    const firebaseConfig = {
+        apiKey: "AIzaSyCfu7XC8pXtpDyQ-9Cjdg4AobA-EVEwWcc",
+        authDomain: "e-mindcare.firebaseapp.com",
+        projectId: "e-mindcare",
+        storageBucket: "e-mindcare.firebasestorage.app",
+        messagingSenderId: "1021883944936",
+        appId: "1:1021883944936:web:39c75a0c98d19a37afde5d",
+        measurementId: "G-3CJVKWGEXV"
+    };
+    
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const ujianResultsCollection = collection(db, "ujian_personaliti_warna");
+    
+    // Student data
+    const studentName = sessionStorage.getItem('studentName') || localStorage.getItem('studentName') || 'Pelajar';
+    const studentIC = sessionStorage.getItem('studentIC') || localStorage.getItem('studentIC') || '-';
+    const studentClass = sessionStorage.getItem('studentClass') || localStorage.getItem('studentClass') || '-';
+    const studentSession = sessionStorage.getItem('studentSession') || localStorage.getItem('studentSession') || '2026';
+    
+    // Date & Time
+    const now = new Date();
+    const currentDate = now.toLocaleDateString('ms-MY', { day: 'numeric', month: 'long', year: 'numeric' });
+    const currentTime = now.toLocaleTimeString('ms-MY', { hour: '2-digit', minute: '2-digit' });
+    const currentDay = now.toLocaleDateString('ms-MY', { weekday: 'long' });
+    
+    // ==================== SOALAN PERSONALITI WARNA (4 WARNA x 25 SOALAN = 100 SOALAN) ====================
+    const soalanEmas = [
+        "SAYA CEPAT MENYESUAIKAN DIRI DENGAN SITUASI BARU.",
+        "SAYA AMAT SELESA DENGAN PENGEKALAN CARA HIDUP TRADISI.",
+        "SAYA SANGAT MENGHARGAI KEHIDUPAN KELUARGA.",
+        "SAYA AKAN MELAKUKAN SEGALA KERJA SECARA BERSISTEMATIK.",
+        "SAYA SELESA MENGHORMATI PIHAK BERKUASA.",
+        "SAYA MEMPUNYAI EMOSI YANG STABIL",
+        "SAYA SENTIASA PATUH PADA PERATURAN WALAU DI MANA SAYA BERADA.",
+        "SAYA AMAT MENGHARGAI MASA.",
+        "SAYA SANGGUP BEKERJA KERAS UNTUK ORGANISASI.",
+        "SAYA SELESA MEMATUHI PERATURAN-PERATURAN YANG TELAH DITETAPKAN.",
+        "SAYA SEORANG YANG SUKA BERJIMAT CERMAT.",
+        "SAYA TIDAK SUKA BERPAKAIAN SELEKEH.",
+        "SAYA SERING BERSIFAT KONKRIT.",
+        "SAYA SEORANG YANG BERTANGGUNGJAWAB.",
+        "SAYA BERSIFAT KEIBUBAPAAN.",
+        "SAYA SEORANG YANG MEMENTINGKAN KEHARMONIAN.",
+        "SAYA SEORANG YANG AMANAH",
+        "SAYA SENTIASA BERSEDIA UNTUK MELAKUKAN SESUATU KERJA.",
+        "SAYA SELALUNYA DAPAT MEMBEZAKAN YANG BAIK DAN BURUK DALAM KEHIDUPAN.",
+        "SAYA BERPUAS HATI KERANA DAPAT MENOLONG SEORANG YANG MEMERLUKAN PERTOLONGAN.",
+        "SAYA SELALU MEMASTIKAN KESTABILAN DALAM SUASANA PEKERJAAN.",
+        "SAYA SEORANG YANG TELITI DALAM MEMBUAT SESUATU PEKERJAAN.",
+        "SAYA SENTIASA BERSIFAT WAJAR DALAM MEMBUAT SEBARANG KEPUTUSAN.",
+        "SAYA BERKEBOLEHAN UNTUK MENGENDALIKAN URUSAN YANG MEMERLUKAN PERINCIAN.",
+        "SAYA MAHIR MENYUSUN ATUR TEMPAT KERJA."
+    ];
+    
+    const soalanBiru = [
+        "SAYA MUDAH MESRA BILA BERHUBUNG DENGAN ORANG LAIN.",
+        "SAYA SUKA KELIHATAN BERBEZA DARIPADA ORANG LAIN.",
+        "SAYA SUKA MENUNJUKKAN KEPERIBADIAN SAYA SEBENAR DALAM SEMUA KEADAAN.",
+        "SAYA SELALU MEMBERI DORONGAN KEPADA ORANG LAIN UNTUK MELAKUKAN SESUATU PEKERJAAN.",
+        "SAYA SENANG BERINTERAKSI DENGAN ORANG LAIN.",
+        "SAYA CENDERUNG MEMILIH PEKERJAAN DALAM BIDANG PENDIDIKAN.",
+        "SAYA AMAT SESUAI MELIBATKAN DIRI DALAM AKTIVITI MENOLONG ORANG LAIN.",
+        "SAYA LEBIH SUKA MELIBATKAN DIRI DALAM PEKERJAAN YANG ADA UNSUR-UNSUR KESENIAN.",
+        "SAYA BERKEBOLEHAN UNTUK MENYELAMI PERASAAN ORANG.",
+        "SAYA MEMILIKI CIRI-CIRI SEORANG PENGASUH.",
+        "SAYA PERCAYA SETIAP ORANG MEMPUNYAI HARGA DIRI.",
+        "SAYA LEBIH BERMOTIVASI SEKIRANYA DIBERI DORONGAN.",
+        "SAYA TIDAK BERMINAT DENGAN AKTIVITI YANG MELIBATKAN PERSAINGAN.",
+        "SAYA MEMPUNYAI PERINSIP HIDUP YANG JELAS.",
+        "KEADAAN PERBALAHAN SELALU MENGGANGGU EMOSI SAYA.",
+        "SAYA SEORANG PENDENGAR YANG BAIK.",
+        "SAYA SEORANG YANG MENYAYANGI ORANG LAIN.",
+        "SEKALI SEKALA SAYA MUDAH TERASA APABILA ORANG LAIN BERCAKAP MENGENAI DIRI SAYA.",
+        "SAYA TIDAK GEMAR MENONTON CERITA YANG BERUNSUR KEGANASAN.",
+        "SAYA MUDAH RASA BERSALAH APABILA TIDAK MEMATUHI NASIHAT IBU BAPA.",
+        "SAYA MUDAH MEMAAFKAN KESALAHAN ORANG LAIN.",
+        "SAYA MUDAH SIMPATI KEPADA SESEORANG AWALAUPUN TERNYATA DIA BERSALAH.",
+        "SAYA SUKA MENIRU GAYA ORANG LAIN.",
+        "ZAMAN PERSEKOLAHAN SAYA BEGITU MEMBOSANKAN KERANA TERPAKSA MENGIKUT PERATURAN.",
+        "SAYA SUKA BERKHAYAL TENTANG MASA HADAPAN."
+    ];
+    
+    const soalanHijau = [
+        "SAYA LEBIH TUA DARI UMUR SEBENAR SAYA.",
+        "SAYA BERSEMANGAT MENGIKUTI SUBJEK YANG MERANSANG MINDA.",
+        "SAYA SENTIASA MEMBACA UNTUK MENAMBAH ILMU PENGETAHUAN.",
+        "SAYA SERING BERTANYA GURU MENGENAI PERSOALAN YANG MENGANGGU MINDA SAYA.",
+        "GURU MERUPAKAN ORANG YANG SANGAT SAYA HORMATI.",
+        "SAYA BERMINAT UNTUK MENEROKA SEMUA BIDANG.",
+        "SAYA SEORANG YANG SABAR.",
+        "SAYA SUKA MENGANALISIS DIRI SENDIRI DAN ORANG LAIN.",
+        "SAYA AKAN BERPUAS HATI SETELAH KERJA DISIAPKAN DENGAN SEMPURNA.",
+        "SAYA SUKA MEMBINCANGKAN FALSAFAH TENTANG SESUATU PERKARA.",
+        "SAYA SERING MEMINTA PENJELASAN TENTANG SESUATU PERSOALAN.",
+        "SAYA SUKA KEPADA PERKARA YANG MEMERLUKAN AKTIVITI PENYELIDIKAN.",
+        "SAYA GEMAR MEMBAHASKAN TEORI.",
+        "SAYA SEORANG BERTANGGUNGJAWAB.",
+        "SAYA CENDERUNG UNTUK MEREKA CIPTA SESUATU YANG BARU.",
+        "SAYA BERKEBOLEHAN MENJALANKAN SESUATU TUGAS DENGAN SEMPURNA.",
+        "SAYA SENTIASA BERSIFAT INGIN TAHU YANG TINGGI TERHADAP SESUATU.",
+        "SAYA ADALAH SEORANG YANG TENANG.",
+        "SAYA BERMINAT MENYERTAI PERTANDINGAN YANG MENCABAR MINDA SAYA.",
+        "BAGI SAYA KERJA ITU ADALAH SUATU PERMAINAN.",
+        "SAYA SEORANG YANG SANGAT MENYUKAI TUGAS-TUGAS YANG MENCABAR.",
+        "SAYA SUKA MEREKACIPTA SESUATU MODEL.",
+        "SAYA LEBIH SUKA MENEROKA IDEA-IDEA BARU.",
+        "SAYA BERMINAT UNTUK MENYERTAI AKTIVITI-AKTIVITI BERBENTUK ILMIAH.",
+        "SAYA AKAN BERALIH KE PROJEK YANG BARU SETELAH MENYELESAIKAN TUGAS YANG LAMA."
+    ];
+    
+    const soalanJingga = [
+        "SAYA ADALAH DALAM GOLONGAN ORANG YANG PANDAI.",
+        "SAYA ISIKAN MASA LAPANG DENGAN AKTIVITI LUAR YANG MENYERONOKKAN.",
+        "SAYA SUKA BERGAUL DENGAN SEMUA ORANG.",
+        "SAYA TIDAK GENTAR DENGAN SEBARANG CABARAN.",
+        "SAYA SEORANG YANG SUKA AKTIVITI PERKHEMAHAN.",
+        "PERSAINGAN ADALAH BAIK BAGI SAYA.",
+        "SAYA SUKAKAN PERKARA YANG BERBENTUK AMALI DARIPADA TEORI.",
+        "SAYA SELALU MENIMBULKAN SUASANA KECERIAAN KETIKA TEGANG.",
+        "SAYA SELALU MEMBERIKAN GERAK YANG SPONTAN DALAM SETIAP TINDAKAN.",
+        "SAYA SUKA KEPADA SESUATU YANG LUAR BISA DAN MENCABAR.",
+        "SAYA SUKA AKTIVITI YANG BERBAHAYA TETAPI MENYERONOKKAN.",
+        "SAYA SEORANG YANG KELAKAR.",
+        "SAYA TIDAK SUKA PELAJARAN YANG MEMERLUKAN PEMBACAAN YANG BANYAK.",
+        "SAYA SUKA AKTIVITI KOKURIKULUM YANG LASAK.",
+        "SAYA BOSAN DENGAN KERJA BERSTRUKTUR.",
+        "SAYA BOSAN DENGAN KERJA-KERJA RIGID.",
+        "SAYA BOSAN DENGAN KERJA RUTIN.",
+        "SAYA PUAS HATI DENGAN KERJA YANG MELIBATKAN KEBEBASAN.",
+        "SAYA PUAS HATI DENGAN KERJA YANG DAPAT MENGGUNAKAN KOORDINASI FIZIKAL.",
+        "SAYA BERPUAS HATI DENGAN KERJA YANG MENGGUNAKAN PERALATAN.",
+        "SAYA SEORANG PERFORMER SEMULAJADI",
+        "SAYA TIDAK SUKA DIKONGKONG.",
+        "SAYA TIDAK SUKA PADA PERATURAN.",
+        "PEKERJAAN TANPA JADUAL SANGAT MENARIK MINAT SAYA",
+        "SAYA SUKA MELAKUKAN KERJA TANPA TEKANAN."
+    ];
+    
+    // Build questions array (100 soalan)
+    let allQuestions = [];
+    for (let i = 0; i < 25; i++) {
+        allQuestions.push({ text: soalanEmas[i], cat: "EMAS" });
+        allQuestions.push({ text: soalanBiru[i], cat: "BIRU" });
+        allQuestions.push({ text: soalanHijau[i], cat: "HIJAU" });
+        allQuestions.push({ text: soalanJingga[i], cat: "JINGGA" });
+    }
+    console.log("Total soalan:", allQuestions.length); // 100
+    
+    let answers = {};
+    let currentIndex = 0;
+    let scores = { EMAS: 0, BIRU: 0, HIJAU: 0, JINGGA: 0 };
+    let hasCompleted = false;
+    let existingResultId = null;
+    
+    const catColors = {
+        EMAS: "#fbbf24", BIRU: "#3b82f6", HIJAU: "#10b981", JINGGA: "#f97316"
+    };
+    
+    function showToast(message) {
+        const toast = document.createElement('div');
+        toast.className = 'toast';
+        toast.innerHTML = `<i class="fas fa-info-circle"></i> ${message}`;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 3000);
+    }
+    
+    function saveProgress() {
+        localStorage.setItem('warna_progress', JSON.stringify({
+            currentIndex, answers, scores, hasCompleted
+        }));
+    }
+    
+    function loadProgress() {
+        const saved = localStorage.getItem('warna_progress');
+        if (saved) {
+            try {
+                const data = JSON.parse(saved);
+                if (!data.hasCompleted) {
+                    currentIndex = data.currentIndex;
+                    answers = data.answers;
+                    scores = data.scores;
+                    hasCompleted = data.hasCompleted;
+                }
+            } catch(e) {}
+        }
+    }
+    
+    async function checkExistingResult() {
+        try {
+            const q = query(ujianResultsCollection, where("studentIC", "==", studentIC));
+            const querySnapshot = await getDocs(q);
+            if (!querySnapshot.empty) {
+                querySnapshot.forEach((doc) => {
+                    hasCompleted = true;
+                    existingResultId = doc.id;
+                });
+                return true;
+            }
+            return false;
+        } catch (error) {
+            console.error("Error checking existing result:", error);
+            return false;
+        }
+    }
+    
+    async function saveResultToFirestore() {
+        // Get dominant color (highest score)
+        let dominantColor = "EMAS";
+        let highestScore = 0;
+        for (const [color, score] of Object.entries(scores)) {
+            if (score > highestScore) {
+                highestScore = score;
+                dominantColor = color;
+            }
+        }
+        
+        const resultData = {
+            studentName: studentName,
+            studentIC: studentIC,
+            studentClass: studentClass,
+            studentSession: studentSession,
+            date: currentDate,
+            time: currentTime,
+            day: currentDay,
+            scores: scores,
+            dominantColor: dominantColor,
+            dominantScore: highestScore,
+            completedAt: new Date().toISOString(),
+            status: "completed"
+        };
+        
+        try {
+            if (existingResultId) {
+                await updateDoc(doc(db, "ujian_personaliti_warna", existingResultId), resultData);
+            } else {
+                await setDoc(doc(db, "ujian_personaliti_warna", `${studentIC}_${Date.now()}`), resultData);
+            }
+            showToast("✅ Jawapan anda telah disimpan!");
+            return true;
+        } catch (error) {
+            console.error("Error saving result:", error);
+            showToast("❌ Gagal menyimpan jawapan");
+            return false;
+        }
+    }
+    
+    function renderProfile() {
+        return `
+            <div class="profile-card">
+                <div class="profile-grid">
+                    <div class="profile-item"><div class="label">Nama Penuh</div><div class="value">${studentName}</div></div>
+                    <div class="profile-item"><div class="label">No. Kad Pengenalan</div><div class="value">${studentIC}</div></div>
+                    <div class="profile-item"><div class="label">Kelas</div><div class="value">${studentClass}</div></div>
+                    <div class="profile-item"><div class="label">Tarikh / Masa</div><div class="value">${currentDate} • ${currentTime}</div></div>
+                    <div class="profile-item"><div class="label">Hari</div><div class="value">${currentDay}</div></div>
+                </div>
+            </div>
+        `;
+    }
+    
+    function renderProgress() {
+        const percent = (currentIndex / allQuestions.length) * 100;
+        return `
+            <div class="progress-container">
+                <div class="progress-bar" style="width: ${percent}%;"></div>
+            </div>
+            <div class="progress-text">Soalan ${currentIndex + 1} / ${allQuestions.length}</div>
+        `;
+    }
+    
+    function getCatClass(cat) {
+        if (cat === "EMAS") return "cat-emas";
+        if (cat === "BIRU") return "cat-biru";
+        if (cat === "HIJAU") return "cat-hijau";
+        return "cat-jingga";
+    }
+    
+    function renderQuestion() {
+        if (currentIndex >= allQuestions.length) {
+            renderResult();
+            return;
+        }
+        
+        const q = allQuestions[currentIndex];
+        const selected = answers[currentIndex];
+        
+        const html = `
+            ${renderProfile()}
+            ${renderProgress()}
+            <div class="question-card">
+                <div class="question-header">
+                    <span class="question-num">Soalan ${currentIndex + 1}</span>
+                    <span class="question-cat ${getCatClass(q.cat)}">${q.cat}</span>
+                </div>
+                <div class="question-text">${q.text}</div>
+                <div class="options">
+                    <button class="option-btn option-yes ${selected === true ? 'option-selected-yes' : ''}" onclick="answerQuestion(true)">
+                        <i class="fas fa-check-circle"></i> YA
+                    </button>
+                    <button class="option-btn option-no ${selected === false ? 'option-selected-no' : ''}" onclick="answerQuestion(false)">
+                        <i class="fas fa-times-circle"></i> TIDAK
+                    </button>
+                </div>
+            </div>
+            <div class="nav-buttons">
+                <button class="nav-btn" onclick="prevQuestion()" ${currentIndex === 0 ? 'disabled' : ''}>
+                    <i class="fas fa-arrow-left"></i> Sebelum
+                </button>
+                <button class="nav-btn nav-btn-primary" onclick="nextQuestion()">
+                    ${currentIndex === allQuestions.length - 1 ? 'Selesai' : 'Seterusnya'} <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+        `;
+        
+        document.getElementById('contentArea').innerHTML = html;
+    }
+    
+    window.answerQuestion = function(answer) {
+        const q = allQuestions[currentIndex];
+        const previousAnswer = answers[currentIndex];
+        
+        if (previousAnswer !== undefined) {
+            if (previousAnswer === true) scores[q.cat]--;
+        }
+        
+        answers[currentIndex] = answer;
+        if (answer === true) {
+            scores[q.cat]++;
+        }
+        
+        saveProgress();
+        
+        const yesBtn = document.querySelector('.option-yes');
+        const noBtn = document.querySelector('.option-no');
+        if (yesBtn && noBtn) {
+            if (answer === true) {
+                yesBtn.classList.add('option-selected-yes');
+                noBtn.classList.remove('option-selected-no');
+            } else {
+                noBtn.classList.add('option-selected-no');
+                yesBtn.classList.remove('option-selected-yes');
+            }
+        }
+    };
+    
+    window.nextQuestion = function() {
+        if (answers[currentIndex] === undefined) {
+            showToast("Sila jawab soalan ini terlebih dahulu");
+            return;
+        }
+        
+        if (currentIndex < allQuestions.length - 1) {
+            currentIndex++;
+            saveProgress();
+            renderQuestion();
+        } else {
+            submitUjian();
+        }
+    };
+    
+    window.prevQuestion = function() {
+        if (currentIndex > 0) {
+            currentIndex--;
+            saveProgress();
+            renderQuestion();
+        }
+    };
+    
+    async function submitUjian() {
+        const totalAnswered = Object.keys(answers).length;
+        if (totalAnswered < allQuestions.length) {
+            showToast(`Sila jawab semua soalan (${allQuestions.length - totalAnswered} soalan lagi)`);
+            return;
+        }
+        
+        await saveResultToFirestore();
+        hasCompleted = true;
+        localStorage.removeItem('warna_progress');
+        renderResult();
+    }
+    
+    function getDominantColor() {
+        let dominant = "EMAS";
+        let highest = 0;
+        for (const [color, score] of Object.entries(scores)) {
+            if (score > highest) {
+                highest = score;
+                dominant = color;
+            }
+        }
+        return { dominant, score: highest };
+    }
+    
+    function getColorDescription(color) {
+        const descriptions = {
+            EMAS: "Personaliti EMAS melambangkan individu yang bertanggungjawab, teratur, disiplin, dan menghargai tradisi. Anda adalah seorang yang boleh diharapkan, suka membantu, dan sentiasa mematuhi peraturan. Anda cenderung menjadi tulang belakang dalam sesebuah organisasi.",
+            BIRU: "Personaliti BIRU melambangkan individu yang kreatif, ekspresif, dan berperasaan. Anda seorang yang idealistik, suka membantu orang lain, dan mempunyai empati yang tinggi. Anda menghargai hubungan yang bermakna dan sering menjadi pendengar yang baik.",
+            HIJAU: "Personaliti HIJAU melambangkan individu yang analitikal, logikal, dan berfikiran strategik. Anda seorang yang ingin tahu, suka menyelesaikan masalah, dan sentiasa mencari ilmu pengetahuan baru. Anda cemerlang dalam bidang yang memerlukan pemikiran kritikal.",
+            JINGGA: "Personaliti JINGGA melambangkan individu yang bertenaga, spontan, dan suka mencabar. Anda seorang yang berani, suka pengembaraan, dan tidak takut mengambil risiko. Anda cemerlang dalam situasi yang memerlukan tindakan pantas dan kebolehan menyesuaikan diri."
+        };
+        return descriptions[dominant] || "";
+    }
+    
+    function renderResult() {
+        const { dominant, score } = getDominantColor();
+        const percent = (score / 25) * 100;
+        
+        const colorName = {
+            EMAS: "EMAS", BIRU: "BIRU", HIJAU: "HIJAU", JINGGA: "JINGGA"
+        };
+        
+        const colorClass = {
+            EMAS: "color-emas", BIRU: "color-biru", HIJAU: "color-hijau", JINGGA: "color-jingga"
+        };
+        
+        // Bar chart for all colors
+        let barsHtml = '';
+        const sorted = Object.entries(scores).sort((a,b) => b[1] - a[1]);
+        for (let [color, sc] of sorted) {
+            const perc = (sc / 25) * 100;
+            barsHtml += `
+                <div class="result-bar">
+                    <div class="result-bar-label">
+                        <span><strong>${color}</strong></span>
+                        <span>${sc} / 25</span>
+                    </div>
+                    <div class="result-bar-fill">
+                        <span style="width: ${perc}%; background: ${catColors[color]};"></span>
+                    </div>
+                </div>
+            `;
+        }
+        
+        const html = `
+            ${renderProfile()}
+            <div class="result-card">
+                <div class="result-title">
+                    <i class="fas fa-palette"></i> KEPUTUSAN INVENTORI PERSONALITI WARNA
+                </div>
+                
+                <div class="dominant-color">
+                    <div class="dominant-badge ${colorClass[dominant]}">
+                        🎨 WARNA DOMINAN: ${colorName[dominant]}
+                    </div>
+                    <div class="color-desc">
+                        ${getColorDescription(dominant)}
+                    </div>
+                    <p style="margin-top: 1rem; font-size: 0.8rem; color: #64748b;">
+                        Skor anda: ${score}/25 (${Math.round(percent)}%)
+                    </p>
+                </div>
+                
+                <div class="result-chart">
+                    <h4 style="margin-bottom: 1rem;">📊 Perincian Skor Setiap Warna</h4>
+                    ${barsHtml}
+                </div>
+                
+                <div style="background: #f1f5f9; border-radius: 1rem; padding: 1rem; margin-top: 1rem;">
+                    <p style="font-size: 0.8rem; color: #64748b; text-align: center;">
+                        <i class="fas fa-info-circle"></i> Personaliti warna dominan menunjukkan kecenderungan semula jadi anda dalam berinteraksi dan membuat keputusan.
+                    </p>
+                    <p style="font-size: 0.7rem; color: #94a3b8; text-align: center; margin-top: 0.5rem;">
+                        Tarikh: ${currentDate} | Masa: ${currentTime} | Hari: ${currentDay}
+                    </p>
+                </div>
+                
+                <button class="btn-submit" onclick="window.location.href='psikometrik.html'">
+                    <i class="fas fa-check-circle"></i> Selesai & Kembali
+                </button>
+            </div>
+        `;
+        
+        document.getElementById('contentArea').innerHTML = html;
+    }
+    
+    function renderLocked() {
+        const html = `
+            ${renderProfile()}
+            <div class="locked-message">
+                <i class="fas fa-lock" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+                <h3>Ujian Telah Selesai</h3>
+                <p>Anda telah pun menjawab Inventori Personaliti Warna ini.</p>
+                <p>Sila rujuk kaunselor untuk reset ujian jika perlu.</p>
+                <button class="btn-submit" style="background: #64748b; margin-top: 1rem;" onclick="window.location.href='psikometrik.html'">
+                    <i class="fas fa-arrow-left"></i> Kembali ke Senarai Ujian
+                </button>
+            </div>
+        `;
+        document.getElementById('contentArea').innerHTML = html;
+    }
+    
+    async function init() {
+        const exists = await checkExistingResult();
+        if (exists) {
+            renderLocked();
+        } else {
+            loadProgress();
+            if (hasCompleted) {
+                renderResult();
+            } else {
+                renderQuestion();
+            }
+        }
+    }
+    
+    window.answerQuestion = answerQuestion;
+    window.nextQuestion = nextQuestion;
+    window.prevQuestion = prevQuestion;
+    
+    init();
+</script>
+</body>
+</html>

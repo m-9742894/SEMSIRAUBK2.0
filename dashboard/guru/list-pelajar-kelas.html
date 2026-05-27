@@ -113,6 +113,44 @@
         }
         .edit-class-btn:hover { background: #2563eb; color: white; }
         
+        /* No Class Card */
+        .no-class-card {
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+            border-radius: 1.2rem;
+            padding: 2rem;
+            text-align: center;
+            margin-bottom: 1.5rem;
+            border: 1px solid #fcd34d;
+        }
+        .no-class-card i {
+            font-size: 3rem;
+            color: #d97706;
+            margin-bottom: 1rem;
+        }
+        .no-class-card h3 {
+            color: #92400e;
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+        }
+        .no-class-card p {
+            color: #78350f;
+            margin-bottom: 1rem;
+        }
+        .no-class-card .btn-edit-class {
+            background: #d97706;
+            color: white;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 2rem;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.2s;
+        }
+        .no-class-card .btn-edit-class:hover {
+            background: #b45309;
+            transform: translateY(-2px);
+        }
+        
         /* Access Denied Card */
         .access-denied {
             background: linear-gradient(135deg, #fee2e2, #fecaca);
@@ -484,7 +522,17 @@
         <div class="stat-card"><i class="fas fa-trophy"></i><div class="number" id="averageMerit">0</div><div class="label">Purata Merit</div></div>
     </div>
     
-    <!-- Access Denied Section - will show if teacher not assigned to this class/year -->
+    <!-- No Class Card - Teacher has no class assigned -->
+    <div id="noClassCard" class="no-class-card" style="display: none;">
+        <i class="fas fa-user-tag"></i>
+        <h3>Anda Belum Ditetapkan Sebagai Guru Kelas</h3>
+        <p>Anda belum mempunyai kelas yang dilantik untuk tahun ini. Sila rujuk kaunselor untuk penetapan kelas.</p>
+        <button class="btn-edit-class" onclick="document.getElementById('editClassYearBtn').click()">
+            <i class="fas fa-edit"></i> Tukar Paparan Kelas / Tahun
+        </button>
+    </div>
+    
+    <!-- Access Denied Card - Teacher not assigned to this specific class -->
     <div id="accessDeniedCard" class="access-denied" style="display: none;">
         <i class="fas fa-lock"></i>
         <h3>Akses Tidak Dibenarkan</h3>
@@ -495,7 +543,7 @@
         </button>
     </div>
     
-    <!-- Main Content - only visible if teacher is class teacher -->
+    <!-- Main Content - only visible if teacher has a class AND is the assigned class teacher -->
     <div id="mainContent" style="display: none;">
         <div class="action-bar">
             <button class="btn-add" id="addStudentBtn"><i class="fas fa-plus"></i> Tambah Pelajar Baru</button>
@@ -625,11 +673,6 @@
     let pendingDeleteId = null;
     let pendingDeleteName = null;
     
-    // Check if teacher is allowed to view this class/year
-    // For now, if currentClass is empty, allow access (view all students)
-    // If currentClass is not empty, check if teacher is assigned as class teacher
-    let isAccessAllowed = true;
-    
     function showAlert(msg, type) {
         const alertDiv = document.getElementById('alertMessage');
         alertDiv.textContent = msg;
@@ -642,46 +685,80 @@
         return str.replace(/[&<>]/g, m => m==='&'?'&amp;':m==='<'?'&lt;':'&gt;'); 
     }
     
+    // Check if teacher has a class assigned (not empty and not "-")
+    function hasTeacherClass() {
+        const teacherAssignedClass = sessionStorage.getItem('teacherAssignedClass') || sessionStorage.getItem('teacherClass') || '';
+        return teacherAssignedClass && teacherAssignedClass.trim() !== "" && teacherAssignedClass !== "-";
+    }
+    
     // Check if teacher is class teacher for current class/year
-    // This function checks if the teacher's assigned class matches the current class
-    // If currentClass is empty, always allow access
     function checkAccessRights() {
-        // If no class filter (view all students), always allow
-        if (!currentClass || currentClass.trim() === "") {
-            isAccessAllowed = true;
-            return true;
-        }
-        
         // Get teacher's assigned class from session
         const teacherAssignedClass = sessionStorage.getItem('teacherAssignedClass') || sessionStorage.getItem('teacherClass') || '';
         const teacherAssignedYear = sessionStorage.getItem('teacherAssignedYear') || sessionStorage.getItem('teacherYear') || '';
         
-        // Check if teacher is assigned to this exact class AND year
-        if (teacherAssignedClass && teacherAssignedClass === currentClass && teacherAssignedYear === currentYear) {
-            isAccessAllowed = true;
-            return true;
+        // CASE 1: Teacher has NO class assigned
+        if (!teacherAssignedClass || teacherAssignedClass.trim() === "" || teacherAssignedClass === "-") {
+            return { hasAccess: false, reason: 'no_class' };
         }
         
-        // If teacher is not assigned to this class/year
-        isAccessAllowed = false;
-        return false;
+        // CASE 2: Teacher has class but viewing ALL classes (currentClass empty)
+        if (!currentClass || currentClass.trim() === "") {
+            return { hasAccess: false, reason: 'no_class_filter' };
+        }
+        
+        // CASE 3: Teacher has class but viewing different class
+        if (teacherAssignedClass !== currentClass || teacherAssignedYear !== currentYear) {
+            return { hasAccess: false, reason: 'wrong_class', assignedClass: teacherAssignedClass, assignedYear: teacherAssignedYear };
+        }
+        
+        // CASE 4: Teacher has class and viewing their own class
+        return { hasAccess: true, reason: 'ok' };
     }
     
     function updateUIBasedOnAccess() {
         const accessDeniedCard = document.getElementById('accessDeniedCard');
+        const noClassCard = document.getElementById('noClassCard');
         const mainContent = document.getElementById('mainContent');
         const stats = document.querySelector('.stats');
         
-        if (!isAccessAllowed) {
-            // Show access denied message
-            accessDeniedCard.style.display = 'block';
+        const accessResult = checkAccessRights();
+        
+        if (!accessResult.hasAccess) {
+            // Hide main content
             mainContent.style.display = 'none';
-            document.getElementById('deniedClass').innerText = currentClass;
-            document.getElementById('deniedYear').innerText = currentYear;
-            // Hide stats or show zero
-            if (stats) stats.style.opacity = '0.5';
+            
+            if (accessResult.reason === 'no_class') {
+                // Teacher has no class assigned
+                noClassCard.style.display = 'block';
+                accessDeniedCard.style.display = 'none';
+                if (stats) stats.style.opacity = '0.5';
+                // Show zero stats
+                document.getElementById('totalStudents').innerText = '0';
+                document.getElementById('totalClassMerit').innerText = '0';
+                document.getElementById('averageMerit').innerText = '0';
+                // Also hide student container
+                document.getElementById('studentsContainer').innerHTML = `<div class="empty-state"><i class="fas fa-user-tag" style="font-size: 2rem;"></i><p>Anda belum ditetapkan sebagai guru kelas. Sila rujuk kaunselor.</p></div>`;
+            } else if (accessResult.reason === 'no_class_filter') {
+                // Teacher has class but viewing all classes (no filter)
+                noClassCard.style.display = 'block';
+                accessDeniedCard.style.display = 'none';
+                noClassCard.querySelector('h3').innerText = 'Anda Hanya Boleh Melihat Kelas Anda Sendiri';
+                noClassCard.querySelector('p').innerHTML = `Anda adalah guru kelas untuk <strong>${accessResult.assignedClass || 'kelas anda'}</strong> pada tahun ${accessResult.assignedYear || currentYear}. Sila tetapkan kelas anda untuk melihat senarai pelajar.`;
+                if (stats) stats.style.opacity = '0.5';
+                document.getElementById('studentsContainer').innerHTML = `<div class="empty-state"><i class="fas fa-lock" style="font-size: 2rem;"></i><p>Sila tetapkan kelas anda untuk melihat senarai pelajar.</p></div>`;
+            } else {
+                // Teacher viewing wrong class
+                noClassCard.style.display = 'none';
+                accessDeniedCard.style.display = 'block';
+                document.getElementById('deniedClass').innerText = currentClass;
+                document.getElementById('deniedYear').innerText = currentYear;
+                if (stats) stats.style.opacity = '0.5';
+                document.getElementById('studentsContainer').innerHTML = `<div class="empty-state"><i class="fas fa-lock" style="font-size: 2rem;"></i><p>Akses tidak dibenarkan untuk kelas ini.</p></div>`;
+            }
         } else {
-            // Show main content
+            // Teacher has access
+            noClassCard.style.display = 'none';
             accessDeniedCard.style.display = 'none';
             mainContent.style.display = 'block';
             if (stats) stats.style.opacity = '1';
@@ -690,26 +767,23 @@
     
     async function loadAllData() {
         // First check access rights
-        checkAccessRights();
-        updateUIBasedOnAccess();
+        const accessResult = checkAccessRights();
         
-        if (!isAccessAllowed) {
-            // Don't load data if access denied
-            document.getElementById('studentsContainer').innerHTML = `<div class="empty-state"><i class="fas fa-lock" style="font-size: 2rem;"></i><p>Akses tidak dibenarkan untuk kelas ini.</p></div>`;
-            document.getElementById('totalStudents').innerText = '0';
-            document.getElementById('totalClassMerit').innerText = '0';
-            document.getElementById('averageMerit').innerText = '0';
+        if (!accessResult.hasAccess) {
+            updateUIBasedOnAccess();
             return;
         }
         
+        // Show main content and hide cards
+        updateUIBasedOnAccess();
+        
         try {
-            // Build query - if class is empty, don't filter by class
-            let q;
-            if (currentClass && currentClass.trim() !== "") {
-                q = query(studentsCollection, where("class", "==", currentClass), where("session", "==", currentYear));
-            } else {
-                q = query(studentsCollection, where("session", "==", currentYear));
-            }
+            // Build query - filter by teacher's assigned class and year
+            const teacherAssignedClass = sessionStorage.getItem('teacherAssignedClass') || sessionStorage.getItem('teacherClass') || '';
+            const teacherAssignedYear = sessionStorage.getItem('teacherAssignedYear') || sessionStorage.getItem('teacherYear') || currentYear;
+            
+            // Only load students for teacher's assigned class and year
+            const q = query(studentsCollection, where("class", "==", teacherAssignedClass), where("session", "==", teacherAssignedYear));
             
             const studentsSnap = await getDocs(q);
             studentsList = [];
@@ -734,9 +808,14 @@
     
     function updateStats() {
         document.getElementById('totalStudents').innerText = studentsList.length;
-        const displayClassText = (currentClass && currentClass.trim() !== "") ? currentClass : 'Semua Kelas';
+        
+        // Display teacher's assigned class and year
+        const teacherAssignedClass = sessionStorage.getItem('teacherAssignedClass') || sessionStorage.getItem('teacherClass') || '-';
+        const teacherAssignedYear = sessionStorage.getItem('teacherAssignedYear') || sessionStorage.getItem('teacherYear') || currentYear;
+        
+        const displayClassText = (teacherAssignedClass && teacherAssignedClass.trim() !== "" && teacherAssignedClass !== "-") ? teacherAssignedClass : 'Tiada Kelas';
         document.getElementById('displayClass').innerText = displayClassText;
-        document.getElementById('displayYear').innerText = currentYear;
+        document.getElementById('displayYear').innerText = teacherAssignedYear;
         
         let classTotalMerit = 0;
         studentsList.forEach(student => {
@@ -851,10 +930,10 @@
             );
         }
         
-        const classDisplay = (currentClass && currentClass.trim() !== "") ? currentClass : 'semua kelas';
+        const teacherClass = sessionStorage.getItem('teacherAssignedClass') || sessionStorage.getItem('teacherClass') || '-';
         
         if (filtered.length === 0) {
-            container.innerHTML = `<div class="empty-state"><i class="fas fa-user-slash" style="font-size: 2rem;"></i><p>Tiada pelajar ditemui dalam ${classDisplay} (${currentYear}).</p><button class="btn-add" id="quickAddBtn" style="margin-top:1rem;"><i class="fas fa-plus"></i> Tambah Pelajar</button></div>`;
+            container.innerHTML = `<div class="empty-state"><i class="fas fa-user-slash" style="font-size: 2rem;"></i><p>Tiada pelajar ditemui dalam kelas ${teacherClass} (${currentYear}).</p><button class="btn-add" id="quickAddBtn" style="margin-top:1rem;"><i class="fas fa-plus"></i> Tambah Pelajar</button></div>`;
             const quickBtn = document.getElementById('quickAddBtn');
             if (quickBtn) quickBtn.onclick = () => openAddStudentModal();
             return;
@@ -954,12 +1033,15 @@
     
     // ==================== STUDENT CRUD ====================
     function openAddStudentModal() {
+        const teacherAssignedClass = sessionStorage.getItem('teacherAssignedClass') || sessionStorage.getItem('teacherClass') || '';
+        const teacherAssignedYear = sessionStorage.getItem('teacherAssignedYear') || sessionStorage.getItem('teacherYear') || currentYear;
+        
         document.getElementById('modalTitle').innerHTML = '<i class="fas fa-user-plus"></i> Tambah Pelajar Baru';
         document.getElementById('studentId').value = '';
         document.getElementById('fullname').value = '';
         document.getElementById('icNumber').value = '';
-        document.getElementById('className').value = currentClass;
-        document.getElementById('session').value = currentYear;
+        document.getElementById('className').value = teacherAssignedClass;
+        document.getElementById('session').value = teacherAssignedYear;
         document.getElementById('studentModal').style.display = 'flex';
     }
     
@@ -1025,8 +1107,10 @@
     
     // ==================== CLASS & YEAR MANAGEMENT ====================
     document.getElementById('editClassYearBtn').addEventListener('click', () => {
-        document.getElementById('newClassName').value = currentClass;
-        document.getElementById('newYear').value = currentYear;
+        const currentClassFromSession = sessionStorage.getItem('teacherAssignedClass') || sessionStorage.getItem('teacherClass') || '';
+        const currentYearFromSession = sessionStorage.getItem('teacherAssignedYear') || sessionStorage.getItem('teacherYear') || currentYear;
+        document.getElementById('newClassName').value = currentClassFromSession;
+        document.getElementById('newYear').value = currentYearFromSession;
         document.getElementById('editClassModal').style.display = 'flex';
     });
     
@@ -1039,16 +1123,19 @@
             return;
         }
         
+        // Save to session storage
+        sessionStorage.setItem('teacherAssignedClass', newClass);
+        sessionStorage.setItem('teacherAssignedYear', newYear);
+        sessionStorage.setItem('teacherClass', newClass);
+        sessionStorage.setItem('teacherYear', newYear);
+        
         currentClass = newClass;
         currentYear = newYear;
         
-        sessionStorage.setItem('teacherClass', currentClass);
-        sessionStorage.setItem('teacherYear', currentYear);
-        
         closeEditClassModal();
         loadAllData();
-        const classDisplay = (currentClass && currentClass !== "") ? currentClass : "semua kelas";
-        showAlert(`✅ Kini melihat ${classDisplay} (${currentYear})`, 'success');
+        const classDisplay = (newClass && newClass !== "") ? newClass : "semua kelas";
+        showAlert(`✅ Kini melihat ${classDisplay} (${newYear})`, 'success');
     });
     
     // ==================== TRANSFER STUDENTS ====================
@@ -1114,9 +1201,13 @@
     });
     
     // Initialize
-    const displayClassText = (currentClass && currentClass.trim() !== "") ? currentClass : 'Semua Kelas';
+    const teacherAssignedClass = sessionStorage.getItem('teacherAssignedClass') || sessionStorage.getItem('teacherClass') || '-';
+    const teacherAssignedYear = sessionStorage.getItem('teacherAssignedYear') || sessionStorage.getItem('teacherYear') || currentYear;
+    
+    const displayClassText = (teacherAssignedClass && teacherAssignedClass.trim() !== "" && teacherAssignedClass !== "-") ? teacherAssignedClass : '-';
     document.getElementById('displayClass').innerText = displayClassText;
-    document.getElementById('displayYear').innerText = currentYear;
+    document.getElementById('displayYear').innerText = teacherAssignedYear;
+    
     loadAllData();
 </script>
 </body>

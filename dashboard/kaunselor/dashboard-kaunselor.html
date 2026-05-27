@@ -325,7 +325,7 @@
   </div>
 
   <div class="menu-grid">
-    <!-- 1. KEPUTUSAN UJIAN INVENTORI -->
+    <!-- 1. KEPUTUSAN UJIAN INVENTORI - Redirect ke keputusan-ujian-psikometrik.html -->
     <div class="menu-card" data-menu="keputusan-ujian">
       <div class="menu-icon"><i class="fas fa-chart-simple"></i></div>
       <h3>Keputusan Ujian Inventori</h3>
@@ -430,7 +430,8 @@
     switch(menuType) {
       // Urusan Utama
       case 'keputusan-ujian':
-        targetUrl = 'keputusan-ujian.html';
+        // ✅ Tukar ke keputusan-ujian-psikometrik.html
+        targetUrl = 'keputusan-ujian-psikometrik.html';
         break;
       case 'mata-merit':
         targetUrl = 'mata-merit.html';

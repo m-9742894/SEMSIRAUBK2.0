@@ -304,8 +304,8 @@
             <div class="enter-btn">Terokai <i class="fas fa-arrow-right"></i></div>
         </div>
 
-        <!-- 2. MOOD CHECK IN -->
-        <div class="menu-card" data-url="mood-checkin.html">
+        <!-- 2. MOOD CHECK IN -> folder mood-checkin/ -->
+        <div class="menu-card" data-url="mood-checkin/mood-checkin.html">
             <div class="menu-icon"><i class="fas fa-smile-beam"></i></div>
             <h3>Mood Check-in</h3>
             <div class="menu-desc">Luahkan rasa, tenang di jiwa • Jejak emosi harian</div>
@@ -373,7 +373,7 @@
 <script>
     AOS.init({ once: true, duration: 700, offset: 10 });
 
-    // Fungsi untuk redirect ke page kosong (atau page yang akan dibina nanti)
+    // Fungsi untuk redirect ke page
     const menuCards = document.querySelectorAll('.menu-card');
     menuCards.forEach(card => {
         card.addEventListener('click', (e) => {

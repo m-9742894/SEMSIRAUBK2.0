@@ -69,6 +69,105 @@
       display: inline-block;
     }
     .stats span { font-weight: 800; color: #4f46e5; font-size: 1.3rem; }
+    
+    /* Search Section */
+    .search-section {
+      background: white;
+      border-radius: 1.2rem;
+      padding: 1.2rem;
+      margin-bottom: 1.5rem;
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+    }
+    .search-wrapper {
+      flex: 1;
+      position: relative;
+    }
+    .search-box {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: #f8fafc;
+      padding: 0.7rem 1rem;
+      border-radius: 50px;
+      border: 1px solid #e2e8f0;
+      transition: 0.2s;
+    }
+    .search-box:focus-within {
+      border-color: #4f46e5;
+      box-shadow: 0 0 0 3px rgba(79,70,229,0.1);
+    }
+    .search-box i {
+      color: #94a3b8;
+    }
+    .search-box input {
+      flex: 1;
+      border: none;
+      background: transparent;
+      outline: none;
+      font-size: 0.9rem;
+    }
+    .suggestions-list {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: white;
+      border-radius: 1rem;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+      max-height: 300px;
+      overflow-y: auto;
+      z-index: 100;
+      margin-top: 8px;
+      display: none;
+      border: 1px solid #e2e8f0;
+    }
+    .suggestions-list div {
+      padding: 0.8rem 1rem;
+      cursor: pointer;
+      border-bottom: 1px solid #f1f5f9;
+      transition: 0.2s;
+    }
+    .suggestions-list div:hover {
+      background: #f1f5f9;
+    }
+    .suggestions-list div .suggestion-name {
+      font-weight: 700;
+      color: #1e293b;
+    }
+    .suggestions-list div .suggestion-detail {
+      font-size: 0.7rem;
+      color: #64748b;
+      margin-top: 2px;
+    }
+    .refresh-btn {
+      background: #f1f5f9;
+      border: none;
+      padding: 0.6rem 1.2rem;
+      border-radius: 50px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: 0.2s;
+    }
+    .refresh-btn:hover {
+      background: #e2e8f0;
+    }
+    .clear-search {
+      background: none;
+      border: none;
+      color: #94a3b8;
+      cursor: pointer;
+      padding: 0 8px;
+      display: none;
+    }
+    .clear-search:hover {
+      color: #ef4444;
+    }
+    
     .card {
       background: white;
       border-radius: 1.5rem;
@@ -130,6 +229,7 @@
       align-items: center;
       flex-wrap: wrap;
       gap: 0.5rem;
+      transition: 0.2s;
     }
     .teacher-item:hover { background: #f1f5f9; }
     .teacher-info { flex: 1; }
@@ -253,6 +353,19 @@
 
   <div id="successMsg" class="success-msg"></div>
 
+  <!-- SEARCH SECTION WITH AUTO SUGGESTION -->
+  <div class="search-section">
+    <div class="search-wrapper">
+      <div class="search-box">
+        <i class="fas fa-search"></i>
+        <input type="text" id="searchInput" placeholder="Cari guru (nama, IC, atau kelas)..." autocomplete="off">
+        <button class="clear-search" id="clearSearchBtn"><i class="fas fa-times-circle"></i></button>
+      </div>
+      <div id="suggestionsList" class="suggestions-list"></div>
+    </div>
+    <button class="refresh-btn" id="refreshBtn"><i class="fas fa-sync-alt"></i> Muat Semula</button>
+  </div>
+
   <!-- Add Teacher Form -->
   <div class="card">
     <h2><i class="fas fa-user-plus"></i> Tambah Guru Baru</h2>
@@ -310,6 +423,7 @@
 
   // ==================== GLOBAL VARIABLES ====================
   let teachers = [];
+  let allTeachers = []; // For search filtering
   let students = [];
   let currentEditTeacherId = null;
 
@@ -346,7 +460,8 @@
       querySnapshot.forEach((doc) => {
         teachers.push({ id: doc.id, ...doc.data() });
       });
-      renderTeacherList();
+      allTeachers = [...teachers];
+      renderTeacherList(teachers);
       updateTotalCount();
       console.log("Teachers loaded from Firebase:", teachers.length);
     } catch (error) {
@@ -388,8 +503,8 @@
       
       const docRef = await addDoc(teachersCollection, newTeacher);
       teachers.push({ id: docRef.id, ...newTeacher });
-      
-      renderTeacherList();
+      allTeachers = [...teachers];
+      renderTeacherList(teachers);
       updateTotalCount();
       showMessage(`✅ Guru ${fullname} berjaya didaftarkan!`, "success");
       return { success: true };
@@ -405,7 +520,8 @@
     try {
       await deleteDoc(doc(db, "teachers", id));
       teachers = teachers.filter(t => t.id !== id);
-      renderTeacherList();
+      allTeachers = [...teachers];
+      renderTeacherList(teachers);
       updateTotalCount();
       showMessage("Guru berjaya dipadam.", "success");
     } catch (error) {
@@ -446,7 +562,8 @@
         if (newYear !== undefined) teacher.year = newYear.trim() || "2026";
       }
       
-      renderTeacherList();
+      allTeachers = [...teachers];
+      renderTeacherList(teachers);
       showMessage("✅ Maklumat guru berjaya dikemaskini!", "success");
       return true;
     } catch (error) {
@@ -505,6 +622,79 @@
       console.error("Error editing student:", error);
       showMessage("Gagal mengemaskini pelajar: " + error.message, "error");
     }
+  }
+
+  // ==================== SEARCH & AUTO SUGGESTION FUNCTIONS ====================
+  function filterTeachers(searchTerm) {
+    if (!searchTerm.trim()) {
+      renderTeacherList(allTeachers);
+      return;
+    }
+    
+    const term = searchTerm.toLowerCase();
+    const filtered = allTeachers.filter(teacher => 
+      teacher.fullname?.toLowerCase().includes(term) ||
+      teacher.icNumber?.toLowerCase().includes(term) ||
+      teacher.teacherClass?.toLowerCase().includes(term) ||
+      teacher.year?.toLowerCase().includes(term)
+    );
+    renderTeacherList(filtered);
+  }
+
+  function updateSuggestions(searchTerm) {
+    const suggestionsDiv = document.getElementById('suggestionsList');
+    const clearBtn = document.getElementById('clearSearchBtn');
+    
+    if (!searchTerm.trim()) {
+      suggestionsDiv.style.display = 'none';
+      clearBtn.style.display = 'none';
+      return;
+    }
+    
+    clearBtn.style.display = 'block';
+    const term = searchTerm.toLowerCase();
+    const matches = allTeachers.filter(teacher => 
+      teacher.fullname?.toLowerCase().includes(term) ||
+      teacher.icNumber?.toLowerCase().includes(term) ||
+      teacher.teacherClass?.toLowerCase().includes(term)
+    ).slice(0, 8);
+    
+    if (matches.length === 0) {
+      suggestionsDiv.innerHTML = `<div style="padding:0.8rem;color:#94a3b8;"><i class="fas fa-info-circle"></i> Tiada guru dijumpai</div>`;
+      suggestionsDiv.style.display = 'block';
+      return;
+    }
+    
+    suggestionsDiv.innerHTML = matches.map(match => `
+      <div onclick="selectSuggestion('${match.id}')">
+        <div class="suggestion-name">
+          <i class="fas fa-user-tie" style="color:#4f46e5; font-size:0.8rem;"></i>
+          ${escapeHtml(match.fullname)}
+        </div>
+        <div class="suggestion-detail">
+          <i class="fas fa-id-card"></i> ${escapeHtml(match.icNumber)} &nbsp;|&nbsp;
+          <i class="fas fa-school"></i> ${escapeHtml(match.teacherClass)} &nbsp;|&nbsp;
+          <i class="fas fa-calendar"></i> ${match.year}
+        </div>
+      </div>
+    `).join('');
+    suggestionsDiv.style.display = 'block';
+  }
+
+  window.selectSuggestion = function(teacherId) {
+    const teacher = allTeachers.find(t => t.id === teacherId);
+    if (teacher) {
+      document.getElementById('searchInput').value = teacher.fullname;
+      document.getElementById('suggestionsList').style.display = 'none';
+      filterTeachers(teacher.fullname);
+    }
+  };
+
+  function clearSearch() {
+    document.getElementById('searchInput').value = '';
+    document.getElementById('suggestionsList').style.display = 'none';
+    document.getElementById('clearSearchBtn').style.display = 'none';
+    renderTeacherList(allTeachers);
   }
 
   // ==================== RENDER FUNCTIONS ====================
@@ -586,15 +776,15 @@
     closeModal();
   }
 
-  function renderTeacherList() {
+  function renderTeacherList(teachersToRender) {
     const container = document.getElementById('teacherListContainer');
     
-    if (teachers.length === 0) {
+    if (teachersToRender.length === 0) {
       container.innerHTML = `<div class="empty-state"><i class="fas fa-user-slash" style="font-size: 2rem;"></i><p>Tiada guru berdaftar.</p></div>`;
       return;
     }
 
-    container.innerHTML = teachers.map(teacher => `
+    container.innerHTML = teachersToRender.map(teacher => `
       <div class="teacher-item">
         <div class="teacher-info">
           <div class="teacher-name">
@@ -644,12 +834,41 @@
     }
   });
 
+  // Search input event
+  const searchInput = document.getElementById('searchInput');
+  searchInput.addEventListener('input', (e) => {
+    const value = e.target.value;
+    updateSuggestions(value);
+    filterTeachers(value);
+  });
+  
+  // Clear search button
+  document.getElementById('clearSearchBtn').addEventListener('click', clearSearch);
+  
+  // Refresh button
+  document.getElementById('refreshBtn').addEventListener('click', async () => {
+    await loadTeachers();
+    await loadAllStudents();
+    searchInput.value = '';
+    clearSearch();
+    showMessage("Data berjaya dimuat semula!", "success");
+  });
+  
+  // Close suggestions when clicking outside
+  document.addEventListener('click', function(e) {
+    const wrapper = document.querySelector('.search-wrapper');
+    if (wrapper && !wrapper.contains(e.target)) {
+      document.getElementById('suggestionsList').style.display = 'none';
+    }
+  });
+
   // Make functions global for onclick
   window.openTeacherDetailDialog = openTeacherDetailDialog;
   window.deleteTeacherFromFirebase = deleteTeacherFromFirebase;
   window.saveTeacherEdit = saveTeacherEdit;
   window.closeModal = closeModal;
   window.editStudentFromModal = editStudentFromModal;
+  window.selectSuggestion = selectSuggestion;
 
   // Initialize
   await loadAllStudents();

@@ -173,13 +173,15 @@
             margin-bottom: 0.8rem;
             border-left: 4px solid;
         }
-        .log-item.success { border-left-color: #10b981; }
+        .log-item.hadir { border-left-color: #10b981; }
+        .log-item.lewat { border-left-color: #f59e0b; }
         .log-item.error { border-left-color: #ef4444; }
         .log-name { font-weight: 700; color: white; font-size: 0.9rem; }
         .log-detail { font-size: 0.7rem; color: #94a3b8; margin-top: 4px; }
-        .log-time { font-size: 0.65rem; color: #64748b; margin-top: 5px; display: flex; justify-content: space-between; }
+        .log-time { font-size: 0.65rem; color: #64748b; margin-top: 5px; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 5px; }
         .badge-status { display: inline-block; padding: 0.2rem 0.5rem; border-radius: 20px; font-size: 0.6rem; font-weight: 600; }
         .badge-hadir { background: #10b981; color: white; }
+        .badge-lewat { background: #f59e0b; color: #78350f; }
         .empty-log { text-align: center; padding: 2rem; color: #64748b; }
         
         .info-note {
@@ -319,6 +321,7 @@
     let isSystemOpen = false;
     let guruVerified = false;
     let currentGuruName = "";
+    let attendanceSettings = { timeOpen: "07:00", timeLate: "08:00", timeClose: "16:00" };
     
     // DOM Elements
     const scanGuruBtn = document.getElementById('scanGuruBtn');
@@ -341,6 +344,23 @@
     setInterval(updateDateTime, 1000);
     updateDateTime();
     
+    // Load attendance settings from Firestore
+    async function loadAttendanceSettings() {
+        try {
+            const docSnap = await getDoc(settingsRef);
+            if (docSnap.exists()) {
+                const data = docSnap.data();
+                if (data.timeOpen) attendanceSettings.timeOpen = data.timeOpen;
+                if (data.timeLate) attendanceSettings.timeLate = data.timeLate;
+                if (data.timeClose) attendanceSettings.timeClose = data.timeClose;
+                console.log("Attendance settings loaded:", attendanceSettings);
+            }
+        } catch (error) {
+            console.error("Error loading settings:", error);
+        }
+    }
+    
+    // Check if today is holiday
     async function checkHoliday() {
         try {
             const settings = await getDoc(settingsRef);
@@ -360,22 +380,64 @@
         } catch(e) { console.error(e); }
     }
     
-    function addLog(name, ic, className, status) {
-        const now = new Date();
-        const timeStr = now.toLocaleTimeString('ms-MY', { hour: '2-digit', minute: '2-digit' });
+    // Get status based on current time
+    function getAttendanceStatus(currentTime) {
+        // Format time to HH:MM for comparison
+        const timeStr = currentTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
+        
+        if (timeStr <= attendanceSettings.timeOpen) {
+            return { status: 'hadir', text: 'Hadir', badgeClass: 'badge-hadir' };
+        } else if (timeStr <= attendanceSettings.timeLate) {
+            return { status: 'lewat', text: 'Lewat', badgeClass: 'badge-lewat' };
+        } else {
+            return { status: 'terlambat', text: 'Terlambat (Melebihi Waktu)', badgeClass: 'badge-lewat' };
+        }
+    }
+    
+    // Add attendance record with proper status
+    function addLog(name, ic, className, status, statusText, timeStr) {
         const logContainer = document.getElementById('logList');
         if (logContainer.querySelector('.empty-log')) logContainer.innerHTML = '';
+        
+        const statusClass = status === 'hadir' ? 'hadir' : 'lewat';
+        const badgeClass = status === 'hadir' ? 'badge-hadir' : 'badge-lewat';
+        
         const logItem = document.createElement('div');
-        logItem.className = 'log-item success';
-        logItem.innerHTML = `<div class="log-name">✅ ${name}</div>
+        logItem.className = `log-item ${statusClass}`;
+        logItem.innerHTML = `<div class="log-name">${status === 'hadir' ? '✅' : '⚠️'} ${name}</div>
             <div class="log-detail">IC: ${ic} | Kelas: ${className}</div>
-            <div class="log-time"><span>${timeStr}</span><span class="badge-status badge-hadir">Hadir</span></div>`;
+            <div class="log-time">
+                <span><i class="fas fa-clock"></i> ${timeStr}</span>
+                <span class="badge-status ${badgeClass}">${statusText}</span>
+            </div>`;
         logContainer.insertBefore(logItem, logContainer.firstChild);
         
+        // Keep only last 20 logs
+        while (logContainer.children.length > 20) {
+            logContainer.removeChild(logContainer.lastChild);
+        }
+    }
+    
+    // Save attendance to Firestore
+    async function saveAttendanceToFirestore(name, ic, className, status, statusText, timeStr) {
+        const now = new Date();
         const dateStr = now.toLocaleDateString('ms-MY');
-        setDoc(doc(attendanceRef, `${ic}_${dateStr.replace(/\//g, '-')}`), {
-            ic, name, className, scanDate: dateStr, time: timeStr, status: 'hadir', timestamp: Timestamp.now()
-        }).catch(e => console.error(e));
+        
+        try {
+            await setDoc(doc(attendanceRef, `${ic}_${dateStr.replace(/\//g, '-')}`), {
+                ic: ic,
+                name: name,
+                className: className,
+                scanDate: dateStr,
+                time: timeStr,
+                status: status,
+                statusText: statusText,
+                timestamp: Timestamp.now()
+            });
+            console.log(`Attendance saved: ${name} - ${statusText} at ${timeStr}`);
+        } catch (error) {
+            console.error("Error saving attendance:", error);
+        }
     }
     
     async function verifyGuruQR(qrData) {
@@ -402,17 +464,20 @@
                 guruStatus.className = 'guru-status guru-verified';
                 guruStatus.innerHTML = `<i class="fas fa-check-circle"></i> Guru ${teacherName} disahkan! Sistem kehadiran dibuka.`;
                 
-                // Tutup scanner guru
                 if (guruHtml5Qr) {
                     try { await guruHtml5Qr.stop(); } catch(e) {}
                 }
                 guruScannerModal.style.display = 'none';
                 document.getElementById('guruSection').style.display = 'none';
                 
-                // Buka scanner pelajar
                 studentScannerSection.style.display = 'block';
                 document.getElementById('logSection').style.display = 'block';
                 document.getElementById('scannerStatus').innerHTML = '✅ Sistem dibuka - Sila scan QR pelajar';
+                
+                // Display current attendance time rules
+                const timeRuleMsg = `⏰ Waktu Kehadiran: Hadir (sebelum ${attendanceSettings.timeOpen}) | Lewat (${attendanceSettings.timeOpen} - ${attendanceSettings.timeLate}) | Melebihi waktu (selepas ${attendanceSettings.timeLate})`;
+                console.log(timeRuleMsg);
+                
                 startStudentScanner();
                 return true;
             } else {
@@ -478,14 +543,46 @@
                         const qrData = JSON.parse(decodedText);
                         if (qrData.type === 'attendance' && qrData.ic && qrData.name) {
                             const today = new Date().toLocaleDateString('ms-MY');
+                            
+                            // Check if already scanned today
                             const existing = await getDocs(query(attendanceRef, where("ic", "==", qrData.ic), where("scanDate", "==", today)));
                             if (!existing.empty) {
-                                addLog(`${qrData.name} - Kehadiran sudah direkodkan hari ini`, qrData.ic, qrData.class || '-', 'warning');
+                                const existingRecord = existing.docs[0].data();
+                                addLog(`${qrData.name} - Kehadiran sudah direkodkan hari ini (${existingRecord.statusText || existingRecord.status})`, qrData.ic, qrData.class || '-', existingRecord.status, existingRecord.statusText, existingRecord.time);
                                 return;
                             }
-                            addLog(qrData.name, qrData.ic, qrData.class || '-', 'success');
+                            
+                            // Get current time and determine status
+                            const now = new Date();
+                            const timeStr = now.toLocaleTimeString('ms-MY', { hour: '2-digit', minute: '2-digit' });
+                            const statusInfo = getAttendanceStatus(now);
+                            
+                            // Add to log display
+                            addLog(qrData.name, qrData.ic, qrData.class || '-', statusInfo.status, statusInfo.text, timeStr);
+                            
+                            // Save to Firestore
+                            await saveAttendanceToFirestore(qrData.name, qrData.ic, qrData.class || '-', statusInfo.status, statusInfo.text, timeStr);
+                        } else {
+                            const logContainer = document.getElementById('logList');
+                            const errorItem = document.createElement('div');
+                            errorItem.className = 'log-item error';
+                            errorItem.innerHTML = `<div class="log-name">❌ QR Code tidak sah!</div>
+                                <div class="log-detail">Sila gunakan QR Code kehadiran yang betul</div>
+                                <div class="log-time"><span>${new Date().toLocaleTimeString()}</span></div>`;
+                            if (logContainer.querySelector('.empty-log')) logContainer.innerHTML = '';
+                            logContainer.insertBefore(errorItem, logContainer.firstChild);
                         }
-                    } catch(e) { console.error("QR parse error:", e); }
+                    } catch(e) { 
+                        console.error("QR parse error:", e);
+                        const logContainer = document.getElementById('logList');
+                        const errorItem = document.createElement('div');
+                        errorItem.className = 'log-item error';
+                        errorItem.innerHTML = `<div class="log-name">❌ QR Code tidak dikenali!</div>
+                            <div class="log-detail">Pastikan QR Code kehadiran yang betul</div>
+                            <div class="log-time"><span>${new Date().toLocaleTimeString()}</span></div>`;
+                        if (logContainer.querySelector('.empty-log')) logContainer.innerHTML = '';
+                        logContainer.insertBefore(errorItem, logContainer.firstChild);
+                    }
                 },
                 (error) => { console.log("Scan error:", error); }
             );
@@ -509,7 +606,13 @@
     stopGuruScannerBtn.onclick = () => stopGuruScanner();
     stopStudentScannerBtn.onclick = () => stopStudentScanner();
     
-    checkHoliday();
+    // Initialize - load settings first
+    async function init() {
+        await loadAttendanceSettings();
+        await checkHoliday();
+    }
+    
+    init();
 </script>
 </body>
 </html>

@@ -66,6 +66,7 @@
         }
         .back-btn:hover { background: #4f46e5; color: white; }
         
+        /* Status Card for Today */
         .today-status-card {
             background: white;
             border-radius: 1.5rem;
@@ -89,6 +90,7 @@
         .tidakhadir .status-title { color: #991b1b; }
         .cuti .status-title { color: #1e40af; }
         
+        /* No Record Card */
         .no-record-card {
             background: #f1f5f9;
             border-radius: 1.5rem;
@@ -99,6 +101,7 @@
         }
         .no-record-card i { font-size: 3rem; color: #94a3b8; margin-bottom: 0.5rem; }
         
+        /* Filter Section */
         .filter-section {
             background: white;
             border-radius: 1.2rem;
@@ -147,20 +150,8 @@
             gap: 8px;
         }
         .btn-filter:hover { background: #4338ca; }
-        .btn-reset {
-            background: #64748b;
-            color: white;
-            border: none;
-            padding: 0.6rem 1.2rem;
-            border-radius: 0.8rem;
-            cursor: pointer;
-            font-weight: 600;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .btn-reset:hover { background: #475569; }
         
+        /* Stats Cards */
         .stats-section {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -188,6 +179,7 @@
         .stat-card.stat-tidakhadir .stat-number { color: #ef4444; }
         .stat-card.stat-cuti .stat-number { color: #3b82f6; }
         
+        /* History Table */
         .history-section {
             background: white;
             border-radius: 1.2rem;
@@ -198,14 +190,8 @@
             padding: 1rem 1.5rem;
             background: #f8fafc;
             border-bottom: 2px solid #e2e8f0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 1rem;
         }
         .history-header h3 { font-size: 1rem; color: #1e293b; }
-        .total-records { font-size: 0.75rem; color: #64748b; }
         .table-container { overflow-x: auto; }
         table {
             width: 100%;
@@ -248,6 +234,22 @@
             font-size: 0.7rem;
         }
         
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #1e293b;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 10px;
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
+        }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
         @media (max-width: 700px) {
             .stats-section { grid-template-columns: repeat(2, 1fr); }
             .filter-section { flex-direction: column; }
@@ -268,6 +270,7 @@
         <a href="dashboard-pelajar.html" class="back-btn"><i class="fas fa-arrow-left"></i> Kembali</a>
     </div>
 
+    <!-- Today's Status Card -->
     <div id="todayStatusContainer">
         <div class="no-record-card">
             <i class="fas fa-spinner fa-pulse"></i>
@@ -275,6 +278,7 @@
         </div>
     </div>
 
+    <!-- Filter Section -->
     <div class="filter-section">
         <div class="filter-group">
             <label><i class="fas fa-calendar-month"></i> Bulan</label>
@@ -302,10 +306,10 @@
         </div>
         <div class="filter-group">
             <button id="applyFilterBtn" class="btn-filter"><i class="fas fa-filter"></i> Guna Filter</button>
-            <button id="resetFilterBtn" class="btn-reset" style="margin-left: 8px;"><i class="fas fa-undo-alt"></i> Reset</button>
         </div>
     </div>
 
+    <!-- Stats Cards -->
     <div class="stats-section">
         <div class="stat-card stat-hadir">
             <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
@@ -329,10 +333,10 @@
         </div>
     </div>
 
+    <!-- History Table -->
     <div class="history-section">
         <div class="history-header">
             <h3><i class="fas fa-history"></i> Sejarah Kehadiran</h3>
-            <div class="total-records" id="totalRecordsCount">0 rekod</div>
         </div>
         <div class="table-container">
             <div id="historyTable">
@@ -370,12 +374,17 @@
     let allRecords = [];
     let filteredRecords = [];
     
+    // Get student info from session storage
     function getStudentInfo() {
         studentIC = sessionStorage.getItem('studentIC') || localStorage.getItem('studentIC') || '';
         studentName = sessionStorage.getItem('studentName') || localStorage.getItem('studentName') || 'Pelajar';
-        console.log("Student IC:", studentIC);
+        
+        if (!studentIC) {
+            console.warn("No student IC found in storage");
+        }
     }
     
+    // Load all attendance records for this student
     async function loadStudentRecords() {
         if (!studentIC) return [];
         
@@ -384,15 +393,10 @@
             const snapshot = await getDocs(q);
             allRecords = [];
             snapshot.forEach(doc => {
-                const data = doc.data();
-                console.log("Record found:", data.scanDate, data.status);
-                allRecords.push({ id: doc.id, ...data });
+                allRecords.push({ id: doc.id, ...doc.data() });
             });
-            // Sort by date descending (newest first)
-            allRecords.sort((a, b) => {
-                return (b.scanDate || '').localeCompare(a.scanDate || '');
-            });
-            console.log("Total records loaded:", allRecords.length);
+            // Sort by date descending
+            allRecords.sort((a, b) => (b.scanDate || '').localeCompare(a.scanDate || ''));
             return allRecords;
         } catch (error) {
             console.error("Error loading records:", error);
@@ -400,33 +404,28 @@
         }
     }
     
+    // Get today's status
     function getTodayStatus() {
-        const today = new Date();
-        const day = today.getDate().toString().padStart(2, '0');
-        const month = (today.getMonth() + 1).toString().padStart(2, '0');
-        const year = today.getFullYear();
-        const todayFormatted = `${day}/${month}/${year}`;
-        console.log("Looking for today:", todayFormatted);
-        const todayRecord = allRecords.find(r => r.scanDate === todayFormatted);
+        const today = new Date().toLocaleDateString('ms-MY');
+        const todayRecord = allRecords.find(r => r.scanDate === today);
         return todayRecord || null;
     }
     
+    // Render today's status card
     function renderTodayStatus() {
         const container = document.getElementById('todayStatusContainer');
         const todayRecord = getTodayStatus();
-        const today = new Date();
-        const day = today.getDate().toString().padStart(2, '0');
-        const month = (today.getMonth() + 1).toString().padStart(2, '0');
-        const year = today.getFullYear();
-        const todayFormatted = `${day}/${month}/${year}`;
-        const dayName = today.toLocaleDateString('ms-MY', { weekday: 'long' });
         
         if (!todayRecord) {
+            const today = new Date();
+            const todayStr = today.toLocaleDateString('ms-MY');
+            const dayName = today.toLocaleDateString('ms-MY', { weekday: 'long' });
+            
             container.innerHTML = `
                 <div class="no-record-card">
                     <i class="fas fa-question-circle"></i>
                     <h3>Tiada Rekod Kehadiran</h3>
-                    <p>Anda belum merekodkan kehadiran untuk hari ini (${todayFormatted} - ${dayName})</p>
+                    <p>Anda belum merekodkan kehadiran untuk hari ini (${todayStr} - ${dayName})</p>
                     <p style="font-size: 0.7rem; margin-top: 0.5rem;">Sila scan QR Code kehadiran untuk merekodkan kehadiran anda.</p>
                 </div>
             `;
@@ -434,7 +433,11 @@
         }
         
         const status = todayRecord.status;
+        const statusText = getStatusText(status);
         const time = todayRecord.time || '-';
+        const today = new Date();
+        const dateStr = today.toLocaleDateString('ms-MY');
+        const dayName = today.toLocaleDateString('ms-MY', { weekday: 'long' });
         const reason = todayRecord.reason || '';
         
         let icon = '', title = '', message = '', cssClass = '';
@@ -477,75 +480,48 @@
                 <div class="status-title">${title}</div>
                 <div class="status-message">${message}</div>
                 <div class="status-datetime">
-                    <i class="fas fa-calendar-alt"></i> ${todayFormatted} (${dayName})<br>
+                    <i class="fas fa-calendar-alt"></i> ${dateStr} (${dayName})<br>
                     <i class="fas fa-clock"></i> Masa: ${time}
                 </div>
             </div>
         `;
     }
     
-    // Parse date string in DD/MM/YYYY format
-    function parseDateDMY(dateStr) {
-        if (!dateStr) return null;
-        const parts = dateStr.split('/');
-        if (parts.length === 3) {
-            return {
-                day: parts[0],
-                month: parts[1],
-                year: parts[2]
-            };
-        }
-        return null;
-    }
-    
+    // Apply filters
     function applyFilters() {
         const month = document.getElementById('monthFilter').value;
-        const dateInput = document.getElementById('dateFilter').value;
+        const date = document.getElementById('dateFilter').value;
         const year = document.getElementById('yearFilter').value;
         
-        console.log("Filter - Month:", month, "Date:", dateInput, "Year:", year);
-        
         filteredRecords = allRecords.filter(record => {
-            const parsed = parseDateDMY(record.scanDate);
-            if (!parsed) return false;
+            const recordDate = record.scanDate;
+            if (!recordDate) return false;
             
-            // Filter by year
-            if (year && parsed.year !== year) return false;
-            
-            // Filter by month (convert month name to number)
-            if (month) {
-                const monthNum = parseInt(parsed.month);
-                if (monthNum !== parseInt(month)) return false;
+            // Parse date (format: DD/MM/YYYY or YYYY-MM-DD)
+            let day = '', monthNum = '', yearNum = '';
+            if (recordDate.includes('/')) {
+                const parts = recordDate.split('/');
+                day = parts[0];
+                monthNum = parts[1];
+                yearNum = parts[2];
+            } else if (recordDate.includes('-')) {
+                const parts = recordDate.split('-');
+                yearNum = parts[0];
+                monthNum = parts[1];
+                day = parts[2];
             }
             
-            // Filter by exact date
-            if (dateInput) {
-                // Convert input date YYYY-MM-DD to DD/MM/YYYY
-                const inputParts = dateInput.split('-');
-                if (inputParts.length === 3) {
-                    const inputDay = inputParts[2];
-                    const inputMonth = inputParts[1];
-                    const inputYear = inputParts[0];
-                    if (parsed.day !== inputDay || parsed.month !== inputMonth || parsed.year !== inputYear) {
-                        return false;
-                    }
-                }
-            }
+            if (year && yearNum !== year) return false;
+            if (month && monthNum !== month) return false;
+            if (date && recordDate !== date) return false;
             
             return true;
         });
         
-        console.log("Filtered records:", filteredRecords.length);
         updateStatsAndHistory();
     }
     
-    function resetFilters() {
-        document.getElementById('monthFilter').value = '';
-        document.getElementById('dateFilter').value = '';
-        document.getElementById('yearFilter').value = '';
-        applyFilters();
-    }
-    
+    // Update stats cards and history table
     function updateStatsAndHistory() {
         const hadir = filteredRecords.filter(r => r.status === 'hadir').length;
         const lewat = filteredRecords.filter(r => r.status === 'lewat').length;
@@ -556,7 +532,6 @@
         document.getElementById('totalLewat').innerText = lewat;
         document.getElementById('totalTidakHadir').innerText = tidakHadir;
         document.getElementById('totalCuti').innerText = cuti;
-        document.getElementById('totalRecordsCount').innerText = `${filteredRecords.length} rekod`;
         
         renderHistoryTable();
     }
@@ -573,19 +548,6 @@
         if (status === 'lewat') return 'badge-lewat';
         if (status === 'cuti') return 'badge-cutibersebab';
         return 'badge-tidakhadir';
-    }
-    
-    function getDayName(dateStr) {
-        try {
-            const parsed = parseDateDMY(dateStr);
-            if (parsed) {
-                const dateObj = new Date(`${parsed.year}-${parsed.month}-${parsed.day}`);
-                if (!isNaN(dateObj.getTime())) {
-                    return dateObj.toLocaleDateString('ms-MY', { weekday: 'long' });
-                }
-            }
-        } catch(e) {}
-        return '-';
     }
     
     function renderHistoryTable() {
@@ -611,7 +573,21 @@
             const statusText = getStatusText(record.status);
             const badgeClass = getBadgeClass(record.status);
             const reason = record.reason || '-';
-            const dayName = getDayName(record.scanDate);
+            
+            // Get day name from date
+            let dayName = '-';
+            try {
+                let dateObj;
+                if (record.scanDate.includes('/')) {
+                    const parts = record.scanDate.split('/');
+                    dateObj = new Date(`${parts[2]}-${parts[1]}-${parts[0]}`);
+                } else {
+                    dateObj = new Date(record.scanDate);
+                }
+                if (!isNaN(dateObj.getTime())) {
+                    dayName = dateObj.toLocaleDateString('ms-MY', { weekday: 'long' });
+                }
+            } catch(e) { console.log(e); }
             
             html += `<tr>
                 <td>${index + 1}</td>
@@ -623,10 +599,17 @@
             </tr>`;
         });
         
-        html += `</tbody></table>`;
+        html += `</tbody>}</div>`;
         container.innerHTML = html;
     }
     
+    // Helper function to check if a date is today
+    function isToday(dateStr) {
+        const today = new Date().toLocaleDateString('ms-MY');
+        return dateStr === today;
+    }
+    
+    // Initialize
     async function init() {
         getStudentInfo();
         
@@ -646,8 +629,8 @@
         applyFilters();
     }
     
+    // Event listeners
     document.getElementById('applyFilterBtn').addEventListener('click', applyFilters);
-    document.getElementById('resetFilterBtn').addEventListener('click', resetFilters);
     document.getElementById('monthFilter').addEventListener('change', applyFilters);
     document.getElementById('yearFilter').addEventListener('change', applyFilters);
     document.getElementById('dateFilter').addEventListener('change', applyFilters);

@@ -266,6 +266,24 @@
       color: white;
     }
 
+    /* Debug Panel */
+    .debug-panel {
+      background: #1e293b;
+      border-radius: 1rem;
+      padding: 0.8rem;
+      margin-bottom: 1.5rem;
+      font-size: 0.7rem;
+      color: #94a3b8;
+      display: none;
+    }
+    .debug-panel pre {
+      color: #10b981;
+      font-family: monospace;
+      font-size: 0.65rem;
+      margin-top: 0.3rem;
+      white-space: pre-wrap;
+    }
+
     /* section divider */
     .section-divider {
       margin: 2rem 0 1rem;
@@ -514,6 +532,12 @@
     </div>
   </div>
 
+  <!-- Debug Panel -->
+  <div class="debug-panel" id="debugPanel">
+    <i class="fas fa-bug"></i> Status Debug:
+    <pre id="debugInfo">Memuatkan data...</pre>
+  </div>
+
   <!-- Profile Card with QR Code -->
   <div class="profile-card" id="profileCard">
     <div class="profile-left">
@@ -655,12 +679,32 @@
   let currentTeacherId = null;
   let currentTeacherData = {};
 
+  // Debug function
+  function updateDebug(message) {
+    const debugInfo = document.getElementById('debugInfo');
+    const time = new Date().toLocaleTimeString();
+    debugInfo.innerHTML = `[${time}] ${message}\n` + debugInfo.innerHTML;
+    if (debugInfo.innerHTML.split('\n').length > 10) {
+      debugInfo.innerHTML = debugInfo.innerHTML.split('\n').slice(0, 10).join('\n');
+    }
+    console.log(message);
+    // Show debug panel if there's any issue
+    const debugPanel = document.getElementById('debugPanel');
+    if (debugPanel && debugPanel.style.display === 'none') {
+      debugPanel.style.display = 'block';
+    }
+  }
+
   // ==================== CHECK LOGIN STATUS ====================
   function checkLoginStatus() {
     const teacherName = sessionStorage.getItem('teacherName');
     const teacherIC = sessionStorage.getItem('teacherIC');
+    const teacherId = sessionStorage.getItem('teacherId');
+    
+    updateDebug(`Session data - Name: ${teacherName}, IC: ${teacherIC}, ID: ${teacherId}`);
     
     if (!teacherName || !teacherIC) {
+      updateDebug("❌ Tiada data login. Redirect ke page login...");
       window.location.href = '../dashboard/page-guru.html';
       return false;
     }
@@ -682,11 +726,16 @@
   async function loadTeacherData() {
     const teacherIC = sessionStorage.getItem('teacherIC');
     const teacherName = sessionStorage.getItem('teacherName');
+    const teacherIdFromSession = sessionStorage.getItem('teacherId');
     
+    updateDebug(`Mencari guru dengan IC: ${teacherIC}`);
+    
+    // First, try to get from session storage first
     if (teacherName) {
       document.getElementById('teacherNameDisplay').innerText = teacherName;
       document.getElementById('profileName').innerText = teacherName;
       document.getElementById('profileIC').innerText = teacherIC || '-';
+      updateDebug(`✅ Nama dari session: ${teacherName}`);
     }
     
     if (teacherIC) {
@@ -702,20 +751,28 @@
             
             const teacherClass = teacherData.teacherClass || '-';
             const teacherYear = teacherData.year || '-';
+            const teacherFullname = teacherData.fullname || teacherName;
+            
+            updateDebug(`✅ Data dari Firestore: Nama=${teacherFullname}, Kelas=${teacherClass}, Tahun=${teacherYear}`);
             
             document.getElementById('profileClass').innerText = teacherClass;
             document.getElementById('profileYear').innerText = teacherYear;
+            document.getElementById('profileName').innerText = teacherFullname;
+            document.getElementById('teacherNameDisplay').innerText = teacherFullname;
             
             sessionStorage.setItem('teacherClass', teacherClass);
             sessionStorage.setItem('teacherYear', teacherYear);
             sessionStorage.setItem('teacherId', doc.id);
+            sessionStorage.setItem('teacherName', teacherFullname);
           });
         } else {
-          document.getElementById('profileClass').innerText = '-';
+          updateDebug(`⚠️ Guru dengan IC ${teacherIC} tidak ditemui di Firestore!`);
+          document.getElementById('profileClass').innerText = 'Belum ditetapkan';
           document.getElementById('profileYear').innerText = '-';
         }
       } catch (error) {
         console.error("Error loading teacher data:", error);
+        updateDebug(`❌ Error loading dari Firestore: ${error.message}`);
         document.getElementById('profileClass').innerText = 'Error loading';
       }
     }
@@ -729,7 +786,12 @@
     const teacherName = sessionStorage.getItem('teacherName') || '';
     const teacherIC = sessionStorage.getItem('teacherIC') || '';
     
-    if (!teacherName || !teacherIC) return;
+    updateDebug(`Menjana QR Code untuk: ${teacherName} (${teacherIC})`);
+    
+    if (!teacherName || !teacherIC) {
+      updateDebug("❌ Nama atau IC kosong, QR Code tidak dapat dijana");
+      return;
+    }
     
     const qrContainer = document.getElementById('qrcode');
     qrContainer.innerHTML = '';
@@ -749,9 +811,10 @@
         colorLight: "#ffffff",
         correctLevel: QRCode.CorrectLevel.M
       });
-      console.log("QR Code berjaya dijana untuk guru");
+      updateDebug("✅ QR Code berjaya dijana untuk guru");
     } catch(e) {
       console.error("QR Code error:", e);
+      updateDebug(`❌ QR Code error: ${e.message}`);
     }
   }
 
@@ -914,7 +977,7 @@
       try {
         const q = query(studentsCollection, where("class", "==", teacherClass));
         const querySnapshot = await getDocs(q);
-        console.log(`Students in class ${teacherClass}: ${querySnapshot.size}`);
+        updateDebug(`📚 Bilangan pelajar dalam kelas ${teacherClass}: ${querySnapshot.size}`);
       } catch (error) {
         console.error("Error loading student count:", error);
       }
@@ -1016,9 +1079,11 @@
 
   // ==================== INITIALIZE ====================
   async function init() {
+    updateDebug("🚀 Memulakan Dashboard Guru...");
     if (!checkLoginStatus()) return;
     await loadTeacherData();
     await loadStudentCount();
+    updateDebug("✅ Inisialisasi selesai");
   }
   
   const menuCards = document.querySelectorAll('.menu-card');

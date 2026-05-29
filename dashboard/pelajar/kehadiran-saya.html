@@ -66,7 +66,6 @@
         }
         .back-btn:hover { background: #4f46e5; color: white; }
         
-        /* Status Card for Today */
         .today-status-card {
             background: white;
             border-radius: 1.5rem;
@@ -90,7 +89,6 @@
         .tidakhadir .status-title { color: #991b1b; }
         .cuti .status-title { color: #1e40af; }
         
-        /* No Record Card */
         .no-record-card {
             background: #f1f5f9;
             border-radius: 1.5rem;
@@ -101,7 +99,6 @@
         }
         .no-record-card i { font-size: 3rem; color: #94a3b8; margin-bottom: 0.5rem; }
         
-        /* Filter Section */
         .filter-section {
             background: white;
             border-radius: 1.2rem;
@@ -164,7 +161,6 @@
         }
         .btn-reset:hover { background: #475569; }
         
-        /* Stats Cards */
         .stats-section {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -192,7 +188,6 @@
         .stat-card.stat-tidakhadir .stat-number { color: #ef4444; }
         .stat-card.stat-cuti .stat-number { color: #3b82f6; }
         
-        /* History Table */
         .history-section {
             background: white;
             border-radius: 1.2rem;
@@ -273,7 +268,6 @@
         <a href="dashboard-pelajar.html" class="back-btn"><i class="fas fa-arrow-left"></i> Kembali</a>
     </div>
 
-    <!-- Today's Status Card -->
     <div id="todayStatusContainer">
         <div class="no-record-card">
             <i class="fas fa-spinner fa-pulse"></i>
@@ -281,17 +275,16 @@
         </div>
     </div>
 
-    <!-- Filter Section -->
     <div class="filter-section">
         <div class="filter-group">
             <label><i class="fas fa-calendar-month"></i> Bulan</label>
             <select id="monthFilter">
                 <option value="">Semua Bulan</option>
-                <option value="01">Januari</option><option value="02">Februari</option>
-                <option value="03">Mac</option><option value="04">April</option>
-                <option value="05">Mei</option><option value="06">Jun</option>
-                <option value="07">Julai</option><option value="08">Ogos</option>
-                <option value="09">September</option><option value="10">Oktober</option>
+                <option value="1">Januari</option><option value="2">Februari</option>
+                <option value="3">Mac</option><option value="4">April</option>
+                <option value="5">Mei</option><option value="6">Jun</option>
+                <option value="7">Julai</option><option value="8">Ogos</option>
+                <option value="9">September</option><option value="10">Oktober</option>
                 <option value="11">November</option><option value="12">Disember</option>
             </select>
         </div>
@@ -305,7 +298,6 @@
                 <option value="">Semua Tahun</option>
                 <option value="2023">2023</option><option value="2024">2024</option>
                 <option value="2025">2025</option><option value="2026">2026</option>
-                <option value="2027">2027</option><option value="2028">2028</option>
             </select>
         </div>
         <div class="filter-group">
@@ -314,7 +306,6 @@
         </div>
     </div>
 
-    <!-- Stats Cards -->
     <div class="stats-section">
         <div class="stat-card stat-hadir">
             <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
@@ -338,7 +329,6 @@
         </div>
     </div>
 
-    <!-- History Table -->
     <div class="history-section">
         <div class="history-header">
             <h3><i class="fas fa-history"></i> Sejarah Kehadiran</h3>
@@ -380,35 +370,12 @@
     let allRecords = [];
     let filteredRecords = [];
     
-    // Helper function to convert date format
-    // Firebase stores date in format: "DD/MM/YYYY" (e.g., "29/05/2026")
-    function formatDateForComparison(dateStr) {
-        if (!dateStr) return '';
-        // If already in YYYY-MM-DD format
-        if (dateStr.includes('-') && dateStr.length === 10) {
-            return dateStr;
-        }
-        // Convert from DD/MM/YYYY to YYYY-MM-DD
-        if (dateStr.includes('/')) {
-            const parts = dateStr.split('/');
-            if (parts.length === 3) {
-                return `${parts[2]}-${parts[1].padStart(2,'0')}-${parts[0].padStart(2,'0')}`;
-            }
-        }
-        return dateStr;
-    }
-    
-    // Get student info from session storage
     function getStudentInfo() {
         studentIC = sessionStorage.getItem('studentIC') || localStorage.getItem('studentIC') || '';
         studentName = sessionStorage.getItem('studentName') || localStorage.getItem('studentName') || 'Pelajar';
-        
-        if (!studentIC) {
-            console.warn("No student IC found in storage");
-        }
+        console.log("Student IC:", studentIC);
     }
     
-    // Load all attendance records for this student
     async function loadStudentRecords() {
         if (!studentIC) return [];
         
@@ -417,14 +384,15 @@
             const snapshot = await getDocs(q);
             allRecords = [];
             snapshot.forEach(doc => {
-                allRecords.push({ id: doc.id, ...doc.data() });
+                const data = doc.data();
+                console.log("Record found:", data.scanDate, data.status);
+                allRecords.push({ id: doc.id, ...data });
             });
             // Sort by date descending (newest first)
             allRecords.sort((a, b) => {
-                const dateA = formatDateForComparison(a.scanDate);
-                const dateB = formatDateForComparison(b.scanDate);
-                return dateB.localeCompare(dateA);
+                return (b.scanDate || '').localeCompare(a.scanDate || '');
             });
+            console.log("Total records loaded:", allRecords.length);
             return allRecords;
         } catch (error) {
             console.error("Error loading records:", error);
@@ -432,36 +400,25 @@
         }
     }
     
-    // Get today's status (based on current date)
     function getTodayStatus() {
         const today = new Date();
-        const todayFormatted = formatDateToDMY(today);
+        const day = today.getDate().toString().padStart(2, '0');
+        const month = (today.getMonth() + 1).toString().padStart(2, '0');
+        const year = today.getFullYear();
+        const todayFormatted = `${day}/${month}/${year}`;
+        console.log("Looking for today:", todayFormatted);
         const todayRecord = allRecords.find(r => r.scanDate === todayFormatted);
         return todayRecord || null;
     }
     
-    // Format date to DD/MM/YYYY
-    function formatDateToDMY(date) {
-        const day = date.getDate().toString().padStart(2, '0');
-        const month = (date.getMonth() + 1).toString().padStart(2, '0');
-        const year = date.getFullYear();
-        return `${day}/${month}/${year}`;
-    }
-    
-    // Format date to YYYY-MM-DD for input date comparison
-    function formatDateToYMD(date) {
-        const year = date.getFullYear();
-        const month = (date.getMonth() + 1).toString().padStart(2, '0');
-        const day = date.getDate().toString().padStart(2, '0');
-        return `${year}-${month}-${day}`;
-    }
-    
-    // Render today's status card
     function renderTodayStatus() {
         const container = document.getElementById('todayStatusContainer');
         const todayRecord = getTodayStatus();
         const today = new Date();
-        const todayFormatted = formatDateToDMY(today);
+        const day = today.getDate().toString().padStart(2, '0');
+        const month = (today.getMonth() + 1).toString().padStart(2, '0');
+        const year = today.getFullYear();
+        const todayFormatted = `${day}/${month}/${year}`;
         const dayName = today.toLocaleDateString('ms-MY', { weekday: 'long' });
         
         if (!todayRecord) {
@@ -477,9 +434,7 @@
         }
         
         const status = todayRecord.status;
-        const statusText = getStatusText(status);
         const time = todayRecord.time || '-';
-        const dateStr = todayFormatted;
         const reason = todayRecord.reason || '';
         
         let icon = '', title = '', message = '', cssClass = '';
@@ -522,46 +477,56 @@
                 <div class="status-title">${title}</div>
                 <div class="status-message">${message}</div>
                 <div class="status-datetime">
-                    <i class="fas fa-calendar-alt"></i> ${dateStr} (${dayName})<br>
+                    <i class="fas fa-calendar-alt"></i> ${todayFormatted} (${dayName})<br>
                     <i class="fas fa-clock"></i> Masa: ${time}
                 </div>
             </div>
         `;
     }
     
-    // Apply filters - FIXED VERSION
+    // Parse date string in DD/MM/YYYY format
+    function parseDateDMY(dateStr) {
+        if (!dateStr) return null;
+        const parts = dateStr.split('/');
+        if (parts.length === 3) {
+            return {
+                day: parts[0],
+                month: parts[1],
+                year: parts[2]
+            };
+        }
+        return null;
+    }
+    
     function applyFilters() {
         const month = document.getElementById('monthFilter').value;
         const dateInput = document.getElementById('dateFilter').value;
         const year = document.getElementById('yearFilter').value;
         
+        console.log("Filter - Month:", month, "Date:", dateInput, "Year:", year);
+        
         filteredRecords = allRecords.filter(record => {
-            const recordDateStr = record.scanDate;
-            if (!recordDateStr) return false;
-            
-            // Parse date from DD/MM/YYYY format
-            let parts = recordDateStr.split('/');
-            if (parts.length !== 3) return false;
-            
-            const recordDay = parts[0];
-            const recordMonth = parts[1];
-            const recordYear = parts[2];
+            const parsed = parseDateDMY(record.scanDate);
+            if (!parsed) return false;
             
             // Filter by year
-            if (year && recordYear !== year) return false;
+            if (year && parsed.year !== year) return false;
             
-            // Filter by month
-            if (month && recordMonth !== month) return false;
+            // Filter by month (convert month name to number)
+            if (month) {
+                const monthNum = parseInt(parsed.month);
+                if (monthNum !== parseInt(month)) return false;
+            }
             
             // Filter by exact date
             if (dateInput) {
-                // Convert input date (YYYY-MM-DD) to DD/MM/YYYY for comparison
+                // Convert input date YYYY-MM-DD to DD/MM/YYYY
                 const inputParts = dateInput.split('-');
                 if (inputParts.length === 3) {
                     const inputDay = inputParts[2];
                     const inputMonth = inputParts[1];
                     const inputYear = inputParts[0];
-                    if (recordDay !== inputDay || recordMonth !== inputMonth || recordYear !== inputYear) {
+                    if (parsed.day !== inputDay || parsed.month !== inputMonth || parsed.year !== inputYear) {
                         return false;
                     }
                 }
@@ -570,10 +535,10 @@
             return true;
         });
         
+        console.log("Filtered records:", filteredRecords.length);
         updateStatsAndHistory();
     }
     
-    // Reset all filters
     function resetFilters() {
         document.getElementById('monthFilter').value = '';
         document.getElementById('dateFilter').value = '';
@@ -581,7 +546,6 @@
         applyFilters();
     }
     
-    // Update stats cards and history table
     function updateStatsAndHistory() {
         const hadir = filteredRecords.filter(r => r.status === 'hadir').length;
         const lewat = filteredRecords.filter(r => r.status === 'lewat').length;
@@ -611,6 +575,19 @@
         return 'badge-tidakhadir';
     }
     
+    function getDayName(dateStr) {
+        try {
+            const parsed = parseDateDMY(dateStr);
+            if (parsed) {
+                const dateObj = new Date(`${parsed.year}-${parsed.month}-${parsed.day}`);
+                if (!isNaN(dateObj.getTime())) {
+                    return dateObj.toLocaleDateString('ms-MY', { weekday: 'long' });
+                }
+            }
+        } catch(e) {}
+        return '-';
+    }
+    
     function renderHistoryTable() {
         const container = document.getElementById('historyTable');
         
@@ -634,20 +611,7 @@
             const statusText = getStatusText(record.status);
             const badgeClass = getBadgeClass(record.status);
             const reason = record.reason || '-';
-            
-            // Get day name from date
-            let dayName = '-';
-            try {
-                if (record.scanDate) {
-                    const parts = record.scanDate.split('/');
-                    if (parts.length === 3) {
-                        const dateObj = new Date(`${parts[2]}-${parts[1]}-${parts[0]}`);
-                        if (!isNaN(dateObj.getTime())) {
-                            dayName = dateObj.toLocaleDateString('ms-MY', { weekday: 'long' });
-                        }
-                    }
-                }
-            } catch(e) { console.log(e); }
+            const dayName = getDayName(record.scanDate);
             
             html += `<tr>
                 <td>${index + 1}</td>
@@ -663,7 +627,6 @@
         container.innerHTML = html;
     }
     
-    // Initialize
     async function init() {
         getStudentInfo();
         
@@ -683,7 +646,6 @@
         applyFilters();
     }
     
-    // Event listeners
     document.getElementById('applyFilterBtn').addEventListener('click', applyFilters);
     document.getElementById('resetFilterBtn').addEventListener('click', resetFilters);
     document.getElementById('monthFilter').addEventListener('change', applyFilters);

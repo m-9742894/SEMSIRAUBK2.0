@@ -7,6 +7,11 @@
   <!-- Fonts & Icons -->
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+  
   <style>
     * {
       margin: 0;
@@ -148,6 +153,72 @@
     .logout-btn:hover {
       background: #fecaca;
       transform: scale(0.98);
+    }
+
+    /* Notification Card */
+    .notification-card {
+      background: linear-gradient(135deg, #fef3c7, #fffbeb);
+      border-radius: 1.2rem;
+      padding: 1rem 1.5rem;
+      margin-bottom: 1.5rem;
+      border-left: 5px solid #f59e0b;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      cursor: pointer;
+      transition: 0.2s;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    .notification-card:hover {
+      transform: translateX(5px);
+      background: #fffbeb;
+    }
+    .notification-left {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .notification-icon {
+      background: #fef3c7;
+      width: 50px;
+      height: 50px;
+      border-radius: 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .notification-icon i {
+      font-size: 1.5rem;
+      color: #f59e0b;
+    }
+    .notification-info h4 {
+      font-size: 0.9rem;
+      color: #92400e;
+      margin-bottom: 0.2rem;
+    }
+    .notification-info p {
+      font-size: 0.7rem;
+      color: #b45309;
+    }
+    .notification-badge {
+      background: #f59e0b;
+      color: white;
+      padding: 0.2rem 0.8rem;
+      border-radius: 2rem;
+      font-weight: 700;
+      font-size: 1.2rem;
+    }
+    .no-notification {
+      background: #f1f5f9;
+      border-left-color: #94a3b8;
+    }
+    .no-notification .notification-icon i {
+      color: #94a3b8;
+    }
+    .no-notification .notification-info h4 {
+      color: #64748b;
     }
 
     /* profile card */
@@ -371,6 +442,58 @@
     .modal-close:hover { color: #dc2626; }
     .modal-body { padding: 1.5rem; }
     
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.8rem 0;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    .info-row span:first-child {
+      font-weight: 600;
+      color: #64748b;
+    }
+    .info-row span:last-child {
+      font-weight: 600;
+      color: #1e293b;
+    }
+    .modal-buttons {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+    .btn-accept {
+      flex: 1;
+      background: #10b981;
+      color: white;
+      border: none;
+      padding: 0.8rem;
+      border-radius: 2rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .btn-accept:hover { background: #059669; transform: translateY(-2px); }
+    .btn-reject {
+      flex: 1;
+      background: #ef4444;
+      color: white;
+      border: none;
+      padding: 0.8rem;
+      border-radius: 2rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .btn-reject:hover { background: #dc2626; transform: translateY(-2px); }
+    
     .form-group { margin-bottom: 1rem; }
     .form-group label {
       display: block;
@@ -389,10 +512,6 @@
       outline: none;
       font-size: 0.9rem;
     }
-    .form-group input:focus, .form-group select:focus {
-      border-color: #2563eb;
-      box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
-    }
     .modal-btn {
       width: 100%;
       padding: 0.8rem;
@@ -405,7 +524,6 @@
       transition: 0.2s;
       margin-top: 0.5rem;
     }
-    .modal-btn:hover { transform: translateY(-2px); }
     
     .alert {
       padding: 12px;
@@ -468,6 +586,20 @@
     </div>
   </div>
 
+  <!-- NOTIFICATION CARD - Permintaan Buka Sistem Kehadiran -->
+  <div id="notificationCard" class="notification-card" onclick="openPendingRequestsModal()">
+    <div class="notification-left">
+      <div class="notification-icon">
+        <i class="fas fa-qrcode"></i>
+      </div>
+      <div class="notification-info">
+        <h4>Permintaan Buka Sistem Kehadiran</h4>
+        <p>Terdapat pelajar yang meminta untuk buka sistem scan QR Code</p>
+      </div>
+    </div>
+    <div class="notification-badge" id="pendingCount">0</div>
+  </div>
+
   <!-- Profile Card with Edit Button -->
   <div class="profile-card" id="profileCard">
     <div class="profile-avatar">
@@ -492,7 +624,6 @@
   </div>
 
   <div class="menu-grid">
-    <!-- 1. LIST PELAJAR KELAS DIA -->
     <div class="menu-card" data-menu="list-pelajar-kelas">
       <div class="menu-icon"><i class="fas fa-users"></i></div>
       <h3>List Pelajar Kelas Saya</h3>
@@ -500,7 +631,6 @@
       <div class="menu-btn">Lihat Pelajar <i class="fas fa-arrow-right"></i></div>
     </div>
 
-    <!-- 2. MATA MERIT (TUKAR DARI MERIT PELAJAR) -->
     <div class="menu-card" data-menu="mata-merit">
       <div class="menu-icon"><i class="fas fa-star"></i></div>
       <h3>Mata Merit</h3>
@@ -508,7 +638,6 @@
       <div class="menu-btn">Lihat Merit <i class="fas fa-arrow-right"></i></div>
     </div>
 
-    <!-- 3. DAFTAR MERIT PELAJAR -->
     <div class="menu-card" data-menu="daftar-merit">
       <div class="menu-icon"><i class="fas fa-plus-circle"></i></div>
       <h3>Daftar Merit Pelajar</h3>
@@ -524,7 +653,6 @@
   </div>
 
   <div class="menu-grid">
-    <!-- 4. SENARAI PELAJAR KESELURUHAN -->
     <div class="menu-card" data-menu="senarai-pelajar-keseluruhan">
       <div class="menu-icon"><i class="fas fa-user-graduate"></i></div>
       <h3>Keseluruhan Murid</h3>
@@ -532,7 +660,6 @@
       <div class="menu-btn">Lihat Semua <i class="fas fa-arrow-right"></i></div>
     </div>
 
-    <!-- 5. KESELURUHAN GURU -->
     <div class="menu-card" data-menu="keseluruhan-guru">
       <div class="menu-icon"><i class="fas fa-user-tie"></i></div>
       <h3>Keseluruhan Guru</h3>
@@ -540,7 +667,6 @@
       <div class="menu-btn">Lihat Semua <i class="fas fa-arrow-right"></i></div>
     </div>
 
-    <!-- 6. KESELURUHAN KELAS -->
     <div class="menu-card" data-menu="keseluruhan-kelas">
       <div class="menu-icon"><i class="fas fa-building"></i></div>
       <h3>Keseluruhan Kelas</h3>
@@ -588,11 +714,9 @@
 </div>
 
 <script type="module">
-  // Import Firebase SDK
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-  import { getFirestore, collection, getDocs, query, where, updateDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+  import { getFirestore, collection, getDocs, query, where, updateDoc, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
   
-  // Firebase configuration
   const firebaseConfig = {
     apiKey: "AIzaSyCfu7XC8pXtpDyQ-9Cjdg4AobA-EVEwWcc",
     authDomain: "e-mindcare.firebaseapp.com",
@@ -603,14 +727,16 @@
     measurementId: "G-3CJVKWGEXV"
   };
 
-  // Initialize Firebase
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
   const teachersCollection = collection(db, "teachers");
   const studentsCollection = collection(db, "students");
+  const scanRequestsCollection = collection(db, "scan_requests");
 
   let currentTeacherId = null;
   let currentTeacherData = {};
+  let pendingRequests = [];
+  let unsubscribeRequests = null;
 
   // ==================== CHECK LOGIN STATUS ====================
   function checkLoginStatus() {
@@ -678,7 +804,149 @@
     }
   }
 
-  // ==================== UPDATE TEACHER PROFILE IN FIRESTORE ====================
+  // ==================== LOAD SCAN REQUESTS (REAL-TIME) ====================
+  function listenToScanRequests() {
+    // Only get pending requests that haven't expired
+    const q = query(scanRequestsCollection, where("status", "==", "pending"));
+    
+    unsubscribeRequests = onSnapshot(q, (snapshot) => {
+      pendingRequests = [];
+      snapshot.forEach((doc) => {
+        const data = doc.data();
+        // Check if request is still valid (not expired)
+        const expiresAt = data.expiresAt?.toDate ? data.expiresAt.toDate() : new Date(data.expiresAt);
+        if (expiresAt > new Date()) {
+          pendingRequests.push({ id: doc.id, ...data });
+        }
+      });
+      updateNotificationBadge();
+    }, (error) => {
+      console.error("Error listening to scan requests:", error);
+    });
+  }
+  
+  function updateNotificationBadge() {
+    const count = pendingRequests.length;
+    const badge = document.getElementById('pendingCount');
+    const notificationCard = document.getElementById('notificationCard');
+    
+    badge.innerText = count;
+    
+    if (count === 0) {
+      notificationCard.classList.add('no-notification');
+      const infoDiv = notificationCard.querySelector('.notification-info');
+      if (infoDiv) {
+        infoDiv.innerHTML = '<h4>Tiada Permintaan</h4><p>Semua permintaan telah diproses</p>';
+      }
+    } else {
+      notificationCard.classList.remove('no-notification');
+      const infoDiv = notificationCard.querySelector('.notification-info');
+      if (infoDiv) {
+        infoDiv.innerHTML = '<h4>Permintaan Buka Sistem Kehadiran</h4><p>Terdapat pelajar yang meminta untuk buka sistem scan QR Code</p>';
+      }
+    }
+  }
+  
+  // ==================== OPEN PENDING REQUESTS MODAL ====================
+  window.openPendingRequestsModal = function() {
+    if (pendingRequests.length === 0) {
+      alert("Tiada permintaan buka sistem kehadiran pada masa ini.");
+      return;
+    }
+    
+    let modalHtml = `
+      <div id="pendingModal" class="modal">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h3><i class="fas fa-qrcode"></i> Permintaan Buka Sistem Kehadiran</h3>
+            <button class="modal-close" onclick="closePendingModal()">&times;</button>
+          </div>
+          <div class="modal-body">
+    `;
+    
+    for (const request of pendingRequests) {
+      const requestDate = request.requestDate || '-';
+      const requestTime = request.requestTimeStr || '-';
+      const deviceInfo = request.deviceInfo || 'Peranti tidak dikenal pasti';
+      
+      modalHtml += `
+        <div style="background:#f8fafc; border-radius:1rem; padding:1rem; margin-bottom:1rem; border-left:4px solid #f59e0b;">
+          <div class="info-row"><span>Tarikh Permintaan:</span><span>${requestDate}</span></div>
+          <div class="info-row"><span>Masa Permintaan:</span><span>${requestTime}</span></div>
+          <div class="info-row"><span>Peranti:</span><span style="font-size:0.75rem;">${escapeHtml(deviceInfo)}</span></div>
+          <div class="modal-buttons" style="margin-top:1rem;">
+            <button class="btn-accept" onclick="approveScanRequest('${request.id}')">
+              <i class="fas fa-check"></i> Sahkan & Buka Sistem
+            </button>
+            <button class="btn-reject" onclick="rejectScanRequest('${request.id}')">
+              <i class="fas fa-times"></i> Tolak
+            </button>
+          </div>
+        </div>
+      `;
+    }
+    
+    modalHtml += `
+          </div>
+        </div>
+      </div>
+    `;
+    
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+  };
+  
+  window.closePendingModal = function() {
+    const modal = document.getElementById('pendingModal');
+    if (modal) modal.remove();
+  };
+  
+  // ==================== APPROVE SCAN REQUEST ====================
+  window.approveScanRequest = async function(requestId) {
+    if (!confirm("Sahkan permintaan ini untuk membuka sistem kehadiran? Pelajar akan dapat scan QR Code selama 3 minit.")) return;
+    
+    try {
+      await updateDoc(doc(db, "scan_requests", requestId), {
+        status: "approved",
+        approvedAt: new Date().toISOString(),
+        approvedBy: sessionStorage.getItem('teacherName') || 'Guru'
+      });
+      showAlert("✅ Sistem kehadiran telah dibuka. Pelajar boleh scan QR Code.", "success");
+      closePendingModal();
+    } catch (error) {
+      console.error("Error approving request:", error);
+      showAlert("❌ Gagal membuka sistem. Sila cuba lagi.", "error");
+    }
+  };
+  
+  // ==================== REJECT SCAN REQUEST ====================
+  window.rejectScanRequest = async function(requestId) {
+    if (!confirm("Tolak permintaan ini?")) return;
+    
+    try {
+      await updateDoc(doc(db, "scan_requests", requestId), {
+        status: "rejected",
+        rejectedAt: new Date().toISOString(),
+        rejectedBy: sessionStorage.getItem('teacherName') || 'Guru'
+      });
+      showAlert("✅ Permintaan telah ditolak.", "success");
+      closePendingModal();
+    } catch (error) {
+      console.error("Error rejecting request:", error);
+      showAlert("❌ Gagal menolak permintaan.", "error");
+    }
+  };
+  
+  function escapeHtml(str) {
+    if (!str) return '';
+    return str.replace(/[&<>]/g, function(m) {
+      if (m === '&') return '&amp;';
+      if (m === '<') return '&lt;';
+      if (m === '>') return '&gt;';
+      return m;
+    });
+  }
+
+  // ==================== UPDATE TEACHER PROFILE ====================
   async function updateTeacherProfile(fullname, icNumber, teacherClass, year) {
     if (!currentTeacherId) {
       showAlert('ID guru tidak ditemui', 'error');
@@ -686,10 +954,8 @@
     }
     
     try {
-      // Format IC without dashes
       const formattedIc = icNumber.replace(/-/g, '');
       
-      // Check if IC already exists for another teacher
       if (formattedIc !== sessionStorage.getItem('teacherIC')) {
         const q = query(teachersCollection, where("icNumber", "==", formattedIc));
         const querySnapshot = await getDocs(q);
@@ -716,13 +982,11 @@
       
       await updateDoc(teacherRef, updateData);
       
-      // Update session storage
       sessionStorage.setItem('teacherName', updateData.fullname);
       sessionStorage.setItem('teacherIC', updateData.icNumber);
       sessionStorage.setItem('teacherClass', updateData.teacherClass);
       sessionStorage.setItem('teacherYear', updateData.year);
       
-      // Update UI
       document.getElementById('teacherNameDisplay').innerText = updateData.fullname;
       document.getElementById('profileName').innerText = updateData.fullname;
       document.getElementById('profileIC').innerText = updateData.icNumber;
@@ -772,7 +1036,6 @@
     document.getElementById('editProfileModal').style.display = 'none';
   };
   
-  // Handle edit profile form submit
   document.getElementById('editProfileForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     
@@ -781,17 +1044,9 @@
     const teacherClass = document.getElementById('editClass').value.trim();
     const year = document.getElementById('editYear').value.trim();
     
-    if (!fullname) {
-      showAlert('Sila masukkan Nama Penuh', 'error');
-      return;
-    }
+    if (!fullname) { showAlert('Sila masukkan Nama Penuh', 'error'); return; }
+    if (!icNumber) { showAlert('Sila masukkan No. Kad Pengenalan', 'error'); return; }
     
-    if (!icNumber) {
-      showAlert('Sila masukkan No. Kad Pengenalan', 'error');
-      return;
-    }
-    
-    // Validate IC format (12 digit)
     const cleanIc = icNumber.replace(/-/g, '');
     if (!/^\d{12}$/.test(cleanIc)) {
       showAlert('❌ No. Kad Pengenalan mestilah 12 digit nombor', 'error');
@@ -803,7 +1058,6 @@
       return;
     }
     
-    // Disable button while processing
     const submitBtn = e.target.querySelector('button[type="submit"]');
     const originalText = submitBtn.innerHTML;
     submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
@@ -813,7 +1067,6 @@
     
     submitBtn.innerHTML = originalText;
     submitBtn.disabled = false;
-    
     closeEditModal();
   });
 
@@ -822,7 +1075,6 @@
     let targetUrl = '';
     
     switch(menuType) {
-      // Urusan Kelas
       case 'list-pelajar-kelas':
         targetUrl = 'list-pelajar-kelas.html';
         break;
@@ -832,8 +1084,6 @@
       case 'daftar-merit':
         targetUrl = 'daftar-merit.html';
         break;
-      
-      // Keseluruhan Data
       case 'senarai-pelajar-keseluruhan':
         targetUrl = 'keseluruhan-murid.html';
         break;
@@ -843,7 +1093,6 @@
       case 'keseluruhan-kelas':
         targetUrl = 'keseluruhan-kelas.html';
         break;
-      
       default:
         return;
     }
@@ -856,9 +1105,9 @@
     if (!checkLoginStatus()) return;
     await loadTeacherData();
     await loadStudentCount();
+    listenToScanRequests();
   }
   
-  // Event listeners for menu cards
   const menuCards = document.querySelectorAll('.menu-card');
   menuCards.forEach(card => {
     card.addEventListener('click', (e) => {
@@ -867,10 +1116,8 @@
     });
   });
   
-  // Edit profile button
   document.getElementById('editProfileBtn').addEventListener('click', openEditModal);
   
-  // Logout button
   const logoutBtn = document.getElementById('logoutBtn');
   logoutBtn.addEventListener('click', () => {
     sessionStorage.clear();

@@ -342,52 +342,6 @@
         margin: 0 auto;
       }
     }
-
-    /* Print styles for QR Code card (7cm x 10cm) */
-    @media print {
-      body * {
-        visibility: hidden;
-      }
-      .qr-print-card, .qr-print-card * {
-        visibility: visible;
-      }
-      .qr-print-card {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 7cm;
-        height: 10cm;
-        padding: 0.5cm;
-        margin: 0;
-        background: white;
-        box-shadow: none;
-        border: 1px solid #ddd;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        page-break-after: avoid;
-        break-inside: avoid;
-      }
-      .qr-print-card .print-qr {
-        margin-bottom: 0.3cm;
-      }
-      .qr-print-card .print-qr img {
-        width: 3.5cm !important;
-        height: 3.5cm !important;
-      }
-      .qr-print-card .print-name {
-        font-size: 12pt;
-        font-weight: bold;
-        text-align: center;
-        margin-bottom: 0.2cm;
-      }
-      .qr-print-card .print-ic {
-        font-size: 10pt;
-        text-align: center;
-        color: #333;
-      }
-    }
   </style>
 </head>
 <body>
@@ -512,14 +466,19 @@
       type: 'attendance'
     });
     
-    new QRCode(qrContainer, {
-      text: qrData,
-      width: 100,
-      height: 100,
-      colorDark: "#1e293b",
-      colorLight: "#ffffff",
-      correctLevel: QRCode.CorrectLevel.M
-    });
+    try {
+      new QRCode(qrContainer, {
+        text: qrData,
+        width: 100,
+        height: 100,
+        colorDark: "#1e293b",
+        colorLight: "#ffffff",
+        correctLevel: QRCode.CorrectLevel.M
+      });
+      console.log("QR Code berjaya dijana");
+    } catch(e) {
+      console.error("QR Code error:", e);
+    }
   }
   
   // ============================================================
@@ -527,12 +486,13 @@
   // ============================================================
   function printQRCode() {
     // Buat elemen untuk print
-    const printContent = `
+    const printHtml = `
       <!DOCTYPE html>
       <html>
       <head>
         <meta charset="UTF-8">
         <title>QR Code Kehadiran - ${studentName}</title>
+        <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"><\/script>
         <style>
           * {
             margin: 0;
@@ -569,10 +529,8 @@
           }
           .print-qr {
             margin: 0.2cm 0;
-          }
-          .print-qr img {
-            width: 3.8cm !important;
-            height: 3.8cm !important;
+            display: flex;
+            justify-content: center;
           }
           .print-name {
             font-size: 11pt;
@@ -598,7 +556,7 @@
       <body>
         <div class="qr-print-card">
           <div class="print-title">E-MIND CARE SEMSIRA</div>
-          <div class="print-qr" id="printQr"></div>
+          <div id="printQr" class="print-qr"></div>
           <div class="print-name">${escapeHtml(studentName)}</div>
           <div class="print-ic">No. IC: ${escapeHtml(studentIC)}</div>
           <div class="print-footer">Kad Kehadiran Digital • Scan untuk rekod kehadiran</div>
@@ -608,8 +566,8 @@
           const qrData = JSON.stringify({ ic: '${escapeHtml(studentIC)}', name: '${escapeHtml(studentName)}', type: 'attendance' });
           new QRCode(document.getElementById('printQr'), {
             text: qrData,
-            width: 140,
-            height: 140,
+            width: 120,
+            height: 120,
             colorDark: "#1e293b",
             colorLight: "#ffffff",
             correctLevel: QRCode.CorrectLevel.M
@@ -618,15 +576,19 @@
           // Tunggu QR siap kemudian cetak
           setTimeout(() => {
             window.print();
-          }, 500);
+            // Tutup window selepas print (optional)
+            setTimeout(() => {
+              window.close();
+            }, 500);
+          }, 800);
         <\/script>
-        <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"><\/script>
       </body>
       </html>
     `;
     
-    const printWindow = window.open('', '_blank');
-    printWindow.document.write(printContent);
+    // Buka window baru untuk print
+    const printWindow = window.open('', '_blank', 'width=400,height=600');
+    printWindow.document.write(printHtml);
     printWindow.document.close();
   }
   

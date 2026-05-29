@@ -150,7 +150,17 @@
             margin-bottom: 1rem;
         }
         .scanner-header h3 { color: white; font-size: 1rem; }
-        #reader { width: 100%; border-radius: 1rem; overflow: hidden; }
+        #guruReader, #studentReader { 
+            width: 100%; 
+            border-radius: 1rem; 
+            overflow: hidden;
+            min-height: 300px;
+        }
+        /* Important: Hide duplicate video streams */
+        #guruReader video, #studentReader video {
+            width: 100% !important;
+            border-radius: 1rem;
+        }
         .camera-controls { display: flex; gap: 1rem; margin-top: 1rem; justify-content: center; }
         .cam-btn {
             padding: 0.5rem 1rem;
@@ -215,7 +225,6 @@
         .closed-section i { font-size: 3rem; color: #f59e0b; margin-bottom: 1rem; }
         .closed-section h3 { color: white; margin-bottom: 0.5rem; }
         
-        /* Toast notification style (in-app, non-popup) */
         .toast-notice {
             position: fixed;
             bottom: 30px;
@@ -363,24 +372,47 @@
     let guruHtml5Qr = null;
     let studentHtml5Qr = null;
     let isSystemOpen = false;
-    let guruVerified = false;
-    let currentGuruName = "";
     let attendanceSettings = { timeOpen: "07:00", timeLate: "09:00", timeClose: "17:00" };
     let isSystemClosed = false;
     let scannedStudents = new Set();
     
-    const scanGuruBtn = document.getElementById('scanGuruBtn');
-    const guruScannerModal = document.getElementById('guruScannerModal');
-    const closeGuruScanner = document.getElementById('closeGuruScanner');
-    const stopGuruScannerBtn = document.getElementById('stopGuruScannerBtn');
-    const guruStatus = document.getElementById('guruStatus');
-    const studentScannerSection = document.getElementById('studentScannerSection');
-    const stopStudentScannerBtn = document.getElementById('stopStudentScannerBtn');
-    const studentScanningStatus = document.getElementById('studentScanningStatus');
-    const logList = document.getElementById('logList');
-    const systemClosedWarning = document.getElementById('systemClosedWarning');
+    // Helper to safely stop any scanner
+    async function safeStopScanner(scanner, scannerName) {
+        if (scanner && typeof scanner.stop === 'function') {
+            try {
+                await scanner.stop();
+                console.log(`${scannerName} stopped successfully`);
+            } catch(e) {
+                console.log(`${scannerName} stop error (already stopped):`, e);
+            }
+        }
+    }
     
-    // Toast notification function (No popup alert)
+    // Clean up student scanner completely
+    async function cleanupStudentScanner() {
+        if (studentHtml5Qr) {
+            await safeStopScanner(studentHtml5Qr, "Student scanner");
+            studentHtml5Qr = null;
+        }
+        // Clear the container to remove any leftover video elements
+        const readerDiv = document.getElementById('studentReader');
+        if (readerDiv) {
+            readerDiv.innerHTML = '';
+        }
+    }
+    
+    // Clean up guru scanner completely
+    async function cleanupGuruScanner() {
+        if (guruHtml5Qr) {
+            await safeStopScanner(guruHtml5Qr, "Guru scanner");
+            guruHtml5Qr = null;
+        }
+        const readerDiv = document.getElementById('guruReader');
+        if (readerDiv) {
+            readerDiv.innerHTML = '';
+        }
+    }
+    
     function showToast(message, type = 'info') {
         const existingToast = document.querySelector('.toast-notice');
         if(existingToast) existingToast.remove();
@@ -435,9 +467,8 @@
                     ? `Sistem akan dibuka pada ${attendanceSettings.timeOpen}` 
                     : `Waktu kehadiran telah tamat pada ${attendanceSettings.timeClose}`;
                 document.getElementById('closedMessage').innerHTML = `${timeInfo}. Sila hubungi kaunselor.`;
-                if (studentHtml5Qr) {
-                    try { studentHtml5Qr.stop(); } catch(e) {}
-                }
+                // Stop student scanner when system closes
+                cleanupStudentScanner();
                 studentScannerSection.style.display = 'none';
             }
             return false;
@@ -446,9 +477,7 @@
                 isSystemClosed = false;
                 systemClosedWarning.style.display = 'none';
                 studentScannerSection.style.display = 'block';
-                if (studentHtml5Qr && isSystemOpen) {
-                    startStudentScanner();
-                }
+                startStudentScanner();
             }
             return true;
         }
@@ -547,14 +576,16 @@
                 let teacherName = '';
                 snapshot.forEach(doc => { teacherName = doc.data().fullname; });
                 currentGuruName = teacherName;
-                guruVerified = true;
                 isSystemOpen = true;
                 guruStatus.style.display = 'block';
                 guruStatus.className = 'guru-status guru-verified';
                 guruStatus.innerHTML = `<i class="fas fa-check-circle"></i> Guru ${teacherName} disahkan! Sistem kehadiran dibuka.`;
-                if (guruHtml5Qr) { try { await guruHtml5Qr.stop(); } catch(e) {} }
+                
+                // Stop guru scanner completely
+                await cleanupGuruScanner();
                 guruScannerModal.style.display = 'none';
                 document.getElementById('guruSection').style.display = 'none';
+                
                 const now = new Date();
                 const currentMinutes = now.getHours() * 60 + now.getMinutes();
                 const openMinutes = timeToMinutes(attendanceSettings.timeOpen);
@@ -596,14 +627,24 @@
     }
     
     async function startGuruScanner() {
+        // Clean up any existing guru scanner first
+        await cleanupGuruScanner();
+        
         guruScannerModal.style.display = 'block';
         const guruReaderDiv = document.getElementById('guruReader');
-        guruReaderDiv.innerHTML = '';
+        guruReaderDiv.innerHTML = ''; // Clear any leftover content
+        
         guruHtml5Qr = new Html5Qrcode("guruReader");
         try {
-            await guruHtml5Qr.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 },
-                async (decodedText) => { await verifyGuruQR(decodedText); },
-                (error) => { console.log("Scan error:", error); }
+            await guruHtml5Qr.start(
+                { facingMode: "environment" },
+                { fps: 10, qrbox: { width: 250, height: 250 } },
+                async (decodedText) => { 
+                    await verifyGuruQR(decodedText);
+                },
+                (errorMessage) => { 
+                    // Silent ignore - continuous scanning
+                }
             );
             document.getElementById('guruScanningStatus').innerHTML = '📷 Kamera aktif. Scan QR Code guru.';
         } catch(err) {
@@ -613,18 +654,25 @@
     }
     
     async function stopGuruScanner() {
-        if (guruHtml5Qr) { try { await guruHtml5Qr.stop(); } catch(e) {} }
+        await cleanupGuruScanner();
         guruScannerModal.style.display = 'none';
         document.getElementById('guruScanningStatus').innerHTML = '';
     }
     
     async function startStudentScanner() {
         if (!isSystemOpen || isSystemClosed) return;
+        
+        // Clean up any existing student scanner first to prevent double camera
+        await cleanupStudentScanner();
+        
         const studentReaderDiv = document.getElementById('studentReader');
-        studentReaderDiv.innerHTML = '';
+        studentReaderDiv.innerHTML = ''; // Ensure clean container
+        
         studentHtml5Qr = new Html5Qrcode("studentReader");
         try {
-            await studentHtml5Qr.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 },
+            await studentHtml5Qr.start(
+                { facingMode: "environment" },
+                { fps: 10, qrbox: { width: 250, height: 250 } },
                 async (decodedText) => {
                     if (!isSystemOpen || isSystemClosed) {
                         showToast("Sistem kehadiran belum dibuka atau telah ditutup", "warning");
@@ -656,7 +704,9 @@
                         showToast("QR Code tidak dikenali. Sila gunakan QR kehadiran yang sah.", "error");
                     }
                 },
-                (error) => { console.log("Scan error:", error); }
+                (errorMessage) => { 
+                    // Silent ignore - continuous scanning
+                }
             );
             studentScanningStatus.innerHTML = `✅ Kamera aktif. Waktu operasi: ${attendanceSettings.timeOpen} - ${attendanceSettings.timeClose}`;
             stopStudentScannerBtn.disabled = false;
@@ -667,7 +717,7 @@
     }
     
     async function stopStudentScanner() {
-        if (studentHtml5Qr) { try { await studentHtml5Qr.stop(); } catch(e) {} }
+        await cleanupStudentScanner();
         studentScanningStatus.innerHTML = '';
         stopStudentScannerBtn.disabled = true;
     }

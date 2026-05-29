@@ -561,7 +561,7 @@
       <div class="menu-btn">Daftar Merit <i class="fas fa-arrow-right"></i></div>
     </div>
 
-    <!-- NEW MENU: Kehadiran Pelajar Sekolah (diletakkan di Urusan Kelas Saya) -->
+    <!-- NEW MENU: Kehadiran Pelajar Sekolah - LEADS TO kehadiran-pelajar-sekolah.html -->
     <div class="menu-card" data-menu="kategori-kehadiran">
       <div class="menu-icon"><i class="fas fa-calendar-check"></i></div>
       <h3>Kehadiran Pelajar Sekolah</h3>
@@ -1019,7 +1019,8 @@
         targetUrl = 'keseluruhan-kelas.html';
         break;
       case 'kategori-kehadiran':
-        targetUrl = 'kehadiran-hari-ini.html';
+        // LEAD TO kehadiran-pelajar-sekolah.html (the new menu page)
+        targetUrl = 'kehadiran-pelajar-sekolah.html';
         break;
       default:
         return;

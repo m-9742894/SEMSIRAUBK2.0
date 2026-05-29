@@ -223,7 +223,7 @@
       letter-spacing: 0.4px;
     }
 
-    /* BUTTON PANEL - 4 cards grid */
+    /* BUTTON PANEL - 5 cards grid (ditambah Sistem Kehadiran) */
     .access-panel {
       margin: 3.5rem 0 2rem;
     }
@@ -425,11 +425,11 @@
 </div>
 
 <div class="container">
-  <!-- Header dengan slot logo KOSONG (untuk logo PNG) -->
+  <!-- Header dengan slot logo KOSONG -->
   <div class="header" data-aos="fade-down" data-aos-duration="800">
     <div class="logo-wrapper">
       <div class="logo-empty-slot" id="logoEmptySlot">
-        <!-- Ruang kosong untuk logo PNG - anda boleh tambah <img src="LOGO SEMSIRA.png"> di sini nanti -->
+        <!-- Ruang kosong untuk logo PNG -->
       </div>
       <div class="logo-text">
         <h2>E-MindCare SEMSIRA</h2>
@@ -461,13 +461,13 @@
     </div>
   </div>
 
-  <!-- Butang login ke page berasingan (GUEST, PELAJAR, GURU, KAUNSELOR) -->
+  <!-- Butang login ke page berasingan (GUEST, PELAJAR, GURU, KAUNSELOR, SISTEM KEHADIRAN) -->
   <div class="access-panel" data-aos="fade-up" data-aos-delay="250">
     <div class="section-label">
       <span><i class="fas fa-sign-in-alt"></i> Akses Sistem</span>
     </div>
     <div class="card-grid">
-      <!-- 1. GUEST -> Terus ke portal-utama.html (root folder) -->
+      <!-- 1. GUEST -> Terus ke portal-utama.html -->
       <div class="access-card" data-role="guest" data-url="portal-utama.html">
         <div class="card-icon"><i class="fas fa-user-friends"></i></div>
         <h3>GUEST</h3>
@@ -498,6 +498,14 @@
         <p>Panel kaunseling sekolah</p>
         <div class="btn-enter"><span>Masuk</span> <i class="fas fa-arrow-right"></i></div>
       </div>
+
+      <!-- 5. SISTEM KEHADIRAN (BARU) -> redirect ke kehadiran.html -->
+      <div class="access-card" data-role="kehadiran" data-url="kehadiran.html">
+        <div class="card-icon"><i class="fas fa-fingerprint"></i></div>
+        <h3>SISTEM KEHADIRAN</h3>
+        <p>Rekod kehadiran & QR Code</p>
+        <div class="btn-enter"><span>Masuk</span> <i class="fas fa-arrow-right"></i></div>
+      </div>
     </div>
   </div>
 
@@ -526,9 +534,9 @@
   // PELAJAR -> dashboard/page-pelajar.html
   // GURU -> dashboard/page-guru.html
   // KAUNSELOR -> dashboard/page-kaunselor.html
+  // SISTEM KEHADIRAN -> kehadiran.html (root)
   // ============================================================
   
-  // Dapatkan semua kad akses
   const accessCards = document.querySelectorAll('.access-card');
   
   accessCards.forEach(card => {
@@ -546,32 +554,6 @@
       }
     });
   });
-  
-  // ============================================================
-  // STRUKTUR FOLDER YANG DISARANKAN:
-  // 
-  // root folder/
-  // ├── index.html (fail ini)
-  // ├── portal-utama.html (halaman guest)
-  // ├── LOGO SEMSIRA.png (logo)
-  // └── dashboard/
-  //     ├── page-pelajar.html
-  //     ├── page-guru.html
-  //     └── page-kaunselor.html
-  //
-  // Contoh kandungan minimum untuk fail di dalam folder dashboard:
-  /*
-  <!DOCTYPE html>
-  <html>
-  <head><meta charset="UTF-8"><title>Dashboard [Role]</title></head>
-  <body style="font-family: sans-serif; text-align: center; padding: 3rem;">
-    <h1>Dashboard [Role]</h1>
-    <p>Kandungan akan ditambah kemudian.</p>
-    <a href="../index.html">Kembali ke Laman Utama</a>
-  </body>
-  </html>
-  */
-  // ============================================================
 </script>
 </body>
 </html>

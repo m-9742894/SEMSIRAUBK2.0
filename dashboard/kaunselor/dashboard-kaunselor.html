@@ -325,7 +325,7 @@
   </div>
 
   <div class="menu-grid">
-    <!-- 1. KEPUTUSAN UJIAN INVENTORI - Redirect ke keputusan-ujian-psikometrik.html -->
+    <!-- 1. KEPUTUSAN UJIAN INVENTORI -->
     <div class="menu-card" data-menu="keputusan-ujian">
       <div class="menu-icon"><i class="fas fa-chart-simple"></i></div>
       <h3>Keputusan Ujian Inventori</h3>
@@ -373,12 +373,20 @@
       <div class="menu-btn">Urus Tempahan <i class="fas fa-arrow-right"></i></div>
     </div>
 
-    <!-- 7. TEMPAHAN DIARI (BARU) -->
+    <!-- 7. TEMPAHAN DIARI -->
     <div class="menu-card" data-menu="tempahan-diari">
       <div class="menu-icon"><i class="fas fa-book"></i></div>
       <h3>Tempahan Diari</h3>
       <div class="menu-desc">Urus tempahan diari fizikal pelajar, sahkan & urus stok diari.</div>
       <div class="menu-btn">Urus Tempahan <i class="fas fa-arrow-right"></i></div>
+    </div>
+
+    <!-- 8. KEHADIRAN PELAJAR SEKOLAH (BARU) -->
+    <div class="menu-card" data-menu="kehadiran-pelajar">
+      <div class="menu-icon"><i class="fas fa-fingerprint"></i></div>
+      <h3>Kehadiran Pelajar Sekolah</h3>
+      <div class="menu-desc">Urus & lihat rekod kehadiran pelajar menggunakan QR Code.</div>
+      <div class="menu-btn">Urus Kehadiran <i class="fas fa-arrow-right"></i></div>
     </div>
   </div>
 
@@ -389,7 +397,7 @@
   </div>
 
   <div class="menu-grid">
-    <!-- 8. KESELURUHAN GURU -->
+    <!-- 9. KESELURUHAN GURU -->
     <div class="menu-card" data-menu="keseluruhan-guru">
       <div class="menu-icon"><i class="fas fa-user-tie"></i></div>
       <h3>Keseluruhan Guru</h3>
@@ -397,7 +405,7 @@
       <div class="menu-btn">Lihat Semua <i class="fas fa-arrow-right"></i></div>
     </div>
 
-    <!-- 9. KESELURUHAN MURID -->
+    <!-- 10. KESELURUHAN MURID -->
     <div class="menu-card" data-menu="keseluruhan-murid">
       <div class="menu-icon"><i class="fas fa-user-graduate"></i></div>
       <h3>Keseluruhan Murid</h3>
@@ -405,7 +413,7 @@
       <div class="menu-btn">Lihat Semua <i class="fas fa-arrow-right"></i></div>
     </div>
 
-    <!-- 10. KESELURUHAN KELAS -->
+    <!-- 11. KESELURUHAN KELAS -->
     <div class="menu-card" data-menu="keseluruhan-kelas">
       <div class="menu-icon"><i class="fas fa-building"></i></div>
       <h3>Keseluruhan Kelas</h3>
@@ -430,7 +438,6 @@
     switch(menuType) {
       // Urusan Utama
       case 'keputusan-ujian':
-        // ✅ Tukar ke keputusan-ujian-psikometrik.html
         targetUrl = 'keputusan-ujian-psikometrik.html';
         break;
       case 'mata-merit':
@@ -448,10 +455,13 @@
       case 'tempahan-kaunseling':
         targetUrl = 'tempahan-kaunseling.html';
         break;
-      
-      // Menu baru: Tempahan Diari
       case 'tempahan-diari':
         targetUrl = 'tempahan-diari.html';
+        break;
+      
+      // Menu baru: Kehadiran Pelajar Sekolah
+      case 'kehadiran-pelajar':
+        targetUrl = 'kehadiran-pelajar.html';
         break;
       
       // Keseluruhan Data

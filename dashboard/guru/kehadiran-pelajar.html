@@ -3,11 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Keseluruhan Murid | E-MindCare SEMSIRA</title>
+    <title>Kehadiran Pelajar Sekolah | Kaunselor SEMSIRA</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <!-- QR Code Library -->
-    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
     
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
@@ -17,12 +15,13 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
-            background: linear-gradient(135deg, #e8f0fe 0%, #dfe7f5 100%);
+            background: linear-gradient(135deg, #f0f4ff 0%, #e9eef6 100%);
             min-height: 100vh;
             padding: 20px;
         }
-        .container { max-width: 1400px; margin: 0 auto; }
+        .container { max-width: 1200px; margin: 0 auto; }
         
+        /* Header */
         .header {
             display: flex;
             justify-content: space-between;
@@ -31,13 +30,12 @@
             gap: 1rem;
             margin-bottom: 2rem;
             padding-bottom: 1rem;
-            border-bottom: 2px solid rgba(37,99,235,0.2);
+            border-bottom: 2px solid rgba(79,70,229,0.2);
         }
         .logo-area { display: flex; align-items: center; gap: 1rem; }
         .logo-icon {
-            background: linear-gradient(145deg, #2563eb, #7c3aed);
-            width: 50px;
-            height: 50px;
+            background: linear-gradient(145deg, #4f46e5, #7c3aed);
+            width: 50px; height: 50px;
             border-radius: 28px;
             display: flex;
             align-items: center;
@@ -47,7 +45,7 @@
         .logo-text h1 {
             font-size: 1.5rem;
             font-weight: 800;
-            background: linear-gradient(135deg, #1e293b, #2563eb);
+            background: linear-gradient(135deg, #1e293b, #4f46e5);
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
@@ -60,203 +58,291 @@
             border-radius: 40px;
             cursor: pointer;
             font-weight: 600;
-            color: #2563eb;
+            color: #4f46e5;
             text-decoration: none;
             display: inline-flex;
             align-items: center;
             gap: 8px;
             transition: 0.2s;
         }
-        .back-btn:hover { background: #2563eb; color: white; }
+        .back-btn:hover { background: #4f46e5; color: white; }
         
-        .filter-section {
-            background: white;
-            border-radius: 1rem;
-            padding: 1rem;
+        /* Stats Banner */
+        .stats-banner {
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            border-radius: 1.2rem;
+            padding: 1rem 1.5rem;
             margin-bottom: 1.5rem;
-            display: flex;
-            gap: 1rem;
-            flex-wrap: wrap;
-            align-items: flex-end;
-        }
-        .filter-group {
-            flex: 1;
-            min-width: 150px;
-        }
-        .filter-group label {
-            display: block;
-            font-size: 0.7rem;
-            font-weight: 600;
-            color: #64748b;
-            margin-bottom: 0.3rem;
-        }
-        .filter-group select {
-            width: 100%;
-            padding: 0.6rem 0.8rem;
-            border-radius: 0.8rem;
-            border: 1px solid #e2e8f0;
-            background: #f8fafc;
-            font-family: inherit;
-            font-size: 0.85rem;
-            outline: none;
-        }
-        .btn-filter {
-            background: #2563eb;
             color: white;
-            border: none;
-            padding: 0.6rem 1.2rem;
-            border-radius: 0.8rem;
-            cursor: pointer;
-            font-weight: 600;
-        }
-        .btn-filter:hover { background: #1d4ed8; }
-        
-        /* Search Box with Auto Suggestion */
-        .search-wrapper {
-            position: relative;
-            flex: 2;
-            min-width: 250px;
-        }
-        .search-wrapper label {
-            display: block;
-            font-size: 0.7rem;
-            font-weight: 600;
-            color: #64748b;
-            margin-bottom: 0.3rem;
-        }
-        .search-input {
-            width: 100%;
-            padding: 0.6rem 0.8rem;
-            border-radius: 0.8rem;
-            border: 1px solid #e2e8f0;
-            background: #f8fafc;
-            font-family: inherit;
-            font-size: 0.85rem;
-            outline: none;
-        }
-        .search-input:focus {
-            border-color: #2563eb;
-            box-shadow: 0 0 0 2px rgba(37,99,235,0.1);
-        }
-        .suggestions-box {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            right: 0;
-            background: white;
-            border: 1px solid #e2e8f0;
-            border-radius: 0.8rem;
-            max-height: 250px;
-            overflow-y: auto;
-            z-index: 100;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            display: none;
-        }
-        .suggestion-item {
-            padding: 0.6rem 0.8rem;
-            cursor: pointer;
-            border-bottom: 1px solid #f1f5f9;
-            font-size: 0.85rem;
-        }
-        .suggestion-item:hover {
-            background: #eef2ff;
-        }
-        .suggestion-item .suggestion-name {
-            font-weight: 600;
-            color: #1e293b;
-        }
-        .suggestion-item .suggestion-detail {
-            font-size: 0.7rem;
-            color: #64748b;
-        }
-        
-        .action-bar {
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
             gap: 1rem;
-            margin-bottom: 1rem;
         }
-        .btn-select-all, .btn-print-selected {
-            background: linear-gradient(95deg, #10b981, #059669);
-            color: white;
-            border: none;
-            padding: 0.6rem 1.2rem;
-            border-radius: 40px;
-            font-weight: 600;
+        
+        /* Menu Buttons */
+        .menu-buttons {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .menu-btn {
+            padding: 1.5rem 1rem;
+            border-radius: 1.2rem;
+            font-weight: 700;
+            font-size: 1.2rem;
             cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            transition: 0.2s;
-        }
-        .btn-print-selected { background: linear-gradient(95deg, #8b5cf6, #7c3aed); }
-        .btn-select-all:hover, .btn-print-selected:hover { transform: translateY(-2px); }
-        
-        .stats {
-            background: white;
-            border-radius: 1rem;
-            padding: 1rem;
-            margin-bottom: 1.5rem;
+            border: none;
+            transition: all 0.3s ease;
             display: flex;
-            gap: 1rem;
-            flex-wrap: wrap;
-        }
-        .stat-card {
-            flex: 1;
-            text-align: center;
-            padding: 0.8rem;
-            background: #f8fafc;
-            border-radius: 1rem;
-        }
-        .stat-card i { font-size: 1.5rem; color: #2563eb; }
-        .stat-card .number { font-size: 1.8rem; font-weight: 800; color: #1e293b; }
-        .stat-card .label { font-size: 0.7rem; color: #5b6e8c; }
-        
-        .table-container {
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
             background: white;
-            border-radius: 1rem;
-            overflow-x: auto;
+            border: 1px solid #e2e8f0;
+            color: #1e293b;
             box-shadow: 0 4px 12px rgba(0,0,0,0.05);
         }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            min-width: 700px;
+        .menu-btn i { font-size: 2rem; }
+        .menu-btn span { font-size: 1rem; font-weight: 600; }
+        .menu-btn:hover {
+            background: #4f46e5;
+            color: white;
+            transform: translateY(-6px);
+            border-color: #4f46e5;
+            box-shadow: 0 15px 30px -10px rgba(79,70,229,0.4);
         }
-        th {
-            text-align: left;
-            padding: 1rem;
-            background: #f8fafc;
-            color: #1e293b;
-            font-weight: 600;
-            border-bottom: 2px solid #e2e8f0;
-        }
-        td {
-            padding: 0.8rem 1rem;
-            border-bottom: 1px solid #e2e8f0;
-            vertical-align: middle;
-        }
-        .checkbox-col { width: 40px; text-align: center; }
         
-        .btn-print-qr {
-            background: #e0e7ff;
-            border: none;
-            padding: 0.3rem 0.8rem;
-            border-radius: 2rem;
-            cursor: pointer;
-            font-size: 0.7rem;
-            font-weight: 600;
-            color: #2563eb;
-            display: inline-flex;
+        /* Modal Styles */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(5px);
+            z-index: 2000;
+            display: flex;
             align-items: center;
-            gap: 5px;
+            justify-content: center;
+            padding: 20px;
+            display: none;
+        }
+        .modal-content {
+            max-width: 650px;
+            width: 100%;
+            background: white;
+            border-radius: 1.5rem;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: modalFadeIn 0.3s ease;
+        }
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .modal-header {
+            padding: 1.2rem 1.5rem;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            background: white;
+            border-radius: 1.5rem 1.5rem 0 0;
+        }
+        .modal-header h3 { color: #1e293b; font-size: 1.2rem; }
+        .modal-header h3 i { color: #4f46e5; margin-right: 8px; }
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #94a3b8;
             transition: 0.2s;
         }
-        .btn-print-qr:hover { background: #c7d2fe; transform: translateY(-1px); }
+        .modal-close:hover { color: #dc2626; }
+        .modal-body { padding: 1.5rem; }
         
-        .empty-state { text-align: center; padding: 3rem; color: #94a3b8; }
+        /* Form Styles */
+        .form-group { margin-bottom: 1rem; }
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            font-size: 0.75rem;
+            color: #1e293b;
+            margin-bottom: 0.3rem;
+        }
+        .form-group label i { margin-right: 5px; color: #4f46e5; }
+        
+        /* Time Picker */
+        .time-picker {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .time-picker select {
+            flex: 1;
+            padding: 0.7rem;
+            border-radius: 0.8rem;
+            border: 1px solid #e2e8f0;
+            background: #f8fafc;
+            font-family: inherit;
+            font-size: 0.9rem;
+            outline: none;
+            cursor: pointer;
+        }
+        .time-picker select:focus {
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 2px rgba(79,70,229,0.1);
+        }
+        .time-picker span {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #4f46e5;
+        }
+        .info-24h {
+            font-size: 0.65rem;
+            color: #64748b;
+            margin-top: 0.3rem;
+        }
+        
+        /* Date Range Picker - Lebih Elok */
+        .date-range-card {
+            background: #f8fafc;
+            border-radius: 1rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border: 1px solid #e2e8f0;
+        }
+        .date-range-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px dashed #cbd5e1;
+        }
+        .date-range-header i {
+            font-size: 1rem;
+            color: #4f46e5;
+        }
+        .date-range-header span {
+            font-weight: 600;
+            color: #1e293b;
+            font-size: 0.8rem;
+        }
+        .date-range-inputs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        .date-input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+        }
+        .date-input-group label {
+            font-size: 0.65rem;
+            color: #64748b;
+            font-weight: 500;
+        }
+        .date-input-group input {
+            padding: 0.6rem;
+            border-radius: 0.8rem;
+            border: 1px solid #e2e8f0;
+            background: white;
+            font-family: inherit;
+            font-size: 0.85rem;
+            outline: none;
+        }
+        .date-input-group input:focus {
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 2px rgba(79,70,229,0.1);
+        }
+        
+        .weekday-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            margin-bottom: 1rem;
+        }
+        .weekday-check {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            background: #f8fafc;
+            padding: 0.3rem 0.8rem;
+            border-radius: 2rem;
+            border: 1px solid #e2e8f0;
+        }
+        .weekday-check input { width: 16px; height: 16px; cursor: pointer; accent-color: #4f46e5; }
+        .weekday-check label { font-size: 0.75rem; font-weight: 500; cursor: pointer; }
+        .btn-submit {
+            width: 100%;
+            padding: 0.8rem;
+            background: linear-gradient(95deg, #4f46e5, #7c3aed);
+            color: white;
+            border: none;
+            border-radius: 2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 0.5rem;
+        }
+        .btn-submit:hover { transform: translateY(-2px); }
+        
+        .holiday-list {
+            margin-top: 1rem;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .holiday-item {
+            background: #f8fafc;
+            border-radius: 0.8rem;
+            padding: 0.6rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 3px solid #f59e0b;
+        }
+        .holiday-info { font-size: 0.75rem; flex: 1; }
+        .holiday-date { font-weight: 700; color: #1e293b; }
+        .holiday-range { font-size: 0.65rem; color: #64748b; margin-top: 0.2rem; }
+        .holiday-name { color: #64748b; font-size: 0.7rem; margin-top: 0.2rem; }
+        .delete-holiday {
+            background: none;
+            border: none;
+            color: #ef4444;
+            cursor: pointer;
+            font-size: 0.9rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 20px;
+        }
+        .delete-holiday:hover { background: #fee2e2; }
+        
+        .time-settings {
+            display: flex;
+            justify-content: space-between;
+            background: #f1f5f9;
+            border-radius: 1rem;
+            padding: 0.8rem;
+            margin-top: 0.5rem;
+            text-align: center;
+        }
+        .time-item { flex: 1; }
+        .time-label { font-size: 0.6rem; color: #64748b; }
+        .time-value { font-size: 0.9rem; font-weight: 700; color: #1e293b; }
         
         .footer {
             margin-top: 2rem;
@@ -267,49 +353,29 @@
             font-size: 0.7rem;
         }
         
-        /* Print QR styling */
-        .qr-print-card {
-            width: 7cm;
-            height: 10cm;
-            padding: 0.4cm;
-            background: white;
-            border: 1px solid #e2e8f0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            font-family: 'Plus Jakarta Sans', 'Segoe UI', Arial, sans-serif;
-            box-sizing: border-box;
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #1e293b;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 10px;
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
+        }
+        .toast.success { background: #10b981; }
+        .toast.error { background: #ef4444; }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
         }
         
-        @media print {
-            body { background: white; padding: 0; margin: 0; }
-            .no-print { display: none !important; }
-            .print-grid-page {
-                page-break-after: always;
-                margin: 0;
-                padding: 0.5cm;
-            }
-            .print-grid-page:last-child { page-break-after: auto; }
-            .print-grid {
-                display: grid;
-                grid-template-columns: repeat(3, 7cm);
-                gap: 0.3cm;
-                justify-content: center;
-                margin: 0 auto;
-            }
-            .qr-print-card {
-                border: 1px solid #ccc;
-                page-break-inside: avoid;
-                margin: 0;
-            }
-        }
-        
-        @media (max-width: 700px) {
-            .filter-section { flex-direction: column; }
-            .filter-group { width: 100%; }
-            .search-wrapper { width: 100%; }
+        @media (max-width: 800px) {
+            .menu-buttons { grid-template-columns: 1fr; gap: 1rem; }
+            .menu-btn { padding: 1rem; flex-direction: row; justify-content: center; gap: 12px; }
+            .menu-btn i { font-size: 1.5rem; }
+            .date-range-inputs { grid-template-columns: 1fr; gap: 0.5rem; }
         }
     </style>
 </head>
@@ -317,69 +383,203 @@
 <div class="container">
     <div class="header">
         <div class="logo-area">
-            <div class="logo-icon"><i class="fas fa-user-graduate"></i></div>
+            <div class="logo-icon"><i class="fas fa-fingerprint"></i></div>
             <div class="logo-text">
-                <h1>Keseluruhan Murid</h1>
-                <p>Senarai semua pelajar yang berdaftar di sekolah</p>
+                <h1>Kehadiran Pelajar Sekolah</h1>
+                <p>Urus rekod kehadiran & tetapan sistem</p>
             </div>
         </div>
-        <a href="dashboard-guru.html" class="back-btn"><i class="fas fa-arrow-left"></i> Kembali ke Dashboard</a>
+        <a href="dashboard-kaunselor.html" class="back-btn"><i class="fas fa-arrow-left"></i> Kembali ke Dashboard</a>
     </div>
-    
-    <!-- Filter Section -->
-    <div class="filter-section">
-        <div class="search-wrapper">
-            <label><i class="fas fa-search"></i> Cari Nama / No. IC</label>
-            <input type="text" id="searchInput" class="search-input" placeholder="Taip nama atau No. Kad Pengenalan..." autocomplete="off">
-            <div id="suggestionsBox" class="suggestions-box"></div>
-        </div>
-        <div class="filter-group">
-            <label><i class="fas fa-layer-group"></i> Tingkatan</label>
-            <select id="filterTingkatan">
-                <option value="">Semua</option>
-                <option value="1">Tingkatan 1</option><option value="2">Tingkatan 2</option>
-                <option value="3">Tingkatan 3</option><option value="4">Tingkatan 4</option>
-                <option value="5">Tingkatan 5</option><option value="6">Tingkatan 6</option>
-            </select>
-        </div>
-        <div class="filter-group">
-            <label><i class="fas fa-school"></i> Kelas</label>
-            <select id="filterKelas"><option value="">Semua Kelas</option></select>
-        </div>
-        <div class="filter-group">
-            <button id="applyFilterBtn" class="btn-filter"><i class="fas fa-filter"></i> Guna Filter</button>
-        </div>
-    </div>
-    
-    <!-- Action Bar -->
-    <div class="action-bar">
-        <div>
-            <button id="selectAllBtn" class="btn-select-all"><i class="fas fa-check-double"></i> Pilih Semua</button>
-            <button id="deselectAllBtn" class="btn-select-all" style="background:#64748b;"><i class="fas fa-times"></i> Nyah Pilih</button>
-        </div>
-        <button id="printSelectedBtn" class="btn-print-selected"><i class="fas fa-print"></i> Print QR Dipilih (<span id="selectedCount">0</span>)</button>
-    </div>
-    
-    <!-- Stats -->
-    <div class="stats">
-        <div class="stat-card"><i class="fas fa-users"></i><div class="number" id="totalStudents">0</div><div class="label">Jumlah Pelajar</div></div>
-        <div class="stat-card"><i class="fas fa-school"></i><div class="number" id="totalClasses">0</div><div class="label">Bilangan Kelas</div></div>
-    </div>
-    
-    <!-- Table -->
-    <div class="table-container">
-        <div id="tableContent"><div class="empty-state"><i class="fas fa-spinner fa-pulse"></i> Memuatkan data...</div></div>
-    </div>
-    
-    <div class="footer"><i class="fas fa-heart"></i> E-MindCare SEMSIRA — Data Pelajar Sekolah</div>
-</div>
 
-<!-- Hidden Print Container -->
-<div id="printContainer" style="display: none;"></div>
+    <!-- Stats Banner -->
+    <div class="stats-banner">
+        <div>
+            <h2><i class="fas fa-fingerprint"></i> Sistem Kehadiran QR Code</h2>
+            <p>Urus kehadiran pelajar melalui QR Code digital</p>
+        </div>
+        <div class="total-count">Sedia</div>
+    </div>
+
+    <!-- Menu Buttons -->
+    <div class="menu-buttons">
+        <button class="menu-btn" id="btnSejarahKehadiran">
+            <i class="fas fa-history"></i>
+            <span>Sejarah Kehadiran</span>
+        </button>
+        <button class="menu-btn" id="btnKehadiranHariIni">
+            <i class="fas fa-calendar-day"></i>
+            <span>Kehadiran Hari Ini</span>
+        </button>
+        <button class="menu-btn" id="openSettingBtn">
+            <i class="fas fa-sliders-h"></i>
+            <span>Setting Kehadiran</span>
+        </button>
+    </div>
+
+    <!-- Modal Setting Kehadiran -->
+    <div id="settingModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-cog"></i> Tetapan Kehadiran</h3>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <!-- Hari Cuti Mingguan -->
+                <div style="margin-bottom: 1.5rem;">
+                    <h4 style="margin-bottom: 0.8rem; font-size: 0.9rem;"><i class="fas fa-calendar-week"></i> Hari Cuti Mingguan</h4>
+                    <div class="weekday-grid">
+                        <div class="weekday-check"><input type="checkbox" id="weekday_mon" value="Monday"><label for="weekday_mon">Isnin</label></div>
+                        <div class="weekday-check"><input type="checkbox" id="weekday_tue" value="Tuesday"><label for="weekday_tue">Selasa</label></div>
+                        <div class="weekday-check"><input type="checkbox" id="weekday_wed" value="Wednesday"><label for="weekday_wed">Rabu</label></div>
+                        <div class="weekday-check"><input type="checkbox" id="weekday_thu" value="Thursday"><label for="weekday_thu">Khamis</label></div>
+                        <div class="weekday-check"><input type="checkbox" id="weekday_fri" value="Friday"><label for="weekday_fri">Jumaat</label></div>
+                        <div class="weekday-check"><input type="checkbox" id="weekday_sat" value="Saturday"><label for="weekday_sat">Sabtu</label></div>
+                        <div class="weekday-check"><input type="checkbox" id="weekday_sun" value="Sunday"><label for="weekday_sun">Ahad</label></div>
+                    </div>
+                    <button class="btn-submit" id="saveWeekdayBtn"><i class="fas fa-save"></i> Simpan Cuti Mingguan</button>
+                </div>
+
+                <!-- Cuti Umum - Dengan Reka Bentuk Lebih Elok -->
+                <div style="margin-bottom: 1.5rem;">
+                    <h4 style="margin-bottom: 0.8rem; font-size: 0.9rem;"><i class="fas fa-calendar-alt"></i> Cuti Umum</h4>
+                    
+                    <!-- Date Range Card -->
+                    <div class="date-range-card">
+                        <div class="date-range-header">
+                            <i class="fas fa-calendar-plus"></i>
+                            <span>Tambah Cuti Baru</span>
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-tag"></i> Nama Cuti</label>
+                            <input type="text" id="holidayName" placeholder="cth: Cuti Pertengahan Penggal, Hari Raya Aidilfitri...">
+                        </div>
+                        <div class="date-range-inputs">
+                            <div class="date-input-group">
+                                <label><i class="fas fa-calendar-day"></i> Tarikh Mula</label>
+                                <input type="date" id="holidayStartDate">
+                            </div>
+                            <div class="date-input-group">
+                                <label><i class="fas fa-calendar-day"></i> Tarikh Akhir</label>
+                                <input type="date" id="holidayEndDate">
+                            </div>
+                        </div>
+                        <button class="btn-submit" id="addHolidayBtn" style="margin-top: 1rem; background: linear-gradient(95deg, #10b981, #059669);">
+                            <i class="fas fa-plus-circle"></i> Tambah Cuti
+                        </button>
+                    </div>
+                    
+                    <!-- Senarai Cuti -->
+                    <div style="margin-top: 1rem;">
+                        <div class="date-range-header" style="margin-bottom: 0.5rem;">
+                            <i class="fas fa-list"></i>
+                            <span>Senarai Cuti Umum</span>
+                        </div>
+                        <div class="holiday-list" id="holidayList">
+                            <p style="font-size:0.7rem; color:#94a3b8; text-align:center; padding: 1rem;">Tiada cuti umum</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Masa Kehadiran -->
+                <div style="margin-bottom: 1rem;">
+                    <h4 style="margin-bottom: 0.8rem; font-size: 0.9rem;"><i class="fas fa-clock"></i> Masa Kehadiran (Sistem 24 Jam)</h4>
+                    
+                    <!-- Masa Buka -->
+                    <div class="form-group">
+                        <label><i class="fas fa-door-open"></i> Masa Buka (Pelajar mula scan)</label>
+                        <div class="time-picker">
+                            <select id="timeOpenHour">
+                                <option value="00">00</option><option value="01">01</option><option value="02">02</option>
+                                <option value="03">03</option><option value="04">04</option><option value="05">05</option>
+                                <option value="06">06</option><option value="07" selected>07</option><option value="08">08</option>
+                                <option value="09">09</option><option value="10">10</option><option value="11">11</option>
+                                <option value="12">12</option><option value="13">13</option><option value="14">14</option>
+                                <option value="15">15</option><option value="16">16</option><option value="17">17</option>
+                                <option value="18">18</option><option value="19">19</option><option value="20">20</option>
+                                <option value="21">21</option><option value="22">22</option><option value="23">23</option>
+                            </select>
+                            <span>:</span>
+                            <select id="timeOpenMinute">
+                                <option value="00">00</option><option value="05">05</option><option value="10">10</option>
+                                <option value="15">15</option><option value="20">20</option><option value="25">25</option>
+                                <option value="30">30</option><option value="35">35</option><option value="40">40</option>
+                                <option value="45">45</option><option value="50">50</option><option value="55">55</option>
+                            </select>
+                        </div>
+                        <div class="info-24h">Gunakan sistem 24 jam (00:00 hingga 23:59)</div>
+                    </div>
+                    
+                    <!-- Masa Lambat -->
+                    <div class="form-group">
+                        <label><i class="fas fa-hourglass-half"></i> Masa Lambat (Pelajar dianggap lewat)</label>
+                        <div class="time-picker">
+                            <select id="timeLateHour">
+                                <option value="00">00</option><option value="01">01</option><option value="02">02</option>
+                                <option value="03">03</option><option value="04">04</option><option value="05">05</option>
+                                <option value="06">06</option><option value="07">07</option><option value="08" selected>08</option>
+                                <option value="09">09</option><option value="10">10</option><option value="11">11</option>
+                                <option value="12">12</option><option value="13">13</option><option value="14">14</option>
+                                <option value="15">15</option><option value="16">16</option><option value="17">17</option>
+                                <option value="18">18</option><option value="19">19</option><option value="20">20</option>
+                                <option value="21">21</option><option value="22">22</option><option value="23">23</option>
+                            </select>
+                            <span>:</span>
+                            <select id="timeLateMinute">
+                                <option value="00">00</option><option value="05">05</option><option value="10">10</option>
+                                <option value="15">15</option><option value="20">20</option><option value="25">25</option>
+                                <option value="30">30</option><option value="35">35</option><option value="40">40</option>
+                                <option value="45">45</option><option value="50">50</option><option value="55">55</option>
+                            </select>
+                        </div>
+                        <div class="info-24h">Pelajar yang scan selepas masa ini akan dikira LEWAT</div>
+                    </div>
+                    
+                    <!-- Masa Tutup -->
+                    <div class="form-group">
+                        <label><i class="fas fa-door-closed"></i> Masa Tutup (Sistem tidak terima kehadiran)</label>
+                        <div class="time-picker">
+                            <select id="timeCloseHour">
+                                <option value="00">00</option><option value="01">01</option><option value="02">02</option>
+                                <option value="03">03</option><option value="04">04</option><option value="05">05</option>
+                                <option value="06">06</option><option value="07">07</option><option value="08">08</option>
+                                <option value="09">09</option><option value="10">10</option><option value="11">11</option>
+                                <option value="12">12</option><option value="13">13</option><option value="14">14</option>
+                                <option value="15">15</option><option value="16" selected>16</option><option value="17">17</option>
+                                <option value="18">18</option><option value="19">19</option><option value="20">20</option>
+                                <option value="21">21</option><option value="22">22</option><option value="23">23</option>
+                            </select>
+                            <span>:</span>
+                            <select id="timeCloseMinute">
+                                <option value="00">00</option><option value="05">05</option><option value="10">10</option>
+                                <option value="15">15</option><option value="20">20</option><option value="25">25</option>
+                                <option value="30">30</option><option value="35">35</option><option value="40">40</option>
+                                <option value="45">45</option><option value="50">50</option><option value="55">55</option>
+                            </select>
+                        </div>
+                        <div class="info-24h">Selepas masa ini, sistem TIDAK akan menerima sebarang scan kehadiran</div>
+                    </div>
+                    
+                    <button class="btn-submit" id="saveTimeBtn"><i class="fas fa-save"></i> Simpan Masa Kehadiran</button>
+                    
+                    <div class="time-settings" id="timeSettingsDisplay">
+                        <div class="time-item"><div class="time-label">Masa Buka</div><div class="time-value" id="displayOpen">07:00</div></div>
+                        <div class="time-item"><div class="time-label">Masa Lambat</div><div class="time-value" id="displayLate">08:00</div></div>
+                        <div class="time-item"><div class="time-label">Masa Tutup</div><div class="time-value" id="displayClose">16:00</div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <i class="fas fa-qrcode"></i> Sistem Kehadiran QR Code • E-MindCare SEMSIRA
+    </div>
+</div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, collection, doc, getDocs, getDoc, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
     
     const firebaseConfig = {
         apiKey: "AIzaSyCfu7XC8pXtpDyQ-9Cjdg4AobA-EVEwWcc",
@@ -393,392 +593,179 @@
     
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
-    const studentsCollection = collection(db, "students");
     
-    let allStudents = [];
-    let filteredStudents = [];
-    let selectedStudents = new Set();
-    let searchTerm = '';
-    let currentFilters = { tingkatan: '', kelas: '' };
+    const settingsRef = doc(db, "attendance_settings", "main");
+    const holidaysRef = collection(db, "attendance_holidays");
     
-    function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, m => m==='&'?'&amp;':m==='<'?'&lt;':'&gt;'); }
-    function extractTingkatan(className) { return className ? className.match(/^\d+/)?.[0] || '' : ''; }
+    function getTimeFromSelects(hourSelectId, minuteSelectId) {
+        const hour = document.getElementById(hourSelectId).value;
+        const minute = document.getElementById(minuteSelectId).value;
+        return `${hour.padStart(2, '0')}:${minute.padStart(2, '0')}`;
+    }
     
-    function showToast(message, type = 'success') {
+    function setTimeSelects(timeStr, hourSelectId, minuteSelectId) {
+        if (!timeStr) return;
+        const [hour, minute] = timeStr.split(':');
+        if (hour) document.getElementById(hourSelectId).value = hour;
+        if (minute) document.getElementById(minuteSelectId).value = minute;
+    }
+    
+    function openModal() { document.getElementById('settingModal').style.display = 'flex'; }
+    window.closeModal = function() { document.getElementById('settingModal').style.display = 'none'; };
+    
+    async function loadSettings() {
+        try {
+            const docSnap = await getDoc(settingsRef);
+            if (docSnap.exists()) {
+                const data = docSnap.data();
+                
+                if (data.weekdayHolidays) {
+                    document.getElementById('weekday_mon').checked = data.weekdayHolidays.includes('Monday');
+                    document.getElementById('weekday_tue').checked = data.weekdayHolidays.includes('Tuesday');
+                    document.getElementById('weekday_wed').checked = data.weekdayHolidays.includes('Wednesday');
+                    document.getElementById('weekday_thu').checked = data.weekdayHolidays.includes('Thursday');
+                    document.getElementById('weekday_fri').checked = data.weekdayHolidays.includes('Friday');
+                    document.getElementById('weekday_sat').checked = data.weekdayHolidays.includes('Saturday');
+                    document.getElementById('weekday_sun').checked = data.weekdayHolidays.includes('Sunday');
+                }
+                
+                if (data.timeOpen) setTimeSelects(data.timeOpen, 'timeOpenHour', 'timeOpenMinute');
+                if (data.timeLate) setTimeSelects(data.timeLate, 'timeLateHour', 'timeLateMinute');
+                if (data.timeClose) setTimeSelects(data.timeClose, 'timeCloseHour', 'timeCloseMinute');
+                
+                updateTimeDisplay();
+            }
+        } catch (error) { console.error("Error loading settings:", error); }
+    }
+    
+    function updateTimeDisplay() {
+        const timeOpen = getTimeFromSelects('timeOpenHour', 'timeOpenMinute');
+        const timeLate = getTimeFromSelects('timeLateHour', 'timeLateMinute');
+        const timeClose = getTimeFromSelects('timeCloseHour', 'timeCloseMinute');
+        
+        document.getElementById('displayOpen').innerText = timeOpen;
+        document.getElementById('displayLate').innerText = timeLate;
+        document.getElementById('displayClose').innerText = timeClose;
+    }
+    
+    async function saveWeekdayHolidays() {
+        const weekdayHolidays = [];
+        if (document.getElementById('weekday_mon').checked) weekdayHolidays.push('Monday');
+        if (document.getElementById('weekday_tue').checked) weekdayHolidays.push('Tuesday');
+        if (document.getElementById('weekday_wed').checked) weekdayHolidays.push('Wednesday');
+        if (document.getElementById('weekday_thu').checked) weekdayHolidays.push('Thursday');
+        if (document.getElementById('weekday_fri').checked) weekdayHolidays.push('Friday');
+        if (document.getElementById('weekday_sat').checked) weekdayHolidays.push('Saturday');
+        if (document.getElementById('weekday_sun').checked) weekdayHolidays.push('Sunday');
+        
+        try {
+            await setDoc(settingsRef, { weekdayHolidays }, { merge: true });
+            showToast("✅ Tetapan cuti mingguan disimpan!", "success");
+        } catch (error) { showToast("❌ Gagal menyimpan", "error"); }
+    }
+    
+    async function saveTimeSettings() {
+        const timeOpen = getTimeFromSelects('timeOpenHour', 'timeOpenMinute');
+        const timeLate = getTimeFromSelects('timeLateHour', 'timeLateMinute');
+        const timeClose = getTimeFromSelects('timeCloseHour', 'timeCloseMinute');
+        
+        if (timeOpen >= timeLate) {
+            showToast("⚠️ Masa Buka mestilah SEBELUM Masa Lambat!", "error");
+            return;
+        }
+        if (timeLate >= timeClose) {
+            showToast("⚠️ Masa Lambat mestilah SEBELUM Masa Tutup!", "error");
+            return;
+        }
+        
+        try {
+            await setDoc(settingsRef, { timeOpen, timeLate, timeClose }, { merge: true });
+            updateTimeDisplay();
+            showToast("✅ Tetapan masa kehadiran disimpan!", "success");
+        } catch (error) { showToast("❌ Gagal menyimpan", "error"); }
+    }
+    
+    async function loadHolidays() {
+        try {
+            const snapshot = await getDocs(holidaysRef);
+            const holidayListDiv = document.getElementById('holidayList');
+            if (snapshot.empty) {
+                holidayListDiv.innerHTML = '<p style="font-size:0.7rem; color:#94a3b8; text-align:center; padding: 1rem;"><i class="fas fa-calendar-day"></i> Tiada cuti umum</p>';
+                return;
+            }
+            let html = '';
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                const dateRange = data.startDate === data.endDate ? data.startDate : `${data.startDate} → ${data.endDate}`;
+                html += `<div class="holiday-item" data-id="${doc.id}">
+                            <div class="holiday-info">
+                                <div class="holiday-date">📅 ${dateRange}</div>
+                                <div class="holiday-name">🏷️ ${escapeHtml(data.name)}</div>
+                            </div>
+                            <button class="delete-holiday" onclick="deleteHoliday('${doc.id}')"><i class="fas fa-trash-alt"></i></button>
+                        </div>`;
+            });
+            holidayListDiv.innerHTML = html;
+        } catch (error) { console.error("Error loading holidays:", error); }
+    }
+    
+    async function addHoliday() {
+        const name = document.getElementById('holidayName').value.trim();
+        const startDate = document.getElementById('holidayStartDate').value;
+        const endDate = document.getElementById('holidayEndDate').value;
+        
+        if (!name) { showToast("Sila masukkan nama cuti", "error"); return; }
+        if (!startDate) { showToast("Sila pilih tarikh mula cuti", "error"); return; }
+        if (!endDate) { showToast("Sila pilih tarikh akhir cuti", "error"); return; }
+        if (startDate > endDate) { showToast("Tarikh akhir mestilah selepas atau sama dengan tarikh mula", "error"); return; }
+        
+        try {
+            await setDoc(doc(holidaysRef, `${startDate}_to_${endDate}`), {
+                name: name,
+                startDate: startDate,
+                endDate: endDate,
+                createdAt: new Date().toISOString()
+            });
+            document.getElementById('holidayName').value = '';
+            document.getElementById('holidayStartDate').value = '';
+            document.getElementById('holidayEndDate').value = '';
+            showToast("✅ Cuti umum ditambah!", "success");
+            loadHolidays();
+        } catch (error) { showToast("❌ Gagal menambah cuti", "error"); }
+    }
+    
+    window.deleteHoliday = async function(id) {
+        if (confirm("Padam cuti ini?")) {
+            try {
+                await deleteDoc(doc(holidaysRef, id));
+                showToast("✅ Cuti dipadam", "success");
+                loadHolidays();
+            } catch (error) { showToast("❌ Gagal memadam", "error"); }
+        }
+    };
+    
+    // Navigation
+    document.getElementById('btnSejarahKehadiran').addEventListener('click', () => window.location.href = 'sejarah-kehadiran.html');
+    document.getElementById('btnKehadiranHariIni').addEventListener('click', () => window.location.href = 'kehadiran-hari-ini.html');
+    document.getElementById('openSettingBtn').addEventListener('click', openModal);
+    document.getElementById('saveWeekdayBtn').addEventListener('click', saveWeekdayHolidays);
+    document.getElementById('saveTimeBtn').addEventListener('click', saveTimeSettings);
+    document.getElementById('addHolidayBtn').addEventListener('click', addHoliday);
+    
+    window.onclick = function(event) { if (event.target === document.getElementById('settingModal')) closeModal(); };
+    
+    function showToast(msg, type) {
         const toast = document.createElement('div');
-        toast.style.cssText = `position:fixed; bottom:30px; right:30px; background:${type==='error'?'#ef4444':'#10b981'}; color:white; padding:12px 24px; border-radius:10px; z-index:1000; animation:slideIn 0.3s ease; font-family:sans-serif;`;
-        toast.innerHTML = `<i class="fas ${type==='error'?'fa-exclamation-circle':'fa-check-circle'}"></i> ${message}`;
+        toast.className = `toast ${type}`;
+        toast.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i> ${msg}`;
         document.body.appendChild(toast);
         setTimeout(() => toast.remove(), 3000);
     }
     
-    async function loadAllStudents() {
-        try {
-            const snapshot = await getDocs(studentsCollection);
-            allStudents = [];
-            snapshot.forEach(doc => { allStudents.push({ id: doc.id, ...doc.data() }); });
-            updateClassFilter();
-            applyFilters();
-        } catch(error) { console.error(error); showToast('Gagal memuat data', 'error'); }
-    }
+    function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, m => m === '&' ? '&amp;' : m === '<' ? '&lt;' : '&gt;'); }
     
-    function updateClassFilter() {
-        const classes = [...new Set(allStudents.map(s => s.class).filter(c => c && c !== '-'))];
-        classes.sort();
-        const select = document.getElementById('filterKelas');
-        const currentVal = select.value;
-        select.innerHTML = '<option value="">Semua Kelas</option>' + classes.map(c => `<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`).join('');
-        if (currentVal) select.value = currentVal;
-    }
-    
-    function applyFilters() {
-        const tingkatan = document.getElementById('filterTingkatan').value;
-        const kelas = document.getElementById('filterKelas').value;
-        
-        filteredStudents = allStudents.filter(student => {
-            const studentClass = student.class || '-';
-            const studentTingkatan = extractTingkatan(studentClass);
-            
-            // Filter by search term
-            if (searchTerm) {
-                const term = searchTerm.toLowerCase();
-                const nameMatch = (student.fullname || '').toLowerCase().includes(term);
-                const icMatch = (student.icNumber || '').includes(term);
-                if (!nameMatch && !icMatch) return false;
-            }
-            
-            if (tingkatan && studentTingkatan !== tingkatan) return false;
-            if (kelas && studentClass !== kelas) return false;
-            return true;
-        });
-        
-        // Clear selections when filter changes
-        selectedStudents.clear();
-        updateSelectedCount();
-        
-        updateStats();
-        renderTable();
-    }
-    
-    function updateStats() {
-        const uniqueClasses = [...new Set(filteredStudents.map(s => s.class).filter(c => c && c !== '-'))];
-        document.getElementById('totalStudents').innerText = filteredStudents.length;
-        document.getElementById('totalClasses').innerText = uniqueClasses.length;
-    }
-    
-    function updateSelectedCount() {
-        document.getElementById('selectedCount').innerText = selectedStudents.size;
-    }
-    
-    function selectAll() {
-        filteredStudents.forEach(student => selectedStudents.add(student.id));
-        updateSelectedCount();
-        renderTable();
-    }
-    
-    function deselectAll() {
-        selectedStudents.clear();
-        updateSelectedCount();
-        renderTable();
-    }
-    
-    // ==================== AUTO SUGGESTION ====================
-    function showSuggestions() {
-        const input = document.getElementById('searchInput');
-        const val = input.value.toLowerCase();
-        const suggestionsBox = document.getElementById('suggestionsBox');
-        
-        if (val.length < 1) {
-            suggestionsBox.style.display = 'none';
-            return;
-        }
-        
-        const matches = allStudents.filter(s => 
-            (s.fullname && s.fullname.toLowerCase().includes(val)) || 
-            (s.icNumber && s.icNumber.includes(val))
-        ).slice(0, 10);
-        
-        if (matches.length === 0) {
-            suggestionsBox.style.display = 'none';
-            return;
-        }
-        
-        suggestionsBox.innerHTML = matches.map(s => `
-            <div class="suggestion-item" onclick="selectSuggestion('${escapeHtml(s.fullname)}')">
-                <div class="suggestion-name">${escapeHtml(s.fullname)}</div>
-                <div class="suggestion-detail">${escapeHtml(s.icNumber)} • ${escapeHtml(s.class || '-')}</div>
-            </div>
-        `).join('');
-        suggestionsBox.style.display = 'block';
-    }
-    
-    window.selectSuggestion = function(name) {
-        document.getElementById('searchInput').value = name;
-        document.getElementById('suggestionsBox').style.display = 'none';
-        searchTerm = name;
-        applyFilters();
-    };
-    
-    // Close suggestions when clicking outside
-    document.addEventListener('click', (e) => {
-        if (!e.target.closest('.search-wrapper')) {
-            document.getElementById('suggestionsBox').style.display = 'none';
-        }
-    });
-    
-    // ==================== PRINT QR CODE INDIVIDU ====================
-    function printSingleQR(studentName, studentIC) {
-        const printContainer = document.getElementById('printContainer');
-        printContainer.style.display = 'block';
-        printContainer.innerHTML = '';
-        
-        const printCard = document.createElement('div');
-        printCard.className = 'qr-print-card';
-        printCard.style.cssText = `
-            width: 7cm;
-            height: 10cm;
-            padding: 0.4cm;
-            background: white;
-            border: 1px solid #e2e8f0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            font-family: 'Plus Jakarta Sans', 'Segoe UI', Arial, sans-serif;
-        `;
-        
-        printCard.innerHTML = `
-            <div style="font-size: 10pt; font-weight: bold; color: #4f46e5; margin-bottom: 0.2cm; text-transform: uppercase;">E-MIND CARE SEMSIRA</div>
-            <div id="singlePrintQr" style="margin: 0.2cm 0; display: flex; justify-content: center;"></div>
-            <div style="font-size: 11pt; font-weight: bold; color: #1e293b; margin-top: 0.2cm; margin-bottom: 0.1cm;">${escapeHtml(studentName)}</div>
-            <div style="font-size: 9pt; color: #64748b; margin-bottom: 0.2cm;">No. IC: ${escapeHtml(studentIC)}</div>
-            <div style="font-size: 7pt; color: #94a3b8; margin-top: 0.2cm; border-top: 0.5px dashed #cbd5e1; padding-top: 0.2cm;">Kad Kehadiran Digital • Scan untuk rekod kehadiran</div>
-        `;
-        
-        printContainer.appendChild(printCard);
-        
-        const qrData = JSON.stringify({ ic: studentIC, name: studentName, type: 'attendance' });
-        new QRCode(document.getElementById('singlePrintQr'), {
-            text: qrData,
-            width: 120,
-            height: 120,
-            colorDark: "#1e293b",
-            colorLight: "#ffffff",
-            correctLevel: QRCode.CorrectLevel.M
-        });
-        
-        setTimeout(() => {
-            const printWindow = window.open('', '_blank');
-            const printHtml = `
-                <!DOCTYPE html>
-                <html>
-                <head><meta charset="UTF-8"><title>QR Code - ${studentName}</title>
-                <style>
-                    * { margin: 0; padding: 0; box-sizing: border-box; }
-                    body { font-family: 'Plus Jakarta Sans', 'Segoe UI', Arial, sans-serif; background: white; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
-                    .qr-print-card { width: 7cm; height: 10cm; padding: 0.4cm; background: white; border: 1px solid #e2e8f0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; box-shadow: none; }
-                </style>
-                </head>
-                <body>${printCard.outerHTML}</body>
-                </html>
-            `;
-            printWindow.document.write(printHtml);
-            printWindow.document.close();
-            printWindow.onload = () => { printWindow.print(); };
-            setTimeout(() => { printContainer.style.display = 'none'; printContainer.innerHTML = ''; }, 1000);
-        }, 500);
-    }
-    
-    // ==================== PRINT SELECTED QR CODES ====================
-    async function printSelectedQRs() {
-        const selectedStudentsList = filteredStudents.filter(s => selectedStudents.has(s.id));
-        if (selectedStudentsList.length === 0) {
-            showToast('Tiada pelajar dipilih', 'error');
-            return;
-        }
-        
-        showToast(`Menyediakan ${selectedStudentsList.length} QR Code untuk dicetak...`, 'success');
-        
-        const tempContainer = document.createElement('div');
-        tempContainer.style.cssText = 'position: absolute; left: -9999px; top: 0; width: 21.6cm;';
-        document.body.appendChild(tempContainer);
-        
-        const allCards = [];
-        
-        for (let i = 0; i < selectedStudentsList.length; i++) {
-            const student = selectedStudentsList[i];
-            
-            const cardDiv = document.createElement('div');
-            cardDiv.className = 'qr-print-card';
-            cardDiv.style.cssText = `
-                width: 7cm;
-                height: 10cm;
-                padding: 0.4cm;
-                background: white;
-                border: 1px solid #ccc;
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                justify-content: center;
-                text-align: center;
-                font-family: 'Plus Jakarta Sans', 'Segoe UI', Arial, sans-serif;
-                box-sizing: border-box;
-                margin: 0;
-            `;
-            
-            cardDiv.innerHTML = `
-                <div style="font-size: 10pt; font-weight: bold; color: #4f46e5; margin-bottom: 0.2cm; text-transform: uppercase;">E-MIND CARE SEMSIRA</div>
-                <div id="tempQrCode_${i}" style="margin: 0.2cm 0; display: flex; justify-content: center; width: 120px; height: 120px;"></div>
-                <div style="font-size: 11pt; font-weight: bold; color: #1e293b; margin-top: 0.2cm; margin-bottom: 0.1cm;">${escapeHtml(student.fullname)}</div>
-                <div style="font-size: 9pt; color: #64748b; margin-bottom: 0.2cm;">No. IC: ${escapeHtml(student.icNumber)}</div>
-                <div style="font-size: 7pt; color: #94a3b8; margin-top: 0.2cm; border-top: 0.5px dashed #cbd5e1; padding-top: 0.2cm;">Kad Kehadiran Digital • Scan untuk rekod kehadiran</div>
-            `;
-            
-            tempContainer.appendChild(cardDiv);
-            
-            const qrData = JSON.stringify({ ic: student.icNumber, name: student.fullname, type: 'attendance' });
-            new QRCode(document.getElementById(`tempQrCode_${i}`), {
-                text: qrData,
-                width: 120,
-                height: 120,
-                colorDark: "#1e293b",
-                colorLight: "#ffffff",
-                correctLevel: QRCode.CorrectLevel.M
-            });
-            
-            allCards.push(cardDiv);
-        }
-        
-        setTimeout(() => {
-            const cardsPerPage = 9;
-            const pages = [];
-            for (let i = 0; i < allCards.length; i += cardsPerPage) {
-                pages.push(allCards.slice(i, i + cardsPerPage));
-            }
-            
-            let printHtml = `<!DOCTYPE html>
-            <html>
-            <head>
-                <meta charset="UTF-8">
-                <title>QR Code Kehadiran Pelajar</title>
-                <style>
-                    * { margin: 0; padding: 0; box-sizing: border-box; }
-                    body { font-family: 'Plus Jakarta Sans', 'Segoe UI', Arial, sans-serif; background: white; margin: 0; padding: 0.5cm; }
-                    .page { page-break-after: always; margin: 0; padding: 0; }
-                    .page:last-child { page-break-after: auto; }
-                    .grid { display: grid; grid-template-columns: repeat(3, 7cm); gap: 0.3cm; justify-content: center; margin: 0 auto; }
-                    .qr-print-card { width: 7cm; height: 10cm; padding: 0.4cm; background: white; border: 1px solid #ccc; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; font-family: 'Plus Jakarta Sans', 'Segoe UI', Arial, sans-serif; box-sizing: border-box; page-break-inside: avoid; }
-                    .header-info { text-align: center; margin-bottom: 0.5cm; }
-                    @media print { body { margin: 0; padding: 0.5cm; } .page { page-break-after: always; } .page:last-child { page-break-after: auto; } }
-                </style>
-            </head>
-            <body>
-                <div class="header-info">
-                    <h2>QR CODE KEHADIRAN PELAJAR</h2>
-                    <p>Jumlah Pelajar Dipilih: ${selectedStudentsList.length}</p>
-                    <hr>
-                </div>`;
-            
-            for (let p = 0; p < pages.length; p++) {
-                printHtml += `<div class="page"><div class="grid">`;
-                for (const card of pages[p]) {
-                    printHtml += card.outerHTML;
-                }
-                printHtml += `</div></div>`;
-            }
-            
-            printHtml += `</body></html>`;
-            
-            const printWindow = window.open('', '_blank');
-            printWindow.document.write(printHtml);
-            printWindow.document.close();
-            printWindow.onload = () => { printWindow.print(); };
-            
-            setTimeout(() => { document.body.removeChild(tempContainer); }, 2000);
-        }, 1000);
-    }
-    
-    function renderTable() {
-        const container = document.getElementById('tableContent');
-        if (filteredStudents.length === 0) {
-            container.innerHTML = '<div class="empty-state"><i class="fas fa-users-slash"></i><p>Tiada pelajar ditemui</p></div>';
-            return;
-        }
-        
-        let html = `<table><thead>
-            <tr>
-                <th class="checkbox-col"><i class="fas fa-check-square"></i></th>
-                <th>Bil</th>
-                <th>Nama Pelajar</th>
-                <th>No. Kad Pengenalan</th>
-                <th>Kelas</th>
-                <th>Tindakan</th>
-            </tr>
-        </thead><tbody>`;
-        
-        filteredStudents.forEach((student, index) => {
-            const isChecked = selectedStudents.has(student.id);
-            html += `
-                <tr>
-                    <td class="checkbox-col">
-                        <input type="checkbox" class="student-checkbox" data-id="${student.id}" ${isChecked ? 'checked' : ''}>
-                     </span>
-                    <td>${index + 1}</span>
-                    <td><strong>${escapeHtml(student.fullname)}</strong></span>
-                    <td>${escapeHtml(student.icNumber)}</span>
-                    <td>${escapeHtml(student.class) || '-'}</span>
-                    <td>
-                        <button class="btn-print-qr" onclick="window.printSingleQR('${escapeHtml(student.fullname)}', '${student.icNumber}')">
-                            <i class="fas fa-print"></i> Print QR
-                        </button>
-                     </span>
-                </tr>
-            `;
-        });
-        
-        html += `</tbody></table>`;
-        container.innerHTML = html;
-        
-        // Attach checkbox event listeners
-        document.querySelectorAll('.student-checkbox').forEach(cb => {
-            cb.addEventListener('change', (e) => {
-                const studentId = cb.getAttribute('data-id');
-                if (cb.checked) {
-                    selectedStudents.add(studentId);
-                } else {
-                    selectedStudents.delete(studentId);
-                }
-                updateSelectedCount();
-            });
-        });
-    }
-    
-    // Expose functions to window
-    window.printSingleQR = printSingleQR;
-    window.printSelectedQRs = printSelectedQRs;
-    
-    // Event listeners
-    document.getElementById('applyFilterBtn').addEventListener('click', () => {
-        applyFilters();
-    });
-    document.getElementById('selectAllBtn').addEventListener('click', selectAll);
-    document.getElementById('deselectAllBtn').addEventListener('click', deselectAll);
-    document.getElementById('printSelectedBtn').addEventListener('click', printSelectedQRs);
-    
-    // Search input event
-    document.getElementById('searchInput').addEventListener('input', (e) => {
-        searchTerm = e.target.value;
-        showSuggestions();
-        applyFilters();
-    });
-    
-    // Filter change events
-    document.getElementById('filterTingkatan').addEventListener('change', applyFilters);
-    document.getElementById('filterKelas').addEventListener('change', applyFilters);
-    
-    // Initialize
-    loadAllStudents();
+    loadSettings();
+    loadHolidays();
 </script>
 </body>
 </html>

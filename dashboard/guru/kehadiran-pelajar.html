@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Kehadiran Pelajar Sekolah | E-MindCare SEMSIRA</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: linear-gradient(135deg, #e8f0fe 0%, #dfe7f5 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+        
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid rgba(37, 99, 235, 0.2);
+        }
+        .logo-area { display: flex; align-items: center; gap: 1rem; }
+        .logo-icon {
+            background: linear-gradient(145deg, #2563eb, #7c3aed);
+            width: 50px; height: 50px;
+            border-radius: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .logo-icon i { font-size: 1.8rem; color: white; }
+        .logo-text h1 {
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #1e293b, #2563eb);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .logo-text p { font-size: 0.7rem; color: #5b6e8c; }
+        .back-btn {
+            background: #eef2ff;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 40px;
+            cursor: pointer;
+            font-weight: 600;
+            color: #2563eb;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: 0.2s;
+        }
+        .back-btn:hover { background: #2563eb; color: white; }
+        
+        /* Welcome Banner */
+        .welcome-banner {
+            background: linear-gradient(135deg, #2563eb, #7c3aed);
+            border-radius: 1.5rem;
+            padding: 1.5rem 2rem;
+            margin-bottom: 2rem;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .welcome-text h2 {
+            font-size: 1.3rem;
+            margin-bottom: 0.3rem;
+        }
+        .welcome-text p {
+            font-size: 0.8rem;
+            opacity: 0.9;
+        }
+        .live-datetime {
+            background: rgba(255,255,255,0.2);
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            font-family: monospace;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+        
+        /* Menu Grid */
+        .menu-section {
+            margin-bottom: 2rem;
+        }
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            margin-bottom: 1.5rem;
+        }
+        .section-title i {
+            font-size: 1.5rem;
+            color: #2563eb;
+            background: white;
+            padding: 0.5rem;
+            border-radius: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .section-title h3 {
+            font-size: 1.2rem;
+            color: #1e293b;
+            font-weight: 700;
+        }
+        
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+        .menu-card {
+            background: white;
+            border-radius: 1.5rem;
+            padding: 2rem 1.5rem;
+            transition: all 0.35s ease;
+            cursor: pointer;
+            box-shadow: 0 8px 20px -8px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(37, 99, 235, 0.1);
+            text-align: center;
+        }
+        .menu-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 20px 30px -12px rgba(37, 99, 235, 0.25);
+            border-color: rgba(37, 99, 235, 0.3);
+        }
+        .menu-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(145deg, #eef2ff, #ffffff);
+            margin: 0 auto 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 28px;
+            font-size: 2.2rem;
+            color: #2563eb;
+            transition: 0.2s;
+        }
+        .menu-card:hover .menu-icon {
+            background: #2563eb;
+            color: white;
+        }
+        .menu-card h3 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: #1f2a44;
+        }
+        .menu-desc {
+            font-size: 0.75rem;
+            color: #6c7289;
+            margin-bottom: 1rem;
+            line-height: 1.5;
+        }
+        .menu-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #f1f5f9;
+            padding: 0.5rem 1.2rem;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            color: #2563eb;
+            transition: 0.2s;
+        }
+        .menu-card:hover .menu-btn {
+            background: #2563eb;
+            color: white;
+            gap: 12px;
+        }
+        
+        /* Info Card */
+        .info-card {
+            background: white;
+            border-radius: 1rem;
+            padding: 1rem 1.5rem;
+            margin-top: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            border: 1px solid #e2e8f0;
+        }
+        .info-card p {
+            font-size: 0.75rem;
+            color: #64748b;
+        }
+        .info-card i {
+            color: #2563eb;
+            margin-right: 6px;
+        }
+        
+        .footer {
+            margin-top: 2rem;
+            text-align: center;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(0,0,0,0.05);
+            color: #7c7f9e;
+            font-size: 0.7rem;
+        }
+        
+        @media (max-width: 700px) {
+            .container { padding: 0; }
+            .menu-grid { gap: 1rem; }
+            .menu-card { padding: 1.5rem 1rem; }
+            .welcome-banner { flex-direction: column; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <!-- Header -->
+    <div class="header">
+        <div class="logo-area">
+            <div class="logo-icon">
+                <i class="fas fa-calendar-check"></i>
+            </div>
+            <div class="logo-text">
+                <h1>Kehadiran Pelajar Sekolah</h1>
+                <p>Urus & lihat rekod kehadiran pelajar menggunakan QR Code</p>
+            </div>
+        </div>
+        <a href="dashboard-guru.html" class="back-btn"><i class="fas fa-arrow-left"></i> Kembali ke Dashboard</a>
+    </div>
+
+    <!-- Welcome Banner -->
+    <div class="welcome-banner">
+        <div class="welcome-text">
+            <h2><i class="fas fa-chalkboard-user"></i> Selamat Datang, <span id="teacherName">Guru</span></h2>
+            <p>Urus kehadiran pelajar dengan sistem QR Code yang mudah dan pantas</p>
+        </div>
+        <div class="live-datetime" id="liveDateTime">-</div>
+    </div>
+
+    <!-- Menu Section -->
+    <div class="menu-section">
+        <div class="section-title">
+            <i class="fas fa-qrcode"></i>
+            <h3>Pilihan Urusan Kehadiran</h3>
+        </div>
+        
+        <div class="menu-grid">
+            <!-- Menu 1: Kehadiran Hari Ini -->
+            <div class="menu-card" data-menu="kehadiran-hari-ini">
+                <div class="menu-icon">
+                    <i class="fas fa-calendar-day"></i>
+                </div>
+                <h3>Kehadiran Hari Ini</h3>
+                <div class="menu-desc">
+                    Lihat rekod kehadiran pelajar untuk hari ini. Paparan mengikut kategori Hadir, Lewat, Tidak Hadir dan Cuti Bersebab mengikut tetapan waktu kaunselor.
+                </div>
+                <div class="menu-btn">
+                    Lihat Kehadiran <i class="fas fa-arrow-right"></i>
+                </div>
+            </div>
+
+            <!-- Menu 2: Sejarah Kehadiran -->
+            <div class="menu-card" data-menu="sejarah-kehadiran">
+                <div class="menu-icon">
+                    <i class="fas fa-history"></i>
+                </div>
+                <h3>Sejarah Kehadiran</h3>
+                <div class="menu-desc">
+                    Semak sejarah kehadiran pelajar mengikut tarikh pilihan. Cari rekod lama, cetak laporan, dan analisa corak kehadiran.
+                </div>
+                <div class="menu-btn">
+                    Lihat Sejarah <i class="fas fa-arrow-right"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Info Card -->
+    <div class="info-card">
+        <p><i class="fas fa-info-circle"></i> Sistem kehadiran menggunakan QR Code yang dijana untuk setiap pelajar. Guru perlu scan QR Code guru terlebih dahulu untuk membuka sistem.</p>
+        <p><i class="fas fa-clock"></i> Tetapan waktu: Hadir (sebelum waktu lewat) | Lewat (selepas waktu lewat) | Tidak Hadir (selepas waktu tutup)</p>
+    </div>
+
+    <div class="footer">
+        <i class="fas fa-heart" style="color:#ec489a;"></i> E-MindCare SEMSIRA — Sistem Kehadiran Pintar
+    </div>
+</div>
+
+<script>
+    // Live DateTime
+    function updateLiveDateTime() {
+        const now = new Date();
+        const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
+        const dateStr = now.toLocaleDateString('ms-MY', options);
+        const timeStr = now.toLocaleTimeString('ms-MY', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        document.getElementById('liveDateTime').innerHTML = `<i class="fas fa-calendar-alt"></i> ${dateStr} | <i class="fas fa-clock"></i> ${timeStr}`;
+    }
+    setInterval(updateLiveDateTime, 1000);
+    updateLiveDateTime();
+    
+    // Load teacher name from session storage
+    function loadTeacherName() {
+        const teacherName = sessionStorage.getItem('teacherName') || 'Guru';
+        document.getElementById('teacherName').innerText = teacherName;
+    }
+    
+    // Check login status
+    function checkLoginStatus() {
+        const teacherName = sessionStorage.getItem('teacherName');
+        const teacherIC = sessionStorage.getItem('teacherIC');
+        
+        if (!teacherName || !teacherIC) {
+            window.location.href = '../dashboard/page-guru.html';
+            return false;
+        }
+        return true;
+    }
+    
+    // Menu navigation
+    function openMenuPage(menuType) {
+        let targetUrl = '';
+        
+        switch(menuType) {
+            case 'kehadiran-hari-ini':
+                targetUrl = 'kehadiran-hari-ini.html';
+                break;
+            case 'sejarah-kehadiran':
+                targetUrl = 'sejarah-kehadiran.html';
+                break;
+            default:
+                return;
+        }
+        
+        window.location.href = targetUrl;
+    }
+    
+    // Initialize
+    function init() {
+        if (!checkLoginStatus()) return;
+        loadTeacherName();
+    }
+    
+    // Add event listeners to menu cards
+    const menuCards = document.querySelectorAll('.menu-card');
+    menuCards.forEach(card => {
+        card.addEventListener('click', (e) => {
+            const menuType = card.getAttribute('data-menu');
+            openMenuPage(menuType);
+        });
+    });
+    
+    init();
+</script>
+</body>
+</html>

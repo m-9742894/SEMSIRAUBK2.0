@@ -8,6 +8,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   
+  <!-- QR Code Library -->
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+  
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
@@ -155,72 +158,6 @@
       transform: scale(0.98);
     }
 
-    /* Notification Card */
-    .notification-card {
-      background: linear-gradient(135deg, #fef3c7, #fffbeb);
-      border-radius: 1.2rem;
-      padding: 1rem 1.5rem;
-      margin-bottom: 1.5rem;
-      border-left: 5px solid #f59e0b;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 1rem;
-      cursor: pointer;
-      transition: 0.2s;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    }
-    .notification-card:hover {
-      transform: translateX(5px);
-      background: #fffbeb;
-    }
-    .notification-left {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-    }
-    .notification-icon {
-      background: #fef3c7;
-      width: 50px;
-      height: 50px;
-      border-radius: 2rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .notification-icon i {
-      font-size: 1.5rem;
-      color: #f59e0b;
-    }
-    .notification-info h4 {
-      font-size: 0.9rem;
-      color: #92400e;
-      margin-bottom: 0.2rem;
-    }
-    .notification-info p {
-      font-size: 0.7rem;
-      color: #b45309;
-    }
-    .notification-badge {
-      background: #f59e0b;
-      color: white;
-      padding: 0.2rem 0.8rem;
-      border-radius: 2rem;
-      font-weight: 700;
-      font-size: 1.2rem;
-    }
-    .no-notification {
-      background: #f1f5f9;
-      border-left-color: #94a3b8;
-    }
-    .no-notification .notification-icon i {
-      color: #94a3b8;
-    }
-    .no-notification .notification-info h4 {
-      color: #64748b;
-    }
-
     /* profile card */
     .profile-card {
       background: white;
@@ -228,12 +165,16 @@
       padding: 1.5rem;
       margin-bottom: 2rem;
       display: flex;
-      align-items: center;
-      gap: 1.5rem;
+      gap: 2rem;
       flex-wrap: wrap;
       box-shadow: 0 8px 20px -8px rgba(0, 0, 0, 0.08);
       border: 1px solid rgba(37, 99, 235, 0.1);
-      position: relative;
+    }
+    .profile-left {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      flex: 2;
     }
     .profile-avatar {
       background: linear-gradient(145deg, #2563eb, #7c3aed);
@@ -247,9 +188,6 @@
     .profile-avatar i {
       font-size: 3rem;
       color: white;
-    }
-    .profile-info {
-      flex: 1;
     }
     .profile-info h3 {
       font-size: 1.3rem;
@@ -269,6 +207,45 @@
       color: #2563eb;
       display: inline-block;
       margin-top: 0.5rem;
+    }
+    .qr-section {
+      background: #f8fafc;
+      border-radius: 1rem;
+      padding: 0.8rem;
+      text-align: center;
+      min-width: 140px;
+      border: 1px solid #e2e8f0;
+    }
+    .qr-section p {
+      font-size: 0.65rem;
+      color: #64748b;
+      margin-top: 0.5rem;
+    }
+    .btn-print-qr {
+      background: #4f46e5;
+      color: white;
+      border: none;
+      padding: 0.3rem 0.8rem;
+      border-radius: 20px;
+      font-size: 0.65rem;
+      cursor: pointer;
+      margin-top: 0.5rem;
+      transition: 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .btn-print-qr:hover {
+      background: #4338ca;
+      transform: translateY(-2px);
+    }
+    #qrcode {
+      display: flex;
+      justify-content: center;
+    }
+    #qrcode img {
+      width: 100px;
+      height: 100px;
     }
     .edit-profile-btn {
       background: #e0e7ff;
@@ -442,58 +419,6 @@
     .modal-close:hover { color: #dc2626; }
     .modal-body { padding: 1.5rem; }
     
-    .info-row {
-      display: flex;
-      justify-content: space-between;
-      padding: 0.8rem 0;
-      border-bottom: 1px solid #e2e8f0;
-    }
-    .info-row span:first-child {
-      font-weight: 600;
-      color: #64748b;
-    }
-    .info-row span:last-child {
-      font-weight: 600;
-      color: #1e293b;
-    }
-    .modal-buttons {
-      display: flex;
-      gap: 1rem;
-      margin-top: 1.5rem;
-    }
-    .btn-accept {
-      flex: 1;
-      background: #10b981;
-      color: white;
-      border: none;
-      padding: 0.8rem;
-      border-radius: 2rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: 0.2s;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-    }
-    .btn-accept:hover { background: #059669; transform: translateY(-2px); }
-    .btn-reject {
-      flex: 1;
-      background: #ef4444;
-      color: white;
-      border: none;
-      padding: 0.8rem;
-      border-radius: 2rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: 0.2s;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-    }
-    .btn-reject:hover { background: #dc2626; transform: translateY(-2px); }
-    
     .form-group { margin-bottom: 1rem; }
     .form-group label {
       display: block;
@@ -551,11 +476,14 @@
         flex-direction: column;
         text-align: center;
       }
+      .profile-left {
+        flex-direction: column;
+      }
       .logo-text h1 {
         font-size: 1.2rem;
       }
-      .edit-profile-btn {
-        margin-top: 0.5rem;
+      .qr-section {
+        margin: 0 auto;
       }
     }
   </style>
@@ -586,35 +514,27 @@
     </div>
   </div>
 
-  <!-- NOTIFICATION CARD - Permintaan Buka Sistem Kehadiran -->
-  <div id="notificationCard" class="notification-card" onclick="openPendingRequestsModal()">
-    <div class="notification-left">
-      <div class="notification-icon">
-        <i class="fas fa-qrcode"></i>
-      </div>
-      <div class="notification-info">
-        <h4>Permintaan Buka Sistem Kehadiran</h4>
-        <p>Terdapat pelajar yang meminta untuk buka sistem scan QR Code</p>
-      </div>
-    </div>
-    <div class="notification-badge" id="pendingCount">0</div>
-  </div>
-
-  <!-- Profile Card with Edit Button -->
+  <!-- Profile Card with QR Code -->
   <div class="profile-card" id="profileCard">
-    <div class="profile-avatar">
-      <i class="fas fa-chalkboard-user"></i>
+    <div class="profile-left">
+      <div class="profile-avatar">
+        <i class="fas fa-chalkboard-user"></i>
+      </div>
+      <div class="profile-info">
+        <h3 id="profileName">-</h3>
+        <p><i class="fas fa-id-card"></i> No. Kad Pengenalan: <span id="profileIC">-</span></p>
+        <p><i class="fas fa-school"></i> Mengajar Kelas: <span id="profileClass">-</span></p>
+        <p><i class="fas fa-calendar"></i> Tahun/Sesi: <span id="profileYear">-</span></p>
+        <div class="badge"><i class="fas fa-check-circle"></i> Guru Aktif</div>
+      </div>
     </div>
-    <div class="profile-info">
-      <h3 id="profileName">-</h3>
-      <p><i class="fas fa-id-card"></i> No. Kad Pengenalan: <span id="profileIC">-</span></p>
-      <p><i class="fas fa-school"></i> Mengajar Kelas: <span id="profileClass">-</span></p>
-      <p><i class="fas fa-calendar"></i> Tahun/Sesi: <span id="profileYear">-</span></p>
-      <div class="badge"><i class="fas fa-check-circle"></i> Guru Aktif</div>
+    <div class="qr-section">
+      <div id="qrcode"></div>
+      <p><i class="fas fa-qrcode"></i> Kad Pengenalan Guru</p>
+      <button class="btn-print-qr" id="printQrBtn">
+        <i class="fas fa-print"></i> Print QR Code
+      </button>
     </div>
-    <button class="edit-profile-btn" id="editProfileBtn">
-      <i class="fas fa-user-edit"></i> Edit Profil
-    </button>
   </div>
 
   <!-- ==================== SECTION 1: URUSAN KELAS ==================== -->
@@ -715,7 +635,7 @@
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-  import { getFirestore, collection, getDocs, query, where, updateDoc, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+  import { getFirestore, collection, getDocs, query, where, updateDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
   
   const firebaseConfig = {
     apiKey: "AIzaSyCfu7XC8pXtpDyQ-9Cjdg4AobA-EVEwWcc",
@@ -731,12 +651,9 @@
   const db = getFirestore(app);
   const teachersCollection = collection(db, "teachers");
   const studentsCollection = collection(db, "students");
-  const scanRequestsCollection = collection(db, "scan_requests");
 
   let currentTeacherId = null;
   let currentTeacherData = {};
-  let pendingRequests = [];
-  let unsubscribeRequests = null;
 
   // ==================== CHECK LOGIN STATUS ====================
   function checkLoginStatus() {
@@ -802,148 +719,132 @@
         document.getElementById('profileClass').innerText = 'Error loading';
       }
     }
+    
+    // Generate QR Code after teacher data is loaded
+    generateQRCode();
   }
 
-  // ==================== LOAD SCAN REQUESTS (REAL-TIME) ====================
-  function listenToScanRequests() {
-    // Only get pending requests that haven't expired
-    const q = query(scanRequestsCollection, where("status", "==", "pending"));
+  // ==================== GENERATE QR CODE ====================
+  function generateQRCode() {
+    const teacherName = sessionStorage.getItem('teacherName') || '';
+    const teacherIC = sessionStorage.getItem('teacherIC') || '';
     
-    unsubscribeRequests = onSnapshot(q, (snapshot) => {
-      pendingRequests = [];
-      snapshot.forEach((doc) => {
-        const data = doc.data();
-        // Check if request is still valid (not expired)
-        const expiresAt = data.expiresAt?.toDate ? data.expiresAt.toDate() : new Date(data.expiresAt);
-        if (expiresAt > new Date()) {
-          pendingRequests.push({ id: doc.id, ...data });
-        }
-      });
-      updateNotificationBadge();
-    }, (error) => {
-      console.error("Error listening to scan requests:", error);
+    if (!teacherName || !teacherIC) return;
+    
+    const qrContainer = document.getElementById('qrcode');
+    qrContainer.innerHTML = '';
+    
+    const qrData = JSON.stringify({
+      type: "teacher",
+      ic: teacherIC,
+      name: teacherName
     });
-  }
-  
-  function updateNotificationBadge() {
-    const count = pendingRequests.length;
-    const badge = document.getElementById('pendingCount');
-    const notificationCard = document.getElementById('notificationCard');
-    
-    badge.innerText = count;
-    
-    if (count === 0) {
-      notificationCard.classList.add('no-notification');
-      const infoDiv = notificationCard.querySelector('.notification-info');
-      if (infoDiv) {
-        infoDiv.innerHTML = '<h4>Tiada Permintaan</h4><p>Semua permintaan telah diproses</p>';
-      }
-    } else {
-      notificationCard.classList.remove('no-notification');
-      const infoDiv = notificationCard.querySelector('.notification-info');
-      if (infoDiv) {
-        infoDiv.innerHTML = '<h4>Permintaan Buka Sistem Kehadiran</h4><p>Terdapat pelajar yang meminta untuk buka sistem scan QR Code</p>';
-      }
-    }
-  }
-  
-  // ==================== OPEN PENDING REQUESTS MODAL ====================
-  window.openPendingRequestsModal = function() {
-    if (pendingRequests.length === 0) {
-      alert("Tiada permintaan buka sistem kehadiran pada masa ini.");
-      return;
-    }
-    
-    let modalHtml = `
-      <div id="pendingModal" class="modal">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h3><i class="fas fa-qrcode"></i> Permintaan Buka Sistem Kehadiran</h3>
-            <button class="modal-close" onclick="closePendingModal()">&times;</button>
-          </div>
-          <div class="modal-body">
-    `;
-    
-    for (const request of pendingRequests) {
-      const requestDate = request.requestDate || '-';
-      const requestTime = request.requestTimeStr || '-';
-      const deviceInfo = request.deviceInfo || 'Peranti tidak dikenal pasti';
-      
-      modalHtml += `
-        <div style="background:#f8fafc; border-radius:1rem; padding:1rem; margin-bottom:1rem; border-left:4px solid #f59e0b;">
-          <div class="info-row"><span>Tarikh Permintaan:</span><span>${requestDate}</span></div>
-          <div class="info-row"><span>Masa Permintaan:</span><span>${requestTime}</span></div>
-          <div class="info-row"><span>Peranti:</span><span style="font-size:0.75rem;">${escapeHtml(deviceInfo)}</span></div>
-          <div class="modal-buttons" style="margin-top:1rem;">
-            <button class="btn-accept" onclick="approveScanRequest('${request.id}')">
-              <i class="fas fa-check"></i> Sahkan & Buka Sistem
-            </button>
-            <button class="btn-reject" onclick="rejectScanRequest('${request.id}')">
-              <i class="fas fa-times"></i> Tolak
-            </button>
-          </div>
-        </div>
-      `;
-    }
-    
-    modalHtml += `
-          </div>
-        </div>
-      </div>
-    `;
-    
-    document.body.insertAdjacentHTML('beforeend', modalHtml);
-  };
-  
-  window.closePendingModal = function() {
-    const modal = document.getElementById('pendingModal');
-    if (modal) modal.remove();
-  };
-  
-  // ==================== APPROVE SCAN REQUEST ====================
-  window.approveScanRequest = async function(requestId) {
-    if (!confirm("Sahkan permintaan ini untuk membuka sistem kehadiran? Pelajar akan dapat scan QR Code selama 3 minit.")) return;
     
     try {
-      await updateDoc(doc(db, "scan_requests", requestId), {
-        status: "approved",
-        approvedAt: new Date().toISOString(),
-        approvedBy: sessionStorage.getItem('teacherName') || 'Guru'
+      new QRCode(qrContainer, {
+        text: qrData,
+        width: 100,
+        height: 100,
+        colorDark: "#1e293b",
+        colorLight: "#ffffff",
+        correctLevel: QRCode.CorrectLevel.M
       });
-      showAlert("✅ Sistem kehadiran telah dibuka. Pelajar boleh scan QR Code.", "success");
-      closePendingModal();
-    } catch (error) {
-      console.error("Error approving request:", error);
-      showAlert("❌ Gagal membuka sistem. Sila cuba lagi.", "error");
+      console.log("QR Code berjaya dijana untuk guru");
+    } catch(e) {
+      console.error("QR Code error:", e);
     }
-  };
-  
-  // ==================== REJECT SCAN REQUEST ====================
-  window.rejectScanRequest = async function(requestId) {
-    if (!confirm("Tolak permintaan ini?")) return;
+  }
+
+  // ==================== PRINT QR CODE ====================
+  function printQRCode() {
+    const teacherName = sessionStorage.getItem('teacherName') || 'Guru';
+    const teacherIC = sessionStorage.getItem('teacherIC') || '';
     
-    try {
-      await updateDoc(doc(db, "scan_requests", requestId), {
-        status: "rejected",
-        rejectedAt: new Date().toISOString(),
-        rejectedBy: sessionStorage.getItem('teacherName') || 'Guru'
-      });
-      showAlert("✅ Permintaan telah ditolak.", "success");
-      closePendingModal();
-    } catch (error) {
-      console.error("Error rejecting request:", error);
-      showAlert("❌ Gagal menolak permintaan.", "error");
-    }
-  };
-  
-  function escapeHtml(str) {
-    if (!str) return '';
-    return str.replace(/[&<>]/g, function(m) {
-      if (m === '&') return '&amp;';
-      if (m === '<') return '&lt;';
-      if (m === '>') return '&gt;';
-      return m;
-    });
+    const printHtml = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="UTF-8">
+        <title>QR Code Guru - ${teacherName}</title>
+        <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"><\/script>
+        <style>
+          * { margin: 0; padding: 0; box-sizing: border-box; }
+          body {
+            font-family: 'Plus Jakarta Sans', 'Segoe UI', Arial, sans-serif;
+            background: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+          }
+          .qr-print-card {
+            width: 7cm;
+            height: 10cm;
+            padding: 0.4cm;
+            background: white;
+            border: 1px solid #e2e8f0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+          }
+          .print-title {
+            font-size: 10pt;
+            font-weight: bold;
+            color: #2563eb;
+            margin-bottom: 0.2cm;
+            text-transform: uppercase;
+          }
+          .print-name {
+            font-size: 11pt;
+            font-weight: bold;
+            color: #1e293b;
+            margin-top: 0.2cm;
+            margin-bottom: 0.1cm;
+          }
+          .print-ic {
+            font-size: 9pt;
+            color: #64748b;
+            margin-bottom: 0.2cm;
+          }
+          .print-footer {
+            font-size: 7pt;
+            color: #94a3b8;
+            margin-top: 0.2cm;
+            border-top: 0.5px dashed #cbd5e1;
+            padding-top: 0.2cm;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="qr-print-card">
+          <div class="print-title">E-MIND CARE SEMSIRA</div>
+          <div id="printQr"></div>
+          <div class="print-name">${escapeHtml(teacherName)}</div>
+          <div class="print-ic">No. IC: ${escapeHtml(teacherIC)}</div>
+          <div class="print-footer">Kad Pengenalan Guru • Scan untuk buka sistem kehadiran</div>
+        </div>
+        <script>
+          const qrData = JSON.stringify({ type: "teacher", ic: "${escapeHtml(teacherIC)}", name: "${escapeHtml(teacherName)}" });
+          new QRCode(document.getElementById('printQr'), {
+            text: qrData,
+            width: 120,
+            height: 120,
+            colorDark: "#1e293b",
+            colorLight: "#ffffff",
+            correctLevel: QRCode.CorrectLevel.M
+          });
+          setTimeout(() => { window.print(); setTimeout(() => window.close(), 500); }, 800);
+        <\/script>
+      </body>
+      </html>
+    `;
+    
+    const printWindow = window.open('', '_blank', 'width=400,height=600');
+    printWindow.document.write(printHtml);
+    printWindow.document.close();
   }
 
   // ==================== UPDATE TEACHER PROFILE ====================
@@ -992,6 +893,9 @@
       document.getElementById('profileIC').innerText = updateData.icNumber;
       document.getElementById('profileClass').innerText = updateData.teacherClass;
       document.getElementById('profileYear').innerText = updateData.year;
+      
+      // Regenerate QR Code with new data
+      generateQRCode();
       
       showAlert('✅ Profil guru berjaya dikemaskini!', 'success');
       return true;
@@ -1100,12 +1004,21 @@
     window.location.href = targetUrl;
   }
   
+  function escapeHtml(str) {
+    if (!str) return '';
+    return str.replace(/[&<>]/g, function(m) {
+      if (m === '&') return '&amp;';
+      if (m === '<') return '&lt;';
+      if (m === '>') return '&gt;';
+      return m;
+    });
+  }
+
   // ==================== INITIALIZE ====================
   async function init() {
     if (!checkLoginStatus()) return;
     await loadTeacherData();
     await loadStudentCount();
-    listenToScanRequests();
   }
   
   const menuCards = document.querySelectorAll('.menu-card');
@@ -1117,6 +1030,7 @@
   });
   
   document.getElementById('editProfileBtn').addEventListener('click', openEditModal);
+  document.getElementById('printQrBtn').addEventListener('click', printQRCode);
   
   const logoutBtn = document.getElementById('logoutBtn');
   logoutBtn.addEventListener('click', () => {

@@ -7,10 +7,8 @@
   <!-- Fonts & Icons -->
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  
   <!-- QR Code Library -->
   <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
-  
   <style>
     * {
       margin: 0;
@@ -25,6 +23,7 @@
       overflow-x: hidden;
     }
 
+    /* animated background */
     .bg-orb {
       position: fixed;
       top: 0;
@@ -41,14 +40,35 @@
       opacity: 0.3;
       animation: floatOrb 25s infinite alternate ease-in-out;
     }
-    .orb1 { width: 500px; height: 500px; background: #60a5fa; top: -150px; left: -200px; }
-    .orb2 { width: 600px; height: 600px; background: #c084fc; bottom: -250px; right: -200px; animation-duration: 30s; }
-    .orb3 { width: 400px; height: 400px; background: #34d399; top: 40%; left: 70%; animation-duration: 22s; }
+    .orb1 {
+      width: 500px;
+      height: 500px;
+      background: #60a5fa;
+      top: -150px;
+      left: -200px;
+    }
+    .orb2 {
+      width: 600px;
+      height: 600px;
+      background: #c084fc;
+      bottom: -250px;
+      right: -200px;
+      animation-duration: 30s;
+    }
+    .orb3 {
+      width: 400px;
+      height: 400px;
+      background: #34d399;
+      top: 40%;
+      left: 70%;
+      animation-duration: 22s;
+    }
     @keyframes floatOrb {
       0% { transform: translate(0,0) scale(1); }
       100% { transform: translate(40px, -30px) scale(1.2); }
     }
 
+    /* main container */
     .dashboard-container {
       max-width: 1400px;
       margin: 0 auto;
@@ -57,6 +77,7 @@
       z-index: 5;
     }
 
+    /* header */
     .dashboard-header {
       display: flex;
       justify-content: space-between;
@@ -67,17 +88,25 @@
       padding-bottom: 1rem;
       border-bottom: 2px solid rgba(37, 99, 235, 0.2);
     }
-    .logo-area { display: flex; align-items: center; gap: 1rem; }
+    .logo-area {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
     .logo-icon {
       background: linear-gradient(145deg, #2563eb, #7c3aed);
-      width: 50px; height: 50px;
+      width: 50px;
+      height: 50px;
       border-radius: 28px;
       display: flex;
       align-items: center;
       justify-content: center;
       box-shadow: 0 8px 18px rgba(37,99,235,0.2);
     }
-    .logo-icon i { font-size: 1.8rem; color: white; }
+    .logo-icon i {
+      font-size: 1.8rem;
+      color: white;
+    }
     .logo-text h1 {
       font-size: 1.6rem;
       font-weight: 800;
@@ -86,7 +115,10 @@
       background-clip: text;
       color: transparent;
     }
-    .logo-text p { font-size: 0.7rem; color: #5b6e8c; }
+    .logo-text p {
+      font-size: 0.7rem;
+      color: #5b6e8c;
+    }
     .user-info {
       background: rgba(255,255,255,0.9);
       backdrop-filter: blur(8px);
@@ -96,8 +128,14 @@
       align-items: center;
       gap: 12px;
     }
-    .user-info i { font-size: 1.3rem; color: #2563eb; }
-    .user-info span { font-weight: 600; color: #1f2a44; }
+    .user-info i {
+      font-size: 1.3rem;
+      color: #2563eb;
+    }
+    .user-info span {
+      font-weight: 600;
+      color: #1f2a44;
+    }
     .logout-btn {
       background: #fee2e2;
       color: #dc2626;
@@ -109,24 +147,9 @@
       font-size: 0.75rem;
       transition: 0.2s;
     }
-    .logout-btn:hover { background: #fecaca; transform: scale(0.98); }
-
-    /* Debug Panel */
-    .debug-panel {
-      background: #1e293b;
-      border-radius: 1rem;
-      padding: 0.8rem;
-      margin-bottom: 1.5rem;
-      font-size: 0.7rem;
-      color: #94a3b8;
-      border: 1px solid #334155;
-    }
-    .debug-panel pre {
-      color: #10b981;
-      font-family: monospace;
-      font-size: 0.65rem;
-      margin-top: 0.3rem;
-      white-space: pre-wrap;
+    .logout-btn:hover {
+      background: #fecaca;
+      transform: scale(0.98);
     }
 
     /* profile card */
@@ -136,28 +159,38 @@
       padding: 1.5rem;
       margin-bottom: 2rem;
       display: flex;
-      gap: 2rem;
+      align-items: center;
+      gap: 1.5rem;
       flex-wrap: wrap;
       box-shadow: 0 8px 20px -8px rgba(0, 0, 0, 0.08);
       border: 1px solid rgba(37, 99, 235, 0.1);
-    }
-    .profile-left {
-      display: flex;
-      align-items: center;
-      gap: 1.5rem;
-      flex: 2;
+      position: relative;
     }
     .profile-avatar {
       background: linear-gradient(145deg, #2563eb, #7c3aed);
-      width: 80px; height: 80px;
+      width: 80px;
+      height: 80px;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
     }
-    .profile-avatar i { font-size: 3rem; color: white; }
-    .profile-info h3 { font-size: 1.3rem; font-weight: 700; color: #1f2a44; }
-    .profile-info p { color: #5b6e8c; margin-top: 0.3rem; }
+    .profile-avatar i {
+      font-size: 3rem;
+      color: white;
+    }
+    .profile-info {
+      flex: 1;
+    }
+    .profile-info h3 {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #1f2a44;
+    }
+    .profile-info p {
+      color: #5b6e8c;
+      margin-top: 0.3rem;
+    }
     .profile-info .badge {
       background: #dbeafe;
       padding: 0.2rem 0.8rem;
@@ -168,32 +201,6 @@
       display: inline-block;
       margin-top: 0.5rem;
     }
-    .qr-section {
-      background: #f8fafc;
-      border-radius: 1rem;
-      padding: 0.8rem;
-      text-align: center;
-      min-width: 140px;
-      border: 1px solid #e2e8f0;
-    }
-    .qr-section p { font-size: 0.65rem; color: #64748b; margin-top: 0.5rem; }
-    .btn-print-qr {
-      background: #4f46e5;
-      color: white;
-      border: none;
-      padding: 0.3rem 0.8rem;
-      border-radius: 20px;
-      font-size: 0.65rem;
-      cursor: pointer;
-      margin-top: 0.5rem;
-      transition: 0.2s;
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-    }
-    .btn-print-qr:hover { background: #4338ca; transform: translateY(-2px); }
-    #qrcode { display: flex; justify-content: center; }
-    #qrcode img { width: 100px; height: 100px; }
     .edit-profile-btn {
       background: #e0e7ff;
       border: none;
@@ -208,8 +215,58 @@
       gap: 8px;
       font-size: 0.8rem;
     }
-    .edit-profile-btn:hover { background: #2563eb; color: white; }
+    .edit-profile-btn:hover {
+      background: #2563eb;
+      color: white;
+    }
+    
+    /* QR Code Section Styling */
+    .qr-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: #f8fafc;
+      padding: 0.8rem 1rem;
+      border-radius: 1.2rem;
+      border: 1px dashed #cbd5e1;
+      min-width: 120px;
+    }
+    .qr-code-placeholder {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 0.5rem;
+    }
+    .qr-code-placeholder canvas, 
+    .qr-code-placeholder img {
+      width: 90px;
+      height: 90px;
+      border-radius: 12px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+    }
+    .print-qr-btn {
+      background: white;
+      border: 1px solid #2563eb;
+      color: #2563eb;
+      padding: 0.3rem 0.8rem;
+      border-radius: 40px;
+      font-size: 0.65rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      margin-top: 6px;
+    }
+    .print-qr-btn:hover {
+      background: #2563eb;
+      color: white;
+      border-color: #2563eb;
+    }
 
+    /* section divider */
     .section-divider {
       margin: 2rem 0 1rem;
       display: flex;
@@ -224,8 +281,14 @@
       border-radius: 40px;
       display: inline-block;
     }
-    .section-divider hr { flex: 1; height: 1px; background: linear-gradient(90deg, #cbd5e1, transparent); border: none; }
+    .section-divider hr {
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, #cbd5e1, transparent);
+      border: none;
+    }
 
+    /* menu grid */
     .menu-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -260,9 +323,22 @@
       color: #2563eb;
       transition: 0.2s;
     }
-    .menu-card:hover .menu-icon { background: #2563eb; color: white; }
-    .menu-card h3 { font-size: 1.15rem; font-weight: 700; margin: 0.5rem 0 0.3rem; color: #1f2a44; }
-    .menu-desc { font-size: 0.7rem; color: #6c7289; margin-bottom: 0.8rem; line-height: 1.4; }
+    .menu-card:hover .menu-icon {
+      background: #2563eb;
+      color: white;
+    }
+    .menu-card h3 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin: 0.5rem 0 0.3rem;
+      color: #1f2a44;
+    }
+    .menu-desc {
+      font-size: 0.7rem;
+      color: #6c7289;
+      margin-bottom: 0.8rem;
+      line-height: 1.4;
+    }
     .menu-btn {
       display: inline-flex;
       align-items: center;
@@ -275,8 +351,13 @@
       color: #2563eb;
       transition: 0.2s;
     }
-    .menu-card:hover .menu-btn { background: #2563eb; color: white; gap: 10px; }
+    .menu-card:hover .menu-btn {
+      background: #2563eb;
+      color: white;
+      gap: 10px;
+    }
 
+    /* footer */
     .footer {
       margin-top: 3rem;
       text-align: center;
@@ -286,6 +367,7 @@
       font-size: 0.75rem;
     }
 
+    /* Modal Styles */
     .modal {
       position: fixed;
       top: 0;
@@ -355,7 +437,10 @@
       outline: none;
       font-size: 0.9rem;
     }
-    .form-group input:focus, .form-group select:focus { border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
+    .form-group input:focus, .form-group select:focus {
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+    }
     .modal-btn {
       width: 100%;
       padding: 0.8rem;
@@ -385,13 +470,58 @@
     .alert.error { background: #fee2e2; color: #dc2626; display: block; }
     .alert.info { background: #dbeafe; color: #1e40af; display: block; }
 
+    /* Print Styles for QR Card */
+    @media print {
+      body * {
+        visibility: hidden;
+      }
+      .qr-print-wrapper, .qr-print-wrapper * {
+        visibility: visible;
+      }
+      .qr-print-wrapper {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        padding: 2rem;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: white;
+      }
+      .print-qr-card {
+        box-shadow: none;
+        border: 1px solid #ccc;
+      }
+      .no-print {
+        display: none;
+      }
+    }
+
     @media (max-width: 700px) {
-      .dashboard-container { padding: 1rem; }
-      .menu-grid { gap: 1rem; }
-      .profile-card { flex-direction: column; text-align: center; }
-      .profile-left { flex-direction: column; }
-      .logo-text h1 { font-size: 1.2rem; }
-      .qr-section { margin: 0 auto; }
+      .dashboard-container {
+        padding: 1rem;
+      }
+      .menu-grid {
+        gap: 1rem;
+      }
+      .profile-card {
+        flex-direction: column;
+        text-align: center;
+      }
+      .logo-text h1 {
+        font-size: 1.2rem;
+      }
+      .edit-profile-btn {
+        margin-top: 0.5rem;
+      }
+      .qr-section {
+        margin-top: 0.5rem;
+        width: 100%;
+        flex-direction: row;
+        justify-content: space-between;
+        gap: 1rem;
+      }
     }
   </style>
 </head>
@@ -403,9 +533,12 @@
 </div>
 
 <div class="dashboard-container">
+  <!-- Header -->
   <div class="dashboard-header">
     <div class="logo-area">
-      <div class="logo-icon"><i class="fas fa-chalkboard-user"></i></div>
+      <div class="logo-icon">
+        <i class="fas fa-chalkboard-user"></i>
+      </div>
       <div class="logo-text">
         <h1>Dashboard Guru</h1>
         <p>E-MindCare SEMSIRA • SMK Syed Sirajuddin</p>
@@ -418,31 +551,31 @@
     </div>
   </div>
 
-  <!-- Debug Panel -->
-  <div class="debug-panel" id="debugPanel">
-    <i class="fas fa-bug"></i> Status Debug:
-    <pre id="debugInfo">Memuatkan data...</pre>
-  </div>
-
-  <!-- Profile Card -->
+  <!-- Profile Card with QR Code and Edit Button -->
   <div class="profile-card" id="profileCard">
-    <div class="profile-left">
-      <div class="profile-avatar"><i class="fas fa-chalkboard-user"></i></div>
-      <div class="profile-info">
-        <h3 id="profileName">-</h3>
-        <p><i class="fas fa-id-card"></i> No. Kad Pengenalan: <span id="profileIC">-</span></p>
-        <p><i class="fas fa-school"></i> Mengajar Kelas: <span id="profileClass">-</span></p>
-        <p><i class="fas fa-calendar"></i> Tahun/Sesi: <span id="profileYear">-</span></p>
-        <div class="badge"><i class="fas fa-check-circle"></i> Guru Aktif</div>
-      </div>
+    <div class="profile-avatar">
+      <i class="fas fa-chalkboard-user"></i>
     </div>
-    <div class="qr-section">
-      <div id="qrcode"></div>
-      <p><i class="fas fa-qrcode"></i> Kad Pengenalan Guru</p>
-      <button class="btn-print-qr" id="printQrBtn"><i class="fas fa-print"></i> Print QR Code</button>
+    <div class="profile-info">
+      <h3 id="profileName">-</h3>
+      <p><i class="fas fa-id-card"></i> No. Kad Pengenalan: <span id="profileIC">-</span></p>
+      <p><i class="fas fa-school"></i> Mengajar Kelas: <span id="profileClass">-</span></p>
+      <p><i class="fas fa-calendar"></i> Tahun/Sesi: <span id="profileYear">-</span></p>
+      <div class="badge"><i class="fas fa-check-circle"></i> Guru Aktif</div>
     </div>
+    
+    <!-- QR Code Section -->
+    <div class="qr-section" id="qrSection">
+      <div class="qr-code-placeholder" id="qrCodeContainer"></div>
+      <button class="print-qr-btn" id="printQrBtn"><i class="fas fa-print"></i> Cetak QR</button>
+    </div>
+    
+    <button class="edit-profile-btn" id="editProfileBtn">
+      <i class="fas fa-user-edit"></i> Edit Profil
+    </button>
   </div>
 
+  <!-- ==================== SECTION 1: URUSAN KELAS ==================== -->
   <div class="section-divider">
     <h3><i class="fas fa-chalkboard"></i> Urusan Kelas Saya</h3>
     <hr>
@@ -469,6 +602,7 @@
     </div>
   </div>
 
+  <!-- ==================== SECTION 2: KESELURUHAN DATA ==================== -->
   <div class="section-divider">
     <h3><i class="fas fa-database"></i> Keseluruhan Data Sekolah</h3>
     <hr>
@@ -512,12 +646,12 @@
         <div class="form-group">
           <label><i class="fas fa-user"></i> Nama Penuh</label>
           <input type="text" id="editFullname" placeholder="Nama Penuh" required>
-          <p>Gunakan HURUF BESAR</p>
+          <p style="font-size:0.65rem; color:#64748b; margin-top:0.3rem;">Gunakan HURUF BESAR</p>
         </div>
         <div class="form-group">
           <label><i class="fas fa-id-card"></i> No. Kad Pengenalan</label>
           <input type="text" id="editIc" placeholder="cth: 800101011234" required>
-          <p>12 digit nombor (tanpa sempang)</p>
+          <p style="font-size:0.65rem; color:#64748b; margin-top:0.3rem;">12 digit nombor (tanpa sempang)</p>
         </div>
         <div class="form-group">
           <label><i class="fas fa-school"></i> Mengajar Kelas</label>
@@ -550,19 +684,18 @@
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
   const teachersCollection = collection(db, "teachers");
-  const studentsCollection = collection(db, "students");
 
   let currentTeacherId = null;
-  let currentTeacherData = {};
+  let currentQr = null;
 
-  function updateDebug(message) {
-    const debugInfo = document.getElementById('debugInfo');
-    const time = new Date().toLocaleTimeString();
-    debugInfo.innerHTML = `[${time}] ${message}\n` + debugInfo.innerHTML;
-    if (debugInfo.innerHTML.split('\n').length > 15) {
-      debugInfo.innerHTML = debugInfo.innerHTML.split('\n').slice(0, 15).join('\n');
+  function checkLoginStatus() {
+    const teacherName = sessionStorage.getItem('teacherName');
+    const teacherIC = sessionStorage.getItem('teacherIC');
+    if (!teacherName || !teacherIC) {
+      window.location.href = '../dashboard/page-guru.html';
+      return false;
     }
-    console.log(message);
+    return true;
   }
 
   function showAlert(message, type) {
@@ -573,199 +706,84 @@
     setTimeout(() => alertDiv.remove(), 4000);
   }
 
-  // Generate QR Code
-  function generateQRCode(name, ic) {
-    if (!name || !ic) {
-      updateDebug("❌ Gagal jana QR Code: Nama atau IC kosong");
-      return;
-    }
-    
-    const qrContainer = document.getElementById('qrcode');
-    if (!qrContainer) return;
-    qrContainer.innerHTML = '';
-    
-    const qrData = JSON.stringify({
-      type: "teacher",
-      ic: ic,
-      name: name
+  // Generate QR code based on teacher name and IC
+  function generateTeacherQR(fullname, icNumber) {
+    const qrContainer = document.getElementById('qrCodeContainer');
+    qrContainer.innerHTML = ''; // clear previous
+    const qrString = `Nama: ${fullname}\nNo. IC: ${icNumber}`;
+    // Use QRCode.js library
+    new QRCode(qrContainer, {
+      text: qrString,
+      width: 90,
+      height: 90,
+      colorDark: "#1e293b",
+      colorLight: "#ffffff",
+      correctLevel: QRCode.CorrectLevel.M
     });
-    
-    try {
-      new QRCode(qrContainer, {
-        text: qrData,
-        width: 100,
-        height: 100,
-        colorDark: "#1e293b",
-        colorLight: "#ffffff",
-        correctLevel: QRCode.CorrectLevel.M
-      });
-      updateDebug(`✅ QR Code berjaya dijana untuk ${name}`);
-    } catch(e) {
-      updateDebug(`❌ QR Code error: ${e.message}`);
-    }
   }
 
-  // Print QR Code
-  function printQRCode() {
-    const teacherName = sessionStorage.getItem('teacherName') || document.getElementById('profileName').innerText || 'Guru';
-    const teacherIC = sessionStorage.getItem('teacherIC') || document.getElementById('profileIC').innerText || '';
-    
-    if (!teacherIC) {
-      showAlert("Tiada data untuk dicetak", "error");
-      return;
-    }
-    
-    const printHtml = `
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <meta charset="UTF-8">
-        <title>QR Code Guru - ${teacherName}</title>
-        <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"><\/script>
-        <style>
-          * { margin: 0; padding: 0; box-sizing: border-box; }
-          body {
-            font-family: 'Plus Jakarta Sans', 'Segoe UI', Arial, sans-serif;
-            background: white;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-          }
-          .qr-print-card {
-            width: 7cm;
-            height: 10cm;
-            padding: 0.4cm;
-            background: white;
-            border: 1px solid #e2e8f0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-          }
-          .print-title { font-size: 10pt; font-weight: bold; color: #2563eb; margin-bottom: 0.2cm; text-transform: uppercase; }
-          .print-name { font-size: 11pt; font-weight: bold; color: #1e293b; margin-top: 0.2cm; margin-bottom: 0.1cm; }
-          .print-ic { font-size: 9pt; color: #64748b; margin-bottom: 0.2cm; }
-          .print-footer { font-size: 7pt; color: #94a3b8; margin-top: 0.2cm; border-top: 0.5px dashed #cbd5e1; padding-top: 0.2cm; }
-        </style>
-      </head>
-      <body>
-        <div class="qr-print-card">
-          <div class="print-title">E-MIND CARE SEMSIRA</div>
-          <div id="printQr"></div>
-          <div class="print-name">${escapeHtml(teacherName)}</div>
-          <div class="print-ic">No. IC: ${escapeHtml(teacherIC)}</div>
-          <div class="print-footer">Kad Pengenalan Guru • Scan untuk buka sistem kehadiran</div>
-        </div>
-        <script>
-          const qrData = JSON.stringify({ type: "teacher", ic: "${escapeHtml(teacherIC)}", name: "${escapeHtml(teacherName)}" });
-          new QRCode(document.getElementById('printQr'), { text: qrData, width: 120, height: 120, colorDark: "#1e293b", colorLight: "#ffffff" });
-          setTimeout(() => { window.print(); setTimeout(() => window.close(), 500); }, 800);
-        <\/script>
-      </body>
-      </html>
-    `;
-    
-    const printWindow = window.open('', '_blank', 'width=400,height=600');
-    printWindow.document.write(printHtml);
-    printWindow.document.close();
-  }
-
-  // Load teacher data from Firestore
   async function loadTeacherData() {
-    updateDebug("🔍 Mula memuat data guru...");
-    
-    // Get IC from session storage (from login)
-    let teacherIC = sessionStorage.getItem('teacherIC');
-    let teacherName = sessionStorage.getItem('teacherName');
-    
-    updateDebug(`📌 Session data - IC: ${teacherIC}, Nama: ${teacherName}`);
-    
-    // If no IC in session, try to get from localStorage
-    if (!teacherIC) {
-      teacherIC = localStorage.getItem('teacherIC');
-      teacherName = localStorage.getItem('teacherName');
-      updateDebug(`📌 LocalStorage data - IC: ${teacherIC}, Nama: ${teacherName}`);
-    }
-    
-    // Display whatever we have first
+    const teacherIC = sessionStorage.getItem('teacherIC');
+    const teacherName = sessionStorage.getItem('teacherName');
     if (teacherName) {
       document.getElementById('teacherNameDisplay').innerText = teacherName;
       document.getElementById('profileName').innerText = teacherName;
       document.getElementById('profileIC').innerText = teacherIC || '-';
-    }
-    
-    if (!teacherIC) {
-      updateDebug("❌ Tiada IC dalam session/localStorage! Sila login semula.");
-      document.getElementById('profileClass').innerText = 'Sila login semula';
-      document.getElementById('profileYear').innerText = '-';
-      return;
-    }
-    
-    // Search in Firestore
-    try {
-      const q = query(teachersCollection, where("icNumber", "==", teacherIC));
-      const querySnapshot = await getDocs(q);
-      
-      if (!querySnapshot.empty) {
-        querySnapshot.forEach((doc) => {
-          const teacherData = doc.data();
-          currentTeacherId = doc.id;
-          currentTeacherData = teacherData;
-          
-          const teacherFullname = teacherData.fullname || teacherName;
-          const teacherClass = teacherData.teacherClass || '-';
-          const teacherYear = teacherData.year || '-';
-          
-          updateDebug(`✅ Data dari Firestore: Nama=${teacherFullname}, Kelas=${teacherClass}, Tahun=${teacherYear}`);
-          
-          document.getElementById('profileName').innerText = teacherFullname;
-          document.getElementById('teacherNameDisplay').innerText = teacherFullname;
-          document.getElementById('profileIC').innerText = teacherIC;
-          document.getElementById('profileClass').innerText = teacherClass;
-          document.getElementById('profileYear').innerText = teacherYear;
-          
-          // Update session storage with correct data
-          sessionStorage.setItem('teacherName', teacherFullname);
-          sessionStorage.setItem('teacherIC', teacherIC);
-          sessionStorage.setItem('teacherClass', teacherClass);
-          sessionStorage.setItem('teacherYear', teacherYear);
-          sessionStorage.setItem('teacherId', doc.id);
-          
-          // Generate QR Code
-          generateQRCode(teacherFullname, teacherIC);
-        });
-      } else {
-        updateDebug(`⚠️ Guru dengan IC ${teacherIC} TIDAK ditemui di Firestore!`);
-        document.getElementById('profileClass').innerText = 'Belum didaftarkan';
-        document.getElementById('profileYear').innerText = '-';
-        // Still generate QR with session data
-        if (teacherName && teacherIC) {
-          generateQRCode(teacherName, teacherIC);
-        }
+      if (teacherIC && teacherName) {
+        generateTeacherQR(teacherName, teacherIC);
       }
-    } catch (error) {
-      console.error("Error loading teacher data:", error);
-      updateDebug(`❌ Error Firestore: ${error.message}`);
-      document.getElementById('profileClass').innerText = 'Ralat sambungan';
-      // Still try to generate QR with session data
-      if (teacherName && teacherIC) {
-        generateQRCode(teacherName, teacherIC);
+    }
+    if (teacherIC) {
+      try {
+        const q = query(teachersCollection, where("icNumber", "==", teacherIC));
+        const querySnapshot = await getDocs(q);
+        if (!querySnapshot.empty) {
+          querySnapshot.forEach((docSnap) => {
+            const teacherData = docSnap.data();
+            currentTeacherId = docSnap.id;
+            currentTeacherData = teacherData;
+            const teacherClass = teacherData.teacherClass || '-';
+            const teacherYear = teacherData.year || '-';
+            document.getElementById('profileClass').innerText = teacherClass;
+            document.getElementById('profileYear').innerText = teacherYear;
+            sessionStorage.setItem('teacherClass', teacherClass);
+            sessionStorage.setItem('teacherYear', teacherYear);
+            sessionStorage.setItem('teacherId', docSnap.id);
+            // Refresh QR with latest data from DB
+            const latestName = teacherData.fullname || teacherName;
+            const latestIc = teacherData.icNumber || teacherIC;
+            generateTeacherQR(latestName, latestIc);
+          });
+        } else {
+          document.getElementById('profileClass').innerText = '-';
+          document.getElementById('profileYear').innerText = '-';
+          if (teacherName && teacherIC) generateTeacherQR(teacherName, teacherIC);
+        }
+      } catch (error) {
+        console.error("Error loading teacher data:", error);
       }
     }
   }
 
-  // Update teacher profile
   async function updateTeacherProfile(fullname, icNumber, teacherClass, year) {
     if (!currentTeacherId) {
-      showAlert('ID guru tidak ditemui. Sila muat semula halaman.', 'error');
+      showAlert('ID guru tidak ditemui', 'error');
       return false;
     }
-    
     try {
       const formattedIc = icNumber.replace(/-/g, '');
-      
+      if (formattedIc !== sessionStorage.getItem('teacherIC')) {
+        const q = query(teachersCollection, where("icNumber", "==", formattedIc));
+        const querySnapshot = await getDocs(q);
+        let icExists = false;
+        querySnapshot.forEach((docSnap) => {
+          if (docSnap.id !== currentTeacherId) icExists = true;
+        });
+        if (icExists) {
+          showAlert(`❌ No. IC ${formattedIc} sudah wujud untuk guru lain!`, 'error');
+          return false;
+        }
+      }
       const teacherRef = doc(db, "teachers", currentTeacherId);
       const updateData = {
         fullname: fullname.toUpperCase().trim(),
@@ -774,51 +792,76 @@
         year: year.trim() || "2026",
         updatedAt: new Date().toISOString()
       };
-      
       await updateDoc(teacherRef, updateData);
-      
       sessionStorage.setItem('teacherName', updateData.fullname);
       sessionStorage.setItem('teacherIC', updateData.icNumber);
       sessionStorage.setItem('teacherClass', updateData.teacherClass);
       sessionStorage.setItem('teacherYear', updateData.year);
-      
       document.getElementById('teacherNameDisplay').innerText = updateData.fullname;
       document.getElementById('profileName').innerText = updateData.fullname;
       document.getElementById('profileIC').innerText = updateData.icNumber;
       document.getElementById('profileClass').innerText = updateData.teacherClass;
       document.getElementById('profileYear').innerText = updateData.year;
-      
-      generateQRCode(updateData.fullname, updateData.icNumber);
-      
+      // Regenerate QR with updated info
+      generateTeacherQR(updateData.fullname, updateData.icNumber);
       showAlert('✅ Profil guru berjaya dikemaskini!', 'success');
       return true;
-      
     } catch (error) {
-      console.error("Error updating teacher profile:", error);
-      showAlert('❌ Gagal mengemaskini profil.', 'error');
+      console.error(error);
+      showAlert('❌ Gagal mengemaskini profil. Sila cuba lagi.', 'error');
       return false;
     }
   }
 
-  async function loadStudentCount() {
-    const teacherClass = sessionStorage.getItem('teacherClass');
-    if (teacherClass && teacherClass !== '-') {
-      try {
-        const q = query(studentsCollection, where("class", "==", teacherClass));
-        const querySnapshot = await getDocs(q);
-        updateDebug(`📚 Bilangan pelajar dalam kelas ${teacherClass}: ${querySnapshot.size}`);
-      } catch (error) {
-        console.error("Error loading student count:", error);
-      }
-    }
+  // Print QR function: create a hidden printable card
+  function printQrCard() {
+    const teacherName = sessionStorage.getItem('teacherName') || 'Nama tidak diisi';
+    const teacherIC = sessionStorage.getItem('teacherIC') || 'IC tidak diisi';
+    const teacherClass = sessionStorage.getItem('teacherClass') || '-';
+    // Create a printable wrapper
+    const printDiv = document.createElement('div');
+    printDiv.className = 'qr-print-wrapper';
+    printDiv.innerHTML = `
+      <div style="font-family: 'Plus Jakarta Sans', sans-serif; text-align: center; padding: 1.5rem; border-radius: 1rem; background: white; width: 320px; margin: auto; box-shadow: 0 10px 25px rgba(0,0,0,0.1);" class="print-qr-card">
+        <div style="margin-bottom: 15px;">
+          <i class="fas fa-chalkboard-user" style="font-size: 42px; color: #2563eb;"></i>
+        </div>
+        <h3 style="margin: 8px 0; color: #1e293b;">Kad Pengenalan Guru</h3>
+        <div style="margin: 12px auto; width: 150px; height: 150px;" id="printQrImage"></div>
+        <div style="margin-top: 12px; text-align: left; border-top: 1px dashed #ccc; padding-top: 10px;">
+          <p><strong>Nama Penuh:</strong> ${teacherName}</p>
+          <p><strong>No. IC:</strong> ${teacherIC}</p>
+          <p><strong>Mengajar Kelas:</strong> ${teacherClass}</p>
+          <p><small>E-MindCare SEMSIRA • SMK Syed Sirajuddin</small></p>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(printDiv);
+    // Generate high-res QR for print inside the print div
+    const qrPrintContainer = printDiv.querySelector('#printQrImage');
+    const qrText = `Nama: ${teacherName}\nNo. IC: ${teacherIC}`;
+    new QRCode(qrPrintContainer, {
+      text: qrText,
+      width: 140,
+      height: 140,
+      colorDark: "#000000",
+      colorLight: "#ffffff",
+      correctLevel: QRCode.CorrectLevel.M
+    });
+    // Wait a bit for QR to render then trigger print
+    setTimeout(() => {
+      window.print();
+      setTimeout(() => {
+        document.body.removeChild(printDiv);
+      }, 500);
+    }, 200);
   }
 
   function openEditModal() {
-    const currentName = sessionStorage.getItem('teacherName') || document.getElementById('profileName').innerText || '';
-    const currentIc = sessionStorage.getItem('teacherIC') || document.getElementById('profileIC').innerText || '';
-    const currentClass = sessionStorage.getItem('teacherClass') || document.getElementById('profileClass').innerText || '';
-    const currentYear = sessionStorage.getItem('teacherYear') || document.getElementById('profileYear').innerText || '2026';
-    
+    const currentName = sessionStorage.getItem('teacherName') || '';
+    const currentIc = sessionStorage.getItem('teacherIC') || '';
+    const currentClass = sessionStorage.getItem('teacherClass') || '';
+    const currentYear = sessionStorage.getItem('teacherYear') || '2026';
     document.getElementById('editFullname').value = currentName;
     document.getElementById('editIc').value = currentIc;
     document.getElementById('editClass').value = currentClass;
@@ -836,35 +879,31 @@
     const icNumber = document.getElementById('editIc').value.trim();
     const teacherClass = document.getElementById('editClass').value.trim();
     const year = document.getElementById('editYear').value.trim();
-    
-    if (!fullname) { showAlert('Sila masukkan Nama Penuh', 'error'); return; }
-    if (!icNumber) { showAlert('Sila masukkan No. Kad Pengenalan', 'error'); return; }
-    
+    if (!fullname || !icNumber) {
+      showAlert('Sila lengkapkan Nama dan No. IC', 'error');
+      return;
+    }
     const cleanIc = icNumber.replace(/-/g, '');
     if (!/^\d{12}$/.test(cleanIc)) {
       showAlert('❌ No. Kad Pengenalan mestilah 12 digit nombor', 'error');
       return;
     }
-    
     if (!year || !/^\d{4}$/.test(year)) {
-      showAlert('Sila masukkan tahun yang sah (4 digit)', 'error');
+      showAlert('Sila masukkan tahun yang sah', 'error');
       return;
     }
-    
     const submitBtn = e.target.querySelector('button[type="submit"]');
     const originalText = submitBtn.innerHTML;
     submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
     submitBtn.disabled = true;
-    
     await updateTeacherProfile(fullname, cleanIc, teacherClass, year);
-    
     submitBtn.innerHTML = originalText;
     submitBtn.disabled = false;
     closeEditModal();
   });
 
   function openMenuPage(menuType) {
-    const urls = {
+    const mapping = {
       'list-pelajar-kelas': 'list-pelajar-kelas.html',
       'mata-merit': 'mata-merit.html',
       'daftar-merit': 'daftar-merit.html',
@@ -872,31 +911,25 @@
       'keseluruhan-guru': 'keseluruhan-guru.html',
       'keseluruhan-kelas': 'keseluruhan-kelas.html'
     };
-    window.location.href = urls[menuType];
-  }
-  
-  function escapeHtml(str) {
-    if (!str) return '';
-    return str.replace(/[&<>]/g, m => m === '&' ? '&amp;' : m === '<' ? '&lt;' : '&gt;');
+    const targetUrl = mapping[menuType];
+    if (targetUrl) window.location.href = targetUrl;
   }
 
   async function init() {
-    updateDebug("🚀 Memulakan Dashboard Guru...");
+    if (!checkLoginStatus()) return;
     await loadTeacherData();
-    await loadStudentCount();
-    updateDebug("✅ Inisialisasi selesai");
   }
-  
+
   document.querySelectorAll('.menu-card').forEach(card => {
-    card.addEventListener('click', () => openMenuPage(card.getAttribute('data-menu')));
+    card.addEventListener('click', (e) => {
+      const menuType = card.getAttribute('data-menu');
+      openMenuPage(menuType);
+    });
   });
-  
   document.getElementById('editProfileBtn').addEventListener('click', openEditModal);
-  document.getElementById('printQrBtn').addEventListener('click', printQRCode);
+  document.getElementById('printQrBtn').addEventListener('click', printQrCard);
   document.getElementById('logoutBtn').addEventListener('click', () => {
     sessionStorage.clear();
-    localStorage.removeItem('teacherIC');
-    localStorage.removeItem('teacherName');
     window.location.href = '../index.html';
   });
   

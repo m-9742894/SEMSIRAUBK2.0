@@ -7,6 +7,8 @@
   <!-- Fonts & Icons -->
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <!-- QR Code Library -->
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
   <style>
     * {
       margin: 0;
@@ -157,11 +159,16 @@
       padding: 1.5rem;
       margin-bottom: 2rem;
       display: flex;
-      align-items: center;
-      gap: 1.5rem;
+      gap: 2rem;
       flex-wrap: wrap;
       box-shadow: 0 8px 20px -8px rgba(0, 0, 0, 0.08);
       border: 1px solid rgba(79, 70, 229, 0.1);
+    }
+    .profile-left {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      flex: 2;
     }
     .profile-avatar {
       background: linear-gradient(145deg, #4f46e5, #7c3aed);
@@ -194,6 +201,45 @@
       color: #4f46e5;
       display: inline-block;
       margin-top: 0.5rem;
+    }
+    .qr-section {
+      background: #f8fafc;
+      border-radius: 1rem;
+      padding: 0.8rem;
+      text-align: center;
+      min-width: 140px;
+      border: 1px solid #e2e8f0;
+    }
+    .qr-section p {
+      font-size: 0.65rem;
+      color: #64748b;
+      margin-top: 0.5rem;
+    }
+    .btn-print-qr {
+      background: #4f46e5;
+      color: white;
+      border: none;
+      padding: 0.3rem 0.8rem;
+      border-radius: 20px;
+      font-size: 0.65rem;
+      cursor: pointer;
+      margin-top: 0.5rem;
+      transition: 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .btn-print-qr:hover {
+      background: #4338ca;
+      transform: translateY(-2px);
+    }
+    #qrcode {
+      display: flex;
+      justify-content: center;
+    }
+    #qrcode img {
+      width: 100px;
+      height: 100px;
     }
 
     /* menu grid */
@@ -286,8 +332,60 @@
         flex-direction: column;
         text-align: center;
       }
+      .profile-left {
+        flex-direction: column;
+      }
       .logo-text h1 {
         font-size: 1.2rem;
+      }
+      .qr-section {
+        margin: 0 auto;
+      }
+    }
+
+    /* Print styles for QR Code card (7cm x 10cm) */
+    @media print {
+      body * {
+        visibility: hidden;
+      }
+      .qr-print-card, .qr-print-card * {
+        visibility: visible;
+      }
+      .qr-print-card {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 7cm;
+        height: 10cm;
+        padding: 0.5cm;
+        margin: 0;
+        background: white;
+        box-shadow: none;
+        border: 1px solid #ddd;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        page-break-after: avoid;
+        break-inside: avoid;
+      }
+      .qr-print-card .print-qr {
+        margin-bottom: 0.3cm;
+      }
+      .qr-print-card .print-qr img {
+        width: 3.5cm !important;
+        height: 3.5cm !important;
+      }
+      .qr-print-card .print-name {
+        font-size: 12pt;
+        font-weight: bold;
+        text-align: center;
+        margin-bottom: 0.2cm;
+      }
+      .qr-print-card .print-ic {
+        font-size: 10pt;
+        text-align: center;
+        color: #333;
       }
     }
   </style>
@@ -318,23 +416,32 @@
     </div>
   </div>
 
-  <!-- Profile Card -->
+  <!-- Profile Card with QR Code -->
   <div class="profile-card" id="profileCard">
-    <div class="profile-avatar">
-      <i class="fas fa-user-graduate"></i>
+    <div class="profile-left">
+      <div class="profile-avatar">
+        <i class="fas fa-user-graduate"></i>
+      </div>
+      <div class="profile-info">
+        <h3 id="profileName">-</h3>
+        <p><i class="fas fa-id-card"></i> No. Kad Pengenalan: <span id="profileIC">-</span></p>
+        <p><i class="fas fa-school"></i> Kelas: <span id="profileClass">-</span></p>
+        <p><i class="fas fa-calendar"></i> Sesi/Tahun: <span id="profileSession">-</span></p>
+        <div class="badge"><i class="fas fa-check-circle"></i> Pelajar Aktif</div>
+      </div>
     </div>
-    <div class="profile-info">
-      <h3 id="profileName">-</h3>
-      <p><i class="fas fa-id-card"></i> No. Kad Pengenalan: <span id="profileIC">-</span></p>
-      <p><i class="fas fa-school"></i> Kelas: <span id="profileClass">-</span></p>
-      <p><i class="fas fa-calendar"></i> Sesi/Tahun: <span id="profileSession">-</span></p>
-      <div class="badge"><i class="fas fa-check-circle"></i> Pelajar Aktif</div>
+    <div class="qr-section">
+      <div id="qrcode"></div>
+      <p><i class="fas fa-qrcode"></i> Kad Kehadiran Digital</p>
+      <button class="btn-print-qr" id="printQrBtn">
+        <i class="fas fa-print"></i> Print QR Code
+      </button>
     </div>
   </div>
 
-  <!-- Menu Grid (3 menu) -->
+  <!-- Menu Grid (4 menu) -->
   <div class="menu-grid">
-    <!-- 1. INVENTORI PSIKOMETRIK - Redirect ke psikometrik.html -->
+    <!-- 1. INVENTORI PSIKOMETRIK -->
     <div class="menu-card" data-menu="inventori-psikometrik">
       <div class="menu-icon"><i class="fas fa-chart-line"></i></div>
       <h3>Inventori Psikometrik</h3>
@@ -342,7 +449,7 @@
       <div class="menu-btn">Mulakan Ujian <i class="fas fa-arrow-right"></i></div>
     </div>
 
-    <!-- 2. MATA MERIT (TUKAR DARI MERIT PELAJAR) -->
+    <!-- 2. MATA MERIT -->
     <div class="menu-card" data-menu="mata-merit">
       <div class="menu-icon"><i class="fas fa-star"></i></div>
       <h3>Mata Merit</h3>
@@ -357,6 +464,14 @@
       <div class="menu-desc">Buat temujanji dengan kaunselor sekolah.</div>
       <div class="menu-btn">Buat Tempahan <i class="fas fa-arrow-right"></i></div>
     </div>
+
+    <!-- 4. KEHADIRAN SAYA (BARU) -->
+    <div class="menu-card" data-menu="kehadiran-saya">
+      <div class="menu-icon"><i class="fas fa-fingerprint"></i></div>
+      <h3>Kehadiran Saya</h3>
+      <div class="menu-desc">Semak rekod kehadiran anda menggunakan QR Code.</div>
+      <div class="menu-btn">Lihat Kehadiran <i class="fas fa-arrow-right"></i></div>
+    </div>
   </div>
 
   <div class="footer">
@@ -366,14 +481,13 @@
 
 <script>
   // ============================================================
-  // AMBIL DATA PELAJAR DARI SESSION STORAGE (dari page login)
+  // AMBIL DATA PELAJAR DARI SESSION STORAGE
   // ============================================================
   
-  // Data pelajar dari sessionStorage
-  const studentName = sessionStorage.getItem('studentName') || 'Pelajar';
-  const studentIC = sessionStorage.getItem('studentIC') || '-';
-  const studentClass = sessionStorage.getItem('studentClass') || '-';
-  const studentSession = sessionStorage.getItem('studentSession') || '2026';
+  const studentName = sessionStorage.getItem('studentName') || localStorage.getItem('studentName') || 'Pelajar';
+  const studentIC = sessionStorage.getItem('studentIC') || localStorage.getItem('studentIC') || '-';
+  const studentClass = sessionStorage.getItem('studentClass') || localStorage.getItem('studentClass') || '-';
+  const studentSession = sessionStorage.getItem('studentSession') || localStorage.getItem('studentSession') || '2026';
   
   // Paparkan nama di header
   document.getElementById('studentNameDisplay').innerText = studentName;
@@ -385,6 +499,148 @@
   document.getElementById('profileSession').innerText = studentSession;
   
   // ============================================================
+  // GENERATE QR CODE (berdasarkan IC dan Nama sahaja - kekal)
+  // ============================================================
+  function generateQRCode() {
+    const qrContainer = document.getElementById('qrcode');
+    qrContainer.innerHTML = '';
+    
+    // Data untuk QR Code - hanya IC dan Nama (tidak berubah walaupun kelas/tahun berubah)
+    const qrData = JSON.stringify({
+      ic: studentIC,
+      name: studentName,
+      type: 'attendance'
+    });
+    
+    new QRCode(qrContainer, {
+      text: qrData,
+      width: 100,
+      height: 100,
+      colorDark: "#1e293b",
+      colorLight: "#ffffff",
+      correctLevel: QRCode.CorrectLevel.M
+    });
+  }
+  
+  // ============================================================
+  // PRINT QR CODE (Saiz 7cm x 10cm - Potrait)
+  // ============================================================
+  function printQRCode() {
+    // Buat elemen untuk print
+    const printContent = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="UTF-8">
+        <title>QR Code Kehadiran - ${studentName}</title>
+        <style>
+          * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+          }
+          body {
+            font-family: 'Plus Jakarta Sans', 'Segoe UI', Arial, sans-serif;
+            background: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+          }
+          .qr-print-card {
+            width: 7cm;
+            height: 10cm;
+            padding: 0.4cm;
+            background: white;
+            border: 1px solid #e2e8f0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+          }
+          .print-title {
+            font-size: 10pt;
+            font-weight: bold;
+            color: #4f46e5;
+            margin-bottom: 0.2cm;
+            text-transform: uppercase;
+          }
+          .print-qr {
+            margin: 0.2cm 0;
+          }
+          .print-qr img {
+            width: 3.8cm !important;
+            height: 3.8cm !important;
+          }
+          .print-name {
+            font-size: 11pt;
+            font-weight: bold;
+            color: #1e293b;
+            margin-top: 0.2cm;
+            margin-bottom: 0.1cm;
+          }
+          .print-ic {
+            font-size: 9pt;
+            color: #64748b;
+            margin-bottom: 0.2cm;
+          }
+          .print-footer {
+            font-size: 7pt;
+            color: #94a3b8;
+            margin-top: 0.2cm;
+            border-top: 0.5px dashed #cbd5e1;
+            padding-top: 0.2cm;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="qr-print-card">
+          <div class="print-title">E-MIND CARE SEMSIRA</div>
+          <div class="print-qr" id="printQr"></div>
+          <div class="print-name">${escapeHtml(studentName)}</div>
+          <div class="print-ic">No. IC: ${escapeHtml(studentIC)}</div>
+          <div class="print-footer">Kad Kehadiran Digital • Scan untuk rekod kehadiran</div>
+        </div>
+        <script>
+          // Generate QR Code dalam print window
+          const qrData = JSON.stringify({ ic: '${escapeHtml(studentIC)}', name: '${escapeHtml(studentName)}', type: 'attendance' });
+          new QRCode(document.getElementById('printQr'), {
+            text: qrData,
+            width: 140,
+            height: 140,
+            colorDark: "#1e293b",
+            colorLight: "#ffffff",
+            correctLevel: QRCode.CorrectLevel.M
+          });
+          
+          // Tunggu QR siap kemudian cetak
+          setTimeout(() => {
+            window.print();
+          }, 500);
+        <\/script>
+        <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"><\/script>
+      </body>
+      </html>
+    `;
+    
+    const printWindow = window.open('', '_blank');
+    printWindow.document.write(printContent);
+    printWindow.document.close();
+  }
+  
+  function escapeHtml(str) {
+    if (!str) return '';
+    return str.replace(/[&<>]/g, function(m) {
+      if (m === '&') return '&amp;';
+      if (m === '<') return '&lt;';
+      if (m === '>') return '&gt;';
+      return m;
+    });
+  }
+  
+  // ============================================================
   // FUNGSI MEMBUKA HALAMAN MENGIKUT MENU
   // ============================================================
   function openMenuPage(menuType) {
@@ -392,7 +648,6 @@
     
     switch(menuType) {
       case 'inventori-psikometrik':
-        // ✅ TUKAR KE psikometrik.html (bukan inventori-psikometrik.html)
         targetUrl = 'psikometrik.html';
         break;
       case 'mata-merit':
@@ -401,6 +656,9 @@
       case 'tempahan-kaunseling':
         targetUrl = 'tempahan-kaunseling.html';
         break;
+      case 'kehadiran-saya':
+        targetUrl = 'kehadiran-saya.html';
+        break;
       default:
         return;
     }
@@ -408,7 +666,17 @@
     window.location.href = targetUrl;
   }
   
-  // Pasang event listener untuk setiap kad menu
+  // ============================================================
+  // EVENT LISTENERS
+  // ============================================================
+  
+  // Generate QR Code
+  generateQRCode();
+  
+  // Print QR Code button
+  document.getElementById('printQrBtn').addEventListener('click', printQRCode);
+  
+  // Menu cards
   const menuCards = document.querySelectorAll('.menu-card');
   menuCards.forEach(card => {
     card.addEventListener('click', (e) => {
@@ -417,19 +685,24 @@
     });
   });
   
-  // Logout button - kembali ke halaman utama
+  // Logout button
   const logoutBtn = document.getElementById('logoutBtn');
   logoutBtn.addEventListener('click', () => {
     sessionStorage.clear();
+    localStorage.removeItem('studentName');
+    localStorage.removeItem('studentIC');
+    localStorage.removeItem('studentClass');
+    localStorage.removeItem('studentSession');
     window.location.href = '../../index.html';
   });
 </script>
 
 <!-- NOTA PENTING:
      Fail-fail yang perlu dicipta dalam folder yang sama (pelajar/):
-     1. psikometrik.html ✅ (redirect ke sini)
+     1. psikometrik.html ✅
      2. mata-merit.html
      3. tempahan-kaunseling.html
+     4. kehadiran-saya.html (BARU - untuk rekod kehadiran)
 -->
 </body>
 </html>

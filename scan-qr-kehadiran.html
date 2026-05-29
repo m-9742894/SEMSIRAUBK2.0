@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Scan QR Code - Kehadiran Pelajar | E-MindCare SEMSIRA</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <!-- HTML5 QR Code Library -->
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container { max-width: 800px; margin: 0 auto; }
+        
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid rgba(255,255,255,0.1);
+        }
+        .logo-area { display: flex; align-items: center; gap: 1rem; }
+        .logo-icon {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            width: 45px; height: 45px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .logo-icon i { font-size: 1.5rem; color: white; }
+        .logo-text h1 { font-size: 1.2rem; color: white; }
+        .logo-text p { font-size: 0.7rem; color: #94a3b8; }
+        .back-btn {
+            background: rgba(255,255,255,0.1);
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 40px;
+            cursor: pointer;
+            font-weight: 600;
+            color: #f1f5f9;
+            text-decoration: none;
+            font-size: 0.8rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: 0.2s;
+        }
+        .back-btn:hover { background: rgba(255,255,255,0.2); }
+        
+        /* Live DateTime */
+        .live-datetime {
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            border-radius: 1rem;
+            padding: 0.8rem 1rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        .datetime-left { display: flex; align-items: center; gap: 10px; }
+        .datetime-left i { font-size: 1.2rem; color: #fbbf24; }
+        .datetime-left span { color: white; font-size: 0.9rem; font-weight: 500; }
+        .datetime-right {
+            background: rgba(0,0,0,0.5);
+            padding: 0.3rem 0.8rem;
+            border-radius: 2rem;
+            font-family: monospace;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #fbbf24;
+        }
+        
+        /* Security Section */
+        .security-section {
+            background: #1e293b;
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .timer-display {
+            font-size: 3rem;
+            font-weight: 800;
+            font-family: monospace;
+            color: #fbbf24;
+            margin: 0.5rem 0;
+        }
+        .request-btn {
+            background: linear-gradient(95deg, #10b981, #059669);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 3rem;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 0.5rem;
+        }
+        .request-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(16,185,129,0.3); }
+        .request-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 0.3rem 1rem;
+            border-radius: 2rem;
+            font-size: 0.7rem;
+            font-weight: 600;
+            margin-top: 0.5rem;
+        }
+        .status-pending { background: #f59e0b; color: #78350f; }
+        .status-approved { background: #10b981; color: white; }
+        .status-expired { background: #ef4444; color: white; }
+        
+        /* QR Scanner Section */
+        .scanner-section {
+            background: #1e293b;
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(255,255,255,0.1);
+            display: none;
+        }
+        .scanner-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        .scanner-header h3 { color: white; font-size: 1rem; }
+        #reader {
+            width: 100%;
+            border-radius: 1rem;
+            overflow: hidden;
+        }
+        .camera-controls {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+            justify-content: center;
+        }
+        .cam-btn {
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .cam-stop { background: #ef4444; color: white; }
+        .cam-stop:hover:not(:disabled) { background: #dc2626; transform: translateY(-2px); }
+        .cam-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .scanning-status {
+            font-size: 0.7rem;
+            color: #fbbf24;
+            margin-top: 0.5rem;
+            text-align: center;
+        }
+        
+        /* Attendance Log */
+        .log-section {
+            background: #1e293b;
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            border: 1px solid rgba(255,255,255,0.1);
+            display: none;
+        }
+        .log-header h3 { color: white; font-size: 1rem; margin-bottom: 1rem; }
+        .log-list {
+            max-height: 350px;
+            overflow-y: auto;
+        }
+        .log-item {
+            background: #0f172a;
+            border-radius: 1rem;
+            padding: 0.8rem;
+            margin-bottom: 0.8rem;
+            border-left: 4px solid;
+        }
+        .log-item.success { border-left-color: #10b981; }
+        .log-item.error { border-left-color: #ef4444; }
+        .log-item.warning { border-left-color: #f59e0b; }
+        .log-name { font-weight: 700; color: white; font-size: 0.9rem; }
+        .log-detail { font-size: 0.7rem; color: #94a3b8; margin-top: 4px; }
+        .log-time { font-size: 0.65rem; color: #64748b; margin-top: 5px; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 5px; }
+        .badge-status { display: inline-block; padding: 0.2rem 0.5rem; border-radius: 20px; font-size: 0.6rem; font-weight: 600; }
+        .badge-hadir { background: #10b981; color: white; }
+        .badge-lewat { background: #f59e0b; color: #78350f; }
+        .empty-log { text-align: center; padding: 2rem; color: #64748b; }
+        
+        .info-note {
+            background: #0f172a;
+            border-radius: 0.8rem;
+            padding: 0.8rem;
+            margin-top: 1rem;
+            font-size: 0.7rem;
+            color: #94a3b8;
+            text-align: center;
+        }
+        
+        .closed-section {
+            background: #1e293b;
+            border-radius: 1.5rem;
+            padding: 2rem;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 1.5rem;
+        }
+        .closed-section i { font-size: 3rem; color: #f59e0b; margin-bottom: 1rem; }
+        .closed-section h3 { color: white; margin-bottom: 0.5rem; }
+        .closed-section p { color: #94a3b8; font-size: 0.8rem; }
+        
+        @media (max-width: 600px) {
+            body { padding: 10px; }
+            .timer-display { font-size: 2rem; }
+            .live-datetime { flex-direction: column; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <div class="logo-area">
+            <div class="logo-icon"><i class="fas fa-qrcode"></i></div>
+            <div class="logo-text">
+                <h1>Scan QR Code Kehadiran</h1>
+                <p>Sistem Kehadiran Pelajar</p>
+            </div>
+        </div>
+        <a href="../portal-utama.html" class="back-btn"><i class="fas fa-arrow-left"></i> Kembali</a>
+    </div>
+
+    <!-- Live DateTime -->
+    <div class="live-datetime" id="liveDateTime">
+        <div class="datetime-left">
+            <i class="fas fa-calendar-alt"></i>
+            <span id="currentDate">-</span>
+            <i class="fas fa-clock" style="margin-left: 10px;"></i>
+            <span id="currentTime">-</span>
+        </div>
+        <div class="datetime-right" id="liveTimer">-</div>
+    </div>
+
+    <!-- Holiday Warning / System Closed -->
+    <div id="holidayWarning" class="closed-section" style="display: none;">
+        <i class="fas fa-umbrella-beach"></i>
+        <h3>Sistem Kehadiran Ditutup</h3>
+        <p id="holidayMessage">Hari ini adalah hari cuti umum / cuti mingguan.</p>
+        <p style="margin-top: 0.5rem; font-size: 0.7rem;">Sila hubungi kaunselor untuk sebarang pertanyaan.</p>
+    </div>
+
+    <!-- Security Section (only show if not holiday) -->
+    <div id="securitySection" class="security-section">
+        <i class="fas fa-shield-alt" style="font-size: 2rem; color: #fbbf24;"></i>
+        <h3 style="color: white; margin-top: 0.5rem;">Pengesahan Keselamatan</h3>
+        <p style="color: #94a3b8; font-size: 0.8rem; margin-top: 0.3rem;">Hantar permintaan untuk membuka sistem scan</p>
+        <div class="timer-display" id="timerDisplay">03:00</div>
+        <button class="request-btn" id="requestBtn">
+            <i class="fas fa-paper-plane"></i> Hantar Permintaan Buka Sistem
+        </button>
+        <div id="requestStatus"></div>
+    </div>
+
+    <!-- QR Scanner Section -->
+    <div id="scannerSection" class="scanner-section">
+        <div class="scanner-header">
+            <h3><i class="fas fa-camera"></i> Scanner QR Code</h3>
+            <div id="scannerStatus" style="font-size: 0.7rem; color: #fbbf24;">Menunggu kelulusan</div>
+        </div>
+        <div id="reader"></div>
+        <div class="camera-controls">
+            <button class="cam-btn cam-stop" id="stopScannerBtn" disabled><i class="fas fa-stop"></i> Stop Kamera</button>
+        </div>
+        <div id="scanningStatus" class="scanning-status"></div>
+    </div>
+
+    <!-- Attendance Log -->
+    <div id="logSection" class="log-section">
+        <div class="log-header">
+            <h3><i class="fas fa-list-alt"></i> Log Kehadiran</h3>
+        </div>
+        <div class="log-list" id="logList">
+            <div class="empty-log">
+                <i class="fas fa-info-circle"></i>
+                <p>Tiada rekod kehadiran</p>
+                <p style="font-size: 0.7rem;">Scan QR Code untuk rekod kehadiran</p>
+            </div>
+        </div>
+        <div class="info-note">
+            <i class="fas fa-info-circle"></i> Pastikan QR Code jelas dan berada dalam frame kamera
+        </div>
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, collection, doc, getDoc, getDocs, setDoc, updateDoc, query, where, Timestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    
+    const firebaseConfig = {
+        apiKey: "AIzaSyCfu7XC8pXtpDyQ-9Cjdg4AobA-EVEwWcc",
+        authDomain: "e-mindcare.firebaseapp.com",
+        projectId: "e-mindcare",
+        storageBucket: "e-mindcare.firebasestorage.app",
+        messagingSenderId: "1021883944936",
+        appId: "1:1021883944936:web:39c75a0c98d19a37afde5d",
+        measurementId: "G-3CJVKWGEXV"
+    };
+    
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    
+    // References
+    const scanRequestsRef = collection(db, "scan_requests");
+    const attendanceRef = collection(db, "attendance_records");
+    const settingsRef = doc(db, "attendance_settings", "main");
+    const holidaysRef = collection(db, "attendance_holidays");
+    
+    // Global variables
+    let html5QrCode = null;
+    let scanRequestId = null;
+    let timerInterval = null;
+    let timeLeft = 180;
+    let isApproved = false;
+    let isExpired = false;
+    let isHoliday = false;
+    let isScanning = false;
+    let settings = { timeOpen: "07:00", timeLate: "08:00", timeClose: "16:00" };
+    let weekdayHolidays = [];
+    let generalHolidays = [];
+    let requestListenerUnsubscribe = null;
+    
+    // DOM Elements
+    const requestBtn = document.getElementById('requestBtn');
+    const timerDisplay = document.getElementById('timerDisplay');
+    const requestStatus = document.getElementById('requestStatus');
+    const scannerSection = document.getElementById('scannerSection');
+    const logSection = document.getElementById('logSection');
+    const stopScannerBtn = document.getElementById('stopScannerBtn');
+    const scannerStatus = document.getElementById('scannerStatus');
+    const scanningStatus = document.getElementById('scanningStatus');
+    const logList = document.getElementById('logList');
+    const holidayWarningDiv = document.getElementById('holidayWarning');
+    const securitySection = document.getElementById('securitySection');
+    const currentDateSpan = document.getElementById('currentDate');
+    const currentTimeSpan = document.getElementById('currentTime');
+    const liveTimerSpan = document.getElementById('liveTimer');
+    
+    // Live DateTime update
+    function updateLiveDateTime() {
+        const now = new Date();
+        const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
+        currentDateSpan.innerHTML = now.toLocaleDateString('ms-MY', options);
+        currentTimeSpan.innerHTML = now.toLocaleTimeString('ms-MY', { hour: '2-digit', minute: '2-digit' });
+        liveTimerSpan.innerHTML = now.toLocaleTimeString('ms-MY', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    }
+    setInterval(updateLiveDateTime, 1000);
+    
+    // Load settings
+    async function loadSettings() {
+        try {
+            const docSnap = await getDoc(settingsRef);
+            if (docSnap.exists()) {
+                const data = docSnap.data();
+                if (data.timeOpen) settings.timeOpen = data.timeOpen;
+                if (data.timeLate) settings.timeLate = data.timeLate;
+                if (data.timeClose) settings.timeClose = data.timeClose;
+                if (data.weekdayHolidays) weekdayHolidays = data.weekdayHolidays;
+            }
+        } catch (error) { console.error("Error loading settings:", error); }
+    }
+    
+    // Load general holidays
+    async function loadHolidays() {
+        try {
+            const snapshot = await getDocs(holidaysRef);
+            generalHolidays = [];
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                generalHolidays.push({ startDate: data.startDate, endDate: data.endDate, name: data.name });
+            });
+        } catch (error) { console.error("Error loading holidays:", error); }
+    }
+    
+    // Check if today is holiday
+    function checkTodayIsHoliday() {
+        const today = new Date();
+        const todayISO = today.toISOString().split('T')[0];
+        const dayName = today.toLocaleDateString('en-US', { weekday: 'long' });
+        
+        if (weekdayHolidays.includes(dayName)) {
+            return { isHoliday: true, reason: `Hari cuti mingguan (${getDayNameMalay(dayName)})` };
+        }
+        
+        for (const holiday of generalHolidays) {
+            if (todayISO >= holiday.startDate && todayISO <= holiday.endDate) {
+                return { isHoliday: true, reason: holiday.name };
+            }
+        }
+        return { isHoliday: false, reason: null };
+    }
+    
+    function getDayNameMalay(day) {
+        const days = { Sunday: 'Ahad', Monday: 'Isnin', Tuesday: 'Selasa', Wednesday: 'Rabu', Thursday: 'Khamis', Friday: 'Jumaat', Saturday: 'Sabtu' };
+        return days[day] || day;
+    }
+    
+    // Update timer display
+    function updateTimerDisplay() {
+        const minutes = Math.floor(timeLeft / 60);
+        const seconds = timeLeft % 60;
+        timerDisplay.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+    }
+    
+    // Start timer countdown
+    function startTimer() {
+        if (timerInterval) clearInterval(timerInterval);
+        timerInterval = setInterval(() => {
+            if (timeLeft <= 0) {
+                clearInterval(timerInterval);
+                isExpired = true;
+                isApproved = false;
+                updateRequestStatus();
+                stopScanner();
+                requestBtn.disabled = false;
+                requestBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Hantar Permintaan Buka Sistem';
+                scannerSection.style.display = 'none';
+                logSection.style.display = 'none';
+                addLog("Masa permintaan telah tamat. Sila hantar permintaan baharu.", "warning");
+            } else {
+                timeLeft--;
+                updateTimerDisplay();
+            }
+        }, 1000);
+    }
+    
+    // Stop scanner
+    async function stopScanner() {
+        if (isScanning && html5QrCode) {
+            try {
+                await html5QrCode.stop();
+                isScanning = false;
+                scanningStatus.innerHTML = '';
+                stopScannerBtn.disabled = true;
+            } catch(e) { console.log("Scanner stop error:", e); }
+        }
+    }
+    
+    // Start scanner automatically
+    async function startScannerAuto() {
+        if (!isApproved || isExpired) return;
+        if (isScanning) return;
+        
+        scanningStatus.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memulakan kamera...';
+        
+        try {
+            await html5QrCode.start(
+                { facingMode: "environment" },
+                { fps: 10, qrbox: 250 },
+                onScanSuccess,
+                (errorMessage) => { console.log("Scan error:", errorMessage); }
+            );
+            isScanning = true;
+            scanningStatus.innerHTML = '✅ Kamera aktif. Hadapkan QR Code ke kamera.';
+            stopScannerBtn.disabled = false;
+            addLog("📷 Kamera diaktifkan secara automatik. Hadapkan QR Code ke kamera.", "info");
+        } catch (err) {
+            console.error("Camera start error:", err);
+            scanningStatus.innerHTML = '❌ Gagal mengakses kamera. Pastikan kebenaran kamera diberikan.';
+            addLog("Gagal mengakses kamera. Pastikan kebenaran kamera diberikan.", "error");
+        }
+    }
+    
+    // Update request status display
+    function updateRequestStatus() {
+        if (isExpired) {
+            requestStatus.innerHTML = '<span class="status-badge status-expired"><i class="fas fa-clock"></i> Permintaan Tamat</span>';
+            scannerStatus.innerHTML = 'Permintaan tamat - hantar permintaan baharu';
+        } else if (isApproved) {
+            requestStatus.innerHTML = '<span class="status-badge status-approved"><i class="fas fa-check-circle"></i> Sistem Dibuka - Sila Scan QR Code</span>';
+            scannerStatus.innerHTML = '✅ Sistem dibuka - Kamera akan mula secara automatik';
+            scannerSection.style.display = 'block';
+            logSection.style.display = 'block';
+            // Auto start scanner when approved
+            setTimeout(() => {
+                if (isApproved && !isExpired && !isScanning) {
+                    startScannerAuto();
+                }
+            }, 500);
+        } else {
+            requestStatus.innerHTML = '<span class="status-badge status-pending"><i class="fas fa-hourglass-half"></i> Menunggu kelulusan kaunselor/guru</span>';
+            scannerStatus.innerHTML = '⏳ Menunggu kelulusan kaunselor/guru';
+        }
+    }
+    
+    // Listen to request status
+    function listenRequestStatus() {
+        if (!scanRequestId) return;
+        if (requestListenerUnsubscribe) requestListenerUnsubscribe();
+        
+        requestListenerUnsubscribe = db.collection("scan_requests").doc(scanRequestId)
+            .onSnapshot((doc) => {
+                if (doc.exists) {
+                    const data = doc.data();
+                    if (data.status === 'approved' && !isApproved) {
+                        isApproved = true;
+                        updateRequestStatus();
+                        addLog("✅ Sistem kehadiran telah dibuka. Kamera akan mula secara automatik.", "success");
+                    } else if (data.status === 'rejected') {
+                        addLog("❌ Permintaan anda ditolak. Sila cuba lagi.", "error");
+                        clearInterval(timerInterval);
+                        isExpired = true;
+                        updateRequestStatus();
+                        requestBtn.disabled = false;
+                        requestBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Hantar Permintaan Buka Sistem';
+                    }
+                }
+            }, (error) => {
+                console.error("Listener error:", error);
+            });
+    }
+    
+    // Create scan request
+    async function createScanRequest() {
+        const deviceInfo = navigator.userAgent.split(' ').slice(-2).join(' ');
+        const now = new Date();
+        
+        const requestData = {
+            deviceInfo: deviceInfo,
+            requestTime: Timestamp.now(),
+            requestTimeStr: now.toLocaleTimeString('ms-MY'),
+            requestDate: now.toLocaleDateString('ms-MY'),
+            status: 'pending',
+            expiresAt: new Date(now.getTime() + 180000)
+        };
+        
+        try {
+            const docRef = await addDoc(scanRequestsRef, requestData);
+            scanRequestId = docRef.id;
+            return true;
+        } catch (error) {
+            console.error("Error creating request:", error);
+            return false;
+        }
+    }
+    
+    async function addDoc(collectionRef, data) {
+        const newDocRef = doc(collectionRef);
+        await setDoc(newDocRef, data);
+        return newDocRef;
+    }
+    
+    // Add log entry
+    function addLog(message, type = 'info') {
+        const logContainer = document.getElementById('logList');
+        const logItem = document.createElement('div');
+        logItem.className = `log-item ${type === 'success' ? 'success' : (type === 'error' ? 'error' : 'warning')}`;
+        const time = new Date().toLocaleTimeString();
+        logItem.innerHTML = `<div class="log-name">${type === 'success' ? '✅' : (type === 'error' ? '❌' : '⚠️')} ${message}</div>
+            <div class="log-time"><span>${time}</span></div>`;
+        
+        if (logContainer.querySelector('.empty-log')) logContainer.innerHTML = '';
+        logContainer.insertBefore(logItem, logContainer.firstChild);
+        while (logContainer.children.length > 20) logContainer.removeChild(logContainer.lastChild);
+    }
+    
+    // Add attendance record
+    async function addAttendanceLog(name, ic, className, status, timeStr) {
+        const now = new Date();
+        const dateStr = now.toLocaleDateString('ms-MY');
+        const dayStr = now.toLocaleDateString('ms-MY', { weekday: 'long' });
+        
+        const logContainer = document.getElementById('logList');
+        const logItem = document.createElement('div');
+        logItem.className = `log-item success`;
+        const statusText = status === 'hadir' ? 'Hadir' : 'Lewat';
+        const statusClass = status === 'hadir' ? 'badge-hadir' : 'badge-lewat';
+        logItem.innerHTML = `<div class="log-name">✅ ${name}</div>
+            <div class="log-detail">IC: ${ic} | Kelas: ${className}</div>
+            <div class="log-time"><span><i class="fas fa-clock"></i> ${timeStr}</span>
+            <span class="badge-status ${statusClass}">${statusText}</span></div>`;
+        
+        if (logContainer.querySelector('.empty-log')) logContainer.innerHTML = '';
+        logContainer.insertBefore(logItem, logContainer.firstChild);
+        
+        try {
+            await setDoc(doc(attendanceRef, `${ic}_${dateStr.replace(/\//g, '-')}`), {
+                ic, name, className, scanDate: dateStr, day: dayStr, time: timeStr, status, timestamp: Timestamp.now()
+            });
+        } catch (error) { console.error("Error saving attendance:", error); }
+    }
+    
+    // Process QR Code scan
+    async function onScanSuccess(decodedText, decodedResult) {
+        if (!isApproved || isExpired) {
+            addLog("❌ Sistem kehadiran belum dibuka. Sila hantar permintaan.", "error");
+            return;
+        }
+        
+        try {
+            const qrData = JSON.parse(decodedText);
+            if (qrData.type === 'attendance' && qrData.ic && qrData.name) {
+                const currentTime = new Date();
+                const timeStr = currentTime.toLocaleTimeString('ms-MY', { hour: '2-digit', minute: '2-digit' });
+                const timeValue = timeStr;
+                
+                let status = 'hadir';
+                if (timeValue > settings.timeLate) status = 'lewat';
+                
+                const existing = await getDocs(query(attendanceRef, where("ic", "==", qrData.ic), where("scanDate", "==", new Date().toLocaleDateString('ms-MY'))));
+                if (!existing.empty) {
+                    addLog(`${qrData.name} - Kehadiran sudah direkodkan hari ini`, "warning");
+                    return;
+                }
+                
+                await addAttendanceLog(qrData.name, qrData.ic, qrData.class || '-', status, timeStr);
+                addLog(`${qrData.name} - Kehadiran direkod (${status === 'hadir' ? 'Hadir' : 'Lewat'})`, "success");
+            } else {
+                addLog("QR Code tidak sah. Sila gunakan QR Code kehadiran yang betul.", "error");
+            }
+        } catch (e) {
+            addLog("QR Code tidak dikenali. Sila gunakan QR Code kehadiran yang disediakan.", "error");
+        }
+    }
+    
+    // Handle request button click
+    requestBtn.onclick = async () => {
+        if (isApproved) {
+            addLog("Sistem kehadiran sudah dibuka. Anda boleh terus scan QR Code.", "warning");
+            if (!isScanning) startScannerAuto();
+            return;
+        }
+        
+        if (!navigator.onLine) {
+            addLog("Tiada sambungan internet. Sila sambung ke internet.", "error");
+            return;
+        }
+        
+        requestBtn.disabled = true;
+        requestBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menghantar permintaan...';
+        
+        const success = await createScanRequest();
+        if (success) {
+            timeLeft = 180;
+            updateTimerDisplay();
+            startTimer();
+            listenRequestStatus();
+            updateRequestStatus();
+            addLog("Permintaan dihantar. Sila tunggu kelulusan dari kaunselor/guru.", "info");
+            requestBtn.innerHTML = '<i class="fas fa-hourglass-half"></i> Menunggu Kelulusan...';
+        } else {
+            addLog("Gagal menghantar permintaan. Sila cuba lagi.", "error");
+            requestBtn.disabled = false;
+            requestBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Hantar Permintaan Buka Sistem';
+        }
+    };
+    
+    // Stop camera button
+    stopScannerBtn.onclick = async () => {
+        await stopScanner();
+        addLog("📷 Kamera dihentikan.", "info");
+    };
+    
+    // Initialize QR Scanner (without auto-start)
+    function initScanner() {
+        html5QrCode = new Html5Qrcode("reader");
+    }
+    
+    // Initialize system
+    async function init() {
+        updateLiveDateTime();
+        await loadSettings();
+        await loadHolidays();
+        
+        const holidayCheck = checkTodayIsHoliday();
+        if (holidayCheck.isHoliday) {
+            isHoliday = true;
+            holidayWarningDiv.style.display = 'block';
+            document.getElementById('holidayMessage').innerHTML = `${holidayCheck.reason}. Sistem kehadiran ditutup.`;
+            securitySection.style.display = 'none';
+            scannerSection.style.display = 'none';
+            logSection.style.display = 'none';
+            return;
+        }
+        
+        holidayWarningDiv.style.display = 'none';
+        securitySection.style.display = 'block';
+        initScanner();
+        updateTimerDisplay();
+    }
+    
+    init();
+</script>
+</body>
+</html>

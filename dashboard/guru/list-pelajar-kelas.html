@@ -126,7 +126,7 @@
             gap: 1rem;
             margin-bottom: 1rem;
         }
-        .btn-add, .btn-transfer {
+        .btn-add, .btn-transfer, .btn-print-class {
             background: linear-gradient(95deg, #10b981, #059669); 
             color: white; 
             border: none; 
@@ -140,7 +140,8 @@
             transition: 0.2s; 
         }
         .btn-transfer { background: linear-gradient(95deg, #f59e0b, #d97706); }
-        .btn-add:hover, .btn-transfer:hover { transform: translateY(-2px); }
+        .btn-print-class { background: linear-gradient(95deg, #8b5cf6, #7c3aed); }
+        .btn-add:hover, .btn-transfer:hover, .btn-print-class:hover { transform: translateY(-2px); }
         
         .search-bar { margin-bottom: 1.5rem; }
         .search-bar input { 
@@ -395,7 +396,7 @@
         .today-status-card .status-icon { font-size: 2rem; }
         .today-status-card .status-title { font-size: 1rem; font-weight: 800; }
         
-        /* Print QR styling - sama dengan dashboard-pelajar */
+        /* Print QR styling */
         .qr-print-card {
             width: 7cm;
             height: 10cm;
@@ -408,6 +409,33 @@
             justify-content: center;
             text-align: center;
             font-family: 'Plus Jakarta Sans', 'Segoe UI', Arial, sans-serif;
+            box-sizing: border-box;
+        }
+        
+        /* Print class grid styling */
+        @media print {
+            body { background: white; padding: 0; margin: 0; }
+            .no-print { display: none !important; }
+            .print-grid-page {
+                page-break-after: always;
+                margin: 0;
+                padding: 0.5cm;
+            }
+            .print-grid-page:last-child {
+                page-break-after: auto;
+            }
+            .print-grid {
+                display: grid;
+                grid-template-columns: repeat(3, 7cm);
+                gap: 0.3cm;
+                justify-content: center;
+                margin: 0 auto;
+            }
+            .qr-print-card {
+                border: 1px solid #ccc;
+                page-break-inside: avoid;
+                margin: 0;
+            }
         }
         
         @media (max-width: 700px) {
@@ -455,7 +483,8 @@
     <div id="mainContent">
         <div class="action-bar">
             <button class="btn-add" id="addStudentBtn"><i class="fas fa-plus"></i> Tambah Pelajar Baru</button>
-            <button class="btn-transfer" id="transferStudentsBtn"><i class="fas fa-exchange-alt"></i> Pindah Pelajar ke Tahun Baru</button>
+            <button class="btn-transfer" id="transferStudentsBtn"><i class="fas fa-exchange-alt"></i> Pindah Pelajar</button>
+            <button class="btn-print-class" id="printClassQrBtn"><i class="fas fa-print"></i> Print QR Kelas</button>
         </div>
         
         <div class="search-bar">
@@ -632,7 +661,7 @@
         return records.reduce((sum, r) => sum + (r.points || 0), 0);
     }
     
-    // ==================== PRINT QR CODE (SAMA SEPERTI DASHBOARD PELAJAR) ====================
+    // ==================== PRINT QR CODE INDIVIDU ====================
     function printQRCode(studentName, studentIC) {
         const printContainer = document.getElementById('printContainer');
         printContainer.style.display = 'block';
@@ -725,6 +754,170 @@
                 printContainer.innerHTML = '';
             }, 1000);
         }, 500);
+    }
+    
+    // ==================== PRINT ALL QR CODES IN CLASS (9 per page) ====================
+    async function printClassQRs() {
+        if (studentsList.length === 0) {
+            showAlert('Tiada pelajar dalam kelas ini', 'error');
+            return;
+        }
+        
+        showAlert('Sedang menyediakan QR Code untuk dicetak...', 'success');
+        
+        // Create a temporary container for all QR cards
+        const tempContainer = document.createElement('div');
+        tempContainer.style.cssText = 'position: absolute; left: -9999px; top: 0; width: 21.6cm;';
+        document.body.appendChild(tempContainer);
+        
+        const allCards = [];
+        
+        // Generate all QR cards
+        for (let i = 0; i < studentsList.length; i++) {
+            const student = studentsList[i];
+            
+            const cardDiv = document.createElement('div');
+            cardDiv.className = 'qr-print-card';
+            cardDiv.style.cssText = `
+                width: 7cm;
+                height: 10cm;
+                padding: 0.4cm;
+                background: white;
+                border: 1px solid #ccc;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                text-align: center;
+                font-family: 'Plus Jakarta Sans', 'Segoe UI', Arial, sans-serif;
+                box-sizing: border-box;
+                margin: 0;
+            `;
+            
+            cardDiv.innerHTML = `
+                <div style="font-size: 10pt; font-weight: bold; color: #4f46e5; margin-bottom: 0.2cm; text-transform: uppercase;">E-MIND CARE SEMSIRA</div>
+                <div id="tempQrCode_${i}" style="margin: 0.2cm 0; display: flex; justify-content: center; width: 120px; height: 120px;"></div>
+                <div style="font-size: 11pt; font-weight: bold; color: #1e293b; margin-top: 0.2cm; margin-bottom: 0.1cm;">${escapeHtml(student.fullname)}</div>
+                <div style="font-size: 9pt; color: #64748b; margin-bottom: 0.2cm;">No. IC: ${escapeHtml(student.icNumber)}</div>
+                <div style="font-size: 7pt; color: #94a3b8; margin-top: 0.2cm; border-top: 0.5px dashed #cbd5e1; padding-top: 0.2cm;">Kad Kehadiran Digital • Scan untuk rekod kehadiran</div>
+            `;
+            
+            tempContainer.appendChild(cardDiv);
+            
+            // Generate QR code inside the card
+            const qrData = JSON.stringify({ ic: student.icNumber, name: student.fullname, type: 'attendance' });
+            new QRCode(document.getElementById(`tempQrCode_${i}`), {
+                text: qrData,
+                width: 120,
+                height: 120,
+                colorDark: "#1e293b",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.M
+            });
+            
+            allCards.push(cardDiv);
+        }
+        
+        // Wait for QR codes to generate
+        setTimeout(() => {
+            // Build pages with 9 cards each (3x3 grid)
+            const pages = [];
+            const cardsPerPage = 9;
+            
+            for (let i = 0; i < allCards.length; i += cardsPerPage) {
+                const pageCards = allCards.slice(i, i + cardsPerPage);
+                pages.push(pageCards);
+            }
+            
+            // Create print HTML
+            let printHtml = `<!DOCTYPE html>
+            <html>
+            <head>
+                <meta charset="UTF-8">
+                <title>QR Code Kehadiran - Kelas ${escapeHtml(currentClass)} (${currentYear})</title>
+                <style>
+                    * { margin: 0; padding: 0; box-sizing: border-box; }
+                    body { 
+                        font-family: 'Plus Jakarta Sans', 'Segoe UI', Arial, sans-serif; 
+                        background: white; 
+                        margin: 0; 
+                        padding: 0.5cm;
+                    }
+                    .page {
+                        page-break-after: always;
+                        margin: 0;
+                        padding: 0;
+                    }
+                    .page:last-child {
+                        page-break-after: auto;
+                    }
+                    .grid {
+                        display: grid;
+                        grid-template-columns: repeat(3, 7cm);
+                        gap: 0.3cm;
+                        justify-content: center;
+                        margin: 0 auto;
+                    }
+                    .qr-print-card {
+                        width: 7cm;
+                        height: 10cm;
+                        padding: 0.4cm;
+                        background: white;
+                        border: 1px solid #ccc;
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                        justify-content: center;
+                        text-align: center;
+                        font-family: 'Plus Jakarta Sans', 'Segoe UI', Arial, sans-serif;
+                        box-sizing: border-box;
+                        page-break-inside: avoid;
+                    }
+                    .header-info {
+                        text-align: center;
+                        margin-bottom: 0.5cm;
+                        font-size: 12pt;
+                    }
+                    @media print {
+                        body { margin: 0; padding: 0.5cm; }
+                        .page { page-break-after: always; }
+                        .page:last-child { page-break-after: auto; }
+                    }
+                </style>
+            </head>
+            <body>`;
+            
+            // Add header info on first page only
+            printHtml += `<div class="header-info" style="text-align:center; margin-bottom:0.5cm;">
+                <h2>QR CODE KEHADIRAN PELAJAR</h2>
+                <p>Kelas: ${escapeHtml(currentClass)} | Tahun: ${currentYear} | Jumlah Pelajar: ${studentsList.length}</p>
+                <hr>
+            </div>`;
+            
+            for (let p = 0; p < pages.length; p++) {
+                printHtml += `<div class="page"><div class="grid">`;
+                for (const card of pages[p]) {
+                    printHtml += card.outerHTML;
+                }
+                printHtml += `</div></div>`;
+            }
+            
+            printHtml += `</body></html>`;
+            
+            // Open print window
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(printHtml);
+            printWindow.document.close();
+            
+            printWindow.onload = () => {
+                printWindow.print();
+            };
+            
+            // Clean up
+            setTimeout(() => {
+                document.body.removeChild(tempContainer);
+            }, 2000);
+        }, 1000);
     }
     
     // ==================== SHOW ATTENDANCE MODAL ====================
@@ -945,6 +1138,7 @@
     };
     
     document.getElementById('addStudentBtn').addEventListener('click', openAddStudentModal);
+    document.getElementById('printClassQrBtn').addEventListener('click', printClassQRs);
     document.getElementById('studentForm').addEventListener('submit', async (e) => {
         e.preventDefault();
         const id = document.getElementById('studentId').value;

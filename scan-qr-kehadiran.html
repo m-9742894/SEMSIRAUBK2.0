@@ -123,6 +123,20 @@
         .guru-verified { background: #064e3b; color: #10b981; }
         .guru-error { background: #450a0a; color: #ef4444; }
         
+        /* System Closed Warning */
+        .system-closed {
+            background: #450a0a;
+            border: 1px solid #ef4444;
+            border-radius: 1rem;
+            padding: 1rem;
+            text-align: center;
+            margin-bottom: 1rem;
+            display: none;
+        }
+        .system-closed i { font-size: 2rem; color: #ef4444; margin-bottom: 0.5rem; }
+        .system-closed h4 { color: #fca5a5; margin-bottom: 0.3rem; }
+        .system-closed p { color: #fecaca; font-size: 0.8rem; }
+        
         /* QR Scanner Section (untuk scan QR pelajar) */
         .scanner-section {
             background: #1e293b;
@@ -240,6 +254,13 @@
         <p id="holidayMessage">Hari ini adalah hari cuti umum / cuti mingguan.</p>
     </div>
 
+    <!-- System Closed Warning (selepas masa tutup) -->
+    <div id="systemClosedWarning" class="system-closed">
+        <i class="fas fa-lock"></i>
+        <h4>Sistem Kehadiran Ditutup</h4>
+        <p id="closedMessage">Waktu kehadiran telah tamat. Sila hubungi kaunselor.</p>
+    </div>
+
     <!-- Guru Verification Section -->
     <div id="guruSection" class="guru-section">
         <i class="fas fa-chalkboard-user" style="font-size: 2rem; color: #fbbf24;"></i>
@@ -322,6 +343,8 @@
     let guruVerified = false;
     let currentGuruName = "";
     let attendanceSettings = { timeOpen: "07:00", timeLate: "08:00", timeClose: "16:00" };
+    let isAfterCloseTime = false;
+    let scannedStudents = new Set(); // Track scanned students in current session (to prevent duplicate log display)
     
     // DOM Elements
     const scanGuruBtn = document.getElementById('scanGuruBtn');
@@ -333,6 +356,7 @@
     const stopStudentScannerBtn = document.getElementById('stopStudentScannerBtn');
     const studentScanningStatus = document.getElementById('studentScanningStatus');
     const logList = document.getElementById('logList');
+    const systemClosedWarning = document.getElementById('systemClosedWarning');
     
     // Live DateTime
     function updateDateTime() {
@@ -340,9 +364,34 @@
         document.getElementById('currentDate').innerHTML = now.toLocaleDateString('ms-MY', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
         document.getElementById('currentTime').innerHTML = now.toLocaleTimeString('ms-MY', { hour: '2-digit', minute: '2-digit' });
         document.getElementById('liveTimer').innerHTML = now.toLocaleTimeString('ms-MY', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        
+        // Check if current time is after close time
+        if (attendanceSettings.timeClose) {
+            const currentTimeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
+            if (currentTimeStr > attendanceSettings.timeClose) {
+                if (!isAfterCloseTime) {
+                    isAfterCloseTime = true;
+                    if (isSystemOpen) {
+                        closeSystemDueToTime();
+                    }
+                }
+            }
+        }
     }
     setInterval(updateDateTime, 1000);
     updateDateTime();
+    
+    // Close system due to time exceeded
+    async function closeSystemDueToTime() {
+        isSystemOpen = false;
+        systemClosedWarning.style.display = 'block';
+        document.getElementById('closedMessage').innerHTML = `Waktu kehadiran telah tamat (selepas ${attendanceSettings.timeClose}). Sila hubungi kaunselor.`;
+        studentScannerSection.style.display = 'none';
+        if (studentHtml5Qr) {
+            try { await studentHtml5Qr.stop(); } catch(e) {}
+        }
+        document.getElementById('scannerStatus').innerHTML = '⏰ Sistem ditutup - Melebihi waktu kehadiran';
+    }
     
     // Load attendance settings from Firestore
     async function loadAttendanceSettings() {
@@ -354,6 +403,13 @@
                 if (data.timeLate) attendanceSettings.timeLate = data.timeLate;
                 if (data.timeClose) attendanceSettings.timeClose = data.timeClose;
                 console.log("Attendance settings loaded:", attendanceSettings);
+                
+                // Check if current time is after close time
+                const now = new Date();
+                const currentTimeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
+                if (currentTimeStr > attendanceSettings.timeClose) {
+                    isAfterCloseTime = true;
+                }
             }
         } catch (error) {
             console.error("Error loading settings:", error);
@@ -382,7 +438,6 @@
     
     // Get status based on current time
     function getAttendanceStatus(currentTime) {
-        // Format time to HH:MM for comparison
         const timeStr = currentTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
         
         if (timeStr <= attendanceSettings.timeOpen) {
@@ -394,8 +449,21 @@
         }
     }
     
-    // Add attendance record with proper status
-    function addLog(name, ic, className, status, statusText, timeStr) {
+    // Check if student already has a log entry for today (in Firestore)
+    async function hasAttendanceToday(ic) {
+        const today = new Date().toLocaleDateString('ms-MY');
+        const existing = await getDocs(query(attendanceRef, where("ic", "==", ic), where("scanDate", "==", today)));
+        return !existing.empty;
+    }
+    
+    // Add attendance record to log (only once per student)
+    async function addAttendanceLog(name, ic, className, status, statusText, timeStr, isFromExisting = false) {
+        // Check if already logged in current session
+        if (scannedStudents.has(ic)) {
+            console.log(`Already logged: ${name}, skipping duplicate log`);
+            return false;
+        }
+        
         const logContainer = document.getElementById('logList');
         if (logContainer.querySelector('.empty-log')) logContainer.innerHTML = '';
         
@@ -412,10 +480,15 @@
             </div>`;
         logContainer.insertBefore(logItem, logContainer.firstChild);
         
+        // Mark as scanned in this session
+        scannedStudents.add(ic);
+        
         // Keep only last 20 logs
         while (logContainer.children.length > 20) {
             logContainer.removeChild(logContainer.lastChild);
         }
+        
+        return true;
     }
     
     // Save attendance to Firestore
@@ -435,12 +508,35 @@
                 timestamp: Timestamp.now()
             });
             console.log(`Attendance saved: ${name} - ${statusText} at ${timeStr}`);
+            return true;
         } catch (error) {
             console.error("Error saving attendance:", error);
+            return false;
         }
     }
     
+    // Check if student already scanned today and display existing record
+    async function checkExistingAttendance(ic, name, className) {
+        const today = new Date().toLocaleDateString('ms-MY');
+        const existing = await getDocs(query(attendanceRef, where("ic", "==", ic), where("scanDate", "==", today)));
+        
+        if (!existing.empty) {
+            const record = existing.docs[0].data();
+            // Display existing record in log (if not already displayed)
+            await addAttendanceLog(name, ic, className, record.status, record.statusText, record.time, true);
+            return true;
+        }
+        return false;
+    }
+    
     async function verifyGuruQR(qrData) {
+        // Check if system is already closed due to time
+        if (isAfterCloseTime) {
+            systemClosedWarning.style.display = 'block';
+            document.getElementById('closedMessage').innerHTML = `Waktu kehadiran telah tamat (selepas ${attendanceSettings.timeClose}). Sila hubungi kaunselor.`;
+            return false;
+        }
+        
         try {
             let guruData;
             if (typeof qrData === 'string') {
@@ -469,14 +565,11 @@
                 }
                 guruScannerModal.style.display = 'none';
                 document.getElementById('guruSection').style.display = 'none';
+                systemClosedWarning.style.display = 'none';
                 
                 studentScannerSection.style.display = 'block';
                 document.getElementById('logSection').style.display = 'block';
-                document.getElementById('scannerStatus').innerHTML = '✅ Sistem dibuka - Sila scan QR pelajar';
-                
-                // Display current attendance time rules
-                const timeRuleMsg = `⏰ Waktu Kehadiran: Hadir (sebelum ${attendanceSettings.timeOpen}) | Lewat (${attendanceSettings.timeOpen} - ${attendanceSettings.timeLate}) | Melebihi waktu (selepas ${attendanceSettings.timeLate})`;
-                console.log(timeRuleMsg);
+                document.getElementById('scannerStatus').innerHTML = `✅ Sistem dibuka - Waktu tutup: ${attendanceSettings.timeClose}`;
                 
                 startStudentScanner();
                 return true;
@@ -527,6 +620,15 @@
     
     async function startStudentScanner() {
         if (!isSystemOpen) return;
+        
+        // Check if already closed due to time
+        const now = new Date();
+        const currentTimeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
+        if (currentTimeStr > attendanceSettings.timeClose) {
+            await closeSystemDueToTime();
+            return;
+        }
+        
         const studentReaderDiv = document.getElementById('studentReader');
         studentReaderDiv.innerHTML = '';
         studentHtml5Qr = new Html5Qrcode("studentReader");
@@ -536,19 +638,28 @@
                 { fps: 10, qrbox: 250 },
                 async (decodedText) => {
                     if (!isSystemOpen) {
-                        alert("Sistem kehadiran belum dibuka");
+                        alert("Sistem kehadiran belum dibuka atau telah ditutup");
                         return;
                     }
+                    
+                    // Check time again before processing
+                    const currentTime = new Date();
+                    const currentTimeStr = currentTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
+                    if (currentTimeStr > attendanceSettings.timeClose) {
+                        await closeSystemDueToTime();
+                        alert("Waktu kehadiran telah tamat. Sistem ditutup.");
+                        return;
+                    }
+                    
                     try {
                         const qrData = JSON.parse(decodedText);
                         if (qrData.type === 'attendance' && qrData.ic && qrData.name) {
-                            const today = new Date().toLocaleDateString('ms-MY');
+                            // Check if already scanned today (from Firestore)
+                            const alreadyAttended = await hasAttendanceToday(qrData.ic);
                             
-                            // Check if already scanned today
-                            const existing = await getDocs(query(attendanceRef, where("ic", "==", qrData.ic), where("scanDate", "==", today)));
-                            if (!existing.empty) {
-                                const existingRecord = existing.docs[0].data();
-                                addLog(`${qrData.name} - Kehadiran sudah direkodkan hari ini (${existingRecord.statusText || existingRecord.status})`, qrData.ic, qrData.class || '-', existingRecord.status, existingRecord.statusText, existingRecord.time);
+                            if (alreadyAttended) {
+                                // Display existing record without re-saving
+                                await checkExistingAttendance(qrData.ic, qrData.name, qrData.class || '-');
                                 return;
                             }
                             
@@ -557,11 +668,12 @@
                             const timeStr = now.toLocaleTimeString('ms-MY', { hour: '2-digit', minute: '2-digit' });
                             const statusInfo = getAttendanceStatus(now);
                             
-                            // Add to log display
-                            addLog(qrData.name, qrData.ic, qrData.class || '-', statusInfo.status, statusInfo.text, timeStr);
+                            // Add to log display (only once)
+                            await addAttendanceLog(qrData.name, qrData.ic, qrData.class || '-', statusInfo.status, statusInfo.text, timeStr);
                             
                             // Save to Firestore
                             await saveAttendanceToFirestore(qrData.name, qrData.ic, qrData.class || '-', statusInfo.status, statusInfo.text, timeStr);
+                            
                         } else {
                             const logContainer = document.getElementById('logList');
                             const errorItem = document.createElement('div');
@@ -586,7 +698,7 @@
                 },
                 (error) => { console.log("Scan error:", error); }
             );
-            studentScanningStatus.innerHTML = '✅ Kamera aktif. Hadapkan QR Code pelajar ke kamera.';
+            studentScanningStatus.innerHTML = `✅ Kamera aktif. Waktu tutup: ${attendanceSettings.timeClose}`;
             stopStudentScannerBtn.disabled = false;
         } catch(err) {
             studentScanningStatus.innerHTML = '❌ Gagal mengakses kamera.';

@@ -24,7 +24,6 @@
         }
         .container { max-width: 800px; margin: 0 auto; }
         
-        /* Header */
         .header {
             display: flex;
             justify-content: space-between;
@@ -64,7 +63,6 @@
         }
         .back-btn:hover { background: rgba(255,255,255,0.2); }
         
-        /* Live DateTime */
         .live-datetime {
             background: linear-gradient(135deg, #1e293b, #0f172a);
             border-radius: 1rem;
@@ -90,7 +88,6 @@
             color: #fbbf24;
         }
         
-        /* Security Section */
         .security-section {
             background: #1e293b;
             border-radius: 1.5rem;
@@ -122,11 +119,7 @@
             margin-top: 0.5rem;
         }
         .request-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(16,185,129,0.3); }
-        .request-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
-        }
+        .request-btn:disabled { opacity: 0.5; cursor: not-allowed; }
         .status-badge {
             display: inline-block;
             padding: 0.3rem 1rem;
@@ -138,8 +131,8 @@
         .status-pending { background: #f59e0b; color: #78350f; }
         .status-approved { background: #10b981; color: white; }
         .status-expired { background: #ef4444; color: white; }
+        .status-rejected { background: #ef4444; color: white; }
         
-        /* QR Scanner Section */
         .scanner-section {
             background: #1e293b;
             border-radius: 1.5rem;
@@ -157,17 +150,8 @@
             gap: 0.5rem;
         }
         .scanner-header h3 { color: white; font-size: 1rem; }
-        #reader {
-            width: 100%;
-            border-radius: 1rem;
-            overflow: hidden;
-        }
-        .camera-controls {
-            display: flex;
-            gap: 1rem;
-            margin-top: 1rem;
-            justify-content: center;
-        }
+        #reader { width: 100%; border-radius: 1rem; overflow: hidden; }
+        .camera-controls { display: flex; gap: 1rem; margin-top: 1rem; justify-content: center; }
         .cam-btn {
             padding: 0.5rem 1rem;
             border-radius: 2rem;
@@ -182,14 +166,8 @@
         .cam-stop { background: #ef4444; color: white; }
         .cam-stop:hover:not(:disabled) { background: #dc2626; transform: translateY(-2px); }
         .cam-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-        .scanning-status {
-            font-size: 0.7rem;
-            color: #fbbf24;
-            margin-top: 0.5rem;
-            text-align: center;
-        }
+        .scanning-status { font-size: 0.7rem; color: #fbbf24; margin-top: 0.5rem; text-align: center; }
         
-        /* Attendance Log */
         .log-section {
             background: #1e293b;
             border-radius: 1.5rem;
@@ -198,10 +176,7 @@
             display: none;
         }
         .log-header h3 { color: white; font-size: 1rem; margin-bottom: 1rem; }
-        .log-list {
-            max-height: 350px;
-            overflow-y: auto;
-        }
+        .log-list { max-height: 350px; overflow-y: auto; }
         .log-item {
             background: #0f172a;
             border-radius: 1rem;
@@ -242,6 +217,15 @@
         .closed-section h3 { color: white; margin-bottom: 0.5rem; }
         .closed-section p { color: #94a3b8; font-size: 0.8rem; }
         
+        .rejected-message {
+            background: #450a0a;
+            border: 1px solid #ef4444;
+            padding: 1rem;
+            border-radius: 1rem;
+            margin-top: 1rem;
+            color: #fca5a5;
+        }
+        
         @media (max-width: 600px) {
             body { padding: 10px; }
             .timer-display { font-size: 2rem; }
@@ -262,8 +246,7 @@
         <a href="../portal-utama.html" class="back-btn"><i class="fas fa-arrow-left"></i> Kembali</a>
     </div>
 
-    <!-- Live DateTime -->
-    <div class="live-datetime" id="liveDateTime">
+    <div class="live-datetime">
         <div class="datetime-left">
             <i class="fas fa-calendar-alt"></i>
             <span id="currentDate">-</span>
@@ -273,27 +256,29 @@
         <div class="datetime-right" id="liveTimer">-</div>
     </div>
 
-    <!-- Holiday Warning / System Closed -->
     <div id="holidayWarning" class="closed-section" style="display: none;">
         <i class="fas fa-umbrella-beach"></i>
         <h3>Sistem Kehadiran Ditutup</h3>
         <p id="holidayMessage">Hari ini adalah hari cuti umum / cuti mingguan.</p>
-        <p style="margin-top: 0.5rem; font-size: 0.7rem;">Sila hubungi kaunselor untuk sebarang pertanyaan.</p>
+        <p>Sila hubungi kaunselor untuk sebarang pertanyaan.</p>
     </div>
 
-    <!-- Security Section (only show if not holiday) -->
+    <!-- Security Section (Paparan awal) -->
     <div id="securitySection" class="security-section">
         <i class="fas fa-shield-alt" style="font-size: 2rem; color: #fbbf24;"></i>
         <h3 style="color: white; margin-top: 0.5rem;">Pengesahan Keselamatan</h3>
-        <p style="color: #94a3b8; font-size: 0.8rem; margin-top: 0.3rem;">Hantar permintaan untuk membuka sistem scan</p>
+        <p style="color: #94a3b8; font-size: 0.8rem;">Hantar permintaan untuk membuka sistem scan</p>
         <div class="timer-display" id="timerDisplay">03:00</div>
         <button class="request-btn" id="requestBtn">
             <i class="fas fa-paper-plane"></i> Hantar Permintaan Buka Sistem
         </button>
         <div id="requestStatus"></div>
+        <div id="rejectedMessage" style="display: none;" class="rejected-message">
+            <i class="fas fa-times-circle"></i> Permohonan anda telah ditolak. Sila cuba lagi.
+        </div>
     </div>
 
-    <!-- QR Scanner Section -->
+    <!-- Scanner Section (Akan muncul bila approved) -->
     <div id="scannerSection" class="scanner-section">
         <div class="scanner-header">
             <h3><i class="fas fa-camera"></i> Scanner QR Code</h3>
@@ -306,7 +291,7 @@
         <div id="scanningStatus" class="scanning-status"></div>
     </div>
 
-    <!-- Attendance Log -->
+    <!-- Log Section -->
     <div id="logSection" class="log-section">
         <div class="log-header">
             <h3><i class="fas fa-list-alt"></i> Log Kehadiran</h3>
@@ -315,7 +300,7 @@
             <div class="empty-log">
                 <i class="fas fa-info-circle"></i>
                 <p>Tiada rekod kehadiran</p>
-                <p style="font-size: 0.7rem;">Scan QR Code untuk rekod kehadiran</p>
+                <p>Scan QR Code untuk rekod kehadiran</p>
             </div>
         </div>
         <div class="info-note">
@@ -341,25 +326,17 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     
-    // References
     const scanRequestsRef = collection(db, "scan_requests");
     const attendanceRef = collection(db, "attendance_records");
     const settingsRef = doc(db, "attendance_settings", "main");
     const holidaysRef = collection(db, "attendance_holidays");
     
-    // Global variables
     let html5QrCode = null;
-    let scanRequestId = null;
+    let currentRequestId = null;
     let timerInterval = null;
     let timeLeft = 180;
     let isApproved = false;
-    let isExpired = false;
-    let isHoliday = false;
-    let isScanning = false;
-    let settings = { timeOpen: "07:00", timeLate: "08:00", timeClose: "16:00" };
-    let weekdayHolidays = [];
-    let generalHolidays = [];
-    let requestListenerUnsubscribe = null;
+    let isWaiting = false;
     
     // DOM Elements
     const requestBtn = document.getElementById('requestBtn');
@@ -367,97 +344,50 @@
     const requestStatus = document.getElementById('requestStatus');
     const scannerSection = document.getElementById('scannerSection');
     const logSection = document.getElementById('logSection');
-    const stopScannerBtn = document.getElementById('stopScannerBtn');
-    const scannerStatus = document.getElementById('scannerStatus');
-    const scanningStatus = document.getElementById('scanningStatus');
-    const logList = document.getElementById('logList');
-    const holidayWarningDiv = document.getElementById('holidayWarning');
     const securitySection = document.getElementById('securitySection');
-    const currentDateSpan = document.getElementById('currentDate');
-    const currentTimeSpan = document.getElementById('currentTime');
-    const liveTimerSpan = document.getElementById('liveTimer');
+    const stopScannerBtn = document.getElementById('stopScannerBtn');
+    const scanningStatus = document.getElementById('scanningStatus');
+    const rejectedMessage = document.getElementById('rejectedMessage');
     
-    // Live DateTime update
-    function updateLiveDateTime() {
+    // Live DateTime
+    function updateDateTime() {
         const now = new Date();
-        const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
-        currentDateSpan.innerHTML = now.toLocaleDateString('ms-MY', options);
-        currentTimeSpan.innerHTML = now.toLocaleTimeString('ms-MY', { hour: '2-digit', minute: '2-digit' });
-        liveTimerSpan.innerHTML = now.toLocaleTimeString('ms-MY', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        document.getElementById('currentDate').innerHTML = now.toLocaleDateString('ms-MY', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+        document.getElementById('currentTime').innerHTML = now.toLocaleTimeString('ms-MY', { hour: '2-digit', minute: '2-digit' });
+        document.getElementById('liveTimer').innerHTML = now.toLocaleTimeString('ms-MY', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
     }
-    setInterval(updateLiveDateTime, 1000);
+    setInterval(updateDateTime, 1000);
+    updateDateTime();
     
-    // Load settings
-    async function loadSettings() {
-        try {
-            const docSnap = await getDoc(settingsRef);
-            if (docSnap.exists()) {
-                const data = docSnap.data();
-                if (data.timeOpen) settings.timeOpen = data.timeOpen;
-                if (data.timeLate) settings.timeLate = data.timeLate;
-                if (data.timeClose) settings.timeClose = data.timeClose;
-                if (data.weekdayHolidays) weekdayHolidays = data.weekdayHolidays;
-            }
-        } catch (error) { console.error("Error loading settings:", error); }
-    }
-    
-    // Load general holidays
-    async function loadHolidays() {
-        try {
-            const snapshot = await getDocs(holidaysRef);
-            generalHolidays = [];
-            snapshot.forEach(doc => {
-                const data = doc.data();
-                generalHolidays.push({ startDate: data.startDate, endDate: data.endDate, name: data.name });
-            });
-        } catch (error) { console.error("Error loading holidays:", error); }
-    }
-    
-    // Check if today is holiday
-    function checkTodayIsHoliday() {
-        const today = new Date();
-        const todayISO = today.toISOString().split('T')[0];
-        const dayName = today.toLocaleDateString('en-US', { weekday: 'long' });
-        
-        if (weekdayHolidays.includes(dayName)) {
-            return { isHoliday: true, reason: `Hari cuti mingguan (${getDayNameMalay(dayName)})` };
-        }
-        
-        for (const holiday of generalHolidays) {
-            if (todayISO >= holiday.startDate && todayISO <= holiday.endDate) {
-                return { isHoliday: true, reason: holiday.name };
-            }
-        }
-        return { isHoliday: false, reason: null };
-    }
-    
-    function getDayNameMalay(day) {
-        const days = { Sunday: 'Ahad', Monday: 'Isnin', Tuesday: 'Selasa', Wednesday: 'Rabu', Thursday: 'Khamis', Friday: 'Jumaat', Saturday: 'Sabtu' };
-        return days[day] || day;
-    }
-    
-    // Update timer display
     function updateTimerDisplay() {
         const minutes = Math.floor(timeLeft / 60);
         const seconds = timeLeft % 60;
         timerDisplay.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
     }
     
-    // Start timer countdown
+    function stopTimer() {
+        if (timerInterval) {
+            clearInterval(timerInterval);
+            timerInterval = null;
+        }
+    }
+    
     function startTimer() {
-        if (timerInterval) clearInterval(timerInterval);
+        stopTimer();
         timerInterval = setInterval(() => {
             if (timeLeft <= 0) {
-                clearInterval(timerInterval);
-                isExpired = true;
+                stopTimer();
                 isApproved = false;
-                updateRequestStatus();
-                stopScanner();
-                requestBtn.disabled = false;
-                requestBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Hantar Permintaan Buka Sistem';
+                isWaiting = false;
+                securitySection.style.display = 'block';
                 scannerSection.style.display = 'none';
                 logSection.style.display = 'none';
-                addLog("Masa permintaan telah tamat. Sila hantar permintaan baharu.", "warning");
+                requestBtn.disabled = false;
+                requestBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Hantar Permintaan Buka Sistem';
+                requestStatus.innerHTML = '<span class="status-badge status-expired"><i class="fas fa-clock"></i> Masa tamat. Sila hantar permintaan baru.</span>';
+                if (html5QrCode) {
+                    try { html5QrCode.stop(); } catch(e) {}
+                }
             } else {
                 timeLeft--;
                 updateTimerDisplay();
@@ -465,97 +395,79 @@
         }, 1000);
     }
     
-    // Stop scanner
     async function stopScanner() {
-        if (isScanning && html5QrCode) {
-            try {
-                await html5QrCode.stop();
-                isScanning = false;
-                scanningStatus.innerHTML = '';
-                stopScannerBtn.disabled = true;
-            } catch(e) { console.log("Scanner stop error:", e); }
+        if (html5QrCode) {
+            try { await html5QrCode.stop(); } catch(e) {}
         }
+        scanningStatus.innerHTML = '';
+        stopScannerBtn.disabled = true;
     }
     
-    // Start scanner automatically
-    async function startScannerAuto() {
-        if (!isApproved || isExpired) return;
-        if (isScanning) return;
-        
+    async function startScanner() {
+        if (!isApproved) return;
         scanningStatus.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memulakan kamera...';
-        
         try {
             await html5QrCode.start(
                 { facingMode: "environment" },
                 { fps: 10, qrbox: 250 },
                 onScanSuccess,
-                (errorMessage) => { console.log("Scan error:", errorMessage); }
+                () => {}
             );
-            isScanning = true;
             scanningStatus.innerHTML = '✅ Kamera aktif. Hadapkan QR Code ke kamera.';
             stopScannerBtn.disabled = false;
-            addLog("📷 Kamera diaktifkan secara automatik. Hadapkan QR Code ke kamera.", "info");
-        } catch (err) {
-            console.error("Camera start error:", err);
-            scanningStatus.innerHTML = '❌ Gagal mengakses kamera. Pastikan kebenaran kamera diberikan.';
-            addLog("Gagal mengakses kamera. Pastikan kebenaran kamera diberikan.", "error");
+        } catch(err) {
+            scanningStatus.innerHTML = '❌ Gagal mengakses kamera. Pastikan kebenaran diberikan.';
         }
     }
     
-    // Update request status display
-    function updateRequestStatus() {
-        if (isExpired) {
-            requestStatus.innerHTML = '<span class="status-badge status-expired"><i class="fas fa-clock"></i> Permintaan Tamat</span>';
-            scannerStatus.innerHTML = 'Permintaan tamat - hantar permintaan baharu';
-        } else if (isApproved) {
-            requestStatus.innerHTML = '<span class="status-badge status-approved"><i class="fas fa-check-circle"></i> Sistem Dibuka - Sila Scan QR Code</span>';
-            scannerStatus.innerHTML = '✅ Sistem dibuka - Kamera akan mula secara automatik';
-            scannerSection.style.display = 'block';
-            logSection.style.display = 'block';
-            // Auto start scanner when approved
-            setTimeout(() => {
-                if (isApproved && !isExpired && !isScanning) {
-                    startScannerAuto();
-                }
-            }, 500);
-        } else {
-            requestStatus.innerHTML = '<span class="status-badge status-pending"><i class="fas fa-hourglass-half"></i> Menunggu kelulusan kaunselor/guru</span>';
-            scannerStatus.innerHTML = '⏳ Menunggu kelulusan kaunselor/guru';
-        }
+    function showApproved() {
+        isApproved = true;
+        securitySection.style.display = 'none';
+        scannerSection.style.display = 'block';
+        logSection.style.display = 'block';
+        requestStatus.innerHTML = '<span class="status-badge status-approved"><i class="fas fa-check-circle"></i> Sistem Dibuka - Sila Scan QR Code</span>';
+        startScanner();
     }
     
-    // Listen to request status
-    function listenRequestStatus() {
-        if (!scanRequestId) return;
-        if (requestListenerUnsubscribe) requestListenerUnsubscribe();
-        
-        requestListenerUnsubscribe = db.collection("scan_requests").doc(scanRequestId)
+    function showRejected() {
+        isApproved = false;
+        isWaiting = false;
+        stopTimer();
+        securitySection.style.display = 'block';
+        scannerSection.style.display = 'none';
+        logSection.style.display = 'none';
+        requestBtn.disabled = false;
+        requestBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Hantar Permintaan Buka Sistem';
+        requestStatus.innerHTML = '';
+        rejectedMessage.style.display = 'block';
+        setTimeout(() => { rejectedMessage.style.display = 'none'; }, 4000);
+    }
+    
+    // Listen to Firestore real-time
+    function listenToRequest(requestId) {
+        if (!requestId) return;
+        const unsubscribe = db.collection("scan_requests").doc(requestId)
             .onSnapshot((doc) => {
                 if (doc.exists) {
                     const data = doc.data();
+                    console.log("Status update:", data.status);
                     if (data.status === 'approved' && !isApproved) {
-                        isApproved = true;
-                        updateRequestStatus();
-                        addLog("✅ Sistem kehadiran telah dibuka. Kamera akan mula secara automatik.", "success");
+                        showApproved();
                     } else if (data.status === 'rejected') {
-                        addLog("❌ Permintaan anda ditolak. Sila cuba lagi.", "error");
-                        clearInterval(timerInterval);
-                        isExpired = true;
-                        updateRequestStatus();
-                        requestBtn.disabled = false;
-                        requestBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Hantar Permintaan Buka Sistem';
+                        showRejected();
                     }
                 }
             }, (error) => {
                 console.error("Listener error:", error);
             });
+        return unsubscribe;
     }
     
-    // Create scan request
-    async function createScanRequest() {
+    let currentUnsubscribe = null;
+    
+    async function sendRequest() {
         const deviceInfo = navigator.userAgent.split(' ').slice(-2).join(' ');
         const now = new Date();
-        
         const requestData = {
             deviceInfo: deviceInfo,
             requestTime: Timestamp.now(),
@@ -566,158 +478,99 @@
         };
         
         try {
-            const docRef = await addDoc(scanRequestsRef, requestData);
-            scanRequestId = docRef.id;
-            return true;
+            const newDocRef = doc(scanRequestsRef);
+            await setDoc(newDocRef, requestData);
+            return newDocRef.id;
         } catch (error) {
-            console.error("Error creating request:", error);
-            return false;
+            console.error("Error:", error);
+            return null;
         }
     }
     
-    async function addDoc(collectionRef, data) {
-        const newDocRef = doc(collectionRef);
-        await setDoc(newDocRef, data);
-        return newDocRef;
-    }
-    
-    // Add log entry
-    function addLog(message, type = 'info') {
-        const logContainer = document.getElementById('logList');
-        const logItem = document.createElement('div');
-        logItem.className = `log-item ${type === 'success' ? 'success' : (type === 'error' ? 'error' : 'warning')}`;
-        const time = new Date().toLocaleTimeString();
-        logItem.innerHTML = `<div class="log-name">${type === 'success' ? '✅' : (type === 'error' ? '❌' : '⚠️')} ${message}</div>
-            <div class="log-time"><span>${time}</span></div>`;
-        
-        if (logContainer.querySelector('.empty-log')) logContainer.innerHTML = '';
-        logContainer.insertBefore(logItem, logContainer.firstChild);
-        while (logContainer.children.length > 20) logContainer.removeChild(logContainer.lastChild);
-    }
-    
-    // Add attendance record
-    async function addAttendanceLog(name, ic, className, status, timeStr) {
-        const now = new Date();
-        const dateStr = now.toLocaleDateString('ms-MY');
-        const dayStr = now.toLocaleDateString('ms-MY', { weekday: 'long' });
-        
-        const logContainer = document.getElementById('logList');
-        const logItem = document.createElement('div');
-        logItem.className = `log-item success`;
-        const statusText = status === 'hadir' ? 'Hadir' : 'Lewat';
-        const statusClass = status === 'hadir' ? 'badge-hadir' : 'badge-lewat';
-        logItem.innerHTML = `<div class="log-name">✅ ${name}</div>
-            <div class="log-detail">IC: ${ic} | Kelas: ${className}</div>
-            <div class="log-time"><span><i class="fas fa-clock"></i> ${timeStr}</span>
-            <span class="badge-status ${statusClass}">${statusText}</span></div>`;
-        
-        if (logContainer.querySelector('.empty-log')) logContainer.innerHTML = '';
-        logContainer.insertBefore(logItem, logContainer.firstChild);
-        
-        try {
-            await setDoc(doc(attendanceRef, `${ic}_${dateStr.replace(/\//g, '-')}`), {
-                ic, name, className, scanDate: dateStr, day: dayStr, time: timeStr, status, timestamp: Timestamp.now()
-            });
-        } catch (error) { console.error("Error saving attendance:", error); }
-    }
-    
-    // Process QR Code scan
-    async function onScanSuccess(decodedText, decodedResult) {
-        if (!isApproved || isExpired) {
-            addLog("❌ Sistem kehadiran belum dibuka. Sila hantar permintaan.", "error");
-            return;
-        }
-        
-        try {
-            const qrData = JSON.parse(decodedText);
-            if (qrData.type === 'attendance' && qrData.ic && qrData.name) {
-                const currentTime = new Date();
-                const timeStr = currentTime.toLocaleTimeString('ms-MY', { hour: '2-digit', minute: '2-digit' });
-                const timeValue = timeStr;
-                
-                let status = 'hadir';
-                if (timeValue > settings.timeLate) status = 'lewat';
-                
-                const existing = await getDocs(query(attendanceRef, where("ic", "==", qrData.ic), where("scanDate", "==", new Date().toLocaleDateString('ms-MY'))));
-                if (!existing.empty) {
-                    addLog(`${qrData.name} - Kehadiran sudah direkodkan hari ini`, "warning");
-                    return;
-                }
-                
-                await addAttendanceLog(qrData.name, qrData.ic, qrData.class || '-', status, timeStr);
-                addLog(`${qrData.name} - Kehadiran direkod (${status === 'hadir' ? 'Hadir' : 'Lewat'})`, "success");
-            } else {
-                addLog("QR Code tidak sah. Sila gunakan QR Code kehadiran yang betul.", "error");
-            }
-        } catch (e) {
-            addLog("QR Code tidak dikenali. Sila gunakan QR Code kehadiran yang disediakan.", "error");
-        }
-    }
-    
-    // Handle request button click
     requestBtn.onclick = async () => {
         if (isApproved) {
-            addLog("Sistem kehadiran sudah dibuka. Anda boleh terus scan QR Code.", "warning");
-            if (!isScanning) startScannerAuto();
+            if (html5QrCode && !html5QrCode.isScanning) startScanner();
             return;
         }
-        
-        if (!navigator.onLine) {
-            addLog("Tiada sambungan internet. Sila sambung ke internet.", "error");
-            return;
-        }
+        if (isWaiting) return;
         
         requestBtn.disabled = true;
-        requestBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menghantar permintaan...';
+        requestBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menghantar...';
         
-        const success = await createScanRequest();
-        if (success) {
+        const requestId = await sendRequest();
+        if (requestId) {
+            currentRequestId = requestId;
+            isWaiting = true;
             timeLeft = 180;
             updateTimerDisplay();
             startTimer();
-            listenRequestStatus();
-            updateRequestStatus();
-            addLog("Permintaan dihantar. Sila tunggu kelulusan dari kaunselor/guru.", "info");
             requestBtn.innerHTML = '<i class="fas fa-hourglass-half"></i> Menunggu Kelulusan...';
+            requestStatus.innerHTML = '<span class="status-badge status-pending"><i class="fas fa-hourglass-half"></i> Menunggu kelulusan guru...</span>';
+            rejectedMessage.style.display = 'none';
+            
+            if (currentUnsubscribe) currentUnsubscribe();
+            currentUnsubscribe = listenToRequest(requestId);
         } else {
-            addLog("Gagal menghantar permintaan. Sila cuba lagi.", "error");
             requestBtn.disabled = false;
             requestBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Hantar Permintaan Buka Sistem';
+            alert("Gagal menghantar permintaan. Sila cuba lagi.");
         }
     };
     
-    // Stop camera button
     stopScannerBtn.onclick = async () => {
         await stopScanner();
-        addLog("📷 Kamera dihentikan.", "info");
     };
     
-    // Initialize QR Scanner (without auto-start)
-    function initScanner() {
-        html5QrCode = new Html5Qrcode("reader");
-    }
-    
-    // Initialize system
-    async function init() {
-        updateLiveDateTime();
-        await loadSettings();
-        await loadHolidays();
-        
-        const holidayCheck = checkTodayIsHoliday();
-        if (holidayCheck.isHoliday) {
-            isHoliday = true;
-            holidayWarningDiv.style.display = 'block';
-            document.getElementById('holidayMessage').innerHTML = `${holidayCheck.reason}. Sistem kehadiran ditutup.`;
-            securitySection.style.display = 'none';
-            scannerSection.style.display = 'none';
-            logSection.style.display = 'none';
+    async function onScanSuccess(decodedText) {
+        if (!isApproved) {
+            alert("Sistem belum dibuka");
             return;
         }
-        
-        holidayWarningDiv.style.display = 'none';
-        securitySection.style.display = 'block';
-        initScanner();
-        updateTimerDisplay();
+        try {
+            const qrData = JSON.parse(decodedText);
+            if (qrData.type === 'attendance' && qrData.ic) {
+                const now = new Date();
+                const timeStr = now.toLocaleTimeString('ms-MY', { hour: '2-digit', minute: '2-digit' });
+                const dateStr = now.toLocaleDateString('ms-MY');
+                const logContainer = document.getElementById('logList');
+                if (logContainer.querySelector('.empty-log')) logContainer.innerHTML = '';
+                const logItem = document.createElement('div');
+                logItem.className = 'log-item success';
+                logItem.innerHTML = `<div class="log-name">✅ ${qrData.name}</div>
+                    <div class="log-detail">IC: ${qrData.ic} | Kelas: ${qrData.class || '-'}</div>
+                    <div class="log-time"><span>${timeStr}</span><span class="badge-status badge-hadir">Hadir</span></div>`;
+                logContainer.insertBefore(logItem, logContainer.firstChild);
+                
+                await setDoc(doc(attendanceRef, `${qrData.ic}_${dateStr.replace(/\//g, '-')}`), {
+                    ic: qrData.ic, name: qrData.name, className: qrData.class || '-',
+                    scanDate: dateStr, time: timeStr, status: 'hadir', timestamp: Timestamp.now()
+                });
+            }
+        } catch(e) {}
+    }
+    
+    async function checkHoliday() {
+        try {
+            const settings = await getDoc(settingsRef);
+            const holidays = await getDocs(holidaysRef);
+            const today = new Date().toISOString().split('T')[0];
+            const dayName = new Date().toLocaleDateString('en-US', { weekday: 'long' });
+            let isHoliday = false;
+            if (settings.exists() && settings.data().weekdayHolidays?.includes(dayName)) isHoliday = true;
+            holidays.forEach(doc => {
+                const h = doc.data();
+                if (today >= h.startDate && today <= h.endDate) isHoliday = true;
+            });
+            if (isHoliday) {
+                document.getElementById('holidayWarning').style.display = 'block';
+                securitySection.style.display = 'none';
+            }
+        } catch(e) {}
+    }
+    
+    function init() {
+        html5QrCode = new Html5Qrcode("reader");
+        checkHoliday();
     }
     
     init();

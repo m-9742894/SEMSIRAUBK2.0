@@ -223,7 +223,7 @@
       letter-spacing: 0.4px;
     }
 
-    /* BUTTON PANEL - 5 cards grid (ditambah Sistem Kehadiran) */
+    /* BUTTON PANEL - 5 cards grid */
     .access-panel {
       margin: 3.5rem 0 2rem;
     }
@@ -461,7 +461,7 @@
     </div>
   </div>
 
-  <!-- Butang login ke page berasingan (GUEST, PELAJAR, GURU, KAUNSELOR, SISTEM KEHADIRAN) -->
+  <!-- Butang login ke page berasingan -->
   <div class="access-panel" data-aos="fade-up" data-aos-delay="250">
     <div class="section-label">
       <span><i class="fas fa-sign-in-alt"></i> Akses Sistem</span>
@@ -499,8 +499,8 @@
         <div class="btn-enter"><span>Masuk</span> <i class="fas fa-arrow-right"></i></div>
       </div>
 
-      <!-- 5. SISTEM KEHADIRAN (BARU) -> redirect ke kehadiran.html -->
-      <div class="access-card" data-role="kehadiran" data-url="kehadiran.html">
+      <!-- 5. SISTEM KEHADIRAN -> redirect ke scan-qr-kehadiran.html (BUKAN kehadiran.html) -->
+      <div class="access-card" data-role="kehadiran" data-url="scan-qr-kehadiran.html">
         <div class="card-icon"><i class="fas fa-fingerprint"></i></div>
         <h3>SISTEM KEHADIRAN</h3>
         <p>Rekod kehadiran & QR Code</p>
@@ -534,7 +534,7 @@
   // PELAJAR -> dashboard/page-pelajar.html
   // GURU -> dashboard/page-guru.html
   // KAUNSELOR -> dashboard/page-kaunselor.html
-  // SISTEM KEHADIRAN -> kehadiran.html (root)
+  // SISTEM KEHADIRAN -> scan-qr-kehadiran.html (root) ✅
   // ============================================================
   
   const accessCards = document.querySelectorAll('.access-card');

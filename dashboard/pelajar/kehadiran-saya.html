@@ -150,6 +150,19 @@
             gap: 8px;
         }
         .btn-filter:hover { background: #4338ca; }
+        .btn-reset {
+            background: #64748b;
+            color: white;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 0.8rem;
+            cursor: pointer;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-reset:hover { background: #475569; }
         
         /* Stats Cards */
         .stats-section {
@@ -190,8 +203,14 @@
             padding: 1rem 1.5rem;
             background: #f8fafc;
             border-bottom: 2px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
         }
         .history-header h3 { font-size: 1rem; color: #1e293b; }
+        .total-records { font-size: 0.75rem; color: #64748b; }
         .table-container { overflow-x: auto; }
         table {
             width: 100%;
@@ -234,22 +253,6 @@
             font-size: 0.7rem;
         }
         
-        .toast {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            background: #1e293b;
-            color: white;
-            padding: 12px 24px;
-            border-radius: 10px;
-            z-index: 1000;
-            animation: slideIn 0.3s ease;
-        }
-        @keyframes slideIn {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-        
         @media (max-width: 700px) {
             .stats-section { grid-template-columns: repeat(2, 1fr); }
             .filter-section { flex-direction: column; }
@@ -284,11 +287,11 @@
             <label><i class="fas fa-calendar-month"></i> Bulan</label>
             <select id="monthFilter">
                 <option value="">Semua Bulan</option>
-                <option value="1">Januari</option><option value="2">Februari</option>
-                <option value="3">Mac</option><option value="4">April</option>
-                <option value="5">Mei</option><option value="6">Jun</option>
-                <option value="7">Julai</option><option value="8">Ogos</option>
-                <option value="9">September</option><option value="10">Oktober</option>
+                <option value="01">Januari</option><option value="02">Februari</option>
+                <option value="03">Mac</option><option value="04">April</option>
+                <option value="05">Mei</option><option value="06">Jun</option>
+                <option value="07">Julai</option><option value="08">Ogos</option>
+                <option value="09">September</option><option value="10">Oktober</option>
                 <option value="11">November</option><option value="12">Disember</option>
             </select>
         </div>
@@ -302,10 +305,12 @@
                 <option value="">Semua Tahun</option>
                 <option value="2023">2023</option><option value="2024">2024</option>
                 <option value="2025">2025</option><option value="2026">2026</option>
+                <option value="2027">2027</option><option value="2028">2028</option>
             </select>
         </div>
         <div class="filter-group">
             <button id="applyFilterBtn" class="btn-filter"><i class="fas fa-filter"></i> Guna Filter</button>
+            <button id="resetFilterBtn" class="btn-reset" style="margin-left: 8px;"><i class="fas fa-undo-alt"></i> Reset</button>
         </div>
     </div>
 
@@ -337,6 +342,7 @@
     <div class="history-section">
         <div class="history-header">
             <h3><i class="fas fa-history"></i> Sejarah Kehadiran</h3>
+            <div class="total-records" id="totalRecordsCount">0 rekod</div>
         </div>
         <div class="table-container">
             <div id="historyTable">
@@ -374,6 +380,24 @@
     let allRecords = [];
     let filteredRecords = [];
     
+    // Helper function to convert date format
+    // Firebase stores date in format: "DD/MM/YYYY" (e.g., "29/05/2026")
+    function formatDateForComparison(dateStr) {
+        if (!dateStr) return '';
+        // If already in YYYY-MM-DD format
+        if (dateStr.includes('-') && dateStr.length === 10) {
+            return dateStr;
+        }
+        // Convert from DD/MM/YYYY to YYYY-MM-DD
+        if (dateStr.includes('/')) {
+            const parts = dateStr.split('/');
+            if (parts.length === 3) {
+                return `${parts[2]}-${parts[1].padStart(2,'0')}-${parts[0].padStart(2,'0')}`;
+            }
+        }
+        return dateStr;
+    }
+    
     // Get student info from session storage
     function getStudentInfo() {
         studentIC = sessionStorage.getItem('studentIC') || localStorage.getItem('studentIC') || '';
@@ -395,8 +419,12 @@
             snapshot.forEach(doc => {
                 allRecords.push({ id: doc.id, ...doc.data() });
             });
-            // Sort by date descending
-            allRecords.sort((a, b) => (b.scanDate || '').localeCompare(a.scanDate || ''));
+            // Sort by date descending (newest first)
+            allRecords.sort((a, b) => {
+                const dateA = formatDateForComparison(a.scanDate);
+                const dateB = formatDateForComparison(b.scanDate);
+                return dateB.localeCompare(dateA);
+            });
             return allRecords;
         } catch (error) {
             console.error("Error loading records:", error);
@@ -404,28 +432,44 @@
         }
     }
     
-    // Get today's status
+    // Get today's status (based on current date)
     function getTodayStatus() {
-        const today = new Date().toLocaleDateString('ms-MY');
-        const todayRecord = allRecords.find(r => r.scanDate === today);
+        const today = new Date();
+        const todayFormatted = formatDateToDMY(today);
+        const todayRecord = allRecords.find(r => r.scanDate === todayFormatted);
         return todayRecord || null;
+    }
+    
+    // Format date to DD/MM/YYYY
+    function formatDateToDMY(date) {
+        const day = date.getDate().toString().padStart(2, '0');
+        const month = (date.getMonth() + 1).toString().padStart(2, '0');
+        const year = date.getFullYear();
+        return `${day}/${month}/${year}`;
+    }
+    
+    // Format date to YYYY-MM-DD for input date comparison
+    function formatDateToYMD(date) {
+        const year = date.getFullYear();
+        const month = (date.getMonth() + 1).toString().padStart(2, '0');
+        const day = date.getDate().toString().padStart(2, '0');
+        return `${year}-${month}-${day}`;
     }
     
     // Render today's status card
     function renderTodayStatus() {
         const container = document.getElementById('todayStatusContainer');
         const todayRecord = getTodayStatus();
+        const today = new Date();
+        const todayFormatted = formatDateToDMY(today);
+        const dayName = today.toLocaleDateString('ms-MY', { weekday: 'long' });
         
         if (!todayRecord) {
-            const today = new Date();
-            const todayStr = today.toLocaleDateString('ms-MY');
-            const dayName = today.toLocaleDateString('ms-MY', { weekday: 'long' });
-            
             container.innerHTML = `
                 <div class="no-record-card">
                     <i class="fas fa-question-circle"></i>
                     <h3>Tiada Rekod Kehadiran</h3>
-                    <p>Anda belum merekodkan kehadiran untuk hari ini (${todayStr} - ${dayName})</p>
+                    <p>Anda belum merekodkan kehadiran untuk hari ini (${todayFormatted} - ${dayName})</p>
                     <p style="font-size: 0.7rem; margin-top: 0.5rem;">Sila scan QR Code kehadiran untuk merekodkan kehadiran anda.</p>
                 </div>
             `;
@@ -435,9 +479,7 @@
         const status = todayRecord.status;
         const statusText = getStatusText(status);
         const time = todayRecord.time || '-';
-        const today = new Date();
-        const dateStr = today.toLocaleDateString('ms-MY');
-        const dayName = today.toLocaleDateString('ms-MY', { weekday: 'long' });
+        const dateStr = todayFormatted;
         const reason = todayRecord.reason || '';
         
         let icon = '', title = '', message = '', cssClass = '';
@@ -487,38 +529,56 @@
         `;
     }
     
-    // Apply filters
+    // Apply filters - FIXED VERSION
     function applyFilters() {
         const month = document.getElementById('monthFilter').value;
-        const date = document.getElementById('dateFilter').value;
+        const dateInput = document.getElementById('dateFilter').value;
         const year = document.getElementById('yearFilter').value;
         
         filteredRecords = allRecords.filter(record => {
-            const recordDate = record.scanDate;
-            if (!recordDate) return false;
+            const recordDateStr = record.scanDate;
+            if (!recordDateStr) return false;
             
-            // Parse date (format: DD/MM/YYYY or YYYY-MM-DD)
-            let day = '', monthNum = '', yearNum = '';
-            if (recordDate.includes('/')) {
-                const parts = recordDate.split('/');
-                day = parts[0];
-                monthNum = parts[1];
-                yearNum = parts[2];
-            } else if (recordDate.includes('-')) {
-                const parts = recordDate.split('-');
-                yearNum = parts[0];
-                monthNum = parts[1];
-                day = parts[2];
+            // Parse date from DD/MM/YYYY format
+            let parts = recordDateStr.split('/');
+            if (parts.length !== 3) return false;
+            
+            const recordDay = parts[0];
+            const recordMonth = parts[1];
+            const recordYear = parts[2];
+            
+            // Filter by year
+            if (year && recordYear !== year) return false;
+            
+            // Filter by month
+            if (month && recordMonth !== month) return false;
+            
+            // Filter by exact date
+            if (dateInput) {
+                // Convert input date (YYYY-MM-DD) to DD/MM/YYYY for comparison
+                const inputParts = dateInput.split('-');
+                if (inputParts.length === 3) {
+                    const inputDay = inputParts[2];
+                    const inputMonth = inputParts[1];
+                    const inputYear = inputParts[0];
+                    if (recordDay !== inputDay || recordMonth !== inputMonth || recordYear !== inputYear) {
+                        return false;
+                    }
+                }
             }
-            
-            if (year && yearNum !== year) return false;
-            if (month && monthNum !== month) return false;
-            if (date && recordDate !== date) return false;
             
             return true;
         });
         
         updateStatsAndHistory();
+    }
+    
+    // Reset all filters
+    function resetFilters() {
+        document.getElementById('monthFilter').value = '';
+        document.getElementById('dateFilter').value = '';
+        document.getElementById('yearFilter').value = '';
+        applyFilters();
     }
     
     // Update stats cards and history table
@@ -532,6 +592,7 @@
         document.getElementById('totalLewat').innerText = lewat;
         document.getElementById('totalTidakHadir').innerText = tidakHadir;
         document.getElementById('totalCuti').innerText = cuti;
+        document.getElementById('totalRecordsCount').innerText = `${filteredRecords.length} rekod`;
         
         renderHistoryTable();
     }
@@ -577,15 +638,14 @@
             // Get day name from date
             let dayName = '-';
             try {
-                let dateObj;
-                if (record.scanDate.includes('/')) {
+                if (record.scanDate) {
                     const parts = record.scanDate.split('/');
-                    dateObj = new Date(`${parts[2]}-${parts[1]}-${parts[0]}`);
-                } else {
-                    dateObj = new Date(record.scanDate);
-                }
-                if (!isNaN(dateObj.getTime())) {
-                    dayName = dateObj.toLocaleDateString('ms-MY', { weekday: 'long' });
+                    if (parts.length === 3) {
+                        const dateObj = new Date(`${parts[2]}-${parts[1]}-${parts[0]}`);
+                        if (!isNaN(dateObj.getTime())) {
+                            dayName = dateObj.toLocaleDateString('ms-MY', { weekday: 'long' });
+                        }
+                    }
                 }
             } catch(e) { console.log(e); }
             
@@ -599,14 +659,8 @@
             </tr>`;
         });
         
-        html += `</tbody>}</div>`;
+        html += `</tbody></table>`;
         container.innerHTML = html;
-    }
-    
-    // Helper function to check if a date is today
-    function isToday(dateStr) {
-        const today = new Date().toLocaleDateString('ms-MY');
-        return dateStr === today;
     }
     
     // Initialize
@@ -631,6 +685,7 @@
     
     // Event listeners
     document.getElementById('applyFilterBtn').addEventListener('click', applyFilters);
+    document.getElementById('resetFilterBtn').addEventListener('click', resetFilters);
     document.getElementById('monthFilter').addEventListener('change', applyFilters);
     document.getElementById('yearFilter').addEventListener('change', applyFilters);
     document.getElementById('dateFilter').addEventListener('change', applyFilters);

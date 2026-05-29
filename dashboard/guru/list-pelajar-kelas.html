@@ -172,10 +172,6 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.05);
             border: 1px solid rgba(37,99,235,0.1);
         }
-        .student-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 12px 24px -12px rgba(0,0,0,0.15);
-        }
         .student-card-header {
             background: linear-gradient(135deg, #2563eb, #7c3aed);
             padding: 1rem;
@@ -206,7 +202,6 @@
         .detail-row span:first-child { color: #64748b; }
         .detail-row span:last-child { font-weight: 600; color: #1e293b; }
         
-        /* Attendance Stats Row */
         .attendance-stats {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -268,7 +263,6 @@
             border-radius: 1.2rem;
         }
         
-        /* Modal Styles */
         .modal {
             position: fixed;
             top: 0;
@@ -390,7 +384,6 @@
         .btn-confirm-yes { background: #dc2626; color: white; }
         .btn-confirm-no { background: #e2e8f0; color: #1e293b; }
         
-        /* Today Status Card in Modal */
         .today-status-card {
             border-radius: 1rem;
             padding: 1rem;
@@ -403,6 +396,21 @@
         .today-status-card.cuti { background: linear-gradient(135deg, #dbeafe, #bfdbfe); border-left: 4px solid #3b82f6; }
         .today-status-card .status-icon { font-size: 2rem; }
         .today-status-card .status-title { font-size: 1rem; font-weight: 800; }
+        
+        /* Print QR styling - sama dengan dashboard-pelajar */
+        .qr-print-card {
+            width: 7cm;
+            height: 10cm;
+            padding: 0.4cm;
+            background: white;
+            border: 1px solid #e2e8f0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-family: 'Plus Jakarta Sans', 'Segoe UI', Arial, sans-serif;
+        }
         
         @media (max-width: 700px) {
             .students-grid { grid-template-columns: 1fr; }
@@ -461,6 +469,9 @@
         </div>
     </div>
 </div>
+
+<!-- Hidden Print Container -->
+<div id="printContainer" style="display: none;"></div>
 
 <!-- Modal Transfer -->
 <div id="transferModal" class="modal" style="display: none;">
@@ -623,7 +634,102 @@
         return records.reduce((sum, r) => sum + (r.points || 0), 0);
     }
     
-    // Download QR Code
+    // ==================== PRINT QR CODE (SAMA SEPERTI DASHBOARD PELAJAR) ====================
+    function printQRCode(studentName, studentIC) {
+        const printContainer = document.getElementById('printContainer');
+        printContainer.style.display = 'block';
+        printContainer.innerHTML = '';
+        
+        const printCard = document.createElement('div');
+        printCard.className = 'qr-print-card';
+        printCard.style.cssText = `
+            width: 7cm;
+            height: 10cm;
+            padding: 0.4cm;
+            background: white;
+            border: 1px solid #e2e8f0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-family: 'Plus Jakarta Sans', 'Segoe UI', Arial, sans-serif;
+        `;
+        
+        printCard.innerHTML = `
+            <div style="font-size: 10pt; font-weight: bold; color: #4f46e5; margin-bottom: 0.2cm; text-transform: uppercase;">E-MIND CARE SEMSIRA</div>
+            <div id="printQrCode" style="margin: 0.2cm 0; display: flex; justify-content: center;"></div>
+            <div style="font-size: 11pt; font-weight: bold; color: #1e293b; margin-top: 0.2cm; margin-bottom: 0.1cm;">${escapeHtml(studentName)}</div>
+            <div style="font-size: 9pt; color: #64748b; margin-bottom: 0.2cm;">No. IC: ${escapeHtml(studentIC)}</div>
+            <div style="font-size: 7pt; color: #94a3b8; margin-top: 0.2cm; border-top: 0.5px dashed #cbd5e1; padding-top: 0.2cm;">Kad Kehadiran Digital • Scan untuk rekod kehadiran</div>
+        `;
+        
+        printContainer.appendChild(printCard);
+        
+        const qrData = JSON.stringify({ ic: studentIC, name: studentName, type: 'attendance' });
+        new QRCode(document.getElementById('printQrCode'), {
+            text: qrData,
+            width: 120,
+            height: 120,
+            colorDark: "#1e293b",
+            colorLight: "#ffffff",
+            correctLevel: QRCode.CorrectLevel.M
+        });
+        
+        setTimeout(() => {
+            const printWindow = window.open('', '_blank');
+            const printHtml = `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <meta charset="UTF-8">
+                    <title>QR Code Kehadiran - ${studentName}</title>
+                    <style>
+                        * { margin: 0; padding: 0; box-sizing: border-box; }
+                        body {
+                            font-family: 'Plus Jakarta Sans', 'Segoe UI', Arial, sans-serif;
+                            background: white;
+                            display: flex;
+                            justify-content: center;
+                            align-items: center;
+                            min-height: 100vh;
+                        }
+                        .qr-print-card {
+                            width: 7cm;
+                            height: 10cm;
+                            padding: 0.4cm;
+                            background: white;
+                            border: 1px solid #e2e8f0;
+                            display: flex;
+                            flex-direction: column;
+                            align-items: center;
+                            justify-content: center;
+                            text-align: center;
+                            box-shadow: none;
+                        }
+                    </style>
+                </head>
+                <body>
+                    ${printCard.outerHTML}
+                </body>
+                </html>
+            `;
+            
+            printWindow.document.write(printHtml);
+            printWindow.document.close();
+            
+            printWindow.onload = () => {
+                printWindow.print();
+            };
+            
+            setTimeout(() => {
+                printContainer.style.display = 'none';
+                printContainer.innerHTML = '';
+            }, 1000);
+        }, 500);
+    }
+    
+    // ==================== DOWNLOAD QR CODE SEBAGAI PNG ====================
     async function downloadQRCode(studentName, studentIC) {
         const qrData = JSON.stringify({ ic: studentIC, name: studentName, type: 'attendance' });
         
@@ -658,7 +764,7 @@
         }, 500);
     }
     
-    // Show Attendance Modal
+    // ==================== SHOW ATTENDANCE MODAL ====================
     async function showAttendanceModal(studentId, studentName, studentIC) {
         const stats = getStudentAttendanceStats(studentIC);
         const todayRecord = getTodayStatus(studentIC);
@@ -712,22 +818,22 @@
                         ${todayHtml}
                         
                         <h4 style="margin:1rem 0 0.5rem;"><i class="fas fa-chart-simple"></i> Ringkasan Kehadiran Keseluruhan</h4>
-                        <div class="attendance-stats" style="display:grid; grid-template-columns:repeat(4,1fr); gap:0.5rem; margin-bottom:1rem;">
-                            <div class="att-stat hadir" style="text-align:center; padding:0.5rem; background:#dcfce7; border-radius:0.5rem;">
-                                <div class="num" style="font-size:1.2rem; font-weight:800;">${stats.hadir}</div>
-                                <div class="label">Hadir</div>
+                        <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:0.5rem; margin-bottom:1rem;">
+                            <div style="text-align:center; padding:0.5rem; background:#dcfce7; border-radius:0.5rem;">
+                                <div style="font-size:1.2rem; font-weight:800;">${stats.hadir}</div>
+                                <div style="font-size:0.65rem;">Hadir</div>
                             </div>
-                            <div class="att-stat lewat" style="text-align:center; padding:0.5rem; background:#fef3c7; border-radius:0.5rem;">
-                                <div class="num" style="font-size:1.2rem; font-weight:800;">${stats.lewat}</div>
-                                <div class="label">Lewat</div>
+                            <div style="text-align:center; padding:0.5rem; background:#fef3c7; border-radius:0.5rem;">
+                                <div style="font-size:1.2rem; font-weight:800;">${stats.lewat}</div>
+                                <div style="font-size:0.65rem;">Lewat</div>
                             </div>
-                            <div class="att-stat tidakhadir" style="text-align:center; padding:0.5rem; background:#fee2e2; border-radius:0.5rem;">
-                                <div class="num" style="font-size:1.2rem; font-weight:800;">${stats.tidakHadir}</div>
-                                <div class="label">Tidak Hadir</div>
+                            <div style="text-align:center; padding:0.5rem; background:#fee2e2; border-radius:0.5rem;">
+                                <div style="font-size:1.2rem; font-weight:800;">${stats.tidakHadir}</div>
+                                <div style="font-size:0.65rem;">Tidak Hadir</div>
                             </div>
-                            <div class="att-stat cuti" style="text-align:center; padding:0.5rem; background:#dbeafe; border-radius:0.5rem;">
-                                <div class="num" style="font-size:1.2rem; font-weight:800;">${stats.cuti}</div>
-                                <div class="label">Cuti</div>
+                            <div style="text-align:center; padding:0.5rem; background:#dbeafe; border-radius:0.5rem;">
+                                <div style="font-size:1.2rem; font-weight:800;">${stats.cuti}</div>
+                                <div style="font-size:0.65rem;">Cuti</div>
                             </div>
                         </div>
                     </div>
@@ -825,7 +931,8 @@
                             <div class="att-stat cuti"><div class="num">${attendanceStats.cuti}</div><div class="label">Cuti</div></div>
                         </div>
                         <div class="card-actions">
-                            <button class="btn-qr" onclick="window.downloadQRCode('${escapeHtml(student.fullname)}', '${student.icNumber}')"><i class="fas fa-qrcode"></i> QR</button>
+                            <button class="btn-qr" onclick="window.downloadQRCode('${escapeHtml(student.fullname)}', '${student.icNumber}')"><i class="fas fa-download"></i> QR</button>
+                            <button class="btn-qr" onclick="window.printQRCode('${escapeHtml(student.fullname)}', '${student.icNumber}')"><i class="fas fa-print"></i> Print QR</button>
                             <button class="btn-attendance" onclick="window.showAttendanceModal('${student.id}', '${escapeHtml(student.fullname)}', '${student.icNumber}')"><i class="fas fa-calendar-check"></i> Kehadiran</button>
                             <button class="btn-view" onclick="viewStudentMerit('${student.id}')"><i class="fas fa-star"></i> Merit</button>
                             <button class="btn-edit-card" onclick="openEditStudentModal('${student.id}', '${escapeHtml(student.fullname)}', '${escapeHtml(student.icNumber)}', '${escapeHtml(student.class)}', '${student.session}')"><i class="fas fa-edit"></i> Edit</button>
@@ -840,6 +947,7 @@
     }
     
     window.downloadQRCode = downloadQRCode;
+    window.printQRCode = printQRCode;
     window.showAttendanceModal = showAttendanceModal;
     
     window.viewStudentMerit = async function(studentId) {

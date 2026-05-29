@@ -711,7 +711,7 @@
             return;
         }
         
-        let html = `</table><thead>汽<th>Bil</th><th>Nama Pelajar</th><th>No. IC</th><th>Kelas</th><th>Masa Scan</th><th>Status</th><th>Tindakan</th></tr></thead><tbody>`;
+        let html = `<table><thead><tr><th>Bil</th><th>Nama Pelajar</th><th>No. IC</th><th>Kelas</th><th>Masa Scan</th><th>Status</th><th>Tindakan</th></tr></thead><tbody>`;
         list.forEach((student, index) => {
             const status = student.statusInfo.status;
             const badgeClass = getBadgeClass(status);
@@ -722,17 +722,17 @@
             html += `<tr>
                         <td>${index+1}</td>
                         <td><strong>${escapeHtml(student.name)}</strong></td>
-                        <td>${escapeHtml(student.ic)}</span></td>
-                        <td>${escapeHtml(student.class)}</span></td>
-                        <td>${scanTime !== '-' ? scanTime : '-'}</span></td>
-                        <td><span class="badge ${badgeClass}">${statusText}${reason ? `<br><small style="font-size:9px;">${escapeHtml(reason)}</small>` : ''}</span></span></td>
+                        <td>${escapeHtml(student.ic)}</td>
+                        <td>${escapeHtml(student.class)}</td>
+                        <td>${scanTime !== '-' ? scanTime : '-'}</td>
+                        <td><span class="badge ${badgeClass}">${statusText}${reason ? `<br><small style="font-size:9px;">${escapeHtml(reason)}</small>` : ''}</span></td>
                         <td class="action-buttons">
                             <button class="btn-edit" onclick="window.openEditModal('${student.id}', '${escapeHtml(student.name)}', '${escapeHtml(student.ic)}', '${status}', '${escapeHtml(reason)}')"><i class="fas fa-edit"></i> Edit</button>
                             <button class="btn-delete" onclick="window.openDeleteModal('${recordId}', '${escapeHtml(student.name)}')"><i class="fas fa-trash-alt"></i> Hapus</button>
-                        </span>
+                        </td>
                       </tr>`;
         });
-        html += `</tbody>船`;
+        html += `</tbody></table>`;
         container.innerHTML = html;
     }
     
@@ -856,7 +856,7 @@
             <div class="header"><h1>LAPORAN KEHADIRAN PELAJAR</h1><p>E-MindCare SEMSIRA • SMK Syed Sirajuddin</p><p>Tarikh: ${todayFormatted}</p><p>Kategori: ${categoryName}</p></div>
             <div class="summary-card"><div class="number">${printList.length}</div><div>Jumlah Pelajar</div></div>
             <table><thead><tr><th>Bil</th><th>Nama Pelajar</th><th>No. IC</th><th>Kelas</th><th>Masa Scan</th><th>Status</th></tr></thead><tbody>
-            ${printList.map((s,i) => { const status = s.statusInfo.status; const badge = getBadgeClass(status); const text = getStatusText(status); return `<tr><td>${i+1}</td><td>${escapeHtml(s.name)}</td><td>${escapeHtml(s.ic)}</td><td>${escapeHtml(s.class)}</td><td>${s.statusInfo.time || '-'}</td><td><span class="badge ${badge}">${text}${s.statusInfo.reason ? `<br><small>${escapeHtml(s.statusInfo.reason)}</small>` : ''}</span></td></tr>`; }).join('')}
+            ${printList.map((s,i) => { const status = s.statusInfo.status; const badge = getBadgeClass(status); const text = getStatusText(status); return `<tr><td>${i+1}</td><td>${escapeHtml(s.name)}</span></td><td>${escapeHtml(s.ic)}</span></td><td>${escapeHtml(s.class)}</span></td><td>${s.statusInfo.time || '-'}</span></td><td><span class="badge ${badge}">${text}${s.statusInfo.reason ? `<br><small>${escapeHtml(s.statusInfo.reason)}</small>` : ''}</span></td>`; }).join('')}
             </tbody></table><div class="footer">Laporan dihasilkan oleh sistem E-MindCare SEMSIRA.</div></body></html>`;
         const win = window.open('', '_blank'); win.document.write(printHtml); win.document.close(); win.print();
     }

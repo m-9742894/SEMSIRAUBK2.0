@@ -71,8 +71,8 @@
         .stats-banner {
             background: linear-gradient(135deg, #4f46e5, #7c3aed);
             border-radius: 1.2rem;
-            padding: 1.2rem 1.5rem;
-            margin-bottom: 2rem;
+            padding: 1rem 1.5rem;
+            margin-bottom: 1.5rem;
             color: white;
             display: flex;
             justify-content: space-between;
@@ -133,7 +133,7 @@
             display: none;
         }
         .modal-content {
-            max-width: 600px;
+            max-width: 650px;
             width: 100%;
             background: white;
             border-radius: 1.5rem;
@@ -179,24 +179,93 @@
             margin-bottom: 0.3rem;
         }
         .form-group label i { margin-right: 5px; color: #4f46e5; }
-        .form-group input, .form-group select {
-            width: 100%;
+        
+        /* Time Picker */
+        .time-picker {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .time-picker select {
+            flex: 1;
             padding: 0.7rem;
             border-radius: 0.8rem;
             border: 1px solid #e2e8f0;
             background: #f8fafc;
             font-family: inherit;
+            font-size: 0.9rem;
             outline: none;
+            cursor: pointer;
         }
-        .form-group input:focus, .form-group select:focus {
+        .time-picker select:focus {
             border-color: #4f46e5;
             box-shadow: 0 0 0 2px rgba(79,70,229,0.1);
         }
-        .date-range {
+        .time-picker span {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #4f46e5;
+        }
+        .info-24h {
+            font-size: 0.65rem;
+            color: #64748b;
+            margin-top: 0.3rem;
+        }
+        
+        /* Date Range Picker - Lebih Elok */
+        .date-range-card {
+            background: #f8fafc;
+            border-radius: 1rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border: 1px solid #e2e8f0;
+        }
+        .date-range-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px dashed #cbd5e1;
+        }
+        .date-range-header i {
+            font-size: 1rem;
+            color: #4f46e5;
+        }
+        .date-range-header span {
+            font-weight: 600;
+            color: #1e293b;
+            font-size: 0.8rem;
+        }
+        .date-range-inputs {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 1rem;
         }
+        .date-input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+        }
+        .date-input-group label {
+            font-size: 0.65rem;
+            color: #64748b;
+            font-weight: 500;
+        }
+        .date-input-group input {
+            padding: 0.6rem;
+            border-radius: 0.8rem;
+            border: 1px solid #e2e8f0;
+            background: white;
+            font-family: inherit;
+            font-size: 0.85rem;
+            outline: none;
+        }
+        .date-input-group input:focus {
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 2px rgba(79,70,229,0.1);
+        }
+        
         .weekday-grid {
             display: flex;
             flex-wrap: wrap;
@@ -306,7 +375,7 @@
             .menu-buttons { grid-template-columns: 1fr; gap: 1rem; }
             .menu-btn { padding: 1rem; flex-direction: row; justify-content: center; gap: 12px; }
             .menu-btn i { font-size: 1.5rem; }
-            .date-range { grid-template-columns: 1fr; gap: 0.5rem; }
+            .date-range-inputs { grid-template-columns: 1fr; gap: 0.5rem; }
         }
     </style>
 </head>
@@ -371,64 +440,126 @@
                     <button class="btn-submit" id="saveWeekdayBtn"><i class="fas fa-save"></i> Simpan Cuti Mingguan</button>
                 </div>
 
-                <!-- Cuti Umum - Dengan Tarikh Dari & Sehingga -->
+                <!-- Cuti Umum - Dengan Reka Bentuk Lebih Elok -->
                 <div style="margin-bottom: 1.5rem;">
                     <h4 style="margin-bottom: 0.8rem; font-size: 0.9rem;"><i class="fas fa-calendar-alt"></i> Cuti Umum</h4>
-                    <div class="form-group">
-                        <label><i class="fas fa-tag"></i> Nama Cuti</label>
-                        <input type="text" id="holidayName" placeholder="cth: Cuti Pertengahan Penggal, Hari Raya...">
-                    </div>
-                    <div class="date-range">
-                        <div class="form-group">
-                            <label><i class="fas fa-calendar-day"></i> Tarikh Mula</label>
-                            <input type="date" id="holidayStartDate">
+                    
+                    <!-- Date Range Card -->
+                    <div class="date-range-card">
+                        <div class="date-range-header">
+                            <i class="fas fa-calendar-plus"></i>
+                            <span>Tambah Cuti Baru</span>
                         </div>
                         <div class="form-group">
-                            <label><i class="fas fa-calendar-day"></i> Tarikh Akhir</label>
-                            <input type="date" id="holidayEndDate">
+                            <label><i class="fas fa-tag"></i> Nama Cuti</label>
+                            <input type="text" id="holidayName" placeholder="cth: Cuti Pertengahan Penggal, Hari Raya Aidilfitri...">
                         </div>
+                        <div class="date-range-inputs">
+                            <div class="date-input-group">
+                                <label><i class="fas fa-calendar-day"></i> Tarikh Mula</label>
+                                <input type="date" id="holidayStartDate">
+                            </div>
+                            <div class="date-input-group">
+                                <label><i class="fas fa-calendar-day"></i> Tarikh Akhir</label>
+                                <input type="date" id="holidayEndDate">
+                            </div>
+                        </div>
+                        <button class="btn-submit" id="addHolidayBtn" style="margin-top: 1rem; background: linear-gradient(95deg, #10b981, #059669);">
+                            <i class="fas fa-plus-circle"></i> Tambah Cuti
+                        </button>
                     </div>
-                    <button class="btn-submit" id="addHolidayBtn"><i class="fas fa-plus"></i> Tambah Cuti</button>
-                    <div class="holiday-list" id="holidayList">
-                        <p style="font-size:0.7rem; color:#94a3b8; text-align:center;">Tiada cuti umum</p>
+                    
+                    <!-- Senarai Cuti -->
+                    <div style="margin-top: 1rem;">
+                        <div class="date-range-header" style="margin-bottom: 0.5rem;">
+                            <i class="fas fa-list"></i>
+                            <span>Senarai Cuti Umum</span>
+                        </div>
+                        <div class="holiday-list" id="holidayList">
+                            <p style="font-size:0.7rem; color:#94a3b8; text-align:center; padding: 1rem;">Tiada cuti umum</p>
+                        </div>
                     </div>
                 </div>
 
                 <!-- Masa Kehadiran -->
                 <div style="margin-bottom: 1rem;">
-                    <h4 style="margin-bottom: 0.8rem; font-size: 0.9rem;"><i class="fas fa-clock"></i> Masa Kehadiran</h4>
+                    <h4 style="margin-bottom: 0.8rem; font-size: 0.9rem;"><i class="fas fa-clock"></i> Masa Kehadiran (Sistem 24 Jam)</h4>
+                    
+                    <!-- Masa Buka -->
                     <div class="form-group">
                         <label><i class="fas fa-door-open"></i> Masa Buka (Pelajar mula scan)</label>
-                        <select id="timeOpen">
-                            <option value="06:00">06:00 Pagi</option>
-                            <option value="06:30">06:30 Pagi</option>
-                            <option value="07:00" selected>07:00 Pagi</option>
-                            <option value="07:30">07:30 Pagi</option>
-                            <option value="08:00">08:00 Pagi</option>
-                            <option value="08:30">08:30 Pagi</option>
-                        </select>
+                        <div class="time-picker">
+                            <select id="timeOpenHour">
+                                <option value="00">00</option><option value="01">01</option><option value="02">02</option>
+                                <option value="03">03</option><option value="04">04</option><option value="05">05</option>
+                                <option value="06">06</option><option value="07" selected>07</option><option value="08">08</option>
+                                <option value="09">09</option><option value="10">10</option><option value="11">11</option>
+                                <option value="12">12</option><option value="13">13</option><option value="14">14</option>
+                                <option value="15">15</option><option value="16">16</option><option value="17">17</option>
+                                <option value="18">18</option><option value="19">19</option><option value="20">20</option>
+                                <option value="21">21</option><option value="22">22</option><option value="23">23</option>
+                            </select>
+                            <span>:</span>
+                            <select id="timeOpenMinute">
+                                <option value="00">00</option><option value="05">05</option><option value="10">10</option>
+                                <option value="15">15</option><option value="20">20</option><option value="25">25</option>
+                                <option value="30">30</option><option value="35">35</option><option value="40">40</option>
+                                <option value="45">45</option><option value="50">50</option><option value="55">55</option>
+                            </select>
+                        </div>
+                        <div class="info-24h">Gunakan sistem 24 jam (00:00 hingga 23:59)</div>
                     </div>
+                    
+                    <!-- Masa Lambat -->
                     <div class="form-group">
-                        <label><i class="fas fa-hourglass-half"></i> Masa Lambat (Tiada kehadiran selepas ini)</label>
-                        <select id="timeLate">
-                            <option value="07:30">07:30 Pagi</option>
-                            <option value="08:00" selected>08:00 Pagi</option>
-                            <option value="08:30">08:30 Pagi</option>
-                            <option value="09:00">09:00 Pagi</option>
-                            <option value="09:30">09:30 Pagi</option>
-                        </select>
+                        <label><i class="fas fa-hourglass-half"></i> Masa Lambat (Pelajar dianggap lewat)</label>
+                        <div class="time-picker">
+                            <select id="timeLateHour">
+                                <option value="00">00</option><option value="01">01</option><option value="02">02</option>
+                                <option value="03">03</option><option value="04">04</option><option value="05">05</option>
+                                <option value="06">06</option><option value="07">07</option><option value="08" selected>08</option>
+                                <option value="09">09</option><option value="10">10</option><option value="11">11</option>
+                                <option value="12">12</option><option value="13">13</option><option value="14">14</option>
+                                <option value="15">15</option><option value="16">16</option><option value="17">17</option>
+                                <option value="18">18</option><option value="19">19</option><option value="20">20</option>
+                                <option value="21">21</option><option value="22">22</option><option value="23">23</option>
+                            </select>
+                            <span>:</span>
+                            <select id="timeLateMinute">
+                                <option value="00">00</option><option value="05">05</option><option value="10">10</option>
+                                <option value="15">15</option><option value="20">20</option><option value="25">25</option>
+                                <option value="30">30</option><option value="35">35</option><option value="40">40</option>
+                                <option value="45">45</option><option value="50">50</option><option value="55">55</option>
+                            </select>
+                        </div>
+                        <div class="info-24h">Pelajar yang scan selepas masa ini akan dikira LEWAT</div>
                     </div>
+                    
+                    <!-- Masa Tutup -->
                     <div class="form-group">
                         <label><i class="fas fa-door-closed"></i> Masa Tutup (Sistem tidak terima kehadiran)</label>
-                        <select id="timeClose">
-                            <option value="12:00">12:00 Tengahari</option>
-                            <option value="13:00">01:00 Petang</option>
-                            <option value="14:00">02:00 Petang</option>
-                            <option value="15:00">03:00 Petang</option>
-                            <option value="16:00" selected>04:00 Petang</option>
-                            <option value="17:00">05:00 Petang</option>
-                        </select>
+                        <div class="time-picker">
+                            <select id="timeCloseHour">
+                                <option value="00">00</option><option value="01">01</option><option value="02">02</option>
+                                <option value="03">03</option><option value="04">04</option><option value="05">05</option>
+                                <option value="06">06</option><option value="07">07</option><option value="08">08</option>
+                                <option value="09">09</option><option value="10">10</option><option value="11">11</option>
+                                <option value="12">12</option><option value="13">13</option><option value="14">14</option>
+                                <option value="15">15</option><option value="16" selected>16</option><option value="17">17</option>
+                                <option value="18">18</option><option value="19">19</option><option value="20">20</option>
+                                <option value="21">21</option><option value="22">22</option><option value="23">23</option>
+                            </select>
+                            <span>:</span>
+                            <select id="timeCloseMinute">
+                                <option value="00">00</option><option value="05">05</option><option value="10">10</option>
+                                <option value="15">15</option><option value="20">20</option><option value="25">25</option>
+                                <option value="30">30</option><option value="35">35</option><option value="40">40</option>
+                                <option value="45">45</option><option value="50">50</option><option value="55">55</option>
+                            </select>
+                        </div>
+                        <div class="info-24h">Selepas masa ini, sistem TIDAK akan menerima sebarang scan kehadiran</div>
                     </div>
+                    
                     <button class="btn-submit" id="saveTimeBtn"><i class="fas fa-save"></i> Simpan Masa Kehadiran</button>
                     
                     <div class="time-settings" id="timeSettingsDisplay">
@@ -466,6 +597,19 @@
     const settingsRef = doc(db, "attendance_settings", "main");
     const holidaysRef = collection(db, "attendance_holidays");
     
+    function getTimeFromSelects(hourSelectId, minuteSelectId) {
+        const hour = document.getElementById(hourSelectId).value;
+        const minute = document.getElementById(minuteSelectId).value;
+        return `${hour.padStart(2, '0')}:${minute.padStart(2, '0')}`;
+    }
+    
+    function setTimeSelects(timeStr, hourSelectId, minuteSelectId) {
+        if (!timeStr) return;
+        const [hour, minute] = timeStr.split(':');
+        if (hour) document.getElementById(hourSelectId).value = hour;
+        if (minute) document.getElementById(minuteSelectId).value = minute;
+    }
+    
     function openModal() { document.getElementById('settingModal').style.display = 'flex'; }
     window.closeModal = function() { document.getElementById('settingModal').style.display = 'none'; };
     
@@ -474,6 +618,7 @@
             const docSnap = await getDoc(settingsRef);
             if (docSnap.exists()) {
                 const data = docSnap.data();
+                
                 if (data.weekdayHolidays) {
                     document.getElementById('weekday_mon').checked = data.weekdayHolidays.includes('Monday');
                     document.getElementById('weekday_tue').checked = data.weekdayHolidays.includes('Tuesday');
@@ -483,18 +628,24 @@
                     document.getElementById('weekday_sat').checked = data.weekdayHolidays.includes('Saturday');
                     document.getElementById('weekday_sun').checked = data.weekdayHolidays.includes('Sunday');
                 }
-                if (data.timeOpen) document.getElementById('timeOpen').value = data.timeOpen;
-                if (data.timeLate) document.getElementById('timeLate').value = data.timeLate;
-                if (data.timeClose) document.getElementById('timeClose').value = data.timeClose;
+                
+                if (data.timeOpen) setTimeSelects(data.timeOpen, 'timeOpenHour', 'timeOpenMinute');
+                if (data.timeLate) setTimeSelects(data.timeLate, 'timeLateHour', 'timeLateMinute');
+                if (data.timeClose) setTimeSelects(data.timeClose, 'timeCloseHour', 'timeCloseMinute');
+                
                 updateTimeDisplay();
             }
         } catch (error) { console.error("Error loading settings:", error); }
     }
     
     function updateTimeDisplay() {
-        document.getElementById('displayOpen').innerText = document.getElementById('timeOpen').value;
-        document.getElementById('displayLate').innerText = document.getElementById('timeLate').value;
-        document.getElementById('displayClose').innerText = document.getElementById('timeClose').value;
+        const timeOpen = getTimeFromSelects('timeOpenHour', 'timeOpenMinute');
+        const timeLate = getTimeFromSelects('timeLateHour', 'timeLateMinute');
+        const timeClose = getTimeFromSelects('timeCloseHour', 'timeCloseMinute');
+        
+        document.getElementById('displayOpen').innerText = timeOpen;
+        document.getElementById('displayLate').innerText = timeLate;
+        document.getElementById('displayClose').innerText = timeClose;
     }
     
     async function saveWeekdayHolidays() {
@@ -506,6 +657,7 @@
         if (document.getElementById('weekday_fri').checked) weekdayHolidays.push('Friday');
         if (document.getElementById('weekday_sat').checked) weekdayHolidays.push('Saturday');
         if (document.getElementById('weekday_sun').checked) weekdayHolidays.push('Sunday');
+        
         try {
             await setDoc(settingsRef, { weekdayHolidays }, { merge: true });
             showToast("✅ Tetapan cuti mingguan disimpan!", "success");
@@ -513,9 +665,19 @@
     }
     
     async function saveTimeSettings() {
-        const timeOpen = document.getElementById('timeOpen').value;
-        const timeLate = document.getElementById('timeLate').value;
-        const timeClose = document.getElementById('timeClose').value;
+        const timeOpen = getTimeFromSelects('timeOpenHour', 'timeOpenMinute');
+        const timeLate = getTimeFromSelects('timeLateHour', 'timeLateMinute');
+        const timeClose = getTimeFromSelects('timeCloseHour', 'timeCloseMinute');
+        
+        if (timeOpen >= timeLate) {
+            showToast("⚠️ Masa Buka mestilah SEBELUM Masa Lambat!", "error");
+            return;
+        }
+        if (timeLate >= timeClose) {
+            showToast("⚠️ Masa Lambat mestilah SEBELUM Masa Tutup!", "error");
+            return;
+        }
+        
         try {
             await setDoc(settingsRef, { timeOpen, timeLate, timeClose }, { merge: true });
             updateTimeDisplay();
@@ -528,7 +690,7 @@
             const snapshot = await getDocs(holidaysRef);
             const holidayListDiv = document.getElementById('holidayList');
             if (snapshot.empty) {
-                holidayListDiv.innerHTML = '<p style="font-size:0.7rem; color:#94a3b8; text-align:center;">Tiada cuti umum</p>';
+                holidayListDiv.innerHTML = '<p style="font-size:0.7rem; color:#94a3b8; text-align:center; padding: 1rem;"><i class="fas fa-calendar-day"></i> Tiada cuti umum</p>';
                 return;
             }
             let html = '';
@@ -540,7 +702,7 @@
                                 <div class="holiday-date">📅 ${dateRange}</div>
                                 <div class="holiday-name">🏷️ ${escapeHtml(data.name)}</div>
                             </div>
-                            <button class="delete-holiday" onclick="deleteHoliday('${doc.id}')"><i class="fas fa-trash"></i></button>
+                            <button class="delete-holiday" onclick="deleteHoliday('${doc.id}')"><i class="fas fa-trash-alt"></i></button>
                         </div>`;
             });
             holidayListDiv.innerHTML = html;
@@ -555,21 +717,15 @@
         if (!name) { showToast("Sila masukkan nama cuti", "error"); return; }
         if (!startDate) { showToast("Sila pilih tarikh mula cuti", "error"); return; }
         if (!endDate) { showToast("Sila pilih tarikh akhir cuti", "error"); return; }
-        
-        if (startDate > endDate) {
-            showToast("Tarikh akhir mestilah selepas atau sama dengan tarikh mula", "error");
-            return;
-        }
+        if (startDate > endDate) { showToast("Tarikh akhir mestilah selepas atau sama dengan tarikh mula", "error"); return; }
         
         try {
-            // Use startDate as document ID for uniqueness, but store both dates
             await setDoc(doc(holidaysRef, `${startDate}_to_${endDate}`), {
                 name: name,
                 startDate: startDate,
                 endDate: endDate,
                 createdAt: new Date().toISOString()
             });
-            
             document.getElementById('holidayName').value = '';
             document.getElementById('holidayStartDate').value = '';
             document.getElementById('holidayEndDate').value = '';

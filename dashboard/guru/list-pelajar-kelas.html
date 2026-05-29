@@ -9,8 +9,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <!-- QR Code Library -->
     <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
-    <!-- html2canvas for QR download -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -230,7 +228,7 @@
             margin-top: 0.5rem;
             flex-wrap: wrap;
         }
-        .btn-view, .btn-edit-card, .btn-delete-card, .btn-qr, .btn-attendance {
+        .btn-view, .btn-edit-card, .btn-delete-card, .btn-print-qr, .btn-attendance {
             flex: 1;
             padding: 0.5rem;
             border-radius: 2rem;
@@ -250,8 +248,8 @@
         .btn-edit-card:hover { background: #fde68a; }
         .btn-delete-card { background: #fee2e2; color: #dc2626; }
         .btn-delete-card:hover { background: #fecaca; }
-        .btn-qr { background: #e0e7ff; color: #2563eb; }
-        .btn-qr:hover { background: #c7d2fe; }
+        .btn-print-qr { background: #e0e7ff; color: #2563eb; }
+        .btn-print-qr:hover { background: #c7d2fe; }
         .btn-attendance { background: #dbeafe; color: #1e40af; }
         .btn-attendance:hover { background: #bfdbfe; }
         
@@ -729,41 +727,6 @@
         }, 500);
     }
     
-    // ==================== DOWNLOAD QR CODE SEBAGAI PNG ====================
-    async function downloadQRCode(studentName, studentIC) {
-        const qrData = JSON.stringify({ ic: studentIC, name: studentName, type: 'attendance' });
-        
-        const qrContainer = document.createElement('div');
-        qrContainer.style.width = '200px';
-        qrContainer.style.height = '200px';
-        qrContainer.style.margin = '0 auto';
-        document.body.appendChild(qrContainer);
-        
-        new QRCode(qrContainer, {
-            text: qrData,
-            width: 200,
-            height: 200,
-            colorDark: "#1e293b",
-            colorLight: "#ffffff",
-            correctLevel: QRCode.CorrectLevel.M
-        });
-        
-        setTimeout(async () => {
-            try {
-                const canvas = await html2canvas(qrContainer);
-                const link = document.createElement('a');
-                link.download = `QR_${studentName}.png`;
-                link.href = canvas.toDataURL();
-                link.click();
-                showAlert(`✅ QR Code untuk ${studentName} telah dimuat turun`, 'success');
-            } catch(e) {
-                showAlert('❌ Gagal memuat turun QR Code', 'error');
-            } finally {
-                document.body.removeChild(qrContainer);
-            }
-        }, 500);
-    }
-    
     // ==================== SHOW ATTENDANCE MODAL ====================
     async function showAttendanceModal(studentId, studentName, studentIC) {
         const stats = getStudentAttendanceStats(studentIC);
@@ -931,8 +894,7 @@
                             <div class="att-stat cuti"><div class="num">${attendanceStats.cuti}</div><div class="label">Cuti</div></div>
                         </div>
                         <div class="card-actions">
-                            <button class="btn-qr" onclick="window.downloadQRCode('${escapeHtml(student.fullname)}', '${student.icNumber}')"><i class="fas fa-download"></i> QR</button>
-                            <button class="btn-qr" onclick="window.printQRCode('${escapeHtml(student.fullname)}', '${student.icNumber}')"><i class="fas fa-print"></i> Print QR</button>
+                            <button class="btn-print-qr" onclick="window.printQRCode('${escapeHtml(student.fullname)}', '${student.icNumber}')"><i class="fas fa-print"></i> Print QR</button>
                             <button class="btn-attendance" onclick="window.showAttendanceModal('${student.id}', '${escapeHtml(student.fullname)}', '${student.icNumber}')"><i class="fas fa-calendar-check"></i> Kehadiran</button>
                             <button class="btn-view" onclick="viewStudentMerit('${student.id}')"><i class="fas fa-star"></i> Merit</button>
                             <button class="btn-edit-card" onclick="openEditStudentModal('${student.id}', '${escapeHtml(student.fullname)}', '${escapeHtml(student.icNumber)}', '${escapeHtml(student.class)}', '${student.session}')"><i class="fas fa-edit"></i> Edit</button>
@@ -946,7 +908,6 @@
         container.innerHTML = html;
     }
     
-    window.downloadQRCode = downloadQRCode;
     window.printQRCode = printQRCode;
     window.showAttendanceModal = showAttendanceModal;
     

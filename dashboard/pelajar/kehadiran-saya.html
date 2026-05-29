@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Kehadiran Saya | E-MindCare SEMSIRA</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: linear-gradient(135deg, #e0e7ff 0%, #f3e8ff 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid rgba(79,70,229,0.2);
+        }
+        .logo-area { display: flex; align-items: center; gap: 1rem; }
+        .logo-icon {
+            background: linear-gradient(145deg, #4f46e5, #7c3aed);
+            width: 50px; height: 50px;
+            border-radius: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .logo-icon i { font-size: 1.8rem; color: white; }
+        .logo-text h1 {
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #1e293b, #4f46e5);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .logo-text p { font-size: 0.7rem; color: #5b6e8c; }
+        .back-btn {
+            background: #eef2ff;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 40px;
+            cursor: pointer;
+            font-weight: 600;
+            color: #4f46e5;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: 0.2s;
+        }
+        .back-btn:hover { background: #4f46e5; color: white; }
+        
+        /* Status Card for Today */
+        .today-status-card {
+            background: white;
+            border-radius: 1.5rem;
+            padding: 1.8rem;
+            margin-bottom: 2rem;
+            text-align: center;
+            box-shadow: 0 8px 25px -10px rgba(0,0,0,0.1);
+            transition: 0.3s;
+        }
+        .today-status-card.hadir { background: linear-gradient(135deg, #dcfce7, #bbf7d0); border-left: 8px solid #10b981; }
+        .today-status-card.lewat { background: linear-gradient(135deg, #fef3c7, #fde68a); border-left: 8px solid #f59e0b; }
+        .today-status-card.tidakhadir { background: linear-gradient(135deg, #fee2e2, #fecaca); border-left: 8px solid #ef4444; }
+        .today-status-card.cuti { background: linear-gradient(135deg, #dbeafe, #bfdbfe); border-left: 8px solid #3b82f6; }
+        
+        .status-icon { font-size: 3rem; margin-bottom: 0.5rem; }
+        .status-title { font-size: 1.5rem; font-weight: 800; margin-bottom: 0.5rem; }
+        .status-message { font-size: 0.9rem; margin-bottom: 1rem; }
+        .status-datetime { font-size: 0.8rem; opacity: 0.8; margin-top: 0.5rem; }
+        .hadir .status-title { color: #166534; }
+        .lewat .status-title { color: #92400e; }
+        .tidakhadir .status-title { color: #991b1b; }
+        .cuti .status-title { color: #1e40af; }
+        
+        /* No Record Card */
+        .no-record-card {
+            background: #f1f5f9;
+            border-radius: 1.5rem;
+            padding: 1.8rem;
+            margin-bottom: 2rem;
+            text-align: center;
+            border: 1px dashed #94a3b8;
+        }
+        .no-record-card i { font-size: 3rem; color: #94a3b8; margin-bottom: 0.5rem; }
+        
+        /* Filter Section */
+        .filter-section {
+            background: white;
+            border-radius: 1.2rem;
+            padding: 1.2rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: flex-end;
+        }
+        .filter-group {
+            flex: 1;
+            min-width: 130px;
+        }
+        .filter-group label {
+            display: block;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: #64748b;
+            margin-bottom: 0.3rem;
+        }
+        .filter-group input, .filter-group select {
+            width: 100%;
+            padding: 0.6rem 0.8rem;
+            border-radius: 0.8rem;
+            border: 1px solid #e2e8f0;
+            background: #f8fafc;
+            font-family: inherit;
+            font-size: 0.85rem;
+            outline: none;
+        }
+        .filter-group input:focus, .filter-group select:focus {
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 2px rgba(79,70,229,0.1);
+        }
+        .btn-filter {
+            background: #4f46e5;
+            color: white;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 0.8rem;
+            cursor: pointer;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-filter:hover { background: #4338ca; }
+        
+        /* Stats Cards */
+        .stats-section {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .stat-card {
+            background: white;
+            border-radius: 1rem;
+            padding: 1rem;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            transition: 0.2s;
+        }
+        .stat-card:hover { transform: translateY(-3px); }
+        .stat-card .stat-icon { font-size: 1.8rem; margin-bottom: 0.3rem; }
+        .stat-card .stat-number { font-size: 1.8rem; font-weight: 800; }
+        .stat-card .stat-label { font-size: 0.7rem; color: #64748b; margin-top: 0.2rem; }
+        .stat-card.stat-hadir .stat-icon { color: #10b981; }
+        .stat-card.stat-lewat .stat-icon { color: #f59e0b; }
+        .stat-card.stat-tidakhadir .stat-icon { color: #ef4444; }
+        .stat-card.stat-cuti .stat-icon { color: #3b82f6; }
+        .stat-card.stat-hadir .stat-number { color: #10b981; }
+        .stat-card.stat-lewat .stat-number { color: #f59e0b; }
+        .stat-card.stat-tidakhadir .stat-number { color: #ef4444; }
+        .stat-card.stat-cuti .stat-number { color: #3b82f6; }
+        
+        /* History Table */
+        .history-section {
+            background: white;
+            border-radius: 1.2rem;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        .history-header {
+            padding: 1rem 1.5rem;
+            background: #f8fafc;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        .history-header h3 { font-size: 1rem; color: #1e293b; }
+        .table-container { overflow-x: auto; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th {
+            text-align: left;
+            padding: 0.8rem 1rem;
+            background: #f8fafc;
+            color: #1e293b;
+            font-weight: 600;
+            font-size: 0.8rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        td {
+            padding: 0.8rem 1rem;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 0.8rem;
+        }
+        .badge {
+            display: inline-block;
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+        .badge-hadir { background: #dcfce7; color: #166534; }
+        .badge-lewat { background: #fef3c7; color: #92400e; }
+        .badge-tidakhadir { background: #fee2e2; color: #991b1b; }
+        .badge-cutibersebab { background: #dbeafe; color: #1e40af; }
+        
+        .empty-state { text-align: center; padding: 2rem; color: #94a3b8; }
+        
+        .footer {
+            margin-top: 2rem;
+            text-align: center;
+            padding-top: 1rem;
+            border-top: 1px solid #e2e8f0;
+            color: #94a3b8;
+            font-size: 0.7rem;
+        }
+        
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #1e293b;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 10px;
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
+        }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        @media (max-width: 700px) {
+            .stats-section { grid-template-columns: repeat(2, 1fr); }
+            .filter-section { flex-direction: column; }
+            .filter-group { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <div class="logo-area">
+            <div class="logo-icon"><i class="fas fa-fingerprint"></i></div>
+            <div class="logo-text">
+                <h1>Kehadiran Saya</h1>
+                <p>Semak rekod kehadiran anda</p>
+            </div>
+        </div>
+        <a href="dashboard-pelajar.html" class="back-btn"><i class="fas fa-arrow-left"></i> Kembali</a>
+    </div>
+
+    <!-- Today's Status Card -->
+    <div id="todayStatusContainer">
+        <div class="no-record-card">
+            <i class="fas fa-spinner fa-pulse"></i>
+            <p>Memuatkan status kehadiran hari ini...</p>
+        </div>
+    </div>
+
+    <!-- Filter Section -->
+    <div class="filter-section">
+        <div class="filter-group">
+            <label><i class="fas fa-calendar-month"></i> Bulan</label>
+            <select id="monthFilter">
+                <option value="">Semua Bulan</option>
+                <option value="1">Januari</option><option value="2">Februari</option>
+                <option value="3">Mac</option><option value="4">April</option>
+                <option value="5">Mei</option><option value="6">Jun</option>
+                <option value="7">Julai</option><option value="8">Ogos</option>
+                <option value="9">September</option><option value="10">Oktober</option>
+                <option value="11">November</option><option value="12">Disember</option>
+            </select>
+        </div>
+        <div class="filter-group">
+            <label><i class="fas fa-calendar-day"></i> Tarikh</label>
+            <input type="date" id="dateFilter">
+        </div>
+        <div class="filter-group">
+            <label><i class="fas fa-calendar-year"></i> Tahun</label>
+            <select id="yearFilter">
+                <option value="">Semua Tahun</option>
+                <option value="2023">2023</option><option value="2024">2024</option>
+                <option value="2025">2025</option><option value="2026">2026</option>
+            </select>
+        </div>
+        <div class="filter-group">
+            <button id="applyFilterBtn" class="btn-filter"><i class="fas fa-filter"></i> Guna Filter</button>
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="stats-section">
+        <div class="stat-card stat-hadir">
+            <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
+            <div class="stat-number" id="totalHadir">0</div>
+            <div class="stat-label">Jumlah Hadir</div>
+        </div>
+        <div class="stat-card stat-lewat">
+            <div class="stat-icon"><i class="fas fa-clock"></i></div>
+            <div class="stat-number" id="totalLewat">0</div>
+            <div class="stat-label">Jumlah Lewat</div>
+        </div>
+        <div class="stat-card stat-tidakhadir">
+            <div class="stat-icon"><i class="fas fa-times-circle"></i></div>
+            <div class="stat-number" id="totalTidakHadir">0</div>
+            <div class="stat-label">Jumlah Tidak Hadir</div>
+        </div>
+        <div class="stat-card stat-cuti">
+            <div class="stat-icon"><i class="fas fa-umbrella-beach"></i></div>
+            <div class="stat-number" id="totalCuti">0</div>
+            <div class="stat-label">Jumlah Cuti Bersebab</div>
+        </div>
+    </div>
+
+    <!-- History Table -->
+    <div class="history-section">
+        <div class="history-header">
+            <h3><i class="fas fa-history"></i> Sejarah Kehadiran</h3>
+        </div>
+        <div class="table-container">
+            <div id="historyTable">
+                <div class="empty-state"><i class="fas fa-spinner fa-pulse"></i> Memuatkan data...</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <i class="fas fa-heart" style="color:#ec489a;"></i> E-MindCare SEMSIRA — Sokongan Kaunseling Profesional
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    
+    const firebaseConfig = {
+        apiKey: "AIzaSyCfu7XC8pXtpDyQ-9Cjdg4AobA-EVEwWcc",
+        authDomain: "e-mindcare.firebaseapp.com",
+        projectId: "e-mindcare",
+        storageBucket: "e-mindcare.firebasestorage.app",
+        messagingSenderId: "1021883944936",
+        appId: "1:1021883944936:web:39c75a0c98d19a37afde5d",
+        measurementId: "G-3CJVKWGEXV"
+    };
+    
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    
+    const attendanceRef = collection(db, "attendance_records");
+    
+    let studentIC = '';
+    let studentName = '';
+    let allRecords = [];
+    let filteredRecords = [];
+    
+    // Get student info from session storage
+    function getStudentInfo() {
+        studentIC = sessionStorage.getItem('studentIC') || localStorage.getItem('studentIC') || '';
+        studentName = sessionStorage.getItem('studentName') || localStorage.getItem('studentName') || 'Pelajar';
+        
+        if (!studentIC) {
+            console.warn("No student IC found in storage");
+        }
+    }
+    
+    // Load all attendance records for this student
+    async function loadStudentRecords() {
+        if (!studentIC) return [];
+        
+        try {
+            const q = query(attendanceRef, where("ic", "==", studentIC));
+            const snapshot = await getDocs(q);
+            allRecords = [];
+            snapshot.forEach(doc => {
+                allRecords.push({ id: doc.id, ...doc.data() });
+            });
+            // Sort by date descending
+            allRecords.sort((a, b) => (b.scanDate || '').localeCompare(a.scanDate || ''));
+            return allRecords;
+        } catch (error) {
+            console.error("Error loading records:", error);
+            return [];
+        }
+    }
+    
+    // Get today's status
+    function getTodayStatus() {
+        const today = new Date().toLocaleDateString('ms-MY');
+        const todayRecord = allRecords.find(r => r.scanDate === today);
+        return todayRecord || null;
+    }
+    
+    // Render today's status card
+    function renderTodayStatus() {
+        const container = document.getElementById('todayStatusContainer');
+        const todayRecord = getTodayStatus();
+        
+        if (!todayRecord) {
+            const today = new Date();
+            const todayStr = today.toLocaleDateString('ms-MY');
+            const dayName = today.toLocaleDateString('ms-MY', { weekday: 'long' });
+            
+            container.innerHTML = `
+                <div class="no-record-card">
+                    <i class="fas fa-question-circle"></i>
+                    <h3>Tiada Rekod Kehadiran</h3>
+                    <p>Anda belum merekodkan kehadiran untuk hari ini (${todayStr} - ${dayName})</p>
+                    <p style="font-size: 0.7rem; margin-top: 0.5rem;">Sila scan QR Code kehadiran untuk merekodkan kehadiran anda.</p>
+                </div>
+            `;
+            return;
+        }
+        
+        const status = todayRecord.status;
+        const statusText = getStatusText(status);
+        const time = todayRecord.time || '-';
+        const today = new Date();
+        const dateStr = today.toLocaleDateString('ms-MY');
+        const dayName = today.toLocaleDateString('ms-MY', { weekday: 'long' });
+        const reason = todayRecord.reason || '';
+        
+        let icon = '', title = '', message = '', cssClass = '';
+        
+        switch(status) {
+            case 'hadir':
+                icon = '<i class="fas fa-check-circle"></i>';
+                title = 'TAHNIAH!';
+                message = 'Anda telah hadir ke sekolah hari ini. Teruskan usaha anda!';
+                cssClass = 'hadir';
+                break;
+            case 'lewat':
+                icon = '<i class="fas fa-clock"></i>';
+                title = 'ANDA LEWAT';
+                message = 'Anda lewat pada hari ini. Cuba datang lebih awal pada hari-hari akan datang.';
+                cssClass = 'lewat';
+                break;
+            case 'tidakhadir':
+                icon = '<i class="fas fa-times-circle"></i>';
+                title = 'ANDA TIDAK HADIR';
+                message = 'Anda tidak hadir pada hari ini. Anda telah merugikan satu hari untuk menuntut ilmu. Sila pastikan anda datang ke sekolah pada hari-hari akan datang.';
+                cssClass = 'tidakhadir';
+                break;
+            case 'cuti':
+                icon = '<i class="fas fa-umbrella-beach"></i>';
+                title = 'CUTI BERSEBAB';
+                message = `Semoga hari anda dapat berjalan lancar. ${reason ? `Sebab: ${reason}` : ''}`;
+                cssClass = 'cuti';
+                break;
+            default:
+                icon = '<i class="fas fa-question-circle"></i>';
+                title = 'STATUS TIDAK DIKENALI';
+                message = 'Sila hubungi kaunselor untuk maklumat lanjut.';
+                cssClass = '';
+        }
+        
+        container.innerHTML = `
+            <div class="today-status-card ${cssClass}">
+                <div class="status-icon">${icon}</div>
+                <div class="status-title">${title}</div>
+                <div class="status-message">${message}</div>
+                <div class="status-datetime">
+                    <i class="fas fa-calendar-alt"></i> ${dateStr} (${dayName})<br>
+                    <i class="fas fa-clock"></i> Masa: ${time}
+                </div>
+            </div>
+        `;
+    }
+    
+    // Apply filters
+    function applyFilters() {
+        const month = document.getElementById('monthFilter').value;
+        const date = document.getElementById('dateFilter').value;
+        const year = document.getElementById('yearFilter').value;
+        
+        filteredRecords = allRecords.filter(record => {
+            const recordDate = record.scanDate;
+            if (!recordDate) return false;
+            
+            // Parse date (format: DD/MM/YYYY or YYYY-MM-DD)
+            let day = '', monthNum = '', yearNum = '';
+            if (recordDate.includes('/')) {
+                const parts = recordDate.split('/');
+                day = parts[0];
+                monthNum = parts[1];
+                yearNum = parts[2];
+            } else if (recordDate.includes('-')) {
+                const parts = recordDate.split('-');
+                yearNum = parts[0];
+                monthNum = parts[1];
+                day = parts[2];
+            }
+            
+            if (year && yearNum !== year) return false;
+            if (month && monthNum !== month) return false;
+            if (date && recordDate !== date) return false;
+            
+            return true;
+        });
+        
+        updateStatsAndHistory();
+    }
+    
+    // Update stats cards and history table
+    function updateStatsAndHistory() {
+        const hadir = filteredRecords.filter(r => r.status === 'hadir').length;
+        const lewat = filteredRecords.filter(r => r.status === 'lewat').length;
+        const tidakHadir = filteredRecords.filter(r => r.status === 'tidakhadir').length;
+        const cuti = filteredRecords.filter(r => r.status === 'cuti').length;
+        
+        document.getElementById('totalHadir').innerText = hadir;
+        document.getElementById('totalLewat').innerText = lewat;
+        document.getElementById('totalTidakHadir').innerText = tidakHadir;
+        document.getElementById('totalCuti').innerText = cuti;
+        
+        renderHistoryTable();
+    }
+    
+    function getStatusText(status) {
+        if (status === 'hadir') return 'Hadir';
+        if (status === 'lewat') return 'Lewat';
+        if (status === 'cuti') return 'Cuti Bersebab';
+        return 'Tidak Hadir';
+    }
+    
+    function getBadgeClass(status) {
+        if (status === 'hadir') return 'badge-hadir';
+        if (status === 'lewat') return 'badge-lewat';
+        if (status === 'cuti') return 'badge-cutibersebab';
+        return 'badge-tidakhadir';
+    }
+    
+    function renderHistoryTable() {
+        const container = document.getElementById('historyTable');
+        
+        if (filteredRecords.length === 0) {
+            container.innerHTML = '<div class="empty-state"><i class="fas fa-inbox"></i><p>Tiada rekod kehadiran untuk filter ini</p></div>';
+            return;
+        }
+        
+        let html = `<table><thead>
+            <tr>
+                <th>Bil</th>
+                <th>Tarikh</th>
+                <th>Hari</th>
+                <th>Masa Scan</th>
+                <th>Status</th>
+                <th>Sebab (jika cuti)</th>
+            </tr>
+        </thead><tbody>`;
+        
+        filteredRecords.forEach((record, index) => {
+            const statusText = getStatusText(record.status);
+            const badgeClass = getBadgeClass(record.status);
+            const reason = record.reason || '-';
+            
+            // Get day name from date
+            let dayName = '-';
+            try {
+                let dateObj;
+                if (record.scanDate.includes('/')) {
+                    const parts = record.scanDate.split('/');
+                    dateObj = new Date(`${parts[2]}-${parts[1]}-${parts[0]}`);
+                } else {
+                    dateObj = new Date(record.scanDate);
+                }
+                if (!isNaN(dateObj.getTime())) {
+                    dayName = dateObj.toLocaleDateString('ms-MY', { weekday: 'long' });
+                }
+            } catch(e) { console.log(e); }
+            
+            html += `<tr>
+                <td>${index + 1}</td>
+                <td>${record.scanDate || '-'}</td>
+                <td>${dayName}</td>
+                <td>${record.time || '-'}</td>
+                <td><span class="badge ${badgeClass}">${statusText}</span></td>
+                <td>${statusText === 'Cuti Bersebab' ? reason : '-'}</td>
+            </tr>`;
+        });
+        
+        html += `</tbody>}</div>`;
+        container.innerHTML = html;
+    }
+    
+    // Helper function to check if a date is today
+    function isToday(dateStr) {
+        const today = new Date().toLocaleDateString('ms-MY');
+        return dateStr === today;
+    }
+    
+    // Initialize
+    async function init() {
+        getStudentInfo();
+        
+        if (!studentIC) {
+            document.getElementById('todayStatusContainer').innerHTML = `
+                <div class="no-record-card">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <h3>Ralat: Maklumat Pelajar Tidak Ditemui</h3>
+                    <p>Sila log masuk semula.</p>
+                </div>
+            `;
+            return;
+        }
+        
+        await loadStudentRecords();
+        renderTodayStatus();
+        applyFilters();
+    }
+    
+    // Event listeners
+    document.getElementById('applyFilterBtn').addEventListener('click', applyFilters);
+    document.getElementById('monthFilter').addEventListener('change', applyFilters);
+    document.getElementById('yearFilter').addEventListener('change', applyFilters);
+    document.getElementById('dateFilter').addEventListener('change', applyFilters);
+    
+    init();
+</script>
+</body>
+</html>

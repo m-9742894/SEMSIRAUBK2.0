@@ -562,7 +562,7 @@
     </div>
   </div>
 
-  <!-- ==================== SECTION 2: KESELURUHAN DATA ==================== -->
+  <!-- ==================== SECTION 2: KESELURUHAN DATA SEKOLAH ==================== -->
   <div class="section-divider">
     <h3><i class="fas fa-database"></i> Keseluruhan Data Sekolah</h3>
     <hr>
@@ -588,6 +588,14 @@
       <h3>Keseluruhan Kelas</h3>
       <div class="menu-desc">Lihat senarai keseluruhan kelas yang ada di sekolah.</div>
       <div class="menu-btn">Lihat Semua <i class="fas fa-arrow-right"></i></div>
+    </div>
+
+    <!-- NEW MENU: Kategori Kehadiran Pelajar -->
+    <div class="menu-card" data-menu="kategori-kehadiran">
+      <div class="menu-icon"><i class="fas fa-calendar-check"></i></div>
+      <h3>Kategori Kehadiran Pelajar</h3>
+      <div class="menu-desc">Lihat laporan kehadiran mengikut kategori (Hadir, Lewat, Tidak Hadir, Cuti Bersebab) mengikut tetapan waktu kaunselor.</div>
+      <div class="menu-btn">Lihat Kehadiran <i class="fas fa-arrow-right"></i></div>
     </div>
   </div>
 
@@ -1009,6 +1017,9 @@
         break;
       case 'keseluruhan-kelas':
         targetUrl = 'keseluruhan-kelas.html';
+        break;
+      case 'kategori-kehadiran':
+        targetUrl = 'kehadiran-hari-ini.html';
         break;
       default:
         return;

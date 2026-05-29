@@ -215,9 +215,41 @@
         .closed-section i { font-size: 3rem; color: #f59e0b; margin-bottom: 1rem; }
         .closed-section h3 { color: white; margin-bottom: 0.5rem; }
         
+        /* Toast notification style (in-app, non-popup) */
+        .toast-notice {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1e293b;
+            backdrop-filter: blur(12px);
+            border-radius: 60px;
+            padding: 12px 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.3);
+            border-left: 4px solid;
+            z-index: 1000;
+            animation: slideUp 0.3s ease;
+            max-width: 85%;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: white;
+        }
+        .toast-notice.success { border-left-color: #10b981; background: #0f172ae6; }
+        .toast-notice.warning { border-left-color: #f59e0b; background: #1e293be6; }
+        .toast-notice.error { border-left-color: #ef4444; background: #2d0a0ae6; }
+        .toast-notice.info { border-left-color: #3b82f6; background: #0f172ae6; }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateX(-50%) translateY(30px); }
+            to { opacity: 1; transform: translateX(-50%) translateY(0); }
+        }
+        
         @media (max-width: 600px) {
             body { padding: 10px; }
             .live-datetime { flex-direction: column; text-align: center; }
+            .toast-notice { bottom: 20px; padding: 10px 18px; font-size: 0.75rem; }
         }
     </style>
 </head>
@@ -348,30 +380,39 @@
     const logList = document.getElementById('logList');
     const systemClosedWarning = document.getElementById('systemClosedWarning');
     
-    // Helper function to convert time string to minutes for comparison
+    // Toast notification function (No popup alert)
+    function showToast(message, type = 'info') {
+        const existingToast = document.querySelector('.toast-notice');
+        if(existingToast) existingToast.remove();
+        
+        const toast = document.createElement('div');
+        toast.className = `toast-notice ${type}`;
+        let icon = '';
+        if(type === 'success') icon = '<i class="fas fa-check-circle"></i>';
+        else if(type === 'warning') icon = '<i class="fas fa-exclamation-triangle"></i>';
+        else if(type === 'error') icon = '<i class="fas fa-times-circle"></i>';
+        else icon = '<i class="fas fa-info-circle"></i>';
+        toast.innerHTML = `${icon} <span>${message}</span>`;
+        document.body.appendChild(toast);
+        setTimeout(() => { if(toast && toast.remove) toast.remove(); }, 2800);
+    }
+    
     function timeToMinutes(timeStr) {
         const [hours, minutes] = timeStr.split(':').map(Number);
         return hours * 60 + minutes;
     }
     
-    // Check if current time is within operating hours (between timeOpen and timeClose)
-    // And determine status (Hadir or Lewat)
     function getAttendanceStatus(currentMinutes) {
         const openMinutes = timeToMinutes(attendanceSettings.timeOpen);
         const lateMinutes = timeToMinutes(attendanceSettings.timeLate);
         const closeMinutes = timeToMinutes(attendanceSettings.timeClose);
         
-        // Check if system is closed (after close time)
         if (currentMinutes >= closeMinutes) {
             return { status: 'closed', text: 'Sistem Ditutup', badgeClass: '', canScan: false };
         }
-        
-        // Check if before open time
         if (currentMinutes < openMinutes) {
             return { status: 'before_open', text: 'Belum Waktu Kehadiran', badgeClass: '', canScan: false };
         }
-        
-        // Within operating hours
         if (currentMinutes < lateMinutes) {
             return { status: 'hadir', text: 'Hadir', badgeClass: 'badge-hadir', canScan: true };
         } else {
@@ -379,14 +420,13 @@
         }
     }
     
-    // Update system closed status based on current time
     function updateSystemStatus() {
+        if (!isSystemOpen) return false;
         const now = new Date();
         const currentMinutes = now.getHours() * 60 + now.getMinutes();
         const openMinutes = timeToMinutes(attendanceSettings.timeOpen);
         const closeMinutes = timeToMinutes(attendanceSettings.timeClose);
         
-        // System is closed if before open time OR after close time
         if (currentMinutes < openMinutes || currentMinutes >= closeMinutes) {
             if (!isSystemClosed) {
                 isSystemClosed = true;
@@ -414,16 +454,12 @@
         }
     }
     
-    // Update live time display and check status periodically
     function updateDateTime() {
         const now = new Date();
         document.getElementById('currentDate').innerHTML = now.toLocaleDateString('ms-MY', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
         document.getElementById('currentTime').innerHTML = now.toLocaleTimeString('ms-MY', { hour: '2-digit', minute: '2-digit' });
         document.getElementById('liveTimer').innerHTML = now.toLocaleTimeString('ms-MY', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-        
-        if (isSystemOpen) {
-            updateSystemStatus();
-        }
+        if (isSystemOpen) updateSystemStatus();
     }
     setInterval(updateDateTime, 1000);
     updateDateTime();
@@ -436,11 +472,8 @@
                 if (data.timeOpen) attendanceSettings.timeOpen = data.timeOpen;
                 if (data.timeLate) attendanceSettings.timeLate = data.timeLate;
                 if (data.timeClose) attendanceSettings.timeClose = data.timeClose;
-                console.log("Attendance settings loaded:", attendanceSettings);
             }
-        } catch (error) {
-            console.error("Error loading settings:", error);
-        }
+        } catch (error) { console.error(error); }
     }
     
     async function checkHoliday() {
@@ -459,6 +492,7 @@
                 document.getElementById('holidayWarning').style.display = 'block';
                 document.getElementById('guruSection').style.display = 'none';
                 document.getElementById('systemClosedWarning').style.display = 'none';
+                showToast("Hari cuti, sistem kehadiran ditutup.", "warning");
             }
         } catch(e) { console.error(e); }
     }
@@ -471,13 +505,10 @@
     
     async function addAttendanceLog(name, ic, className, status, statusText, timeStr) {
         if (scannedStudents.has(ic)) return false;
-        
         const logContainer = document.getElementById('logList');
         if (logContainer.querySelector('.empty-log')) logContainer.innerHTML = '';
-        
         const statusClass = status === 'hadir' ? 'hadir' : 'lewat';
         const badgeClass = status === 'hadir' ? 'badge-hadir' : 'badge-lewat';
-        
         const logItem = document.createElement('div');
         logItem.className = `log-item ${statusClass}`;
         logItem.innerHTML = `<div class="log-name">${status === 'hadir' ? '✅' : '⚠️'} ${name}</div>
@@ -487,36 +518,20 @@
                 <span class="badge-status ${badgeClass}">${statusText}</span>
             </div>`;
         logContainer.insertBefore(logItem, logContainer.firstChild);
-        
         scannedStudents.add(ic);
-        
-        while (logContainer.children.length > 20) {
-            logContainer.removeChild(logContainer.lastChild);
-        }
-        
+        while (logContainer.children.length > 20) logContainer.removeChild(logContainer.lastChild);
         return true;
     }
     
     async function saveAttendanceToFirestore(name, ic, className, status, statusText, timeStr) {
         const now = new Date();
         const dateStr = now.toLocaleDateString('ms-MY');
-        
         try {
             await setDoc(doc(attendanceRef, `${ic}_${dateStr.replace(/\//g, '-')}`), {
-                ic: ic,
-                name: name,
-                className: className,
-                scanDate: dateStr,
-                time: timeStr,
-                status: status,
-                statusText: statusText,
-                timestamp: Timestamp.now()
+                ic, name, className, scanDate: dateStr, time: timeStr, status, statusText, timestamp: Timestamp.now()
             });
             return true;
-        } catch (error) {
-            console.error("Error saving attendance:", error);
-            return false;
-        }
+        } catch (error) { console.error(error); return false; }
     }
     
     async function verifyGuruQR(qrData) {
@@ -525,35 +540,25 @@
             if (typeof qrData === 'string') {
                 try { guruData = JSON.parse(qrData); } catch(e) { guruData = { ic: qrData }; }
             } else { guruData = qrData; }
-            
             const ic = guruData.ic || guruData;
-            
             const q = query(teachersRef, where("icNumber", "==", ic));
             const snapshot = await getDocs(q);
-            
             if (!snapshot.empty) {
                 let teacherName = '';
                 snapshot.forEach(doc => { teacherName = doc.data().fullname; });
                 currentGuruName = teacherName;
                 guruVerified = true;
                 isSystemOpen = true;
-                
                 guruStatus.style.display = 'block';
                 guruStatus.className = 'guru-status guru-verified';
                 guruStatus.innerHTML = `<i class="fas fa-check-circle"></i> Guru ${teacherName} disahkan! Sistem kehadiran dibuka.`;
-                
-                if (guruHtml5Qr) {
-                    try { await guruHtml5Qr.stop(); } catch(e) {}
-                }
+                if (guruHtml5Qr) { try { await guruHtml5Qr.stop(); } catch(e) {} }
                 guruScannerModal.style.display = 'none';
                 document.getElementById('guruSection').style.display = 'none';
-                
-                // Check if system is within operating hours
                 const now = new Date();
                 const currentMinutes = now.getHours() * 60 + now.getMinutes();
                 const openMinutes = timeToMinutes(attendanceSettings.timeOpen);
                 const closeMinutes = timeToMinutes(attendanceSettings.timeClose);
-                
                 if (currentMinutes >= openMinutes && currentMinutes < closeMinutes) {
                     isSystemClosed = false;
                     systemClosedWarning.style.display = 'none';
@@ -561,30 +566,30 @@
                     document.getElementById('logSection').style.display = 'block';
                     document.getElementById('scannerStatus').innerHTML = `✅ Sistem dibuka - Waktu operasi: ${attendanceSettings.timeOpen} - ${attendanceSettings.timeClose}`;
                     startStudentScanner();
+                    showToast(`Sistem dibuka oleh ${teacherName}. Selamat datang!`, "success");
                 } else {
                     isSystemClosed = true;
                     systemClosedWarning.style.display = 'block';
-                    const timeInfo = currentMinutes < openMinutes 
-                        ? `Sistem akan dibuka pada ${attendanceSettings.timeOpen}` 
-                        : `Waktu kehadiran telah tamat pada ${attendanceSettings.timeClose}`;
+                    const timeInfo = currentMinutes < openMinutes ? `Sistem akan dibuka pada ${attendanceSettings.timeOpen}` : `Waktu kehadiran telah tamat pada ${attendanceSettings.timeClose}`;
                     document.getElementById('closedMessage').innerHTML = timeInfo;
                     studentScannerSection.style.display = 'none';
                     document.getElementById('scannerStatus').innerHTML = '⏰ Di luar waktu operasi';
+                    showToast(`Sistem dibuka tetapi ${timeInfo.toLowerCase()}`, "warning");
                 }
-                
                 return true;
             } else {
                 guruStatus.style.display = 'block';
                 guruStatus.className = 'guru-status guru-error';
                 guruStatus.innerHTML = `<i class="fas fa-times-circle"></i> QR Code tidak sah! Guru tidak berdaftar.`;
+                showToast("QR Code guru tidak sah / tiada dalam pangkalan data", "error");
                 setTimeout(() => { guruStatus.style.display = 'none'; }, 3000);
                 return false;
             }
         } catch(error) {
-            console.error("Verify error:", error);
             guruStatus.style.display = 'block';
             guruStatus.className = 'guru-status guru-error';
             guruStatus.innerHTML = `<i class="fas fa-times-circle"></i> QR Code tidak sah!`;
+            showToast("Gagal mengesahkan QR code guru", "error");
             setTimeout(() => { guruStatus.style.display = 'none'; }, 3000);
             return false;
         }
@@ -596,72 +601,59 @@
         guruReaderDiv.innerHTML = '';
         guruHtml5Qr = new Html5Qrcode("guruReader");
         try {
-            await guruHtml5Qr.start(
-                { facingMode: "environment" },
-                { fps: 10, qrbox: 250 },
-                async (decodedText) => {
-                    await verifyGuruQR(decodedText);
-                },
+            await guruHtml5Qr.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 },
+                async (decodedText) => { await verifyGuruQR(decodedText); },
                 (error) => { console.log("Scan error:", error); }
             );
             document.getElementById('guruScanningStatus').innerHTML = '📷 Kamera aktif. Scan QR Code guru.';
         } catch(err) {
             document.getElementById('guruScanningStatus').innerHTML = '❌ Gagal mengakses kamera.';
+            showToast("Gagal mengakses kamera. Pastikan kebenaran diberikan.", "error");
         }
     }
     
     async function stopGuruScanner() {
-        if (guruHtml5Qr) {
-            try { await guruHtml5Qr.stop(); } catch(e) {}
-        }
+        if (guruHtml5Qr) { try { await guruHtml5Qr.stop(); } catch(e) {} }
         guruScannerModal.style.display = 'none';
         document.getElementById('guruScanningStatus').innerHTML = '';
     }
     
     async function startStudentScanner() {
         if (!isSystemOpen || isSystemClosed) return;
-        
         const studentReaderDiv = document.getElementById('studentReader');
         studentReaderDiv.innerHTML = '';
         studentHtml5Qr = new Html5Qrcode("studentReader");
         try {
-            await studentHtml5Qr.start(
-                { facingMode: "environment" },
-                { fps: 10, qrbox: 250 },
+            await studentHtml5Qr.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 },
                 async (decodedText) => {
                     if (!isSystemOpen || isSystemClosed) {
-                        alert("Sistem kehadiran belum dibuka atau telah ditutup");
+                        showToast("Sistem kehadiran belum dibuka atau telah ditutup", "warning");
                         return;
                     }
-                    
                     try {
                         const qrData = JSON.parse(decodedText);
                         if (qrData.type === 'attendance' && qrData.ic && qrData.name) {
                             const now = new Date();
                             const currentMinutes = now.getHours() * 60 + now.getMinutes();
                             const statusInfo = getAttendanceStatus(currentMinutes);
-                            
                             if (!statusInfo.canScan) {
-                                alert(statusInfo.text);
+                                showToast(statusInfo.text, "warning");
                                 return;
                             }
-                            
                             const alreadyAttended = await hasAttendanceToday(qrData.ic);
                             if (alreadyAttended) {
-                                alert(`${qrData.name} - Kehadiran sudah direkodkan hari ini`);
+                                showToast(`${qrData.name} - Kehadiran sudah direkodkan hari ini`, "info");
                                 return;
                             }
-                            
                             const timeStr = now.toLocaleTimeString('ms-MY', { hour: '2-digit', minute: '2-digit' });
                             await addAttendanceLog(qrData.name, qrData.ic, qrData.class || '-', statusInfo.status, statusInfo.text, timeStr);
                             await saveAttendanceToFirestore(qrData.name, qrData.ic, qrData.class || '-', statusInfo.status, statusInfo.text, timeStr);
-                            
+                            showToast(`${qrData.name} - ${statusInfo.text} direkodkan pada ${timeStr}`, "success");
                         } else {
-                            alert("QR Code tidak sah! Sila gunakan QR Code kehadiran yang betul.");
+                            showToast("QR Code tidak sah! Sila gunakan QR Code kehadiran yang betul.", "error");
                         }
-                    } catch(e) { 
-                        console.error("QR parse error:", e);
-                        alert("QR Code tidak dikenali. Sila gunakan QR Code kehadiran yang disediakan.");
+                    } catch(e) {
+                        showToast("QR Code tidak dikenali. Sila gunakan QR kehadiran yang sah.", "error");
                     }
                 },
                 (error) => { console.log("Scan error:", error); }
@@ -670,13 +662,12 @@
             stopStudentScannerBtn.disabled = false;
         } catch(err) {
             studentScanningStatus.innerHTML = '❌ Gagal mengakses kamera.';
+            showToast("Gagal mengakses kamera pelajar. Sila periksa kebenaran.", "error");
         }
     }
     
     async function stopStudentScanner() {
-        if (studentHtml5Qr) {
-            try { await studentHtml5Qr.stop(); } catch(e) {}
-        }
+        if (studentHtml5Qr) { try { await studentHtml5Qr.stop(); } catch(e) {} }
         studentScanningStatus.innerHTML = '';
         stopStudentScannerBtn.disabled = true;
     }
@@ -691,7 +682,6 @@
         await checkHoliday();
         updateSystemStatus();
     }
-    
     init();
 </script>
 </body>

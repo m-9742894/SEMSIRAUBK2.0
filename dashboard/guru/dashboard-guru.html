@@ -11,10 +11,6 @@
   <!-- QR Code Library -->
   <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
   
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-  
   <style>
     * {
       margin: 0;
@@ -158,7 +154,7 @@
       transform: scale(0.98);
     }
 
-    /* profile card */
+    /* profile card - UPDATED with QR section */
     .profile-card {
       background: white;
       border-radius: 1.5rem;
@@ -264,24 +260,6 @@
     .edit-profile-btn:hover {
       background: #2563eb;
       color: white;
-    }
-
-    /* Debug Panel */
-    .debug-panel {
-      background: #1e293b;
-      border-radius: 1rem;
-      padding: 0.8rem;
-      margin-bottom: 1.5rem;
-      font-size: 0.7rem;
-      color: #94a3b8;
-      display: none;
-    }
-    .debug-panel pre {
-      color: #10b981;
-      font-family: monospace;
-      font-size: 0.65rem;
-      margin-top: 0.3rem;
-      white-space: pre-wrap;
     }
 
     /* section divider */
@@ -455,6 +433,10 @@
       outline: none;
       font-size: 0.9rem;
     }
+    .form-group input:focus, .form-group select:focus {
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+    }
     .modal-btn {
       width: 100%;
       padding: 0.8rem;
@@ -467,6 +449,7 @@
       transition: 0.2s;
       margin-top: 0.5rem;
     }
+    .modal-btn:hover { transform: translateY(-2px); }
     
     .alert {
       padding: 12px;
@@ -532,12 +515,6 @@
     </div>
   </div>
 
-  <!-- Debug Panel -->
-  <div class="debug-panel" id="debugPanel">
-    <i class="fas fa-bug"></i> Status Debug:
-    <pre id="debugInfo">Memuatkan data...</pre>
-  </div>
-
   <!-- Profile Card with QR Code -->
   <div class="profile-card" id="profileCard">
     <div class="profile-left">
@@ -568,6 +545,7 @@
   </div>
 
   <div class="menu-grid">
+    <!-- 1. LIST PELAJAR KELAS DIA -->
     <div class="menu-card" data-menu="list-pelajar-kelas">
       <div class="menu-icon"><i class="fas fa-users"></i></div>
       <h3>List Pelajar Kelas Saya</h3>
@@ -575,6 +553,7 @@
       <div class="menu-btn">Lihat Pelajar <i class="fas fa-arrow-right"></i></div>
     </div>
 
+    <!-- 2. MATA MERIT -->
     <div class="menu-card" data-menu="mata-merit">
       <div class="menu-icon"><i class="fas fa-star"></i></div>
       <h3>Mata Merit</h3>
@@ -582,6 +561,7 @@
       <div class="menu-btn">Lihat Merit <i class="fas fa-arrow-right"></i></div>
     </div>
 
+    <!-- 3. DAFTAR MERIT PELAJAR -->
     <div class="menu-card" data-menu="daftar-merit">
       <div class="menu-icon"><i class="fas fa-plus-circle"></i></div>
       <h3>Daftar Merit Pelajar</h3>
@@ -597,6 +577,7 @@
   </div>
 
   <div class="menu-grid">
+    <!-- 4. SENARAI PELAJAR KESELURUHAN -->
     <div class="menu-card" data-menu="senarai-pelajar-keseluruhan">
       <div class="menu-icon"><i class="fas fa-user-graduate"></i></div>
       <h3>Keseluruhan Murid</h3>
@@ -604,6 +585,7 @@
       <div class="menu-btn">Lihat Semua <i class="fas fa-arrow-right"></i></div>
     </div>
 
+    <!-- 5. KESELURUHAN GURU -->
     <div class="menu-card" data-menu="keseluruhan-guru">
       <div class="menu-icon"><i class="fas fa-user-tie"></i></div>
       <h3>Keseluruhan Guru</h3>
@@ -611,6 +593,7 @@
       <div class="menu-btn">Lihat Semua <i class="fas fa-arrow-right"></i></div>
     </div>
 
+    <!-- 6. KESELURUHAN KELAS -->
     <div class="menu-card" data-menu="keseluruhan-kelas">
       <div class="menu-icon"><i class="fas fa-building"></i></div>
       <h3>Keseluruhan Kelas</h3>
@@ -658,9 +641,11 @@
 </div>
 
 <script type="module">
+  // Import Firebase SDK
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
   import { getFirestore, collection, getDocs, query, where, updateDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
   
+  // Firebase configuration
   const firebaseConfig = {
     apiKey: "AIzaSyCfu7XC8pXtpDyQ-9Cjdg4AobA-EVEwWcc",
     authDomain: "e-mindcare.firebaseapp.com",
@@ -671,6 +656,7 @@
     measurementId: "G-3CJVKWGEXV"
   };
 
+  // Initialize Firebase
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
   const teachersCollection = collection(db, "teachers");
@@ -679,32 +665,12 @@
   let currentTeacherId = null;
   let currentTeacherData = {};
 
-  // Debug function
-  function updateDebug(message) {
-    const debugInfo = document.getElementById('debugInfo');
-    const time = new Date().toLocaleTimeString();
-    debugInfo.innerHTML = `[${time}] ${message}\n` + debugInfo.innerHTML;
-    if (debugInfo.innerHTML.split('\n').length > 10) {
-      debugInfo.innerHTML = debugInfo.innerHTML.split('\n').slice(0, 10).join('\n');
-    }
-    console.log(message);
-    // Show debug panel if there's any issue
-    const debugPanel = document.getElementById('debugPanel');
-    if (debugPanel && debugPanel.style.display === 'none') {
-      debugPanel.style.display = 'block';
-    }
-  }
-
   // ==================== CHECK LOGIN STATUS ====================
   function checkLoginStatus() {
     const teacherName = sessionStorage.getItem('teacherName');
     const teacherIC = sessionStorage.getItem('teacherIC');
-    const teacherId = sessionStorage.getItem('teacherId');
-    
-    updateDebug(`Session data - Name: ${teacherName}, IC: ${teacherIC}, ID: ${teacherId}`);
     
     if (!teacherName || !teacherIC) {
-      updateDebug("❌ Tiada data login. Redirect ke page login...");
       window.location.href = '../dashboard/page-guru.html';
       return false;
     }
@@ -722,76 +688,12 @@
     }, 4000);
   }
 
-  // ==================== LOAD TEACHER DATA ====================
-  async function loadTeacherData() {
-    const teacherIC = sessionStorage.getItem('teacherIC');
-    const teacherName = sessionStorage.getItem('teacherName');
-    const teacherIdFromSession = sessionStorage.getItem('teacherId');
-    
-    updateDebug(`Mencari guru dengan IC: ${teacherIC}`);
-    
-    // First, try to get from session storage first
-    if (teacherName) {
-      document.getElementById('teacherNameDisplay').innerText = teacherName;
-      document.getElementById('profileName').innerText = teacherName;
-      document.getElementById('profileIC').innerText = teacherIC || '-';
-      updateDebug(`✅ Nama dari session: ${teacherName}`);
-    }
-    
-    if (teacherIC) {
-      try {
-        const q = query(teachersCollection, where("icNumber", "==", teacherIC));
-        const querySnapshot = await getDocs(q);
-        
-        if (!querySnapshot.empty) {
-          querySnapshot.forEach((doc) => {
-            const teacherData = doc.data();
-            currentTeacherId = doc.id;
-            currentTeacherData = teacherData;
-            
-            const teacherClass = teacherData.teacherClass || '-';
-            const teacherYear = teacherData.year || '-';
-            const teacherFullname = teacherData.fullname || teacherName;
-            
-            updateDebug(`✅ Data dari Firestore: Nama=${teacherFullname}, Kelas=${teacherClass}, Tahun=${teacherYear}`);
-            
-            document.getElementById('profileClass').innerText = teacherClass;
-            document.getElementById('profileYear').innerText = teacherYear;
-            document.getElementById('profileName').innerText = teacherFullname;
-            document.getElementById('teacherNameDisplay').innerText = teacherFullname;
-            
-            sessionStorage.setItem('teacherClass', teacherClass);
-            sessionStorage.setItem('teacherYear', teacherYear);
-            sessionStorage.setItem('teacherId', doc.id);
-            sessionStorage.setItem('teacherName', teacherFullname);
-          });
-        } else {
-          updateDebug(`⚠️ Guru dengan IC ${teacherIC} tidak ditemui di Firestore!`);
-          document.getElementById('profileClass').innerText = 'Belum ditetapkan';
-          document.getElementById('profileYear').innerText = '-';
-        }
-      } catch (error) {
-        console.error("Error loading teacher data:", error);
-        updateDebug(`❌ Error loading dari Firestore: ${error.message}`);
-        document.getElementById('profileClass').innerText = 'Error loading';
-      }
-    }
-    
-    // Generate QR Code after teacher data is loaded
-    generateQRCode();
-  }
-
   // ==================== GENERATE QR CODE ====================
   function generateQRCode() {
     const teacherName = sessionStorage.getItem('teacherName') || '';
     const teacherIC = sessionStorage.getItem('teacherIC') || '';
     
-    updateDebug(`Menjana QR Code untuk: ${teacherName} (${teacherIC})`);
-    
-    if (!teacherName || !teacherIC) {
-      updateDebug("❌ Nama atau IC kosong, QR Code tidak dapat dijana");
-      return;
-    }
+    if (!teacherName || !teacherIC) return;
     
     const qrContainer = document.getElementById('qrcode');
     qrContainer.innerHTML = '';
@@ -811,10 +713,9 @@
         colorLight: "#ffffff",
         correctLevel: QRCode.CorrectLevel.M
       });
-      updateDebug("✅ QR Code berjaya dijana untuk guru");
+      console.log("QR Code berjaya dijana untuk guru");
     } catch(e) {
       console.error("QR Code error:", e);
-      updateDebug(`❌ QR Code error: ${e.message}`);
     }
   }
 
@@ -910,6 +811,52 @@
     printWindow.document.close();
   }
 
+  // ==================== LOAD TEACHER DATA ====================
+  async function loadTeacherData() {
+    const teacherIC = sessionStorage.getItem('teacherIC');
+    const teacherName = sessionStorage.getItem('teacherName');
+    
+    if (teacherName) {
+      document.getElementById('teacherNameDisplay').innerText = teacherName;
+      document.getElementById('profileName').innerText = teacherName;
+      document.getElementById('profileIC').innerText = teacherIC || '-';
+    }
+    
+    if (teacherIC) {
+      try {
+        const q = query(teachersCollection, where("icNumber", "==", teacherIC));
+        const querySnapshot = await getDocs(q);
+        
+        if (!querySnapshot.empty) {
+          querySnapshot.forEach((doc) => {
+            const teacherData = doc.data();
+            currentTeacherId = doc.id;
+            currentTeacherData = teacherData;
+            
+            const teacherClass = teacherData.teacherClass || '-';
+            const teacherYear = teacherData.year || '-';
+            
+            document.getElementById('profileClass').innerText = teacherClass;
+            document.getElementById('profileYear').innerText = teacherYear;
+            
+            sessionStorage.setItem('teacherClass', teacherClass);
+            sessionStorage.setItem('teacherYear', teacherYear);
+            sessionStorage.setItem('teacherId', doc.id);
+          });
+        } else {
+          document.getElementById('profileClass').innerText = '-';
+          document.getElementById('profileYear').innerText = '-';
+        }
+      } catch (error) {
+        console.error("Error loading teacher data:", error);
+        document.getElementById('profileClass').innerText = 'Error loading';
+      }
+    }
+    
+    // Generate QR Code after teacher data is loaded
+    generateQRCode();
+  }
+
   // ==================== UPDATE TEACHER PROFILE ====================
   async function updateTeacherProfile(fullname, icNumber, teacherClass, year) {
     if (!currentTeacherId) {
@@ -957,7 +904,7 @@
       document.getElementById('profileClass').innerText = updateData.teacherClass;
       document.getElementById('profileYear').innerText = updateData.year;
       
-      // Regenerate QR Code with new data
+      // Regenerate QR Code
       generateQRCode();
       
       showAlert('✅ Profil guru berjaya dikemaskini!', 'success');
@@ -977,7 +924,7 @@
       try {
         const q = query(studentsCollection, where("class", "==", teacherClass));
         const querySnapshot = await getDocs(q);
-        updateDebug(`📚 Bilangan pelajar dalam kelas ${teacherClass}: ${querySnapshot.size}`);
+        console.log(`Students in class ${teacherClass}: ${querySnapshot.size}`);
       } catch (error) {
         console.error("Error loading student count:", error);
       }
@@ -1079,11 +1026,9 @@
 
   // ==================== INITIALIZE ====================
   async function init() {
-    updateDebug("🚀 Memulakan Dashboard Guru...");
     if (!checkLoginStatus()) return;
     await loadTeacherData();
     await loadStudentCount();
-    updateDebug("✅ Inisialisasi selesai");
   }
   
   const menuCards = document.querySelectorAll('.menu-card');

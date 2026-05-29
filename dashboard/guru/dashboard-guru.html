@@ -9,7 +9,6 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <!-- QR Code Library -->
   <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
-  
   <style>
     * {
       margin: 0;
@@ -160,12 +159,16 @@
       padding: 1.5rem;
       margin-bottom: 2rem;
       display: flex;
-      align-items: center;
-      gap: 1.5rem;
+      gap: 2rem;
       flex-wrap: wrap;
       box-shadow: 0 8px 20px -8px rgba(0, 0, 0, 0.08);
       border: 1px solid rgba(37, 99, 235, 0.1);
-      position: relative;
+    }
+    .profile-left {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      flex: 2;
     }
     .profile-avatar {
       background: linear-gradient(145deg, #2563eb, #7c3aed);
@@ -179,9 +182,6 @@
     .profile-avatar i {
       font-size: 3rem;
       color: white;
-    }
-    .profile-info {
-      flex: 1;
     }
     .profile-info h3 {
       font-size: 1.3rem;
@@ -202,26 +202,6 @@
       display: inline-block;
       margin-top: 0.5rem;
     }
-    .edit-profile-btn {
-      background: #e0e7ff;
-      border: none;
-      padding: 0.5rem 1rem;
-      border-radius: 2rem;
-      cursor: pointer;
-      font-weight: 600;
-      color: #2563eb;
-      transition: 0.2s;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 0.8rem;
-    }
-    .edit-profile-btn:hover {
-      background: #2563eb;
-      color: white;
-    }
-    
-    /* QR Code Section */
     .qr-section {
       background: #f8fafc;
       border-radius: 1rem;
@@ -236,7 +216,7 @@
       margin-top: 0.5rem;
     }
     .btn-print-qr {
-      background: #4f46e5;
+      background: #2563eb;
       color: white;
       border: none;
       padding: 0.3rem 0.8rem;
@@ -250,17 +230,29 @@
       gap: 5px;
     }
     .btn-print-qr:hover {
-      background: #4338ca;
+      background: #1d4ed8;
       transform: translateY(-2px);
     }
-    #qrcode {
-      display: flex;
-      justify-content: center;
+    .edit-profile-btn {
+      background: #e0e7ff;
+      border: none;
+      padding: 0.3rem 0.8rem;
+      border-radius: 20px;
+      cursor: pointer;
+      font-weight: 600;
+      color: #2563eb;
+      transition: 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.7rem;
     }
-    #qrcode img {
-      width: 100px;
-      height: 100px;
+    .edit-profile-btn:hover {
+      background: #2563eb;
+      color: white;
     }
+    #qrcode { display: flex; justify-content: center; }
+    #qrcode img { width: 100px; height: 100px; }
 
     /* section divider */
     .section-divider {
@@ -466,52 +458,6 @@
     .alert.error { background: #fee2e2; color: #dc2626; display: block; }
     .alert.info { background: #dbeafe; color: #1e40af; display: block; }
 
-    /* Print styles for QR Code card (7cm x 10cm) */
-    @media print {
-      body * {
-        visibility: hidden;
-      }
-      .qr-print-card, .qr-print-card * {
-        visibility: visible;
-      }
-      .qr-print-card {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 7cm;
-        height: 10cm;
-        padding: 0.5cm;
-        margin: 0;
-        background: white;
-        box-shadow: none;
-        border: 1px solid #ddd;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        page-break-after: avoid;
-        break-inside: avoid;
-      }
-      .qr-print-card .print-qr {
-        margin-bottom: 0.3cm;
-      }
-      .qr-print-card .print-qr img {
-        width: 3.5cm !important;
-        height: 3.5cm !important;
-      }
-      .qr-print-card .print-name {
-        font-size: 12pt;
-        font-weight: bold;
-        text-align: center;
-        margin-bottom: 0.2cm;
-      }
-      .qr-print-card .print-ic {
-        font-size: 10pt;
-        text-align: center;
-        color: #333;
-      }
-    }
-
     @media (max-width: 700px) {
       .dashboard-container {
         padding: 1rem;
@@ -523,11 +469,11 @@
         flex-direction: column;
         text-align: center;
       }
+      .profile-left {
+        flex-direction: column;
+      }
       .logo-text h1 {
         font-size: 1.2rem;
-      }
-      .edit-profile-btn {
-        margin-top: 0.5rem;
       }
       .qr-section {
         margin: 0 auto;
@@ -561,28 +507,30 @@
     </div>
   </div>
 
-  <!-- Profile Card with QR Code and Edit Button -->
+  <!-- Profile Card with QR Code -->
   <div class="profile-card" id="profileCard">
-    <div class="profile-avatar">
-      <i class="fas fa-chalkboard-user"></i>
-    </div>
-    <div class="profile-info">
-      <h3 id="profileName">-</h3>
-      <p><i class="fas fa-id-card"></i> No. Kad Pengenalan: <span id="profileIC">-</span></p>
-      <p><i class="fas fa-school"></i> Mengajar Kelas: <span id="profileClass">-</span></p>
-      <p><i class="fas fa-calendar"></i> Tahun/Sesi: <span id="profileYear">-</span></p>
-      <div class="badge"><i class="fas fa-check-circle"></i> Guru Aktif</div>
+    <div class="profile-left">
+      <div class="profile-avatar">
+        <i class="fas fa-chalkboard-user"></i>
+      </div>
+      <div class="profile-info">
+        <h3 id="profileName">-</h3>
+        <p><i class="fas fa-id-card"></i> No. Kad Pengenalan: <span id="profileIC">-</span></p>
+        <p><i class="fas fa-school"></i> Mengajar Kelas: <span id="profileClass">-</span></p>
+        <p><i class="fas fa-calendar"></i> Tahun/Sesi: <span id="profileYear">-</span></p>
+        <div class="badge"><i class="fas fa-check-circle"></i> Guru Aktif</div>
+      </div>
     </div>
     <div class="qr-section">
       <div id="qrcode"></div>
-      <p><i class="fas fa-qrcode"></i> Kad Akses Sistem Kehadiran</p>
+      <p><i class="fas fa-qrcode"></i> QR Code Guru</p>
       <button class="btn-print-qr" id="printQrBtn">
         <i class="fas fa-print"></i> Print QR Code
       </button>
+      <button class="edit-profile-btn" id="editProfileBtn" style="margin-top: 0.5rem;">
+        <i class="fas fa-user-edit"></i> Edit Profil
+      </button>
     </div>
-    <button class="edit-profile-btn" id="editProfileBtn">
-      <i class="fas fa-user-edit"></i> Edit Profil
-    </button>
   </div>
 
   <!-- ==================== SECTION 1: URUSAN KELAS ==================== -->
@@ -592,7 +540,6 @@
   </div>
 
   <div class="menu-grid">
-    <!-- 1. LIST PELAJAR KELAS DIA -->
     <div class="menu-card" data-menu="list-pelajar-kelas">
       <div class="menu-icon"><i class="fas fa-users"></i></div>
       <h3>List Pelajar Kelas Saya</h3>
@@ -600,7 +547,6 @@
       <div class="menu-btn">Lihat Pelajar <i class="fas fa-arrow-right"></i></div>
     </div>
 
-    <!-- 2. MATA MERIT (TUKAR DARI MERIT PELAJAR) -->
     <div class="menu-card" data-menu="mata-merit">
       <div class="menu-icon"><i class="fas fa-star"></i></div>
       <h3>Mata Merit</h3>
@@ -608,7 +554,6 @@
       <div class="menu-btn">Lihat Merit <i class="fas fa-arrow-right"></i></div>
     </div>
 
-    <!-- 3. DAFTAR MERIT PELAJAR -->
     <div class="menu-card" data-menu="daftar-merit">
       <div class="menu-icon"><i class="fas fa-plus-circle"></i></div>
       <h3>Daftar Merit Pelajar</h3>
@@ -624,7 +569,6 @@
   </div>
 
   <div class="menu-grid">
-    <!-- 4. SENARAI PELAJAR KESELURUHAN -->
     <div class="menu-card" data-menu="senarai-pelajar-keseluruhan">
       <div class="menu-icon"><i class="fas fa-user-graduate"></i></div>
       <h3>Keseluruhan Murid</h3>
@@ -632,7 +576,6 @@
       <div class="menu-btn">Lihat Semua <i class="fas fa-arrow-right"></i></div>
     </div>
 
-    <!-- 5. KESELURUHAN GURU -->
     <div class="menu-card" data-menu="keseluruhan-guru">
       <div class="menu-icon"><i class="fas fa-user-tie"></i></div>
       <h3>Keseluruhan Guru</h3>
@@ -640,7 +583,6 @@
       <div class="menu-btn">Lihat Semua <i class="fas fa-arrow-right"></i></div>
     </div>
 
-    <!-- 6. KESELURUHAN KELAS -->
     <div class="menu-card" data-menu="keseluruhan-kelas">
       <div class="menu-icon"><i class="fas fa-building"></i></div>
       <h3>Keseluruhan Kelas</h3>
@@ -653,6 +595,9 @@
     <i class="fas fa-heart" style="color:#ec489a;"></i> E-MindCare SEMSIRA — Sokongan Kaunseling Profesional
   </div>
 </div>
+
+<!-- Hidden Print Container -->
+<div id="printContainer" style="display: none;"></div>
 
 <!-- Modal Edit Profile -->
 <div id="editProfileModal" class="modal" style="display: none;">
@@ -780,17 +725,14 @@
 
   // ==================== GENERATE QR CODE ====================
   function generateQRCode() {
-    const teacherIC = sessionStorage.getItem('teacherIC');
-    const teacherName = sessionStorage.getItem('teacherName');
-    
-    if (!teacherIC) return;
+    const teacherIC = sessionStorage.getItem('teacherIC') || '-';
+    const teacherName = sessionStorage.getItem('teacherName') || 'Guru';
     
     const qrContainer = document.getElementById('qrcode');
     qrContainer.innerHTML = '';
     
-    // QR Code data for teacher (will be used to open attendance system)
     const qrData = JSON.stringify({
-      type: "teacher",
+      type: 'teacher',
       ic: teacherIC,
       name: teacherName
     });
@@ -804,113 +746,110 @@
         colorLight: "#ffffff",
         correctLevel: QRCode.CorrectLevel.M
       });
-      console.log("QR Code berjaya dijana untuk guru");
+      console.log("QR Code guru berjaya dijana");
     } catch(e) {
       console.error("QR Code error:", e);
     }
   }
-
-  // ==================== PRINT QR CODE (Saiz 7cm x 10cm) ====================
+  
+  // ==================== PRINT QR CODE ====================
   function printQRCode() {
-    const teacherName = sessionStorage.getItem('teacherName') || 'Guru';
     const teacherIC = sessionStorage.getItem('teacherIC') || '-';
+    const teacherName = sessionStorage.getItem('teacherName') || 'Guru';
     
-    const printHtml = `
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <meta charset="UTF-8">
-        <title>QR Code Guru - ${teacherName}</title>
-        <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"><\/script>
-        <style>
-          * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-          }
-          body {
-            font-family: 'Plus Jakarta Sans', 'Segoe UI', Arial, sans-serif;
-            background: white;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-          }
-          .qr-print-card {
-            width: 7cm;
-            height: 10cm;
-            padding: 0.4cm;
-            background: white;
-            border: 1px solid #e2e8f0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-          }
-          .print-title {
-            font-size: 10pt;
-            font-weight: bold;
-            color: #4f46e5;
-            margin-bottom: 0.2cm;
-            text-transform: uppercase;
-          }
-          .print-qr {
-            margin: 0.2cm 0;
-            display: flex;
-            justify-content: center;
-          }
-          .print-name {
-            font-size: 11pt;
-            font-weight: bold;
-            color: #1e293b;
-            margin-top: 0.2cm;
-            margin-bottom: 0.1cm;
-          }
-          .print-ic {
-            font-size: 9pt;
-            color: #64748b;
-            margin-bottom: 0.2cm;
-          }
-          .print-footer {
-            font-size: 7pt;
-            color: #94a3b8;
-            margin-top: 0.2cm;
-            border-top: 0.5px dashed #cbd5e1;
-            padding-top: 0.2cm;
-          }
-        </style>
-      </head>
-      <body>
-        <div class="qr-print-card">
-          <div class="print-title">E-MIND CARE SEMSIRA</div>
-          <div id="printQr" class="print-qr"></div>
-          <div class="print-name">${escapeHtml(teacherName)}</div>
-          <div class="print-ic">No. IC: ${escapeHtml(teacherIC)}</div>
-          <div class="print-footer">Kad Akses Sistem Kehadiran • Scan untuk buka sistem</div>
-        </div>
-        <script>
-          const qrData = JSON.stringify({ type: "teacher", ic: "${escapeHtml(teacherIC)}", name: "${escapeHtml(teacherName)}" });
-          new QRCode(document.getElementById('printQr'), {
-            text: qrData,
-            width: 120,
-            height: 120,
-            colorDark: "#1e293b",
-            colorLight: "#ffffff",
-            correctLevel: QRCode.CorrectLevel.M
-          });
-          setTimeout(() => { window.print(); setTimeout(() => { window.close(); }, 500); }, 800);
-        <\/script>
-      </body>
-      </html>
+    const printContainer = document.getElementById('printContainer');
+    printContainer.style.display = 'block';
+    printContainer.innerHTML = '';
+    
+    const printCard = document.createElement('div');
+    printCard.className = 'qr-print-card';
+    printCard.style.cssText = `
+      width: 7cm;
+      height: 10cm;
+      padding: 0.4cm;
+      background: white;
+      border: 1px solid #e2e8f0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      font-family: 'Plus Jakarta Sans', 'Segoe UI', Arial, sans-serif;
     `;
     
-    const printWindow = window.open('', '_blank', 'width=400,height=600');
-    printWindow.document.write(printHtml);
-    printWindow.document.close();
+    printCard.innerHTML = `
+      <div style="font-size: 10pt; font-weight: bold; color: #2563eb; margin-bottom: 0.2cm; text-transform: uppercase;">E-MIND CARE SEMSIRA</div>
+      <div id="printQrCode" style="margin: 0.2cm 0; display: flex; justify-content: center;"></div>
+      <div style="font-size: 11pt; font-weight: bold; color: #1e293b; margin-top: 0.2cm; margin-bottom: 0.1cm;">${escapeHtml(teacherName)}</div>
+      <div style="font-size: 9pt; color: #64748b; margin-bottom: 0.2cm;">No. IC: ${escapeHtml(teacherIC)}</div>
+      <div style="font-size: 7pt; color: #94a3b8; margin-top: 0.2cm; border-top: 0.5px dashed #cbd5e1; padding-top: 0.2cm;">Kad Pengesahan Guru • Scan untuk buka sistem kehadiran</div>
+    `;
+    
+    printContainer.appendChild(printCard);
+    
+    const qrData = JSON.stringify({ type: 'teacher', ic: teacherIC, name: teacherName });
+    new QRCode(document.getElementById('printQrCode'), {
+      text: qrData,
+      width: 120,
+      height: 120,
+      colorDark: "#1e293b",
+      colorLight: "#ffffff",
+      correctLevel: QRCode.CorrectLevel.M
+    });
+    
+    setTimeout(() => {
+      const printWindow = window.open('', '_blank');
+      const printHtml = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="UTF-8">
+          <title>QR Code Guru - ${teacherName}</title>
+          <style>
+            * { margin: 0; padding: 0; box-sizing: border-box; }
+            body {
+              font-family: 'Plus Jakarta Sans', 'Segoe UI', Arial, sans-serif;
+              background: white;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              min-height: 100vh;
+            }
+            .qr-print-card {
+              width: 7cm;
+              height: 10cm;
+              padding: 0.4cm;
+              background: white;
+              border: 1px solid #e2e8f0;
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              justify-content: center;
+              text-align: center;
+              box-shadow: none;
+            }
+          </style>
+        </head>
+        <body>
+          ${printCard.outerHTML}
+        </body>
+        </html>
+      `;
+      
+      printWindow.document.write(printHtml);
+      printWindow.document.close();
+      
+      printWindow.onload = () => {
+        printWindow.print();
+      };
+      
+      setTimeout(() => {
+        printContainer.style.display = 'none';
+        printContainer.innerHTML = '';
+      }, 1000);
+    }, 500);
   }
-
+  
   function escapeHtml(str) {
     if (!str) return '';
     return str.replace(/[&<>]/g, function(m) {
@@ -921,7 +860,7 @@
     });
   }
 
-  // ==================== UPDATE TEACHER PROFILE IN FIRESTORE ====================
+  // ==================== UPDATE TEACHER PROFILE ====================
   async function updateTeacherProfile(fullname, icNumber, teacherClass, year) {
     if (!currentTeacherId) {
       showAlert('ID guru tidak ditemui', 'error');
@@ -929,10 +868,8 @@
     }
     
     try {
-      // Format IC without dashes
       const formattedIc = icNumber.replace(/-/g, '');
       
-      // Check if IC already exists for another teacher
       if (formattedIc !== sessionStorage.getItem('teacherIC')) {
         const q = query(teachersCollection, where("icNumber", "==", formattedIc));
         const querySnapshot = await getDocs(q);
@@ -959,13 +896,11 @@
       
       await updateDoc(teacherRef, updateData);
       
-      // Update session storage
       sessionStorage.setItem('teacherName', updateData.fullname);
       sessionStorage.setItem('teacherIC', updateData.icNumber);
       sessionStorage.setItem('teacherClass', updateData.teacherClass);
       sessionStorage.setItem('teacherYear', updateData.year);
       
-      // Update UI
       document.getElementById('teacherNameDisplay').innerText = updateData.fullname;
       document.getElementById('profileName').innerText = updateData.fullname;
       document.getElementById('profileIC').innerText = updateData.icNumber;
@@ -1018,7 +953,6 @@
     document.getElementById('editProfileModal').style.display = 'none';
   };
   
-  // Handle edit profile form submit
   document.getElementById('editProfileForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     
@@ -1027,17 +961,9 @@
     const teacherClass = document.getElementById('editClass').value.trim();
     const year = document.getElementById('editYear').value.trim();
     
-    if (!fullname) {
-      showAlert('Sila masukkan Nama Penuh', 'error');
-      return;
-    }
+    if (!fullname) { showAlert('Sila masukkan Nama Penuh', 'error'); return; }
+    if (!icNumber) { showAlert('Sila masukkan No. Kad Pengenalan', 'error'); return; }
     
-    if (!icNumber) {
-      showAlert('Sila masukkan No. Kad Pengenalan', 'error');
-      return;
-    }
-    
-    // Validate IC format (12 digit)
     const cleanIc = icNumber.replace(/-/g, '');
     if (!/^\d{12}$/.test(cleanIc)) {
       showAlert('❌ No. Kad Pengenalan mestilah 12 digit nombor', 'error');
@@ -1049,7 +975,6 @@
       return;
     }
     
-    // Disable button while processing
     const submitBtn = e.target.querySelector('button[type="submit"]');
     const originalText = submitBtn.innerHTML;
     submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
@@ -1059,7 +984,6 @@
     
     submitBtn.innerHTML = originalText;
     submitBtn.disabled = false;
-    
     closeEditModal();
   });
 
@@ -1068,7 +992,6 @@
     let targetUrl = '';
     
     switch(menuType) {
-      // Urusan Kelas
       case 'list-pelajar-kelas':
         targetUrl = 'list-pelajar-kelas.html';
         break;
@@ -1078,8 +1001,6 @@
       case 'daftar-merit':
         targetUrl = 'daftar-merit.html';
         break;
-      
-      // Keseluruhan Data
       case 'senarai-pelajar-keseluruhan':
         targetUrl = 'keseluruhan-murid.html';
         break;
@@ -1089,7 +1010,6 @@
       case 'keseluruhan-kelas':
         targetUrl = 'keseluruhan-kelas.html';
         break;
-      
       default:
         return;
     }
@@ -1105,7 +1025,7 @@
     generateQRCode();
   }
   
-  // Event listeners for menu cards
+  // Event listeners
   const menuCards = document.querySelectorAll('.menu-card');
   menuCards.forEach(card => {
     card.addEventListener('click', (e) => {
@@ -1114,13 +1034,9 @@
     });
   });
   
-  // Edit profile button
   document.getElementById('editProfileBtn').addEventListener('click', openEditModal);
-  
-  // Print QR Code button
   document.getElementById('printQrBtn').addEventListener('click', printQRCode);
   
-  // Logout button
   const logoutBtn = document.getElementById('logoutBtn');
   logoutBtn.addEventListener('click', () => {
     sessionStorage.clear();

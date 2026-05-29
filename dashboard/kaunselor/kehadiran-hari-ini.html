@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Kehadiran Pelajar | Kaunselor SEMSIRA</title>
+    <title>Kehadiran Hari Ini | Kaunselor SEMSIRA</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -68,9 +68,33 @@
         }
         .back-btn:hover { background: #4f46e5; color: white; }
         
+        /* Live DateTime */
+        .live-datetime {
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            border-radius: 1.2rem;
+            padding: 0.8rem 1.5rem;
+            margin-bottom: 1.5rem;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .datetime-left h3 { font-size: 1.1rem; margin-bottom: 0.2rem; }
+        .datetime-left p { font-size: 0.8rem; opacity: 0.9; }
+        .datetime-right {
+            background: rgba(255,255,255,0.2);
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            font-family: monospace;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+        
         /* Stats Banner */
         .stats-banner {
-            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            background: linear-gradient(135deg, #1e293b, #334155);
             border-radius: 1.2rem;
             padding: 1rem 1.5rem;
             margin-bottom: 1.5rem;
@@ -81,7 +105,6 @@
             flex-wrap: wrap;
             gap: 1rem;
         }
-        .stats-banner h2 { font-size: 1.2rem; }
         .date-picker {
             background: rgba(255,255,255,0.2);
             border: none;
@@ -93,6 +116,14 @@
             cursor: pointer;
         }
         .date-picker::-webkit-calendar-picker-indicator { filter: invert(1); cursor: pointer; }
+        .holiday-badge {
+            background: #f59e0b;
+            color: #78350f;
+            padding: 0.3rem 1rem;
+            border-radius: 2rem;
+            font-weight: 600;
+            font-size: 0.8rem;
+        }
         
         /* Search & Filter */
         .search-section {
@@ -358,12 +389,22 @@
         <a href="kehadiran-pelajar.html" class="back-btn"><i class="fas fa-arrow-left"></i> Kembali</a>
     </div>
 
+    <!-- Live DateTime -->
+    <div class="live-datetime">
+        <div class="datetime-left">
+            <h3><i class="fas fa-clock"></i> Sistem Kehadiran QR Code</h3>
+            <p>Status kehadiran dikemaskini secara real-time</p>
+        </div>
+        <div class="datetime-right" id="liveDateTime">-</div>
+    </div>
+
     <div class="stats-banner">
         <div>
             <h2><i class="fas fa-calendar-alt"></i> <span id="selectedDateDisplay">-</span></h2>
         </div>
         <div>
             <input type="date" id="datePicker" class="date-picker">
+            <span id="holidayWarning" style="display: none; margin-left: 10px;" class="holiday-badge"><i class="fas fa-umbrella-beach"></i> HARI CUTI</span>
         </div>
     </div>
 
@@ -449,27 +490,44 @@
     const studentsRef = collection(db, "students");
     const attendanceRef = collection(db, "attendance_records");
     const settingsRef = doc(db, "attendance_settings", "main");
+    const holidaysRef = collection(db, "attendance_holidays");
     
     let allStudents = [];
     let allAttendance = [];
     let settings = { timeOpen: "07:00", timeLate: "08:00", timeClose: "16:00" };
+    let weekdayHolidays = [];
+    let generalHolidays = [];
     let currentTab = "hadir";
     let currentSearch = "", currentTingkatan = "", currentKelas = "";
     let currentDate = new Date();
     let currentDateStr = "";
+    let currentDateISO = "";
     let currentEditStudent = null;
+    let isHoliday = false;
+    
+    // Live DateTime
+    function updateLiveDateTime() {
+        const now = new Date();
+        const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
+        const dateStr = now.toLocaleDateString('ms-MY', options);
+        const timeStr = now.toLocaleTimeString('ms-MY', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        document.getElementById('liveDateTime').innerHTML = `<i class="fas fa-calendar-alt"></i> ${dateStr} | <i class="fas fa-clock"></i> ${timeStr}`;
+    }
+    setInterval(updateLiveDateTime, 1000);
     
     function updateDateDisplay() {
         const options = { day: 'numeric', month: 'long', year: 'numeric' };
         document.getElementById('selectedDateDisplay').innerText = currentDate.toLocaleDateString('ms-MY', options);
         document.getElementById('datePicker').value = currentDate.toISOString().split('T')[0];
         currentDateStr = currentDate.toLocaleDateString('ms-MY');
+        currentDateISO = currentDate.toISOString().split('T')[0];
     }
     
-    function showToast(message) {
+    function showToast(message, type = 'success') {
         const toast = document.createElement('div');
         toast.className = 'toast';
-        toast.innerHTML = `<i class="fas fa-info-circle"></i> ${message}`;
+        toast.style.background = type === 'error' ? '#ef4444' : '#10b981';
+        toast.innerHTML = `<i class="fas ${type === 'error' ? 'fa-exclamation-circle' : 'fa-check-circle'}"></i> ${message}`;
         document.body.appendChild(toast);
         setTimeout(() => toast.remove(), 3000);
     }
@@ -493,8 +551,41 @@
                 if (data.timeOpen) settings.timeOpen = data.timeOpen;
                 if (data.timeLate) settings.timeLate = data.timeLate;
                 if (data.timeClose) settings.timeClose = data.timeClose;
+                if (data.weekdayHolidays) weekdayHolidays = data.weekdayHolidays;
             }
         } catch (error) { console.error("Error loading settings:", error); }
+    }
+    
+    async function loadHolidays() {
+        try {
+            const snapshot = await getDocs(holidaysRef);
+            generalHolidays = [];
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                generalHolidays.push({ startDate: data.startDate, endDate: data.endDate, name: data.name });
+            });
+        } catch (error) { console.error("Error loading holidays:", error); }
+    }
+    
+    function checkIsHoliday(dateISO, dateObj) {
+        // Check weekday holiday
+        const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+        const dayName = days[dateObj.getDay()];
+        if (weekdayHolidays.includes(dayName)) return true;
+        
+        // Check general holiday range
+        for (const holiday of generalHolidays) {
+            if (dateISO >= holiday.startDate && dateISO <= holiday.endDate) return true;
+        }
+        return false;
+    }
+    
+    function isFutureDate(dateISO) {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const compareDate = new Date(dateISO);
+        compareDate.setHours(0, 0, 0, 0);
+        return compareDate > today;
     }
     
     async function loadAllStudents() {
@@ -514,6 +605,16 @@
         } catch (error) { console.error("Error loading attendance:", error); }
     }
     
+    function getCurrentTime() {
+        const now = new Date();
+        return now.toLocaleTimeString('ms-MY', { hour: '2-digit', minute: '2-digit' });
+    }
+    
+    function isBeforeCloseTime() {
+        const currentTime = getCurrentTime();
+        return currentTime <= settings.timeClose;
+    }
+    
     function getStudentStatus(student) {
         const attendance = allAttendance.find(a => a.ic === student.ic);
         if (attendance) {
@@ -523,10 +624,17 @@
             if (timeValue <= settings.timeLate) return { status: 'lewat', time: attendance.time };
             return { status: 'tidakhadir', time: attendance.time };
         }
-        return { status: 'tidakhadir', time: null };
+        return { status: null, time: null };
     }
     
     function processAttendance() {
+        if (isHoliday) {
+            return { hadirList: [], lewatList: [], tidakhadirList: [], cutiList: [], showMessage: true };
+        }
+        
+        const isToday = currentDateISO === new Date().toISOString().split('T')[0];
+        const beforeClose = isBeforeCloseTime();
+        
         const hadirList = [], lewatList = [], tidakhadirList = [], cutiList = [];
         
         for (const student of allStudents) {
@@ -542,10 +650,16 @@
             }
             
             const statusInfo = getStudentStatus(student);
+            
+            // For today and before close time, only show students who already scanned
+            if (isToday && beforeClose && statusInfo.status === null) {
+                continue; // Skip students who haven't scanned yet
+            }
+            
             if (statusInfo.status === 'hadir') hadirList.push({ ...student, statusInfo });
             else if (statusInfo.status === 'lewat') lewatList.push({ ...student, statusInfo });
             else if (statusInfo.status === 'cuti') cutiList.push({ ...student, statusInfo });
-            else tidakhadirList.push({ ...student, statusInfo });
+            else if (statusInfo.status === 'tidakhadir') tidakhadirList.push({ ...student, statusInfo });
         }
         
         document.getElementById('countHadir').innerText = hadirList.length;
@@ -553,7 +667,7 @@
         document.getElementById('countTidakHadir').innerText = tidakhadirList.length;
         document.getElementById('countCuti').innerText = cutiList.length;
         
-        return { hadirList, lewatList, tidakhadirList, cutiList };
+        return { hadirList, lewatList, tidakhadirList, cutiList, showMessage: false };
     }
     
     function getBadgeClass(status) {
@@ -572,6 +686,17 @@
     
     function renderTable(lists, type) {
         const container = document.getElementById('tableContent');
+        
+        if (isHoliday) {
+            container.innerHTML = `<div class="empty-state"><i class="fas fa-umbrella-beach" style="font-size: 3rem;"></i><p>Hari ini adalah hari cuti</p><p style="font-size: 0.8rem;">Tiada rekod kehadiran untuk tarikh ini</p></div>`;
+            return;
+        }
+        
+        if (isFutureDate(currentDateISO)) {
+            container.innerHTML = `<div class="empty-state"><i class="fas fa-calendar-day" style="font-size: 3rem;"></i><p>Tarikh belum berlaku</p><p style="font-size: 0.8rem;">Rekod kehadiran hanya tersedia untuk tarikh hari ini atau sebelumnya</p></div>`;
+            return;
+        }
+        
         let list = [];
         if (type === 'hadir') list = lists.hadirList;
         else if (type === 'lewat') list = lists.lewatList;
@@ -579,7 +704,13 @@
         else list = lists.tidakhadirList;
         
         if (list.length === 0) {
-            container.innerHTML = `<div class="empty-state"><i class="fas fa-user-slash"></i><p>Tiada rekod untuk kategori ini</p></div>`;
+            const isToday = currentDateISO === new Date().toISOString().split('T')[0];
+            const beforeClose = isBeforeCloseTime();
+            let message = "Tiada rekod untuk kategori ini";
+            if (isToday && beforeClose && (type === 'tidakhadir' || type === 'lewat')) {
+                message = "Pelajar yang belum scan akan dipaparkan selepas masa tutup kehadiran";
+            }
+            container.innerHTML = `<div class="empty-state"><i class="fas fa-user-slash"></i><p>${message}</p></div>`;
             return;
         }
         
@@ -593,9 +724,9 @@
             html += `<tr>
                         <td>${index + 1}</td>
                         <td><strong>${escapeHtml(student.name)}</strong></td>
-                        <td>${escapeHtml(student.ic)}</td>
-                        <td>${escapeHtml(student.class)}</td>
-                        <td>${scanTime !== '-' ? scanTime : '-'}</td>
+                        <td>${escapeHtml(student.ic)}</span></td>
+                        <td>${escapeHtml(student.class)}</span></td>
+                        <td>${scanTime !== '-' ? scanTime : '-'}</span></td>
                         <td><span class="badge ${badgeClass}">${statusText}${reason ? `<br><small style="font-size:9px;">${escapeHtml(reason)}</small>` : ''}</span></td>
                         <td><button class="btn-edit" onclick="openEditModal('${student.id}', '${escapeHtml(student.name)}', '${escapeHtml(student.ic)}', '${status}', '${escapeHtml(reason)}')"><i class="fas fa-edit"></i> Edit</button></td>
                      </tr>`;
@@ -633,8 +764,7 @@
         if (!student) return;
         
         const existingAttendance = allAttendance.find(a => a.ic === student.ic);
-        const now = new Date();
-        const timeStr = now.toLocaleTimeString('ms-MY', { hour: '2-digit', minute: '2-digit' });
+        const timeStr = getCurrentTime();
         
         try {
             if (existingAttendance) {
@@ -674,20 +804,45 @@
         await loadAllStudents();
         await loadAttendanceByDate(currentDateStr);
         await updateClassFilter();
+        
+        // Check if selected date is holiday
+        isHoliday = checkIsHoliday(currentDateISO, currentDate);
+        const holidayWarning = document.getElementById('holidayWarning');
+        if (isHoliday) {
+            holidayWarning.style.display = 'inline-block';
+        } else {
+            holidayWarning.style.display = 'none';
+        }
+        
         const lists = processAttendance();
         renderTable(lists, currentTab);
     }
     
     async function printPDF() {
+        if (isHoliday) {
+            showToast("Tiada data untuk dicetak kerana hari cuti", "error");
+            return;
+        }
+        
+        if (isFutureDate(currentDateISO)) {
+            showToast("Tiada data untuk dicetak kerana tarikh belum berlaku", "error");
+            return;
+        }
+        
         const lists = processAttendance();
         const todayFormatted = currentDate.toLocaleDateString('ms-MY', { day: 'numeric', month: 'long', year: 'numeric' });
         let printList = [];
-        if (currentTab === 'hadir') printList = lists.hadirList;
-        else if (currentTab === 'lewat') printList = lists.lewatList;
-        else if (currentTab === 'cuti') printList = lists.cutiList;
-        else printList = lists.tidakhadirList;
+        let categoryName = "";
         
-        const categoryName = currentTab === 'hadir' ? 'HADIR' : (currentTab === 'lewat' ? 'LEWAT' : (currentTab === 'cuti' ? 'CUTI BERSEBAB' : 'TIDAK HADIR'));
+        if (currentTab === 'hadir') { printList = lists.hadirList; categoryName = 'HADIR'; }
+        else if (currentTab === 'lewat') { printList = lists.lewatList; categoryName = 'LEWAT'; }
+        else if (currentTab === 'cuti') { printList = lists.cutiList; categoryName = 'CUTI BERSEBAB'; }
+        else { printList = lists.tidakhadirList; categoryName = 'TIDAK HADIR'; }
+        
+        if (printList.length === 0) {
+            showToast("Tiada data untuk dicetak", "error");
+            return;
+        }
         
         const printHtml = `<!DOCTYPE html>
         <html><head><meta charset="UTF-8"><title>Laporan Kehadiran - ${categoryName}</title>
@@ -719,7 +874,14 @@
                 const statusText = getStatusText(status);
                 const scanTime = student.statusInfo.time || '-';
                 const reason = student.statusInfo.reason || '';
-                return `<tr><td>${i+1}</td><td>${escapeHtml(student.name)}</td><td>${escapeHtml(student.ic)}</td><td>${escapeHtml(student.class)}</td><td>${scanTime}</td><td><span class="badge ${badgeClass}">${statusText}${reason ? `<br><small>${escapeHtml(reason)}</small>` : ''}</span></td></tr>`;
+                return `<tr>
+                            <td>${i+1}</td>
+                            <td>${escapeHtml(student.name)}</span></td>
+                            <td>${escapeHtml(student.ic)}</span></td>
+                            <td>${escapeHtml(student.class)}</span></td>
+                            <td>${scanTime}</span></td>
+                            <td><span class="badge ${badgeClass}">${statusText}${reason ? `<br><small>${escapeHtml(reason)}</small>` : ''}</span></td>
+                          </tr>`;
             }).join('')}
             </tbody></table>
             <div class="footer"><p>Laporan ini dihasilkan secara automatik oleh sistem E-MindCare SEMSIRA.</p></div>
@@ -750,9 +912,12 @@
     });
     
     async function init() {
+        updateLiveDateTime();
         updateDateDisplay();
         await loadSettings();
+        await loadHolidays();
         await refreshData();
+        setInterval(updateLiveDateTime, 1000);
     }
     init();
 </script>

@@ -90,7 +90,7 @@
             color: #64748b;
             margin-bottom: 0.3rem;
         }
-        .filter-group select, .filter-group input {
+        .filter-group select {
             width: 100%;
             padding: 0.6rem 0.8rem;
             border-radius: 0.8rem;
@@ -110,6 +110,65 @@
             font-weight: 600;
         }
         .btn-filter:hover { background: #1d4ed8; }
+        
+        /* Search Box with Auto Suggestion */
+        .search-wrapper {
+            position: relative;
+            flex: 2;
+            min-width: 250px;
+        }
+        .search-wrapper label {
+            display: block;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: #64748b;
+            margin-bottom: 0.3rem;
+        }
+        .search-input {
+            width: 100%;
+            padding: 0.6rem 0.8rem;
+            border-radius: 0.8rem;
+            border: 1px solid #e2e8f0;
+            background: #f8fafc;
+            font-family: inherit;
+            font-size: 0.85rem;
+            outline: none;
+        }
+        .search-input:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 2px rgba(37,99,235,0.1);
+        }
+        .suggestions-box {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.8rem;
+            max-height: 250px;
+            overflow-y: auto;
+            z-index: 100;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            display: none;
+        }
+        .suggestion-item {
+            padding: 0.6rem 0.8rem;
+            cursor: pointer;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 0.85rem;
+        }
+        .suggestion-item:hover {
+            background: #eef2ff;
+        }
+        .suggestion-item .suggestion-name {
+            font-weight: 600;
+            color: #1e293b;
+        }
+        .suggestion-item .suggestion-detail {
+            font-size: 0.7rem;
+            color: #64748b;
+        }
         
         .action-bar {
             display: flex;
@@ -164,7 +223,7 @@
         table {
             width: 100%;
             border-collapse: collapse;
-            min-width: 800px;
+            min-width: 700px;
         }
         th {
             text-align: left;
@@ -180,17 +239,6 @@
             vertical-align: middle;
         }
         .checkbox-col { width: 40px; text-align: center; }
-        .badge {
-            display: inline-block;
-            padding: 0.2rem 0.6rem;
-            border-radius: 20px;
-            font-size: 0.7rem;
-            font-weight: 600;
-        }
-        .badge-hadir { background: #dcfce7; color: #166534; }
-        .badge-lewat { background: #fef3c7; color: #92400e; }
-        .badge-tidakhadir { background: #fee2e2; color: #991b1b; }
-        .badge-cutibersebab { background: #dbeafe; color: #1e40af; }
         
         .btn-print-qr {
             background: #e0e7ff;
@@ -261,6 +309,7 @@
         @media (max-width: 700px) {
             .filter-section { flex-direction: column; }
             .filter-group { width: 100%; }
+            .search-wrapper { width: 100%; }
         }
     </style>
 </head>
@@ -277,8 +326,13 @@
         <a href="dashboard-guru.html" class="back-btn"><i class="fas fa-arrow-left"></i> Kembali ke Dashboard</a>
     </div>
     
-    <!-- Filter Section - Tanpa Filter Tahun -->
+    <!-- Filter Section -->
     <div class="filter-section">
+        <div class="search-wrapper">
+            <label><i class="fas fa-search"></i> Cari Nama / No. IC</label>
+            <input type="text" id="searchInput" class="search-input" placeholder="Taip nama atau No. Kad Pengenalan..." autocomplete="off">
+            <div id="suggestionsBox" class="suggestions-box"></div>
+        </div>
         <div class="filter-group">
             <label><i class="fas fa-layer-group"></i> Tingkatan</label>
             <select id="filterTingkatan">
@@ -344,6 +398,7 @@
     let allStudents = [];
     let filteredStudents = [];
     let selectedStudents = new Set();
+    let searchTerm = '';
     let currentFilters = { tingkatan: '', kelas: '' };
     
     function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, m => m==='&'?'&amp;':m==='<'?'&lt;':'&gt;'); }
@@ -384,6 +439,14 @@
             const studentClass = student.class || '-';
             const studentTingkatan = extractTingkatan(studentClass);
             
+            // Filter by search term
+            if (searchTerm) {
+                const term = searchTerm.toLowerCase();
+                const nameMatch = (student.fullname || '').toLowerCase().includes(term);
+                const icMatch = (student.icNumber || '').includes(term);
+                if (!nameMatch && !icMatch) return false;
+            }
+            
             if (tingkatan && studentTingkatan !== tingkatan) return false;
             if (kelas && studentClass !== kelas) return false;
             return true;
@@ -407,17 +470,6 @@
         document.getElementById('selectedCount').innerText = selectedStudents.size;
     }
     
-    function toggleSelect(studentId) {
-        if (selectedStudents.has(studentId)) {
-            selectedStudents.delete(studentId);
-        } else {
-            selectedStudents.add(studentId);
-        }
-        updateSelectedCount();
-        const checkbox = document.getElementById(`chk_${studentId}`);
-        if (checkbox) checkbox.checked = selectedStudents.has(studentId);
-    }
-    
     function selectAll() {
         filteredStudents.forEach(student => selectedStudents.add(student.id));
         updateSelectedCount();
@@ -429,6 +481,50 @@
         updateSelectedCount();
         renderTable();
     }
+    
+    // ==================== AUTO SUGGESTION ====================
+    function showSuggestions() {
+        const input = document.getElementById('searchInput');
+        const val = input.value.toLowerCase();
+        const suggestionsBox = document.getElementById('suggestionsBox');
+        
+        if (val.length < 1) {
+            suggestionsBox.style.display = 'none';
+            return;
+        }
+        
+        const matches = allStudents.filter(s => 
+            (s.fullname && s.fullname.toLowerCase().includes(val)) || 
+            (s.icNumber && s.icNumber.includes(val))
+        ).slice(0, 10);
+        
+        if (matches.length === 0) {
+            suggestionsBox.style.display = 'none';
+            return;
+        }
+        
+        suggestionsBox.innerHTML = matches.map(s => `
+            <div class="suggestion-item" onclick="selectSuggestion('${escapeHtml(s.fullname)}')">
+                <div class="suggestion-name">${escapeHtml(s.fullname)}</div>
+                <div class="suggestion-detail">${escapeHtml(s.icNumber)} • ${escapeHtml(s.class || '-')}</div>
+            </div>
+        `).join('');
+        suggestionsBox.style.display = 'block';
+    }
+    
+    window.selectSuggestion = function(name) {
+        document.getElementById('searchInput').value = name;
+        document.getElementById('suggestionsBox').style.display = 'none';
+        searchTerm = name;
+        applyFilters();
+    };
+    
+    // Close suggestions when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.search-wrapper')) {
+            document.getElementById('suggestionsBox').style.display = 'none';
+        }
+    });
     
     // ==================== PRINT QR CODE INDIVIDU ====================
     function printSingleQR(studentName, studentIC) {
@@ -627,16 +723,16 @@
                 <tr>
                     <td class="checkbox-col">
                         <input type="checkbox" class="student-checkbox" data-id="${student.id}" ${isChecked ? 'checked' : ''}>
-                     </td>
-                    <td>${index + 1}</td>
-                    <td><strong>${escapeHtml(student.fullname)}</strong></td>
-                    <td>${escapeHtml(student.icNumber)}</span></td>
-                    <td>${escapeHtml(student.class) || '-'}</td>
+                     </span>
+                    <td>${index + 1}</span>
+                    <td><strong>${escapeHtml(student.fullname)}</strong></span>
+                    <td>${escapeHtml(student.icNumber)}</span>
+                    <td>${escapeHtml(student.class) || '-'}</span>
                     <td>
                         <button class="btn-print-qr" onclick="window.printSingleQR('${escapeHtml(student.fullname)}', '${student.icNumber}')">
                             <i class="fas fa-print"></i> Print QR
                         </button>
-                     </td>
+                     </span>
                 </tr>
             `;
         });
@@ -669,6 +765,13 @@
     document.getElementById('selectAllBtn').addEventListener('click', selectAll);
     document.getElementById('deselectAllBtn').addEventListener('click', deselectAll);
     document.getElementById('printSelectedBtn').addEventListener('click', printSelectedQRs);
+    
+    // Search input event
+    document.getElementById('searchInput').addEventListener('input', (e) => {
+        searchTerm = e.target.value;
+        showSuggestions();
+        applyFilters();
+    });
     
     // Filter change events
     document.getElementById('filterTingkatan').addEventListener('change', applyFilters);

@@ -192,6 +192,50 @@
         }
         .btn-delete-all:hover { background: #dc2626; transform: translateY(-2px); }
         
+        /* View Toggle Buttons */
+        .view-toggle {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            justify-content: center;
+        }
+        .view-btn {
+            flex: 1;
+            max-width: 250px;
+            padding: 0.8rem 1.5rem;
+            border-radius: 3rem;
+            font-weight: 700;
+            font-size: 0.9rem;
+            cursor: pointer;
+            border: none;
+            transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .view-btn.completed {
+            background: #e2e8f0;
+            color: #1e293b;
+            border: 2px solid #10b981;
+        }
+        .view-btn.completed.active {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            border: none;
+        }
+        .view-btn.pending {
+            background: #e2e8f0;
+            color: #1e293b;
+            border: 2px solid #f59e0b;
+        }
+        .view-btn.pending.active {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+            border: none;
+        }
+        .view-btn:hover { transform: translateY(-2px); }
+        
         /* Selection Bar */
         .selection-bar {
             background: linear-gradient(135deg, #eef2ff, #e0e7ff);
@@ -214,7 +258,6 @@
             align-items: center;
             gap: 8px;
         }
-        .selection-info i { font-size: 1.2rem; }
         .selection-actions {
             display: flex;
             gap: 0.8rem;
@@ -258,7 +301,6 @@
             align-items: center;
             gap: 6px;
         }
-        .btn-cancel:hover { background: #cbd5e1; transform: translateY(-2px); }
         
         /* Results Grid */
         .results-grid {
@@ -346,9 +388,46 @@
             margin-top: 0.5rem;
             text-align: right;
         }
-        .empty-state { text-align: center; padding: 3rem; color: #94a3b8; }
         
-        /* Toast */
+        /* Pending student card */
+        .pending-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 1rem;
+        }
+        .pending-card {
+            background: white;
+            border-radius: 1rem;
+            padding: 0.8rem 1rem;
+            border: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .pending-card .student-avatar-sm {
+            width: 40px;
+            height: 40px;
+            background: #fef3c7;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .pending-card .student-avatar-sm i { font-size: 1.2rem; color: #d97706; }
+        .pending-card .pending-info h4 { font-size: 0.85rem; color: #1e293b; }
+        .pending-card .pending-info p { font-size: 0.65rem; color: #64748b; }
+        .pending-card .pending-badge {
+            margin-left: auto;
+            background: #fef3c7;
+            color: #d97706;
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+            font-size: 0.6rem;
+            font-weight: 600;
+        }
+        
+        .empty-state { text-align: center; padding: 2rem; color: #94a3b8; }
+        
         .toast {
             position: fixed;
             bottom: 30px;
@@ -369,8 +448,10 @@
         
         @media (max-width: 700px) {
             .results-grid { grid-template-columns: 1fr; }
+            .pending-grid { grid-template-columns: 1fr; }
             .scores-grid { grid-template-columns: repeat(2, 1fr); }
-            .selection-actions { width: 100%; justify-content: center; }
+            .view-toggle { flex-direction: column; align-items: center; }
+            .view-btn { max-width: 100%; width: 100%; }
         }
     </style>
 </head>
@@ -391,7 +472,7 @@
     <div class="stats-banner">
         <div>
             <h2><i class="fas fa-chart-pie"></i> Keputusan Ujian Tret Personaliti</h2>
-            <p>Senarai pelajar yang telah menjawab Inventori Tret Personaliti</p>
+            <p>Senarai pelajar yang telah / belum menjawab Inventori Tret Personaliti</p>
         </div>
         <div class="total-count" id="totalCount">0 Pelajar</div>
     </div>
@@ -426,7 +507,17 @@
         </div>
     </div>
 
-    <!-- Selection Bar -->
+    <!-- View Toggle Buttons -->
+    <div class="view-toggle">
+        <button id="viewCompletedBtn" class="view-btn completed active">
+            <i class="fas fa-check-circle"></i> Selesai Menjawab
+        </button>
+        <button id="viewPendingBtn" class="view-btn pending">
+            <i class="fas fa-hourglass-half"></i> Belum Menjawab
+        </button>
+    </div>
+
+    <!-- Selection Bar (only for completed view) -->
     <div id="selectionBar" class="selection-bar">
         <div class="selection-info">
             <i class="fas fa-check-circle"></i> <span id="selectedCount">0</span> pelajar dipilih
@@ -438,8 +529,8 @@
         </div>
     </div>
 
-    <!-- Results Container -->
-    <div id="resultsContainer">
+    <!-- Main Content Container -->
+    <div id="mainContent">
         <div class="empty-state"><i class="fas fa-spinner fa-pulse"></i> Memuatkan data...</div>
     </div>
 </div>
@@ -461,15 +552,19 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     const ujianCollection = collection(db, "ujian_tret_personaliti");
+    const studentsCollection = collection(db, "students");
     
-    let allResults = [];
-    let filteredResults = [];
+    let allCompletedResults = [];
+    let allStudents = [];
+    let filteredCompleted = [];
+    let filteredPending = [];
     let selectedIds = new Set();
     let currentSearch = "";
     let currentTingkatan = "";
     let currentKelas = "";
+    let currentView = "completed";
     
-    // Kategori colors
+    // Kategori colors and names
     const kategoriColors = {
         "AUTONOMI": "#e17055", "KREATIF": "#6c5ce7", "AGRESIF": "#dc2626",
         "EKSTROVERT": "#fdcb6e", "PENCAPAIAN": "#10b981", "KEPELBAGAIAN": "#a29bfe",
@@ -497,57 +592,91 @@
         return match ? match[0] : '';
     }
     
-    async function loadData() {
+    async function loadAllStudents() {
         try {
-            const querySnapshot = await getDocs(ujianCollection);
-            allResults = [];
-            querySnapshot.forEach((doc) => {
-                allResults.push({ id: doc.id, ...doc.data() });
+            const snapshot = await getDocs(studentsCollection);
+            allStudents = [];
+            snapshot.forEach(doc => {
+                allStudents.push({ id: doc.id, ...doc.data() });
             });
-            allResults.sort((a, b) => (a.studentName || '').localeCompare(b.studentName || ''));
-            
-            updateClassFilter();
-            applyFilters();
-            
-            document.getElementById('totalCount').innerHTML = `${allResults.length} Pelajar`;
-            console.log(`Loaded ${allResults.length} results`);
+            console.log(`Loaded ${allStudents.length} students`);
         } catch (error) {
-            console.error("Error loading data:", error);
-            document.getElementById('resultsContainer').innerHTML = `<div class="empty-state"><i class="fas fa-exclamation-triangle"></i> Gagal memuat data</div>`;
+            console.error("Error loading students:", error);
         }
     }
     
+    async function loadCompletedResults() {
+        try {
+            const querySnapshot = await getDocs(ujianCollection);
+            allCompletedResults = [];
+            querySnapshot.forEach((doc) => {
+                allCompletedResults.push({ id: doc.id, ...doc.data() });
+            });
+            allCompletedResults.sort((a, b) => (a.studentName || '').localeCompare(b.studentName || ''));
+            console.log(`Loaded ${allCompletedResults.length} completed results`);
+        } catch (error) {
+            console.error("Error loading results:", error);
+        }
+    }
+    
+    function getPendingStudents() {
+        const completedICs = new Set(allCompletedResults.map(r => r.studentIC));
+        return allStudents.filter(student => !completedICs.has(student.icNumber));
+    }
+    
     function updateClassFilter() {
-        const classes = [...new Set(allResults.map(r => r.studentClass).filter(c => c && c !== '-'))];
+        const classes = [...new Set(allStudents.map(s => s.class).filter(c => c && c !== '-'))];
         classes.sort();
         const select = document.getElementById('kelasFilter');
+        const currentVal = select.value;
         select.innerHTML = '<option value="">Semua Kelas</option>' + 
             classes.map(c => `<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`).join('');
+        if (currentVal) select.value = currentVal;
     }
     
     function applyFilters() {
-        filteredResults = [...allResults];
-        
+        // Filter completed results
+        filteredCompleted = [...allCompletedResults];
         if (currentSearch) {
             const term = currentSearch.toLowerCase();
-            filteredResults = filteredResults.filter(r => 
+            filteredCompleted = filteredCompleted.filter(r => 
                 (r.studentName || '').toLowerCase().includes(term) || 
                 (r.studentIC || '').includes(term)
             );
         }
-        
         if (currentTingkatan) {
-            filteredResults = filteredResults.filter(r => {
+            filteredCompleted = filteredCompleted.filter(r => {
                 const tingkatan = extractTingkatan(r.studentClass);
                 return tingkatan === currentTingkatan;
             });
         }
-        
         if (currentKelas) {
-            filteredResults = filteredResults.filter(r => r.studentClass === currentKelas);
+            filteredCompleted = filteredCompleted.filter(r => r.studentClass === currentKelas);
         }
         
-        renderResults();
+        // Filter pending students
+        let pendingStudents = getPendingStudents();
+        filteredPending = [...pendingStudents];
+        if (currentSearch) {
+            const term = currentSearch.toLowerCase();
+            filteredPending = filteredPending.filter(s => 
+                (s.fullname || '').toLowerCase().includes(term) || 
+                (s.icNumber || '').includes(term)
+            );
+        }
+        if (currentTingkatan) {
+            filteredPending = filteredPending.filter(s => {
+                const tingkatan = extractTingkatan(s.class);
+                return tingkatan === currentTingkatan;
+            });
+        }
+        if (currentKelas) {
+            filteredPending = filteredPending.filter(s => s.class === currentKelas);
+        }
+        
+        document.getElementById('totalCount').innerHTML = `${allCompletedResults.length} Selesai | ${pendingStudents.length} Belum`;
+        
+        renderCurrentView();
     }
     
     function getTopCategories(scores) {
@@ -557,26 +686,20 @@
         return entries.slice(0, 3);
     }
     
-    function renderResults() {
-        const container = document.getElementById('resultsContainer');
-        
-        if (filteredResults.length === 0) {
-            container.innerHTML = `<div class="empty-state"><i class="fas fa-user-slash" style="font-size: 2rem;"></i><p>Tiada keputusan ujian dijumpai.</p></div>`;
-            document.getElementById('totalCount').innerHTML = `${allResults.length} Pelajar | Ditapis: 0`;
-            return;
+    function renderCompletedResults() {
+        if (filteredCompleted.length === 0) {
+            return `<div class="empty-state"><i class="fas fa-user-check"></i><p>Tiada keputusan ujian dijumpai.</p></div>`;
         }
         
         let html = `<div class="results-grid">`;
-        for (const result of filteredResults) {
+        for (const result of filteredCompleted) {
             const scores = result.scores || {};
             const top3 = getTopCategories(scores);
             const isSelected = selectedIds.has(result.id);
             
-            // Create score bars for top 6 categories (compact view)
             let topScoresHtml = '';
             const top6 = Object.entries(scores).sort((a,b) => b[1] - a[1]).slice(0, 6);
             for (let [cat, score] of top6) {
-                const percent = (score / 10) * 100;
                 topScoresHtml += `
                     <div class="score-item">
                         <div class="score-cat" style="color:${kategoriColors[cat] || '#4f46e5'}">${cat.substring(0, 8)}</div>
@@ -614,13 +737,50 @@
             `;
         }
         html += `</div>`;
-        container.innerHTML = html;
+        return html;
+    }
+    
+    function renderPendingResults() {
+        if (filteredPending.length === 0) {
+            return `<div class="empty-state"><i class="fas fa-hourglass"></i><p>Tiada pelajar yang belum menjawab.</p></div>`;
+        }
         
-        const filterText = (currentSearch || currentTingkatan || currentKelas) ? ` | Ditapis: ${filteredResults.length}` : '';
-        document.getElementById('totalCount').innerHTML = `${allResults.length} Pelajar${filterText}`;
+        let html = `<div class="pending-grid">`;
+        for (const student of filteredPending) {
+            html += `
+                <div class="pending-card">
+                    <div class="student-avatar-sm">
+                        <i class="fas fa-user-graduate"></i>
+                    </div>
+                    <div class="pending-info">
+                        <h4>${escapeHtml(student.fullname)}</h4>
+                        <p><i class="fas fa-id-card"></i> ${escapeHtml(student.icNumber)} &nbsp;|&nbsp; <i class="fas fa-school"></i> ${escapeHtml(student.class)}</p>
+                    </div>
+                    <div class="pending-badge">
+                        <i class="fas fa-clock"></i> Belum Menjawab
+                    </div>
+                </div>
+            `;
+        }
+        html += `</div>`;
+        return html;
+    }
+    
+    function renderCurrentView() {
+        const container = document.getElementById('mainContent');
         
+        if (currentView === 'completed') {
+            container.innerHTML = renderCompletedResults();
+            updateSelectionBar();
+        } else {
+            container.innerHTML = renderPendingResults();
+            document.getElementById('selectionBar').classList.remove('show');
+        }
+    }
+    
+    function updateSelectionBar() {
         const selectionBar = document.getElementById('selectionBar');
-        if (selectedIds.size > 0) {
+        if (currentView === 'completed' && selectedIds.size > 0) {
             selectionBar.classList.add('show');
             document.getElementById('selectedCount').innerText = selectedIds.size;
         } else {
@@ -629,28 +789,34 @@
     }
     
     window.toggleSelect = function(id) {
+        if (currentView !== 'completed') return;
         if (selectedIds.has(id)) {
             selectedIds.delete(id);
         } else {
             selectedIds.add(id);
         }
-        renderResults();
+        renderCurrentView();
+        updateSelectionBar();
     };
     
     function selectAll() {
-        for (const result of filteredResults) {
+        if (currentView !== 'completed') return;
+        for (const result of filteredCompleted) {
             selectedIds.add(result.id);
         }
-        renderResults();
+        renderCurrentView();
+        updateSelectionBar();
         showToast(`${selectedIds.size} pelajar dipilih`, 'success');
     }
     
     function cancelSelection() {
         selectedIds.clear();
-        renderResults();
+        renderCurrentView();
+        updateSelectionBar();
     }
     
     async function deleteSelected() {
+        if (currentView !== 'completed') return;
         if (selectedIds.size === 0) {
             showToast('Tiada pelajar dipilih', 'error');
             return;
@@ -667,20 +833,24 @@
                 }
             }
             selectedIds.clear();
-            await loadData();
+            await loadCompletedResults();
+            await loadAllStudents();
+            applyFilters();
+            updateSelectionBar();
             showToast(`✅ ${deleted} rekod telah dipadam`, 'success');
         }
     }
     
     async function deleteAll() {
-        if (allResults.length === 0) {
+        if (currentView !== 'completed') return;
+        if (allCompletedResults.length === 0) {
             showToast('Tiada data untuk dipadam', 'error');
             return;
         }
         
-        if (confirm(`⚠️ PERHATIAN!\n\nAnda akan memadam SEMUA rekod (${allResults.length} pelajar).\n\nTindakan ini TIDAK BOLEH DIBATALKAN!\n\nTeruskan?`)) {
+        if (confirm(`⚠️ PERHATIAN!\n\nAnda akan memadam SEMUA rekod (${allCompletedResults.length} pelajar).\n\nTindakan ini TIDAK BOLEH DIBATALKAN!\n\nTeruskan?`)) {
             let deleted = 0;
-            for (const result of allResults) {
+            for (const result of allCompletedResults) {
                 try {
                     await deleteDoc(doc(db, "ujian_tret_personaliti", result.id));
                     deleted++;
@@ -688,7 +858,10 @@
                     console.error("Error deleting:", e);
                 }
             }
-            await loadData();
+            await loadCompletedResults();
+            await loadAllStudents();
+            applyFilters();
+            updateSelectionBar();
             showToast(`✅ ${deleted} rekod telah dipadam`, 'success');
         }
     }
@@ -700,9 +873,9 @@
             return;
         }
         const term = searchTerm.toLowerCase();
-        const matches = allResults.filter(r => 
-            (r.studentName || '').toLowerCase().includes(term) || 
-            (r.studentIC || '').includes(term)
+        const matches = allStudents.filter(s => 
+            (s.fullname || '').toLowerCase().includes(term) || 
+            (s.icNumber || '').includes(term)
         ).slice(0, 8);
         
         if (matches.length === 0) {
@@ -711,65 +884,64 @@
         }
         
         suggestionsDiv.innerHTML = matches.map(match => `
-            <div onclick="selectSuggestion('${match.id}')">
-                <div style="font-weight:700;">${escapeHtml(match.studentName)}</div>
-                <div style="font-size:0.7rem; color:#64748b;">${escapeHtml(match.studentIC)} • ${escapeHtml(match.studentClass)}</div>
+            <div onclick="selectSuggestion('${match.fullname}')">
+                <div style="font-weight:700;">${escapeHtml(match.fullname)}</div>
+                <div style="font-size:0.7rem; color:#64748b;">${escapeHtml(match.icNumber)} • ${escapeHtml(match.class)}</div>
             </div>
         `).join('');
         suggestionsDiv.style.display = 'block';
     }
     
-    window.selectSuggestion = function(id) {
-        const result = allResults.find(r => r.id === id);
-        if (result) {
-            document.getElementById('searchInput').value = result.studentName;
-            document.getElementById('suggestionsList').style.display = 'none';
-            currentSearch = result.studentName;
-            applyFilters();
-        }
+    window.selectSuggestion = function(name) {
+        document.getElementById('searchInput').value = name;
+        document.getElementById('suggestionsList').style.display = 'none';
+        currentSearch = name;
+        applyFilters();
     };
     
     async function printReport() {
-        const resultsToPrint = filteredResults.length > 0 ? filteredResults : allResults;
-        
-        if (resultsToPrint.length === 0) {
-            showToast('Tiada data untuk dicetak', 'error');
-            return;
-        }
-        
-        const printHtml = `
-            <!DOCTYPE html>
-            <html>
-            <head>
-                <meta charset="UTF-8">
-                <title>Laporan Keputusan Inventori Tret Personaliti</title>
-                <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-                <style>
-                    * { margin: 0; padding: 0; box-sizing: border-box; }
-                    body { font-family: 'Plus Jakarta Sans', sans-serif; padding: 40px; background: white; }
-                    .header { text-align: center; margin-bottom: 30px; }
-                    .header h1 { color: #4f46e5; margin-bottom: 5px; }
-                    .header p { color: #64748b; }
-                    table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 12px; }
-                    th { background: #4f46e5; color: white; padding: 10px; text-align: left; }
-                    td { padding: 8px; border-bottom: 1px solid #e2e8f0; }
-                    .footer { margin-top: 30px; text-align: center; font-size: 12px; color: #94a3b8; }
-                </style>
-            </head>
-            <body>
-                <div class="header">
-                    <h1>LAPORAN KEPUTUSAN INVENTORI TRET PERSONALITI</h1>
-                    <p>E-MindCare SEMSIRA • SMK Syed Sirajuddin</p>
-                    <p>Tarikh: ${new Date().toLocaleDateString('ms-MY')} | Masa: ${new Date().toLocaleTimeString('ms-MY')}</p>
-                </div>
-                <table>
-                    <thead>
-                        <tr><th>Bil</th><th>Nama Pelajar</th><th>No. IC</th><th>Kelas</th>
-                        <th>Autonomi</th><th>Kreatif</th><th>Agresif</th><th>Ekstrovert</th><th>Pencapaian</th>
-                        <th>Kepelbagaian</th><th>Intelektual</th><th>Kepemimpinan</th><th>Struktur</th>
-                        <th>Resilen</th><th>Menolong</th><th>Analitikal</th><th>Kritik Diri</th><th>Wawasan</th><th>Ketelusan</th>
-                        <th>3 Tertinggi</th>
-                    </tr>
+        if (currentView === 'completed') {
+            const resultsToPrint = filteredCompleted.length > 0 ? filteredCompleted : allCompletedResults;
+            
+            if (resultsToPrint.length === 0) {
+                showToast('Tiada data untuk dicetak', 'error');
+                return;
+            }
+            
+            const printHtml = `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <meta charset="UTF-8">
+                    <title>Laporan Keputusan Inventori Tret Personaliti</title>
+                    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+                    <style>
+                        * { margin: 0; padding: 0; box-sizing: border-box; }
+                        body { font-family: 'Plus Jakarta Sans', sans-serif; padding: 40px; background: white; }
+                        .header { text-align: center; margin-bottom: 30px; }
+                        .header h1 { color: #4f46e5; margin-bottom: 5px; }
+                        .header p { color: #64748b; }
+                        table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 12px; }
+                        th { background: #4f46e5; color: white; padding: 10px; text-align: left; }
+                        td { padding: 8px; border-bottom: 1px solid #e2e8f0; }
+                        .footer { margin-top: 30px; text-align: center; font-size: 12px; color: #94a3b8; }
+                    </style>
+                </head>
+                <body>
+                    <div class="header">
+                        <h1>LAPORAN KEPUTUSAN INVENTORI TRET PERSONALITI</h1>
+                        <p>E-MindCare SEMSIRA • SMK Syed Sirajuddin</p>
+                        <p>Tarikh: ${new Date().toLocaleDateString('ms-MY')} | Masa: ${new Date().toLocaleTimeString('ms-MY')}</p>
+                        <p>Status: SELESAI MENJAWAB (${resultsToPrint.length} pelajar)</p>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr><th>Bil</th><th>Nama Pelajar</th><th>No. IC</th><th>Kelas</th>
+                            <th>Autonomi</th><th>Kreatif</th><th>Agresif</th><th>Ekstrovert</th><th>Pencapaian</th>
+                            <th>Kepelbagaian</th><th>Intelektual</th><th>Kepemimpinan</th><th>Struktur</th>
+                            <th>Resilen</th><th>Menolong</th><th>Analitikal</th><th>Kritik Diri</th><th>Wawasan</th><th>Ketelusan</th>
+                            <th>3 Tertinggi</th>
+                        </tr>
                     </thead>
                     <tbody>
                         ${resultsToPrint.map((r, i) => {
@@ -777,40 +949,121 @@
                             const top3 = Object.entries(scores).sort((a,b) => b[1] - a[1]).slice(0,3).map(([cat,score]) => `${cat}(${score})`).join(", ");
                             return `<tr>
                                 <td>${i+1}</td>
-                                <td>${escapeHtml(r.studentName)}</td>
-                                <td>${escapeHtml(r.studentIC)}</td>
-                                <td>${escapeHtml(r.studentClass)}</td>
-                                <td>${scores.AUTONOMI || 0}</td>
-                                <td>${scores.KREATIF || 0}</td>
-                                <td>${scores.AGRESIF || 0}</td>
-                                <td>${scores.EKSTROVERT || 0}</td>
-                                <td>${scores.PENCAPAIAN || 0}</td>
-                                <td>${scores.KEPELBAGAIAN || 0}</td>
-                                <td>${scores.INTELEKTUAL || 0}</td>
-                                <td>${scores.KEPEMIMPINAN || 0}</td>
-                                <td>${scores.STRUKTUR || 0}</td>
-                                <td>${scores.RESILEN || 0}</td>
-                                <td>${scores.MENOLONG || 0}</td>
-                                <td>${scores.ANALITIKAL || 0}</td>
-                                <td>${scores.KRITIK_DIRI || 0}</td>
-                                <td>${scores.WAWASAN || 0}</td>
-                                <td>${scores.KETELUSAN || 0}</td>
-                                <td>${top3}</td>
+                                <td>${escapeHtml(r.studentName)}</span></td>
+                                <td>${escapeHtml(r.studentIC)}</span></td>
+                                <td>${escapeHtml(r.studentClass)}</span></td>
+                                <td>${scores.AUTONOMI || 0}</span></td>
+                                <td>${scores.KREATIF || 0}</span></span></td>
+                                <td>${scores.AGRESIF || 0}</span></span></td>
+                                <td>${scores.EKSTROVERT || 0}</span></span></td>
+                                <td>${scores.PENCAPAIAN || 0}</span></span></td>
+                                <td>${scores.KEPELBAGAIAN || 0}</span></span></td>
+                                <td>${scores.INTELEKTUAL || 0}</span></span></td>
+                                <td>${scores.KEPEMIMPINAN || 0}</span></span></td>
+                                <td>${scores.STRUKTUR || 0}</span></span></td>
+                                <td>${scores.RESILEN || 0}</span></span></td>
+                                <td>${scores.MENOLONG || 0}</span></span></td>
+                                <td>${scores.ANALITIKAL || 0}</span></span></td>
+                                <td>${scores.KRITIK_DIRI || 0}</span></span></td>
+                                <td>${scores.WAWASAN || 0}</span></span></td>
+                                <td>${scores.KETELUSAN || 0}</span></span></td>
+                                <td>${top3}</span></span>
                             </tr>`;
                         }).join('')}
                     </tbody>
                 </table>
-                <div class="footer">
-                    <p>Laporan ini dihasilkan secara automatik oleh sistem E-MindCare SEMSIRA.</p>
-                </div>
-            </body>
-            </html>
-        `;
+                    <div class="footer">
+                        <p>Laporan ini dihasilkan secara automatik oleh sistem E-MindCare SEMSIRA.</p>
+                    </div>
+                </body>
+                </html>
+            `;
+            
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(printHtml);
+            printWindow.document.close();
+            printWindow.print();
+            
+        } else {
+            if (filteredPending.length === 0) {
+                showToast('Tiada pelajar yang belum menjawab', 'error');
+                return;
+            }
+            
+            const printHtml = `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <meta charset="UTF-8">
+                    <title>Senarai Pelajar Belum Menjawab Inventori Tret Personaliti</title>
+                    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+                    <style>
+                        * { margin: 0; padding: 0; box-sizing: border-box; }
+                        body { font-family: 'Plus Jakarta Sans', sans-serif; padding: 40px; background: white; }
+                        .header { text-align: center; margin-bottom: 30px; }
+                        .header h1 { color: #d97706; margin-bottom: 5px; }
+                        .header p { color: #64748b; }
+                        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+                        th { background: #f59e0b; color: white; padding: 10px; text-align: left; }
+                        td { padding: 8px; border-bottom: 1px solid #e2e8f0; }
+                        .footer { margin-top: 30px; text-align: center; font-size: 12px; color: #94a3b8; }
+                    </style>
+                </head>
+                <body>
+                    <div class="header">
+                        <h1>SENARAI PELAJAR BELUM MENJAWAB</h1>
+                        <h2>Inventori Tret Personaliti</h2>
+                        <p>E-MindCare SEMSIRA • SMK Syed Sirajuddin</p>
+                        <p>Tarikh: ${new Date().toLocaleDateString('ms-MY')} | Masa: ${new Date().toLocaleTimeString('ms-MY')}</p>
+                        <p>Jumlah: ${filteredPending.length} pelajar</p>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr><th>Bil</th><th>Nama Pelajar</th><th>No. Kad Pengenalan</th><th>Kelas</th></tr>
+                        </thead>
+                        <tbody>
+                            ${filteredPending.map((student, i) => `
+                                <tr>
+                                    <td>${i+1}</td>
+                                    <td>${escapeHtml(student.fullname)}</span></td>
+                                    <td>${escapeHtml(student.icNumber)}</span></td>
+                                    <td>${escapeHtml(student.class)}</span></td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                    <div class="footer">
+                        <p>Laporan ini dihasilkan secara automatik oleh sistem E-MindCare SEMSIRA.</p>
+                        <p><i class="fas fa-exclamation-triangle"></i> Pelajar-pelajar ini perlu diminta menjawab Inventori Tret Personaliti.</p>
+                    </div>
+                </body>
+                </html>
+            `;
+            
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(printHtml);
+            printWindow.document.close();
+            printWindow.print();
+        }
+    }
+    
+    function setView(view) {
+        currentView = view;
         
-        const printWindow = window.open('', '_blank');
-        printWindow.document.write(printHtml);
-        printWindow.document.close();
-        printWindow.print();
+        const completedBtn = document.getElementById('viewCompletedBtn');
+        const pendingBtn = document.getElementById('viewPendingBtn');
+        
+        if (view === 'completed') {
+            completedBtn.classList.add('active');
+            pendingBtn.classList.remove('active');
+        } else {
+            completedBtn.classList.remove('active');
+            pendingBtn.classList.add('active');
+        }
+        
+        selectedIds.clear();
+        renderCurrentView();
+        updateSelectionBar();
     }
     
     // Event listeners
@@ -831,7 +1084,9 @@
     });
     
     document.getElementById('refreshBtn').addEventListener('click', async () => {
-        await loadData();
+        await loadCompletedResults();
+        await loadAllStudents();
+        applyFilters();
         showToast('Data dimuat semula', 'success');
     });
     
@@ -840,6 +1095,8 @@
     document.getElementById('selectAllBtn').addEventListener('click', selectAll);
     document.getElementById('deleteSelectedBtn').addEventListener('click', deleteSelected);
     document.getElementById('cancelSelectionBtn').addEventListener('click', cancelSelection);
+    document.getElementById('viewCompletedBtn').addEventListener('click', () => setView('completed'));
+    document.getElementById('viewPendingBtn').addEventListener('click', () => setView('pending'));
     
     document.addEventListener('click', function(e) {
         const wrapper = document.querySelector('.search-wrapper');
@@ -851,7 +1108,14 @@
     window.toggleSelect = toggleSelect;
     window.selectSuggestion = selectSuggestion;
     
-    loadData();
+    async function init() {
+        await loadAllStudents();
+        await loadCompletedResults();
+        updateClassFilter();
+        applyFilters();
+    }
+    
+    init();
 </script>
 </body>
 </html>

@@ -306,19 +306,6 @@
       background: #cbd5e1;
     }
     
-    /* Auto-cleanup notification */
-    .cleanup-notice {
-      background: #fef3c7;
-      color: #d97706;
-      padding: 0.5rem 1rem;
-      border-radius: 2rem;
-      font-size: 0.7rem;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      margin-left: 1rem;
-    }
-    
     @media (max-width: 900px) {
       body { padding: 1rem; }
       .stats { flex-direction: column; align-items: stretch; }
@@ -423,7 +410,6 @@ Muhammad Danish bin Rosli|070303-03-9012|3 Bestari|2025'></textarea>
     const db = getFirestore(app);
     const studentsCollection = collection(db, "students");
     const meritCollection = collection(db, "merit_records");
-    const attendanceRef = collection(db, "attendance_records");
 
     // ==================== GLOBAL VARIABLES ====================
     window.students = [];
@@ -432,109 +418,6 @@ Muhammad Danish bin Rosli|070303-03-9012|3 Bestari|2025'></textarea>
     let pendingDeleteName = null;
     let pendingDeleteIc = null;
     let pendingDeleteMeritCount = 0;
-    
-    // ==================== AUTO CLEANUP FUNCTION ====================
-    // This function runs automatically and deletes corrupted student records
-    // A record is considered corrupted if:
-    // - No fullname OR fullname is empty/whitespace only
-    // - No icNumber OR icNumber is empty/whitespace only
-    // - icNumber is not a valid format (at least 6 characters)
-    // - fullname is too short (less than 3 characters after trim)
-    async function autoCleanupCorruptedRecords() {
-      let deletedCount = 0;
-      let corruptedIds = [];
-      
-      for (const student of window.students) {
-        let isCorrupted = false;
-        let reason = "";
-        
-        // Check for missing or empty fullname
-        if (!student.fullname || student.fullname.trim() === "") {
-          isCorrupted = true;
-          reason = "Nama kosong";
-        } 
-        // Check for fullname too short (less than 3 characters)
-        else if (student.fullname.trim().length < 3) {
-          isCorrupted = true;
-          reason = `Nama terlalu pendek: "${student.fullname}"`;
-        }
-        // Check for missing or empty IC
-        else if (!student.icNumber || student.icNumber.trim() === "") {
-          isCorrupted = true;
-          reason = "No. IC kosong";
-        }
-        // Check for IC too short (less than 6 characters)
-        else if (student.icNumber.trim().length < 6) {
-          isCorrupted = true;
-          reason = `No. IC terlalu pendek: "${student.icNumber}"`;
-        }
-        // Check for IC containing only invalid characters (just numbers or with dashes)
-        // We'll just check if it's not a reasonable length
-        else if (student.icNumber.trim().length > 20) {
-          isCorrupted = true;
-          reason = `No. IC terlalu panjang: "${student.icNumber}"`;
-        }
-        
-        if (isCorrupted) {
-          corruptedIds.push({ id: student.id, name: student.fullname || "Tanpa Nama", ic: student.icNumber || "Tanpa IC", reason: reason });
-        }
-      }
-      
-      // Delete corrupted records from Firestore
-      for (const corrupted of corruptedIds) {
-        try {
-          // Delete merit records associated with this student
-          const studentMeritRecords = allMeritRecords.filter(r => r.studentId === corrupted.id);
-          for (const record of studentMeritRecords) {
-            await deleteDoc(doc(db, "merit_records", record.id));
-          }
-          
-          // Delete attendance records associated with this student
-          const attendanceQuery = query(attendanceRef, where("ic", "==", corrupted.ic));
-          const attendanceSnap = await getDocs(attendanceQuery);
-          for (const record of attendanceSnap.docs) {
-            await deleteDoc(doc(db, "attendance_records", record.id));
-          }
-          
-          // Delete the student record
-          await deleteDoc(doc(db, "students", corrupted.id));
-          deletedCount++;
-          console.log(`🗑️ Auto-cleanup: Deleted corrupted student record - ${corrupted.name || corrupted.id} (Reason: ${corrupted.reason})`);
-        } catch (e) {
-          console.error(`Failed to delete corrupted record ${corrupted.id}:`, e);
-        }
-      }
-      
-      // Remove corrupted records from local arrays
-      if (deletedCount > 0) {
-        const corruptedIdsSet = new Set(corruptedIds.map(c => c.id));
-        window.students = window.students.filter(s => !corruptedIdsSet.has(s.id));
-        allMeritRecords = allMeritRecords.filter(r => !corruptedIdsSet.has(r.studentId));
-        
-        // Show notification
-        const statsDiv = document.querySelector('.stats-left');
-        const existingNotice = document.querySelector('.cleanup-notice');
-        if (existingNotice) existingNotice.remove();
-        
-        const notice = document.createElement('span');
-        notice.className = 'cleanup-notice';
-        notice.innerHTML = `<i class="fas fa-broom"></i> Auto-cleanup: ${deletedCount} rekod rosak dipadam`;
-        statsDiv.appendChild(notice);
-        
-        setTimeout(() => {
-          if (notice) notice.remove();
-        }, 5000);
-        
-        // Update UI
-        renderStudentList();
-        updateTotalCount();
-        updateClassFilter();
-        
-        showMessage(`🧹 Sistem telah memadam ${deletedCount} rekod pelajar yang rosak (data tidak lengkap).`, "success");
-      }
-      
-      return deletedCount;
-    }
     
     // ==================== LOAD MERIT RECORDS ====================
     async function loadMeritRecords() {
@@ -558,30 +441,24 @@ Muhammad Danish bin Rosli|070303-03-9012|3 Bestari|2025'></textarea>
     // ==================== DELETE STUDENT WITH ALL MERIT RECORDS ====================
     async function executeDeleteStudent(id, name, ic, meritCount) {
       try {
-        // Delete all merit records for this student
+        // Step 1: Find all merit records for this student
         const studentMeritRecords = allMeritRecords.filter(r => r.studentId === id);
+        
+        // Step 2: Delete each merit record from Firestore
         for (const record of studentMeritRecords) {
           await deleteDoc(doc(db, "merit_records", record.id));
           console.log(`Deleted merit record: ${record.id}`);
         }
         
-        // Delete attendance records for this student
-        const attendanceQuery = query(attendanceRef, where("ic", "==", ic));
-        const attendanceSnap = await getDocs(attendanceQuery);
-        for (const record of attendanceSnap.docs) {
-          await deleteDoc(doc(db, "attendance_records", record.id));
-          console.log(`Deleted attendance record: ${record.id}`);
-        }
-        
-        // Delete the student document
+        // Step 3: Delete the student document from Firestore
         await deleteDoc(doc(db, "students", id));
         console.log(`Deleted student: ${id} (${name})`);
         
-        // Update local arrays
+        // Step 4: Update local arrays
         allMeritRecords = allMeritRecords.filter(r => r.studentId !== id);
         window.students = window.students.filter(s => s.id !== id);
         
-        // Update UI
+        // Step 5: Update UI
         await saveStudentCredentials();
         renderStudentList();
         updateTotalCount();
@@ -617,7 +494,6 @@ Muhammad Danish bin Rosli|070303-03-9012|3 Bestari|2025'></textarea>
                 <ul style="margin-top:0.5rem; text-align:left; padding-left:1.5rem;">
                   <li>1 rekod pelajar</li>
                   <li>${meritCount} rekod merit</li>
-                  <li>Semua rekod kehadiran</li>
                 </ul>
               </div>
               
@@ -652,11 +528,12 @@ Muhammad Danish bin Rosli|070303-03-9012|3 Bestari|2025'></textarea>
       }
     };
     
+    // Replace delete function
     window.deleteStudentFromFirebase = function(id, name, ic, meritCount) {
       confirmDeleteStudent(id, name, ic, meritCount);
     };
     
-    // ==================== LOAD STUDENTS (with auto-cleanup) ====================
+    // ==================== LOAD STUDENTS ====================
     window.loadStudents = async function() {
       try {
         const querySnapshot = await getDocs(studentsCollection);
@@ -668,11 +545,6 @@ Muhammad Danish bin Rosli|070303-03-9012|3 Bestari|2025'></textarea>
           });
         });
         await loadMeritRecords();
-        
-        // ==================== RUN AUTO-CLEANUP ====================
-        // This will automatically delete corrupted records
-        await autoCleanupCorruptedRecords();
-        
         updateClassFilter();
         renderStudentList();
         updateTotalCount();
@@ -810,6 +682,7 @@ Muhammad Danish bin Rosli|070303-03-9012|3 Bestari|2025'></textarea>
       return filtered;
     };
 
+    // Open comprehensive edit dialog
     window.openFullEditDialog = function(id, currentName, currentIc, currentClass, currentSession) {
       const newName = prompt("✏️ Edit Nama Penuh:", currentName);
       if (newName === null) return;
@@ -996,13 +869,6 @@ Muhammad Danish bin Rosli|070303-03-9012|3 Bestari|2025'></textarea>
         }
       });
     });
-
-    // Run auto-cleanup every 30 seconds (in background)
-    setInterval(async () => {
-      if (window.students.length > 0) {
-        await autoCleanupCorruptedRecords();
-      }
-    }, 30000);
 
     // Load initial data
     window.loadStudents();

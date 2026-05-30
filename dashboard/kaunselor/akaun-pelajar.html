@@ -438,6 +438,55 @@ Muhammad Danish bin Rosli|070303-03-9012|3 Bestari|2025'></textarea>
       return allMeritRecords.filter(r => r.studentId === studentId).length;
     }
     
+    // ==================== AUTO CLEANUP CORRUPTED STUDENTS ====================
+    // Detect and automatically delete students without name or IC
+    async function autoCleanupCorruptedStudents() {
+      const corruptedStudents = window.students.filter(s => {
+        // Check if student has no name or no IC or name is empty string or IC is empty string
+        const hasNoName = !s.fullname || s.fullname.trim() === "";
+        const hasNoIc = !s.icNumber || s.icNumber.trim() === "";
+        const hasInvalidName = s.fullname === "undefined" || s.fullname === "null";
+        const hasInvalidIc = s.icNumber === "undefined" || s.icNumber === "null";
+        
+        return hasNoName || hasNoIc || hasInvalidName || hasInvalidIc;
+      });
+      
+      if (corruptedStudents.length > 0) {
+        console.log(`Found ${corruptedStudents.length} corrupted student records. Cleaning up...`);
+        
+        let deletedCount = 0;
+        for (const student of corruptedStudents) {
+          try {
+            // Get merit records for this student
+            const studentMeritRecords = allMeritRecords.filter(r => r.studentId === student.id);
+            
+            // Delete merit records
+            for (const record of studentMeritRecords) {
+              await deleteDoc(doc(db, "merit_records", record.id));
+              console.log(`Deleted merit record for corrupted student: ${record.id}`);
+            }
+            
+            // Delete the corrupted student
+            await deleteDoc(doc(db, "students", student.id));
+            console.log(`Deleted corrupted student: ${student.id} (${student.fullname || 'no name'} / ${student.icNumber || 'no IC'})`);
+            
+            // Remove from local arrays
+            allMeritRecords = allMeritRecords.filter(r => r.studentId !== student.id);
+            window.students = window.students.filter(s => s.id !== student.id);
+            deletedCount++;
+          } catch (e) {
+            console.error(`Failed to delete corrupted student ${student.id}:`, e);
+          }
+        }
+        
+        if (deletedCount > 0) {
+          showMessage(`🧹 Sistem telah membersihkan ${deletedCount} rekod pelajar yang rosak/tidak lengkap secara automatik.`, "success");
+          return true;
+        }
+      }
+      return false;
+    }
+    
     // ==================== DELETE STUDENT WITH ALL MERIT RECORDS ====================
     async function executeDeleteStudent(id, name, ic, meritCount) {
       try {
@@ -545,6 +594,23 @@ Muhammad Danish bin Rosli|070303-03-9012|3 Bestari|2025'></textarea>
           });
         });
         await loadMeritRecords();
+        
+        // AUTO CLEANUP: Remove corrupted students (no name or no IC)
+        const cleaned = await autoCleanupCorruptedStudents();
+        
+        // If cleanup happened, reload fresh data
+        if (cleaned) {
+          const freshSnapshot = await getDocs(studentsCollection);
+          window.students = [];
+          freshSnapshot.forEach((doc) => {
+            window.students.push({
+              id: doc.id,
+              ...doc.data()
+            });
+          });
+          await loadMeritRecords();
+        }
+        
         updateClassFilter();
         renderStudentList();
         updateTotalCount();
@@ -718,6 +784,11 @@ Muhammad Danish bin Rosli|070303-03-9012|3 Bestari|2025'></textarea>
 
       container.innerHTML = filtered.map(student => {
         const meritCount = getStudentMeritCount(student.id);
+        const hasValidData = student.fullname && student.fullname.trim() !== "" && student.icNumber && student.icNumber.trim() !== "";
+        
+        // Skip rendering if data is invalid (should have been cleaned, but just in case)
+        if (!hasValidData) return '';
+        
         return `
           <div class="student-item">
             <div class="student-info">

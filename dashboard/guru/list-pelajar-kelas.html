@@ -613,6 +613,8 @@
             allAttendanceRecords = [];
             attendanceSnap.forEach(doc => allAttendanceRecords.push({ id: doc.id, ...doc.data() }));
             
+            console.log("Attendance records loaded:", allAttendanceRecords.length);
+            
             updateStats();
             renderStudents();
         } catch(e) {
@@ -648,13 +650,21 @@
         return { hadir, lewat, tidakHadir, cuti };
     }
     
+    // FIXED: getTodayStatus function with better debugging
     function getTodayStatus(studentIC) {
         const today = new Date();
         const day = today.getDate().toString().padStart(2, '0');
         const month = (today.getMonth() + 1).toString().padStart(2, '0');
         const year = today.getFullYear();
         const todayFormatted = `${day}/${month}/${year}`;
-        return allAttendanceRecords.find(r => r.ic === studentIC && r.scanDate === todayFormatted);
+        console.log(`Looking for today's attendance (${todayFormatted}) for IC: ${studentIC}`);
+        const record = allAttendanceRecords.find(r => r.ic === studentIC && r.scanDate === todayFormatted);
+        if (record) {
+            console.log("Found record:", record.status, record.time);
+        } else {
+            console.log("No record found for today");
+        }
+        return record;
     }
     
     function getStudentTotalMerit(studentId) {
@@ -766,14 +776,12 @@
         
         showAlert('Sedang menyediakan QR Code untuk dicetak...', 'success');
         
-        // Create a temporary container for all QR cards
         const tempContainer = document.createElement('div');
         tempContainer.style.cssText = 'position: absolute; left: -9999px; top: 0; width: 21.6cm;';
         document.body.appendChild(tempContainer);
         
         const allCards = [];
         
-        // Generate all QR cards
         for (let i = 0; i < studentsList.length; i++) {
             const student = studentsList[i];
             
@@ -805,7 +813,6 @@
             
             tempContainer.appendChild(cardDiv);
             
-            // Generate QR code inside the card
             const qrData = JSON.stringify({ ic: student.icNumber, name: student.fullname, type: 'attendance' });
             new QRCode(document.getElementById(`tempQrCode_${i}`), {
                 text: qrData,
@@ -819,9 +826,7 @@
             allCards.push(cardDiv);
         }
         
-        // Wait for QR codes to generate
         setTimeout(() => {
-            // Build pages with 9 cards each (3x3 grid)
             const pages = [];
             const cardsPerPage = 9;
             
@@ -830,7 +835,6 @@
                 pages.push(pageCards);
             }
             
-            // Create print HTML
             let printHtml = `<!DOCTYPE html>
             <html>
             <head>
@@ -888,7 +892,6 @@
             </head>
             <body>`;
             
-            // Add header info on first page only
             printHtml += `<div class="header-info" style="text-align:center; margin-bottom:0.5cm;">
                 <h2>QR CODE KEHADIRAN PELAJAR</h2>
                 <p>Kelas: ${escapeHtml(currentClass)} | Tahun: ${currentYear} | Jumlah Pelajar: ${studentsList.length}</p>
@@ -905,7 +908,6 @@
             
             printHtml += `</body></html>`;
             
-            // Open print window
             const printWindow = window.open('', '_blank');
             printWindow.document.write(printHtml);
             printWindow.document.close();
@@ -914,19 +916,21 @@
                 printWindow.print();
             };
             
-            // Clean up
             setTimeout(() => {
                 document.body.removeChild(tempContainer);
             }, 2000);
         }, 1000);
     }
     
-    // ==================== SHOW ATTENDANCE MODAL ====================
+    // ==================== SHOW ATTENDANCE MODAL (FIXED) ====================
     async function showAttendanceModal(studentId, studentName, studentIC) {
         const stats = getStudentAttendanceStats(studentIC);
         const todayRecord = getTodayStatus(studentIC);
         const today = new Date();
-        const todayFormatted = `${today.getDate().toString().padStart(2,'0')}/${(today.getMonth()+1).toString().padStart(2,'0')}/${today.getFullYear()}`;
+        const day = today.getDate().toString().padStart(2, '0');
+        const month = (today.getMonth() + 1).toString().padStart(2, '0');
+        const year = today.getFullYear();
+        const todayFormatted = `${day}/${month}/${year}`;
         const dayName = today.toLocaleDateString('ms-MY', { weekday: 'long' });
         
         let todayHtml = '';
@@ -934,10 +938,35 @@
             const status = todayRecord.status;
             let icon = '', title = '', message = '', cssClass = '';
             switch(status) {
-                case 'hadir': icon = '<i class="fas fa-check-circle"></i>'; title = 'TAHNIAH!'; message = 'Anda telah hadir ke sekolah hari ini.'; cssClass = 'hadir'; break;
-                case 'lewat': icon = '<i class="fas fa-clock"></i>'; title = 'ANDA LEWAT'; message = 'Anda lewat pada hari ini. Cuba datang lebih awal.'; cssClass = 'lewat'; break;
-                case 'tidakhadir': icon = '<i class="fas fa-times-circle"></i>'; title = 'ANDA TIDAK HADIR'; message = 'Anda tidak hadir pada hari ini.'; cssClass = 'tidakhadir'; break;
-                case 'cuti': icon = '<i class="fas fa-umbrella-beach"></i>'; title = 'CUTI BERSEBAB'; message = `Semoga hari anda berjalan lancar. ${todayRecord.reason ? `Sebab: ${todayRecord.reason}` : ''}`; cssClass = 'cuti'; break;
+                case 'hadir': 
+                    icon = '<i class="fas fa-check-circle"></i>'; 
+                    title = 'TAHNIAH!'; 
+                    message = 'Anda telah hadir ke sekolah hari ini. Teruskan usaha anda!'; 
+                    cssClass = 'hadir'; 
+                    break;
+                case 'lewat': 
+                    icon = '<i class="fas fa-clock"></i>'; 
+                    title = 'ANDA LEWAT'; 
+                    message = 'Anda lewat pada hari ini. Cuba datang lebih awal pada hari-hari akan datang.'; 
+                    cssClass = 'lewat'; 
+                    break;
+                case 'tidakhadir': 
+                    icon = '<i class="fas fa-times-circle"></i>'; 
+                    title = 'ANDA TIDAK HADIR'; 
+                    message = 'Anda tidak hadir pada hari ini. Anda telah merugikan satu hari untuk menuntut ilmu. Sila pastikan anda datang ke sekolah pada hari-hari akan datang.'; 
+                    cssClass = 'tidakhadir'; 
+                    break;
+                case 'cuti': 
+                    icon = '<i class="fas fa-umbrella-beach"></i>'; 
+                    title = 'CUTI BERSEBAB'; 
+                    message = `Semoga hari anda berjalan lancar. ${todayRecord.reason ? `Sebab: ${todayRecord.reason}` : ''}`; 
+                    cssClass = 'cuti'; 
+                    break;
+                default:
+                    icon = '<i class="fas fa-question-circle"></i>';
+                    title = 'STATUS TIDAK DIKENALI';
+                    message = 'Sila hubungi kaunselor untuk maklumat lanjut.';
+                    cssClass = '';
             }
             todayHtml = `
                 <div class="today-status-card ${cssClass}">
@@ -955,6 +984,7 @@
                 <div class="today-status-card" style="background:#f1f5f9; text-align:center; padding:1rem; border-radius:1rem;">
                     <i class="fas fa-question-circle" style="font-size:2rem; color:#94a3b8;"></i>
                     <p style="margin-top:0.5rem;">Tiada rekod kehadiran untuk hari ini (${todayFormatted})</p>
+                    <p style="font-size:0.6rem; margin-top:0.2rem;">Sila scan QR Code kehadiran untuk merekodkan kehadiran anda.</p>
                 </div>
             `;
         }
@@ -1017,12 +1047,10 @@
         }
     }
     
-    // EXPOSE confirmDeleteStudent to window
     window.confirmDeleteStudent = function(id, name) {
         pendingDeleteId = id;
         pendingDeleteName = name;
         
-        // Remove existing modal if any
         const existingModal = document.getElementById('confirmDeleteModal');
         if (existingModal) existingModal.remove();
         

@@ -586,6 +586,7 @@
         const alertDiv = document.getElementById('alertMessage');
         alertDiv.textContent = msg;
         alertDiv.className = `alert ${type}`;
+        alertDiv.style.display = 'block';
         setTimeout(() => { alertDiv.style.display = 'none'; }, 4000);
     }
     
@@ -1016,9 +1017,15 @@
         }
     }
     
-    function confirmDeleteStudent(id, name) {
+    // EXPOSE confirmDeleteStudent to window
+    window.confirmDeleteStudent = function(id, name) {
         pendingDeleteId = id;
         pendingDeleteName = name;
+        
+        // Remove existing modal if any
+        const existingModal = document.getElementById('confirmDeleteModal');
+        if (existingModal) existingModal.remove();
+        
         const modalHtml = `
             <div id="confirmDeleteModal" class="modal">
                 <div class="modal-content confirm-delete">
@@ -1032,14 +1039,14 @@
                         <p style="color:#dc2626; font-size:0.7rem;">⚠️ Tindakan ini TIDAK BOLEH DIBATALKAN!</p>
                         <div class="confirm-buttons">
                             <button class="btn-confirm btn-confirm-no" onclick="document.getElementById('confirmDeleteModal').remove()">Batal</button>
-                            <button class="btn-confirm btn-confirm-yes" onclick="proceedDelete()">Ya, Padam</button>
+                            <button class="btn-confirm btn-confirm-yes" onclick="window.proceedDelete()">Ya, Padam</button>
                         </div>
                     </div>
                 </div>
             </div>
         `;
         document.body.insertAdjacentHTML('beforeend', modalHtml);
-    }
+    };
     
     window.proceedDelete = function() {
         if (pendingDeleteId) {
@@ -1091,7 +1098,7 @@
                             <button class="btn-attendance" onclick="window.showAttendanceModal('${student.id}', '${escapeHtml(student.fullname)}', '${student.icNumber}')"><i class="fas fa-calendar-check"></i> Kehadiran</button>
                             <button class="btn-view" onclick="viewStudentMerit('${student.id}')"><i class="fas fa-star"></i> Merit</button>
                             <button class="btn-edit-card" onclick="openEditStudentModal('${student.id}', '${escapeHtml(student.fullname)}', '${escapeHtml(student.icNumber)}', '${escapeHtml(student.class)}', '${student.session}')"><i class="fas fa-edit"></i> Edit</button>
-                            <button class="btn-delete-card" onclick="confirmDeleteStudent('${student.id}', '${escapeHtml(student.fullname)}')"><i class="fas fa-trash"></i> Hapus</button>
+                            <button class="btn-delete-card" onclick="window.confirmDeleteStudent('${student.id}', '${escapeHtml(student.fullname)}')"><i class="fas fa-trash"></i> Hapus</button>
                         </div>
                     </div>
                 </div>

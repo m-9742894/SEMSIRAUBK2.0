@@ -375,6 +375,7 @@
     let attendanceSettings = { timeOpen: "07:00", timeLate: "09:00", timeClose: "17:00" };
     let isSystemClosed = false;
     let scannedStudents = new Set();
+    let isProcessingQR = false;
     
     async function safeStopScanner(scanner, scannerName) {
         if (scanner && typeof scanner.stop === 'function') {
@@ -554,19 +555,15 @@
         } catch (error) { console.error(error); return false; }
     }
     
-    // ========== FIXED: verifyGuruQR function ==========
     async function verifyGuruQR(qrData) {
         try {
             console.log("=== VERIFY GURU QR ===");
             console.log("Raw QR data:", qrData);
-            console.log("Type of QR data:", typeof qrData);
             
             let icNumber = null;
             let teacherNameFromQR = null;
             
-            // Parse QR data
             if (typeof qrData === 'string') {
-                // Try to parse as JSON first
                 if (qrData.startsWith('{') && qrData.endsWith('}')) {
                     try {
                         const parsed = JSON.parse(qrData);
@@ -581,12 +578,9 @@
                             icNumber = qrData;
                         }
                     } catch(e) {
-                        // Not JSON, use as plain text (maybe just IC number)
                         icNumber = qrData;
-                        console.log("Not JSON, using as plain text:", icNumber);
                     }
                 } else {
-                    // Plain string (just IC number)
                     icNumber = qrData;
                 }
             } else if (typeof qrData === 'object') {
@@ -601,18 +595,13 @@
             
             console.log("Searching for teacher with IC:", icNumber);
             
-            // Search for teacher in Firestore using icNumber field
             const q = query(teachersRef, where("icNumber", "==", icNumber));
             const snapshot = await getDocs(q);
-            
-            console.log("Query result size:", snapshot.size);
             
             if (!snapshot.empty) {
                 let teacherFullName = '';
                 snapshot.forEach(doc => {
-                    const teacherData = doc.data();
-                    teacherFullName = teacherData.fullname;
-                    console.log("Found teacher:", teacherFullName);
+                    teacherFullName = doc.data().fullname;
                 });
                 
                 currentGuruName = teacherFullName;
@@ -622,7 +611,6 @@
                 guruStatus.className = 'guru-status guru-verified';
                 guruStatus.innerHTML = `<i class="fas fa-check-circle"></i> Guru ${teacherFullName} disahkan! Sistem kehadiran dibuka.`;
                 
-                // Stop guru scanner
                 await cleanupGuruScanner();
                 guruScannerModal.style.display = 'none';
                 document.getElementById('guruSection').style.display = 'none';
@@ -651,8 +639,6 @@
                 }
                 return true;
             } else {
-                // Teacher not found
-                console.log("Teacher NOT found for IC:", icNumber);
                 guruStatus.style.display = 'block';
                 guruStatus.className = 'guru-status guru-error';
                 guruStatus.innerHTML = `<i class="fas fa-times-circle"></i> QR Code tidak sah! Guru tidak berdaftar. (IC: ${icNumber})`;
@@ -680,15 +666,25 @@
         
         guruHtml5Qr = new Html5Qrcode("guruReader");
         try {
+            // Optimized: No qrbox restriction, higher fps for faster scanning
             await guruHtml5Qr.start(
                 { facingMode: "environment" },
-                { fps: 10, qrbox: { width: 250, height: 250 } },
+                { 
+                    fps: 30,
+                    qrbox: (viewfinderWidth, viewfinderHeight) => {
+                        // Make qrbox larger or use full viewfinder
+                        let minEdgePercentage = 0.7;
+                        let minEdgeSize = Math.min(viewfinderWidth, viewfinderHeight);
+                        let qrboxSize = Math.floor(minEdgeSize * minEdgePercentage);
+                        return { width: qrboxSize, height: qrboxSize };
+                    }
+                },
                 async (decodedText) => { 
                     console.log("QR scanned:", decodedText);
                     await verifyGuruQR(decodedText);
                 },
                 (errorMessage) => { 
-                    // Silent ignore
+                    // Silent ignore - continuous scanning
                 }
             );
             document.getElementById('guruScanningStatus').innerHTML = '📷 Kamera aktif. Scan QR Code guru.';
@@ -714,14 +710,28 @@
         
         studentHtml5Qr = new Html5Qrcode("studentReader");
         try {
+            // OPTIMIZED: Higher FPS, no qrbox restriction for faster scanning
             await studentHtml5Qr.start(
                 { facingMode: "environment" },
-                { fps: 10, qrbox: { width: 250, height: 250 } },
+                { 
+                    fps: 30,
+                    qrbox: (viewfinderWidth, viewfinderHeight) => {
+                        let minEdgePercentage = 0.7;
+                        let minEdgeSize = Math.min(viewfinderWidth, viewfinderHeight);
+                        let qrboxSize = Math.floor(minEdgeSize * minEdgePercentage);
+                        return { width: qrboxSize, height: qrboxSize };
+                    }
+                },
                 async (decodedText) => {
                     if (!isSystemOpen || isSystemClosed) {
                         showToast("Sistem kehadiran belum dibuka atau telah ditutup", "warning");
                         return;
                     }
+                    
+                    // Prevent multiple processing of same QR at same time
+                    if (isProcessingQR) return;
+                    isProcessingQR = true;
+                    
                     try {
                         const qrData = JSON.parse(decodedText);
                         if (qrData.type === 'attendance' && qrData.ic && qrData.name) {
@@ -730,11 +740,13 @@
                             const statusInfo = getAttendanceStatus(currentMinutes);
                             if (!statusInfo.canScan) {
                                 showToast(statusInfo.text, "warning");
+                                isProcessingQR = false;
                                 return;
                             }
                             const alreadyAttended = await hasAttendanceToday(qrData.ic);
                             if (alreadyAttended) {
                                 showToast(`${qrData.name} - Kehadiran sudah direkodkan hari ini`, "info");
+                                isProcessingQR = false;
                                 return;
                             }
                             const timeStr = now.toLocaleTimeString('ms-MY', { hour: '2-digit', minute: '2-digit' });
@@ -746,10 +758,12 @@
                         }
                     } catch(e) {
                         showToast("QR Code tidak dikenali. Sila gunakan QR kehadiran yang sah.", "error");
+                    } finally {
+                        isProcessingQR = false;
                     }
                 },
                 (errorMessage) => { 
-                    // Silent ignore
+                    // Silent ignore - continuous scanning
                 }
             );
             studentScanningStatus.innerHTML = `✅ Kamera aktif. Waktu operasi: ${attendanceSettings.timeOpen} - ${attendanceSettings.timeClose}`;

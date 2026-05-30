@@ -375,7 +375,6 @@
     let attendanceSettings = { timeOpen: "07:00", timeLate: "09:00", timeClose: "17:00" };
     let isSystemClosed = false;
     let scannedStudents = new Set();
-    let isProcessingQR = false;
     
     async function safeStopScanner(scanner, scannerName) {
         if (scanner && typeof scanner.stop === 'function') {
@@ -524,37 +523,6 @@
         return !existing.empty;
     }
     
-    // VALIDATION: Check if student exists in database
-    async function validateStudent(ic) {
-        try {
-            const studentsRef = collection(db, "students");
-            const q = query(studentsRef, where("icNumber", "==", ic));
-            const snapshot = await getDocs(q);
-            
-            if (snapshot.empty) {
-                console.log(`Student with IC ${ic} not found in students collection`);
-                return null;
-            }
-            
-            let studentData = null;
-            snapshot.forEach(doc => {
-                studentData = { id: doc.id, ...doc.data() };
-            });
-            
-            // Validate student has name and IC
-            if (!studentData.fullname || studentData.fullname.trim() === "" || 
-                !studentData.icNumber || studentData.icNumber.trim() === "") {
-                console.log(`Student ${ic} has incomplete data`);
-                return null;
-            }
-            
-            return studentData;
-        } catch (error) {
-            console.error("Error validating student:", error);
-            return null;
-        }
-    }
-    
     async function addAttendanceLog(name, ic, className, status, statusText, timeStr) {
         if (scannedStudents.has(ic)) return false;
         const logContainer = document.getElementById('logList');
@@ -576,62 +544,33 @@
     }
     
     async function saveAttendanceToFirestore(name, ic, className, status, statusText, timeStr) {
-        // VALIDATION: Ensure all required fields are present and valid
-        if (!ic || ic === "" || ic === "undefined" || ic === "null") {
-            console.error("Cannot save attendance: Invalid IC");
-            return false;
-        }
-        
-        if (!name || name === "" || name === "undefined" || name === "null") {
-            console.error("Cannot save attendance: Invalid name");
-            return false;
-        }
-        
         const now = new Date();
         const dateStr = now.toLocaleDateString('ms-MY');
-        const docId = `${ic}_${dateStr.replace(/\//g, '-')}`;
-        
         try {
-            // Check if attendance already exists for today
-            const docRef = doc(db, "attendance_records", docId);
-            const docSnap = await getDoc(docRef);
-            
-            if (docSnap.exists()) {
-                console.log(`Attendance already recorded for ${name} today`);
-                return false;
-            }
-            
-            await setDoc(docRef, {
-                ic: ic,
-                name: name,
-                className: className || "-",
-                scanDate: dateStr,
-                time: timeStr,
-                status: status,
-                statusText: statusText,
-                timestamp: Timestamp.now()
+            await setDoc(doc(attendanceRef, `${ic}_${dateStr.replace(/\//g, '-')}`), {
+                ic, name, className, scanDate: dateStr, time: timeStr, status, statusText, timestamp: Timestamp.now()
             });
-            console.log(`Attendance saved for ${name} (${ic})`);
             return true;
-        } catch (error) {
-            console.error("Error saving attendance:", error);
-            return false;
-        }
+        } catch (error) { console.error(error); return false; }
     }
     
-    // ========== verifyGuruQR function ==========
+    // ========== FIXED: verifyGuruQR function ==========
     async function verifyGuruQR(qrData) {
         try {
             console.log("=== VERIFY GURU QR ===");
             console.log("Raw QR data:", qrData);
+            console.log("Type of QR data:", typeof qrData);
             
             let icNumber = null;
             let teacherNameFromQR = null;
             
+            // Parse QR data
             if (typeof qrData === 'string') {
+                // Try to parse as JSON first
                 if (qrData.startsWith('{') && qrData.endsWith('}')) {
                     try {
                         const parsed = JSON.parse(qrData);
+                        console.log("Parsed JSON:", parsed);
                         if (parsed.type === 'teacher') {
                             icNumber = parsed.ic;
                             teacherNameFromQR = parsed.name;
@@ -642,9 +581,12 @@
                             icNumber = qrData;
                         }
                     } catch(e) {
+                        // Not JSON, use as plain text (maybe just IC number)
                         icNumber = qrData;
+                        console.log("Not JSON, using as plain text:", icNumber);
                     }
                 } else {
+                    // Plain string (just IC number)
                     icNumber = qrData;
                 }
             } else if (typeof qrData === 'object') {
@@ -657,13 +599,20 @@
                 return false;
             }
             
+            console.log("Searching for teacher with IC:", icNumber);
+            
+            // Search for teacher in Firestore using icNumber field
             const q = query(teachersRef, where("icNumber", "==", icNumber));
             const snapshot = await getDocs(q);
+            
+            console.log("Query result size:", snapshot.size);
             
             if (!snapshot.empty) {
                 let teacherFullName = '';
                 snapshot.forEach(doc => {
-                    teacherFullName = doc.data().fullname;
+                    const teacherData = doc.data();
+                    teacherFullName = teacherData.fullname;
+                    console.log("Found teacher:", teacherFullName);
                 });
                 
                 currentGuruName = teacherFullName;
@@ -673,6 +622,7 @@
                 guruStatus.className = 'guru-status guru-verified';
                 guruStatus.innerHTML = `<i class="fas fa-check-circle"></i> Guru ${teacherFullName} disahkan! Sistem kehadiran dibuka.`;
                 
+                // Stop guru scanner
                 await cleanupGuruScanner();
                 guruScannerModal.style.display = 'none';
                 document.getElementById('guruSection').style.display = 'none';
@@ -701,6 +651,8 @@
                 }
                 return true;
             } else {
+                // Teacher not found
+                console.log("Teacher NOT found for IC:", icNumber);
                 guruStatus.style.display = 'block';
                 guruStatus.className = 'guru-status guru-error';
                 guruStatus.innerHTML = `<i class="fas fa-times-circle"></i> QR Code tidak sah! Guru tidak berdaftar. (IC: ${icNumber})`;
@@ -730,7 +682,7 @@
         try {
             await guruHtml5Qr.start(
                 { facingMode: "environment" },
-                { fps: 30, qrbox: { width: 250, height: 250 } },
+                { fps: 10, qrbox: { width: 250, height: 250 } },
                 async (decodedText) => { 
                     console.log("QR scanned:", decodedText);
                     await verifyGuruQR(decodedText);
@@ -764,86 +716,36 @@
         try {
             await studentHtml5Qr.start(
                 { facingMode: "environment" },
-                { fps: 30, qrbox: { width: 250, height: 250 } },
+                { fps: 10, qrbox: { width: 250, height: 250 } },
                 async (decodedText) => {
                     if (!isSystemOpen || isSystemClosed) {
                         showToast("Sistem kehadiran belum dibuka atau telah ditutup", "warning");
                         return;
                     }
-                    
-                    if (isProcessingQR) return;
-                    isProcessingQR = true;
-                    
                     try {
-                        let qrData;
-                        try {
-                            qrData = JSON.parse(decodedText);
-                        } catch(e) {
-                            console.error("Failed to parse QR:", e);
-                            showToast("QR Code tidak dikenali. Sila gunakan QR kehadiran yang sah.", "error");
-                            isProcessingQR = false;
-                            return;
+                        const qrData = JSON.parse(decodedText);
+                        if (qrData.type === 'attendance' && qrData.ic && qrData.name) {
+                            const now = new Date();
+                            const currentMinutes = now.getHours() * 60 + now.getMinutes();
+                            const statusInfo = getAttendanceStatus(currentMinutes);
+                            if (!statusInfo.canScan) {
+                                showToast(statusInfo.text, "warning");
+                                return;
+                            }
+                            const alreadyAttended = await hasAttendanceToday(qrData.ic);
+                            if (alreadyAttended) {
+                                showToast(`${qrData.name} - Kehadiran sudah direkodkan hari ini`, "info");
+                                return;
+                            }
+                            const timeStr = now.toLocaleTimeString('ms-MY', { hour: '2-digit', minute: '2-digit' });
+                            await addAttendanceLog(qrData.name, qrData.ic, qrData.class || '-', statusInfo.status, statusInfo.text, timeStr);
+                            await saveAttendanceToFirestore(qrData.name, qrData.ic, qrData.class || '-', statusInfo.status, statusInfo.text, timeStr);
+                            showToast(`${qrData.name} - ${statusInfo.text} direkodkan pada ${timeStr}`, "success");
+                        } else {
+                            showToast("QR Code tidak sah! Sila gunakan QR Code kehadiran yang betul.", "error");
                         }
-                        
-                        // VALIDATION: Check if QR has required fields
-                        if (!qrData.type || qrData.type !== 'attendance') {
-                            showToast("QR Code bukan untuk kehadiran!", "error");
-                            isProcessingQR = false;
-                            return;
-                        }
-                        
-                        if (!qrData.ic || qrData.ic === "" || qrData.ic === "undefined" || qrData.ic === "null") {
-                            showToast("QR Code tidak sah - IC tidak valid", "error");
-                            isProcessingQR = false;
-                            return;
-                        }
-                        
-                        if (!qrData.name || qrData.name === "" || qrData.name === "undefined" || qrData.name === "null") {
-                            showToast("QR Code tidak sah - Nama tidak valid", "error");
-                            isProcessingQR = false;
-                            return;
-                        }
-                        
-                        // VALIDATION: Verify student exists in database
-                        const studentData = await validateStudent(qrData.ic);
-                        
-                        if (!studentData) {
-                            showToast(`Pelajar dengan IC ${qrData.ic} tidak berdaftar dalam sistem!`, "error");
-                            isProcessingQR = false;
-                            return;
-                        }
-                        
-                        // Use the correct name from database, not from QR (to avoid tampering)
-                        const validName = studentData.fullname;
-                        const validClass = studentData.class || '-';
-                        
-                        const now = new Date();
-                        const currentMinutes = now.getHours() * 60 + now.getMinutes();
-                        const statusInfo = getAttendanceStatus(currentMinutes);
-                        
-                        if (!statusInfo.canScan) {
-                            showToast(statusInfo.text, "warning");
-                            isProcessingQR = false;
-                            return;
-                        }
-                        
-                        const alreadyAttended = await hasAttendanceToday(qrData.ic);
-                        if (alreadyAttended) {
-                            showToast(`${validName} - Kehadiran sudah direkodkan hari ini`, "info");
-                            isProcessingQR = false;
-                            return;
-                        }
-                        
-                        const timeStr = now.toLocaleTimeString('ms-MY', { hour: '2-digit', minute: '2-digit' });
-                        await addAttendanceLog(validName, qrData.ic, validClass, statusInfo.status, statusInfo.text, timeStr);
-                        await saveAttendanceToFirestore(validName, qrData.ic, validClass, statusInfo.status, statusInfo.text, timeStr);
-                        showToast(`${validName} - ${statusInfo.text} direkodkan pada ${timeStr}`, "success");
-                        
                     } catch(e) {
-                        console.error("Error processing QR:", e);
-                        showToast("Ralat memproses QR Code", "error");
-                    } finally {
-                        isProcessingQR = false;
+                        showToast("QR Code tidak dikenali. Sila gunakan QR kehadiran yang sah.", "error");
                     }
                 },
                 (errorMessage) => { 

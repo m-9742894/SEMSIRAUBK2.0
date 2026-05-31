@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Galeri Memori | UBK SEMSIRA</title>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;700&family=Orbitron:wght@700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #feada6 100%);
+            min-height: 100vh;
+            font-family: 'Quicksand', sans-serif;
+            overflow-x: hidden;
+            padding-bottom: 100px;
+        }
+
+        .header {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            color: #fff;
+            font-size: clamp(1.8rem, 8vw, 3rem);
+            text-shadow: 4px 4px 0px rgba(209, 80, 118, 0.3);
+        }
+
+        /* Info bar - menunjukkan bilangan gambar yang ada */
+        .info-bar {
+            text-align: center;
+            margin: 20px auto;
+            background: rgba(255,255,255,0.25);
+            backdrop-filter: blur(10px);
+            display: inline-block;
+            padding: 8px 20px;
+            border-radius: 50px;
+            color: white;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 50px;
+            padding: 20px 50px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .photo-card {
+            background: white;
+            padding: 15px 15px 40px 15px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            border-radius: 10px;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            animation: floatSlow var(--time) infinite ease-in-out alternate;
+            transform: rotate(var(--rotation));
+            cursor: pointer;
+            opacity: 0;
+            transform-origin: center;
+            animation: fadeSlideUp 0.5s ease forwards, floatSlow var(--time) infinite ease-in-out alternate;
+        }
+
+        /* Animation untuk kemunculan kad baru */
+        @keyframes fadeSlideUp {
+            0% {
+                opacity: 0;
+                transform: translateY(30px) rotate(var(--rotation));
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) rotate(var(--rotation));
+            }
+        }
+
+        .photo-card:hover {
+            transform: scale(1.1) rotate(0deg) translateY(-10px) !important;
+            z-index: 100;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.2);
+        }
+
+        .photo-card img {
+            width: 100%;
+            height: 220px;
+            object-fit: cover;
+            border-radius: 5px;
+            background: #f0f0f0;
+            display: block;
+        }
+
+        .photo-card::after {
+            content: "♥ Memori Terindah";
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.75rem;
+            color: #ff9a9e;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        /* Badge tarikh / nombor memori (pilihan) */
+        .memory-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.6);
+            color: white;
+            font-size: 0.7rem;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-family: monospace;
+            backdrop-filter: blur(4px);
+            z-index: 5;
+        }
+
+        @keyframes floatSlow {
+            0% { transform: translateY(0) rotate(var(--rotation)); }
+            100% { transform: translateY(-18px) rotate(var(--rotation-end)); }
+        }
+
+        /* --- STYLES UNTUK ZOOM (LIGHTBOX) --- */
+        #lightbox {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            backdrop-filter: blur(12px);
+            cursor: zoom-out;
+        }
+
+        #lightbox img {
+            max-width: 90%;
+            max-height: 80%;
+            border-radius: 12px;
+            box-shadow: 0 0 50px rgba(0,0,0,0.6);
+            border: 4px solid white;
+            animation: zoomIn 0.25s ease;
+        }
+
+        @keyframes zoomIn {
+            from { transform: scale(0.6); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .btn-back {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 1000;
+            background: #fff;
+            color: #d15076;
+            text-transform: uppercase;
+            text-decoration: none;
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-weight: bold;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            border: 2px solid #ff9a9e;
+            transition: 0.3s;
+            font-family: 'Quicksand', sans-serif;
+        }
+
+        .btn-back:hover {
+            background: #ff9a9e;
+            color: white;
+            transform: scale(1.05);
+        }
+
+        /* Empty state sekiranya tiada gambar langsung */
+        .empty-gallery {
+            text-align: center;
+            padding: 80px 20px;
+            color: white;
+            background: rgba(255,255,255,0.2);
+            border-radius: 40px;
+            margin: 40px;
+            backdrop-filter: blur(8px);
+        }
+
+        .empty-gallery h3 {
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .gallery-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 25px; padding: 15px; }
+            .photo-card img { height: 150px; }
+            .photo-card::after { font-size: 0.65rem; white-space: normal; width: 90%; text-align: center; }
+            .btn-back { bottom: 20px; right: 20px; padding: 10px 20px; font-size: 0.8rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="lightbox" onclick="this.style.display='none'">
+        <img id="lightbox-img" src="">
+    </div>
+
+    <div class="header">
+        <h1>📸 GALERI MEMORI</h1>
+        <p style="color: white; opacity: 0.9; margin-top: 10px;">Koleksi momen indah UBK SEMSIRA</p>
+        <div class="info-bar" id="infoBar">✨ Memuat turun memori...</div>
+    </div>
+
+    <div class="gallery-grid" id="galleryContainer">
+        <!-- Kad memori akan dimuatkan secara dinamik di sini -->
+    </div>
+
+    <a href="portal-utama.html" class="btn-back">← KEMBALI KE PORTAL</a>
+
+    <script>
+        // Fungsi utama: scan imej aktivitiX.png dari folder root
+        // Imej akan disusun mengikut NOMBOR TERTINGGI (TERBARU) DI ATAS
+        // Maksimum cubaan 150 imej untuk prestasi (boleh adjust)
+        
+        const container = document.getElementById('galleryContainer');
+        const lightbox = document.getElementById('lightbox');
+        const lightboxImg = document.getElementById('lightbox-img');
+        const infoBar = document.getElementById('infoBar');
+        
+        // Simpan senarai imej yang ditemui dalam format { nomor, path }
+        let foundImages = [];
+        
+        // Fungsi untuk menambah kad ke dalam galeri (dengan susunan terbaru di atas)
+        // Susunan: latest image akan muncul di awal array -> maka kita masukkan di awal container
+        function addPhotoCardToTop(imagePath, imageNumber) {
+            const card = document.createElement('div');
+            card.className = 'photo-card';
+            
+            // Random rotation dan float effect untuk setiap kad
+            const rotation = (Math.random() * 8 - 4) + 'deg';
+            const rotationEnd = (Math.random() * 8 - 4) + 'deg';
+            const time = (Math.random() * 2.5 + 3) + 's';
+            
+            card.style.setProperty('--rotation', rotation);
+            card.style.setProperty('--rotation-end', rotationEnd);
+            card.style.setProperty('--time', time);
+            
+            // inner content: gambar + badge nombor memori
+            card.innerHTML = `
+                <div class="memory-badge">#${imageNumber}</div>
+                <img src="${imagePath}" alt="Aktiviti ${imageNumber}" 
+                     onerror="this.onerror=null; this.src='https://via.placeholder.com/300x220?text=Tidak+dapat+dimuatkan&bg=f4a261&color=white'; this.alt='Gagal muat'">
+            `;
+            
+            // Fungsi Zoom apabila klik kad
+            card.onclick = (e) => {
+                e.stopPropagation();
+                lightboxImg.src = imagePath;
+                // fallback jika image error dalam lightbox
+                lightboxImg.onerror = () => {
+                    lightboxImg.src = 'https://via.placeholder.com/800x500?text=Gambar+tidak+ditemui';
+                };
+                lightbox.style.display = 'flex';
+            };
+            
+            // Masukkan kad ke dalam container di posisi PERTAMA (teratas)
+            // supaya gambar terbaru sentiasa di atas (susunan menurun mengikut masa)
+            if (container.firstChild) {
+                container.insertBefore(card, container.firstChild);
+            } else {
+                container.appendChild(card);
+            }
+            
+            // Trigger sedikit animasi tambahan (optional: scroll ke atas sedikit)
+            // supaya pengguna nampak kad baru di atas
+            if (foundImages.length === 1) {
+                // kali pertama tambah, tak perlu scroll agresif
+            } else {
+                // supaya pengguna sedar update - smooth ke atas sedikit
+                setTimeout(() => {
+                    card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 100);
+            }
+        }
+        
+        // Fungsi untuk mengesan semua fail aktiviti1.png ... aktivitiN.png secara automatik
+        // Ia akan cuba dari nombor tertinggi (cth: cuba 200 ke bawah) supaya dapat latest dulu.
+        // Idea: Kita buat carian dengan limit 200. Kita detect imej dari high ke low.
+        // Kemudian kita susun ikut descending number terus, kemudian add to gallery terbalik biar top latest.
+        // Atau cara lain: scan dulu semua imej dari 1 hingga maxTry, kumpul yang wujud, kemudian tambah dari terbesar ke terkecil.
+        // Tapi kita nak latest akan ada di atas -> jadi selepas dapat array sortedDesc, kita loop & add ke container dengan insertBefore (top).
+        
+        const MAX_CHECK = 200; // maximum bilangan nama fail yang akan diperiksa (aktiviti1 hingga aktiviti200)
+        
+        async function detectAndLoadGallery() {
+            container.innerHTML = ''; // kosongkan container
+            
+            // Tunjukkan loading
+            infoBar.innerHTML = "🔍 Sedang mengimbas memori indah...";
+            
+            const existingImages = []; // simpan { number, path }
+            
+            // Kita akan check dari 1 hingga MAX_CHECK untuk tahu imej mana wujud
+            // Untuk prestasi, kita gunakan Promise.all untuk check serentak (lebih cepat)
+            const checkPromises = [];
+            
+            for (let i = 1; i <= MAX_CHECK; i++) {
+                const imgPath = `aktiviti${i}.png`;
+                // Buat promise untuk setiap imej
+                const promise = new Promise((resolve) => {
+                    const img = new Image();
+                    img.onload = () => resolve({ number: i, path: imgPath, exists: true });
+                    img.onerror = () => resolve({ number: i, path: imgPath, exists: false });
+                    img.src = imgPath;
+                    // timeout untuk mengelak lama sangat (5 saat)
+                    setTimeout(() => {
+                        if (!img.complete) {
+                            img.src = '';
+                            resolve({ number: i, path: imgPath, exists: false });
+                        }
+                    }, 2000);
+                });
+                checkPromises.push(promise);
+            }
+            
+            // Tunggu semua selesai check
+            const results = await Promise.all(checkPromises);
+            
+            // Filter yang wujud sahaja
+            for (const res of results) {
+                if (res.exists) {
+                    existingImages.push({ number: res.number, path: res.path });
+                }
+            }
+            
+            // SUSUNAN MENGIKUT NOMBOR TERBESAR KE TERKECIL (terbaru di atas)
+            // Dengan anggapan semakin besar nombor semakin baru (aktiviti99.png lebih baru dari aktiviti1.png)
+            existingImages.sort((a, b) => b.number - a.number);
+            
+            // Kemas kini info bar
+            if (existingImages.length === 0) {
+                infoBar.innerHTML = "📭 Tiada memori lagi. Muat naik gambar (aktiviti1.png, aktiviti2.png ...) ke folder root.";
+                // Paparkan mesej galeri kosong
+                const emptyMsg = document.createElement('div');
+                emptyMsg.className = 'empty-gallery';
+                emptyMsg.innerHTML = '<h3>🌸 Belum ada kenangan 🌸</h3><p>Muat naik gambar dengan nama <strong>aktiviti1.png , aktiviti2.png</strong> dan seterusnya.<br>Gambar terbaru akan muncul di atas galeri.</p>';
+                container.appendChild(emptyMsg);
+                return;
+            }
+            
+            infoBar.innerHTML = `✨ ${existingImages.length} memori indah ✨ | Terbaru di atas`;
+            
+            // Sekarang loop setiap imej (dari tertinggi ke terendah) dan tambah ke GALERI,
+            // supaya nombor terbesar (latest) akan muncul paling atas.
+            // Kita guna addPhotoCardToTop tetapi setiap panggilan akan insert di atas. 
+            // Tapi jika kita loop dari besar ke kecil dan masukkan satu per satu ke atas,
+            // maka urutan akan menjadi: latest masuk dulu (jadi paling atas), kemudian second latest masuk di atas latest? 
+            // Perhatikan: insertBefore(child, firstChild) akan menyebabkan gambar baru dimasukkan di atas yg sedia ada.
+            // Jika kita loop descending: contohnya (100, 99, 98). 
+            // Mula container kosong => add 100 => jadi [100]. 
+            // add 99 => insertBefore(99, firstChild) => jadi [99,100] -> tapi ini salah kerana 100 lebih baru harus di atas 99.
+            // Jadi Cara betul: Kita loop dari NOMBOR TERTINGGI KE TERENDAH, tapi kita TAMBAH ke bawah (append) atau kita reverse.
+            // Supaya yang paling besar (100) di atas, kita boleh buat: bina semua kad dulu dalam array mengikut urutan descending, kemudian masukkan ke container dari bawah ke atas? 
+            // Cara paling mudah: kosongkan container, kemudian loop imej dari descending (100,99,...1) dan gunakan appendChild.
+            // AppendChild akan menambah di bawah, tetapi kerana kita loop 100 dulu dia akan jadi paling atas kalau disusun flex grid? Tidak, div akan mengikut urutan dalam DOM: elemen pertama dalam container adalah paling atas secara visual (kiri-atas).
+            // Oleh itu, kita loop descending, dan setiap kali appendChild, maka 100 akan menjadi anak pertama (paling atas), kemudian 99 anak kedua, dan seterusnya.
+            // TAPI grid tetap akan papar dari kiri ke kanan, baris pertama adalah anak pertama. Jadi betullah: susunan DOM = urutan descending => latest berada di posisi pertama (paling atas/kiri).
+            // Jadi kita gunakan append sahaja, tapi pastikan kita clear container dulu.
+            
+            container.innerHTML = ''; // clear empty message jika ada
+            
+            for (const imgData of existingImages) {
+                // Buat kad untuk setiap imej (guna fungsi pembina kad tanpa insert ke atas, tetapi kita akan append)
+                const card = createCardElement(imgData.number, imgData.path);
+                container.appendChild(card);
+                // Tambah sedikit jeda untuk animasi berturutan (optional)
+                await new Promise(r => setTimeout(r, 30));
+            }
+            
+            // Optional: Tambah class atau efek fresh load
+            console.log(`Galeri dimuatkan dengan ${existingImages.length} gambar | Susunan latest di atas.`);
+        }
+        
+        // Fungsi untuk mencipta element kad tanpa terus insert ke DOM (guna untuk loop bersusun)
+        function createCardElement(imageNumber, imagePath) {
+            const card = document.createElement('div');
+            card.className = 'photo-card';
+            
+            const rotation = (Math.random() * 8 - 4) + 'deg';
+            const rotationEnd = (Math.random() * 8 - 4) + 'deg';
+            const time = (Math.random() * 2.5 + 3) + 's';
+            
+            card.style.setProperty('--rotation', rotation);
+            card.style.setProperty('--rotation-end', rotationEnd);
+            card.style.setProperty('--time', time);
+            
+            card.innerHTML = `
+                <div class="memory-badge">📸 #${imageNumber}</div>
+                <img src="${imagePath}" alt="Kenangan ${imageNumber}" 
+                     onerror="this.onerror=null; this.src='https://via.placeholder.com/300x220?text=Gambar+tidak+ditemui&bg=e76f51&color=fff'; this.alt='Ralat muat'">
+            `;
+            
+            card.onclick = (e) => {
+                e.stopPropagation();
+                lightboxImg.src = imagePath;
+                lightboxImg.onerror = () => {
+                    lightboxImg.src = 'https://via.placeholder.com/800x500?text=Memori+tidak+dapat+dimuatkan';
+                };
+                lightbox.style.display = 'flex';
+            };
+            
+            return card;
+        }
+        
+        // Fungsi untuk "Refresh Live" sekiranya ada gambar baru dimuat naik ke server
+        // Kita boleh tambah mekanisme polling ringan atau butang refresh? Lebih baik tambah butang Refresh tersembunyi atau auto detect setiap 15 saat? 
+        // Untuk pengalaman lancar, kita letak butang "Muat Semula Galeri" di header atau footer? Saya akan tambah di info bar (button refresh kecil).
+        // Juga boleh set semula detection secara manual. Tapi demi kesempurnaan dan keperluan "upload gambar baru naik 1 frame ja, latest di atas"
+        // Pengguna hanya refresh halaman atau klik butang refresh untuk imbasan semula.
+        // Tetapi user boleh muat naik gambar baru melalui FTP / panel. Apabila mereka buka portal dan klik menu galeri, page ini akan detect kesemua imej.
+        // Untuk automasi tanpa reload page, kita boleh buat butang "Refresh" yang panggil detectAndLoadGallery() semula.
+        
+        // Tambah butang refresh di sebelah info bar
+        function addRefreshButton() {
+            const refreshBtn = document.createElement('button');
+            refreshBtn.innerHTML = '🔄 Muat Semula Galeri';
+            refreshBtn.style.background = 'white';
+            refreshBtn.style.border = 'none';
+            refreshBtn.style.padding = '8px 18px';
+            refreshBtn.style.borderRadius = '40px';
+            refreshBtn.style.fontFamily = 'Quicksand, sans-serif';
+            refreshBtn.style.fontWeight = 'bold';
+            refreshBtn.style.color = '#d15076';
+            refreshBtn.style.cursor = 'pointer';
+            refreshBtn.style.marginLeft = '15px';
+            refreshBtn.style.boxShadow = '0 2px 8px rgba(0,0,0,0.2)';
+            refreshBtn.style.transition = '0.2s';
+            
+            refreshBtn.onmouseover = () => {
+                refreshBtn.style.transform = 'scale(1.05)';
+                refreshBtn.style.background = '#ffe0e7';
+            };
+            refreshBtn.onmouseout = () => {
+                refreshBtn.style.transform = 'scale(1)';
+                refreshBtn.style.background = 'white';
+            };
+            
+            refreshBtn.onclick = async () => {
+                refreshBtn.innerHTML = '🔄 Mengimbas...';
+                refreshBtn.disabled = true;
+                await detectAndLoadGallery();
+                refreshBtn.innerHTML = '🔄 Muat Semula Galeri';
+                refreshBtn.disabled = false;
+                // Tampilkan notifikasi ringkas jika ada perubahan
+                const notif = document.createElement('div');
+                notif.textContent = '✅ Galeri dikemas kini! Susunan terbaru di atas.';
+                notif.style.position = 'fixed';
+                notif.style.bottom = '100px';
+                notif.style.right = '30px';
+                notif.style.background = '#2d6a4f';
+                notif.style.color = 'white';
+                notif.style.padding = '10px 20px';
+                notif.style.borderRadius = '30px';
+                notif.style.zIndex = '999';
+                notif.style.fontWeight = 'bold';
+                notif.style.boxShadow = '0 5px 15px rgba(0,0,0,0.2)';
+                document.body.appendChild(notif);
+                setTimeout(() => notif.remove(), 2500);
+            };
+            
+            const headerDiv = document.querySelector('.header');
+            const infoBarElem = document.getElementById('infoBar');
+            if (infoBarElem && headerDiv) {
+                // letakkan butang dalam satu baris dengan info bar
+                const containerRow = document.createElement('div');
+                containerRow.style.display = 'flex';
+                containerRow.style.justifyContent = 'center';
+                containerRow.style.alignItems = 'center';
+                containerRow.style.flexWrap = 'wrap';
+                containerRow.style.gap = '12px';
+                containerRow.style.marginTop = '10px';
+                
+                // pindahkan infoBar ke dalam containerRow
+                const parent = infoBarElem.parentNode;
+                parent.insertBefore(containerRow, infoBarElem);
+                containerRow.appendChild(infoBarElem);
+                containerRow.appendChild(refreshBtn);
+            } else {
+                // fallback: lekat selepas header
+                document.querySelector('.header')?.appendChild(refreshBtn);
+            }
+        }
+        
+        // Simulasi "upload gambar baru naik 1 frame ja" – Apabila pengguna refresh atau klik butang refresh,
+        // sistem akan mengimbas semula semua aktiviti*.png dan hanya akan memaparkan frame berdasarkan jumlah sebenar.
+        // Imej baru (contoh aktiviti101.png) akan dikesan dan akan diletakkan di atas galeri kerana kita sort descending.
+        // Jika upload 1 gambar baru (contoh aktiviti88.png sebelum ini hanya sampai 87), sistem akan detect 88 dan memaparkannya paling atas.
+        // Ini memenuhi keperluan: "kalau contoh baru upload 1 gambar, naik 1 frame ja, pastu kalau upload yang lain pulak baru naik frame baru,
+        // dan bagi yang latest tu akan naik duduk atas, gambar lama makin ke bawah."
+        
+        // initialize page
+        window.addEventListener('DOMContentLoaded', async () => {
+            await detectAndLoadGallery();
+            addRefreshButton();
+            
+            // Optional: jika terdapat parameter URL ?refresh=1, auto refresh detection
+            if (window.location.search.includes('refresh=1')) {
+                await detectAndLoadGallery();
+            }
+            
+            // Sokongan untuk lightbox klik luar
+            lightbox.addEventListener('click', (e) => {
+                if (e.target === lightbox) lightbox.style.display = 'none';
+            });
+        });
+        
+        // Untuk memudahkan admin/pengguna: Pesanan tooltip bahawa gambar mesti dinamakan aktivitiNUMBER.png
+        console.log("Galeri Memori Sedia | Nama fail dijangka: aktiviti1.png, aktiviti2.png ...");
+    </script>
+</body>
+</html>

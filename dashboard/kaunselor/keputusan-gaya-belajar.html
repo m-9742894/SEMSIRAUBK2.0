@@ -84,6 +84,14 @@
         .stats-banner h2 { font-size: 1.2rem; }
         .stats-banner p { font-size: 0.8rem; opacity: 0.9; }
         .total-count { background: rgba(255,255,255,0.2); padding: 0.3rem 1rem; border-radius: 2rem; font-weight: 600; }
+        .duplicate-badge {
+            background: #fef3c7;
+            color: #d97706;
+            padding: 0.3rem 1rem;
+            border-radius: 2rem;
+            font-weight: 600;
+            font-size: 0.8rem;
+        }
         
         /* Search & Filter Section */
         .search-section {
@@ -191,6 +199,19 @@
             gap: 8px;
         }
         .btn-delete-all:hover { background: #dc2626; transform: translateY(-2px); }
+        .btn-deduplicate {
+            background: #d97706;
+            color: white;
+            border: none;
+            padding: 0.7rem 1.2rem;
+            border-radius: 2rem;
+            cursor: pointer;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-deduplicate:hover { background: #b45309; transform: translateY(-2px); }
         
         /* View Toggle Buttons */
         .view-toggle {
@@ -325,6 +346,10 @@
             background: #eef2ff;
             border: 2px solid #4f46e5;
         }
+        .result-card.duplicate {
+            border: 2px solid #f59e0b;
+            background: #fffbeb;
+        }
         .checkbox-select {
             position: absolute;
             top: 1rem;
@@ -334,6 +359,17 @@
             cursor: pointer;
             accent-color: #4f46e5;
         }
+        .duplicate-label {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            background: #f59e0b;
+            color: white;
+            font-size: 0.6rem;
+            font-weight: 700;
+            padding: 0.2rem 0.5rem;
+            border-radius: 20px;
+        }
         .student-header {
             display: flex;
             align-items: center;
@@ -341,6 +377,7 @@
             margin-bottom: 1rem;
             padding-bottom: 0.5rem;
             border-bottom: 1px solid #e2e8f0;
+            margin-top: 10px;
         }
         .student-avatar {
             width: 50px;
@@ -453,6 +490,7 @@
         }
         .toast.success { background: #10b981; }
         .toast.error { background: #ef4444; }
+        .toast.warning { background: #d97706; }
         @keyframes slideIn {
             from { transform: translateX(100%); opacity: 0; }
             to { transform: translateX(0); opacity: 1; }
@@ -521,6 +559,7 @@
         </div>
         <div class="filter-group">
             <button id="refreshBtn" class="btn-refresh"><i class="fas fa-sync-alt"></i> Muat Semula</button>
+            <button id="deduplicateBtn" class="btn-deduplicate"><i class="fas fa-clone"></i> Hapus Data Berganda</button>
             <button id="printBtn" class="btn-print"><i class="fas fa-print"></i> Cetak Report</button>
             <button id="deleteAllBtn" class="btn-delete-all"><i class="fas fa-trash-alt"></i> Hapus Semua</button>
         </div>
@@ -556,7 +595,7 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, collection, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, collection, getDocs, deleteDoc, doc, query, where, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
     
     const firebaseConfig = {
         apiKey: "AIzaSyCfu7XC8pXtpDyQ-9Cjdg4AobA-EVEwWcc",
@@ -595,7 +634,7 @@
     function showToast(msg, type = 'success') {
         const toast = document.createElement('div');
         toast.className = `toast ${type}`;
-        toast.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i> ${msg}`;
+        toast.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'warning' ? 'fa-exclamation-triangle' : 'fa-exclamation-circle'}"></i> ${msg}`;
         document.body.appendChild(toast);
         setTimeout(() => toast.remove(), 3000);
     }
@@ -638,6 +677,109 @@
         }
     }
     
+    // ==================== AUTO DEDUPLICATE FUNCTION ====================
+    async function autoDeduplicateRecords() {
+        console.log("🔍 Mencari rekod berganda (duplicate records)...");
+        
+        // Group by student name (case-insensitive)
+        const groupedByName = new Map();
+        
+        for (const result of allCompletedResults) {
+            const studentName = (result.studentName || "").trim().toLowerCase();
+            if (!studentName) continue;
+            
+            if (!groupedByName.has(studentName)) {
+                groupedByName.set(studentName, []);
+            }
+            groupedByName.get(studentName).push(result);
+        }
+        
+        // Find duplicates (more than 1 record per student)
+        const duplicatesToDelete = [];
+        const keepRecords = [];
+        
+        for (const [name, records] of groupedByName.entries()) {
+            if (records.length > 1) {
+                // Sort by date (keep the most recent)
+                records.sort((a, b) => {
+                    const dateA = a.date || a.createdAt || "";
+                    const dateB = b.date || b.createdAt || "";
+                    return dateB.localeCompare(dateA);
+                });
+                
+                // Keep the first (most recent), delete the rest
+                const keep = records[0];
+                const toDelete = records.slice(1);
+                
+                keepRecords.push(keep);
+                for (const del of toDelete) {
+                    duplicatesToDelete.push(del);
+                }
+                
+                console.log(`📊 Pelajar "${name}" mempunyai ${records.length} rekod. Menyimpan rekod dari ${keep.date || keep.createdAt || 'tarikh tidak diketahui'}, memadam ${toDelete.length} rekod lain.`);
+            } else {
+                keepRecords.push(records[0]);
+            }
+        }
+        
+        if (duplicatesToDelete.length === 0) {
+            console.log("✅ Tiada rekod berganda ditemui.");
+            showToast("✅ Tiada rekod berganda ditemui dalam sistem.", "success");
+            return 0;
+        }
+        
+        // Delete duplicate records from Firebase
+        let deletedCount = 0;
+        for (const record of duplicatesToDelete) {
+            try {
+                await deleteDoc(doc(db, "ujian_gaya_belajar", record.id));
+                deletedCount++;
+                console.log(`🗑️ Deleted duplicate record: ${record.id} - ${record.studentName}`);
+            } catch (e) {
+                console.error(`Error deleting ${record.id}:`, e);
+            }
+        }
+        
+        // Update local array
+        allCompletedResults = keepRecords;
+        allCompletedResults.sort((a, b) => (a.studentName || '').localeCompare(b.studentName || ''));
+        
+        // Clear selections
+        selectedIds.clear();
+        
+        // Show summary
+        const message = `🧹 Sistem auto-deduplicate: ${deletedCount} rekod berganda telah dipadam. Setiap pelajar kini hanya mempunyai SATU rekod keputusan (yang paling terkini).`;
+        console.log(`✅ ${message}`);
+        showToast(message, "warning");
+        
+        return deletedCount;
+    }
+    
+    // ==================== MANUAL DEDUPLICATE BUTTON ====================
+    async function manualDeduplicate() {
+        if (allCompletedResults.length === 0) {
+            showToast("Tiada data untuk diproses.", "error");
+            return;
+        }
+        
+        showToast("🔄 Sedang memproses data berganda...", "warning");
+        
+        // Reload latest data first
+        await loadCompletedResults();
+        
+        const deleted = await autoDeduplicateRecords();
+        
+        if (deleted > 0) {
+            // Refresh UI
+            await loadAllStudents();
+            applyFilters();
+            updateSelectionBar();
+            showToast(`✅ Berjaya memadam ${deleted} rekod berganda!`, "success");
+        } else if (deleted === 0) {
+            showToast("✅ Tiada rekod berganda ditemui.", "success");
+        }
+    }
+    
     function getPendingStudents() {
         const completedICs = new Set(allCompletedResults.map(r => r.studentIC));
         return allStudents.filter(student => !completedICs.has(student.icNumber));
@@ -651,6 +793,26 @@
         select.innerHTML = '<option value="">Semua Kelas</option>' + 
             classes.map(c => `<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`).join('');
         if (currentVal) select.value = currentVal;
+    }
+    
+    // Find duplicate IDs for highlighting
+    function getDuplicateIds() {
+        const nameCount = new Map();
+        for (const result of allCompletedResults) {
+            const name = (result.studentName || "").trim().toLowerCase();
+            if (name) {
+                nameCount.set(name, (nameCount.get(name) || 0) + 1);
+            }
+        }
+        
+        const duplicateIds = new Set();
+        for (const result of allCompletedResults) {
+            const name = (result.studentName || "").trim().toLowerCase();
+            if (nameCount.get(name) > 1) {
+                duplicateIds.add(result.id);
+            }
+        }
+        return duplicateIds;
     }
     
     function applyFilters() {
@@ -696,7 +858,9 @@
             filteredPending = filteredPending.filter(s => s.class === currentKelas);
         }
         
-        document.getElementById('totalCount').innerHTML = `${allCompletedResults.length} Selesai | ${pendingStudents.length} Belum`;
+        const duplicateCount = getDuplicateIds().size;
+        const duplicateBadgeHtml = duplicateCount > 0 ? `<span class="duplicate-badge"><i class="fas fa-clone"></i> ${duplicateCount} rekod berganda</span>` : '';
+        document.getElementById('totalCount').innerHTML = `${allCompletedResults.length} Selesai | ${pendingStudents.length} Belum ${duplicateBadgeHtml}`;
         
         renderCurrentView();
     }
@@ -706,19 +870,23 @@
             return `<div class="empty-state"><i class="fas fa-user-check"></i><p>Tiada keputusan ujian dijumpai.</p></div>`;
         }
         
+        const duplicateIds = getDuplicateIds();
+        
         let html = `<div class="results-grid">`;
         for (const result of filteredCompleted) {
             const scores = result.scores || { V: 0, A: 0, R: 0, K: 0 };
             const dominant = result.dominantStyle || "V";
             const totalQ = result.totalQuestions || 15;
             const isSelected = selectedIds.has(result.id);
+            const isDuplicate = duplicateIds.has(result.id);
             
             const gayaInfo = gayaConfig[dominant] || gayaConfig.V;
             const badgeClass = gayaInfo.badge;
             
             html += `
-                <div class="result-card ${isSelected ? 'selected' : ''}" data-id="${result.id}">
-                    <input type="checkbox" class="checkbox-select" ${isSelected ? 'checked' : ''} onchange="toggleSelect('${result.id}')">
+                <div class="result-card ${isSelected ? 'selected' : ''} ${isDuplicate ? 'duplicate' : ''}" data-id="${result.id}">
+                    ${isDuplicate ? '<div class="duplicate-label"><i class="fas fa-clone"></i> DUPLIKAT</div>' : ''}
+                    <input type="checkbox" class="checkbox-select" ${isSelected ? 'checked' : ''} onchange="window.toggleSelect('${result.id}')">
                     <div class="student-header">
                         <div class="student-avatar">
                             <i class="fas fa-user-graduate"></i>
@@ -903,7 +1071,7 @@
         }
         
         suggestionsDiv.innerHTML = matches.map(match => `
-            <div onclick="selectSuggestion('${match.fullname}')">
+            <div onclick="window.selectSuggestion('${match.fullname.replace(/'/g, "\\'")}')">
                 <div style="font-weight:700;">${escapeHtml(match.fullname)}</div>
                 <div style="font-size:0.7rem; color:#64748b;">${escapeHtml(match.icNumber)} • ${escapeHtml(match.class)}</div>
             </div>
@@ -963,26 +1131,26 @@
                             <tr><th>Bil</th><th>Nama Pelajar</th><th>No. IC</th><th>Kelas</th>
                             <th>Visual (V)</th><th>Auditori (A)</th><th>Bacaan (R)</th><th>Kinestetik (K)</th><th>Gaya Dominan</th>
                         </tr>
-                    </thead>
-                    <tbody>
-                        ${resultsToPrint.map((r, i) => {
-                            const scores = r.scores || { V: 0, A: 0, R: 0, K: 0 };
-                            const dominant = r.dominantStyle || "V";
-                            const totalQ = r.totalQuestions || 15;
-                            return `<tr>
-                                <td>${i+1}</span></span>
-                                <td>${escapeHtml(r.studentName)}</span></span>
-                                <td>${escapeHtml(r.studentIC)}</span></span>
-                                <td>${escapeHtml(r.studentClass)}</span></span>
-                                <td>${scores.V || 0}/${totalQ}</span></span>
-                                <td>${scores.A || 0}/${totalQ}</span></span>
-                                <td>${scores.R || 0}/${totalQ}</span></span>
-                                <td>${scores.K || 0}/${totalQ}</span></span>
-                                <td><span class="badge badge-${dominant}">${gayaConfig[dominant]?.name || dominant}</span></span>
-                            </tr>`;
-                        }).join('')}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            ${resultsToPrint.map((r, i) => {
+                                const scores = r.scores || { V: 0, A: 0, R: 0, K: 0 };
+                                const dominant = r.dominantStyle || "V";
+                                const totalQ = r.totalQuestions || 15;
+                                return `<tr>
+                                    <td>${i+1}</td>
+                                    <td>${escapeHtml(r.studentName)}</td>
+                                    <td>${escapeHtml(r.studentIC)}</td>
+                                    <td>${escapeHtml(r.studentClass)}</td>
+                                    <td>${scores.V || 0}/${totalQ}</td>
+                                    <td>${scores.A || 0}/${totalQ}</td>
+                                    <td>${scores.R || 0}/${totalQ}</td>
+                                    <td>${scores.K || 0}/${totalQ}</td>
+                                    <td><span class="badge badge-${dominant}">${gayaConfig[dominant]?.name || dominant}</span></td>
+                                </tr>`;
+                            }).join('')}
+                        </tbody>
+                    </table>
                     <div class="footer">
                         <p>Laporan ini dihasilkan secara automatik oleh sistem E-MindCare SEMSIRA.</p>
                     </div>
@@ -1035,10 +1203,10 @@
                         <tbody>
                             ${filteredPending.map((student, i) => `
                                 <tr>
-                                    <td>${i+1}</span>
-                                    <td>${escapeHtml(student.fullname)}</span>
-                                    <td>${escapeHtml(student.icNumber)}</span>
-                                    <td>${escapeHtml(student.class)}</span>
+                                    <td>${i+1}</td>
+                                    <td>${escapeHtml(student.fullname)}</td>
+                                    <td>${escapeHtml(student.icNumber)}</td>
+                                    <td>${escapeHtml(student.class)}</td>
                                 </tr>
                             `).join('')}
                         </tbody>
@@ -1077,6 +1245,26 @@
         updateSelectionBar();
     }
     
+    // ==================== AUTO RUN DEDUPLICATE ON LOAD ====================
+    async function init() {
+        await loadAllStudents();
+        await loadCompletedResults();
+        
+        // Auto-deduplicate on load
+        const deleted = await autoDeduplicateRecords();
+        if (deleted > 0) {
+            await loadAllStudents();
+            await loadCompletedResults();
+        }
+        
+        updateClassFilter();
+        applyFilters();
+        
+        if (deleted > 0) {
+            showToast(`🧹 Auto-deduplicate: ${deleted} rekod berganda telah dipadam secara automatik!`, "warning");
+        }
+    }
+    
     // Event listeners
     document.getElementById('searchInput').addEventListener('input', (e) => {
         currentSearch = e.target.value;
@@ -1106,6 +1294,7 @@
         showToast('Data dimuat semula', 'success');
     });
     
+    document.getElementById('deduplicateBtn').addEventListener('click', manualDeduplicate);
     document.getElementById('printBtn').addEventListener('click', printReport);
     document.getElementById('deleteAllBtn').addEventListener('click', deleteAll);
     document.getElementById('selectAllBtn').addEventListener('click', selectAll);
@@ -1121,15 +1310,9 @@
         }
     });
     
+    // Make functions global
     window.toggleSelect = toggleSelect;
     window.selectSuggestion = selectSuggestion;
-    
-    async function init() {
-        await loadAllStudents();
-        await loadCompletedResults();
-        updateClassFilter();
-        applyFilters();
-    }
     
     init();
 </script>

@@ -438,6 +438,71 @@ Muhammad Danish bin Rosli|070303-03-9012|3 Bestari|2025'></textarea>
       return allMeritRecords.filter(r => r.studentId === studentId).length;
     }
     
+    // ==================== AUTO DELETE INVALID STUDENTS ====================
+    async function autoDeleteInvalidStudents() {
+        console.log("🔍 Mencari pelajar dengan data tidak lengkap...");
+        let deletedCount = 0;
+        const invalidStudents = [];
+        
+        try {
+            // Scan semua pelajar
+            for (const student of window.students) {
+                const hasEmptyName = !student.fullname || student.fullname.trim() === "";
+                const hasEmptyIc = !student.icNumber || student.icNumber.trim() === "";
+                
+                if (hasEmptyName || hasEmptyIc) {
+                    invalidStudents.push(student);
+                    
+                    // Cari semua rekod merit untuk pelajar ini
+                    const studentMeritRecords = allMeritRecords.filter(r => r.studentId === student.id);
+                    
+                    // Delete semua rekod merit
+                    for (const record of studentMeritRecords) {
+                        await deleteDoc(doc(db, "merit_records", record.id));
+                        console.log(`🗑️ Auto-deleted merit record: ${record.id} untuk pelajar ${student.id}`);
+                    }
+                    
+                    // Delete pelajar dari Firestore
+                    await deleteDoc(doc(db, "students", student.id));
+                    console.log(`🗑️ Auto-deleted student: ${student.id} | Nama: "${student.fullname}" | IC: "${student.icNumber}"`);
+                    deletedCount++;
+                }
+            }
+            
+            // Update local arrays jika ada yang didelete
+            if (deletedCount > 0) {
+                // Filter out deleted students
+                window.students = window.students.filter(s => 
+                    s.fullname && s.fullname.trim() !== "" && 
+                    s.icNumber && s.icNumber.trim() !== ""
+                );
+                
+                // Filter out deleted merit records
+                allMeritRecords = allMeritRecords.filter(r => 
+                    window.students.some(s => s.id === r.studentId)
+                );
+                
+                // Update UI
+                await saveStudentCredentials();
+                renderStudentList();
+                updateTotalCount();
+                updateClassFilter();
+                
+                // Show summary message
+                const message = `🧹 Sistem auto-delete: ${deletedCount} pelajar dengan data tidak lengkap (nama kosong / IC kosong) dan rekod merit berkaitan telah dipadam secara automatik.`;
+                console.log(`✅ ${message}`);
+                showMessage(message, "success");
+            } else {
+                console.log("✅ Tiada pelajar dengan data tidak lengkap ditemui.");
+            }
+            
+            return deletedCount;
+        } catch (error) {
+            console.error("Error in auto-delete function:", error);
+            return 0;
+        }
+    }
+    
     // ==================== DELETE STUDENT WITH ALL MERIT RECORDS ====================
     async function executeDeleteStudent(id, name, ic, meritCount) {
       try {
@@ -463,6 +528,9 @@ Muhammad Danish bin Rosli|070303-03-9012|3 Bestari|2025'></textarea>
         renderStudentList();
         updateTotalCount();
         updateClassFilter();
+        
+        // Step 6: Run auto-delete again for consistency
+        await autoDeleteInvalidStudents();
         
         showMessage(`✅ Pelajar "${name}" (${ic}) dan ${meritCount} rekod merit telah dipadam sepenuhnya dari sistem.`, "success");
       } catch (error) {
@@ -502,8 +570,8 @@ Muhammad Danish bin Rosli|070303-03-9012|3 Bestari|2025'></textarea>
               </p>
               
               <div class="confirm-buttons">
-                <button class="confirm-btn confirm-btn-no" onclick="closeConfirmModal()">Batal</button>
-                <button class="confirm-btn confirm-btn-yes" onclick="proceedDelete()">Ya, Padam</button>
+                <button class="confirm-btn confirm-btn-no" onclick="window.closeConfirmModal()">Batal</button>
+                <button class="confirm-btn confirm-btn-yes" onclick="window.proceedDelete()">Ya, Padam</button>
               </div>
             </div>
           </div>
@@ -549,6 +617,10 @@ Muhammad Danish bin Rosli|070303-03-9012|3 Bestari|2025'></textarea>
         renderStudentList();
         updateTotalCount();
         console.log("Students loaded from Firebase:", window.students.length);
+        
+        // ⭐ AUTO-DELETE: Padam pelajar dengan data tidak lengkap selepas muat
+        await autoDeleteInvalidStudents();
+        
       } catch (error) {
         console.error("Error loading students:", error);
         showMessage("Gagal memuat data dari Firebase. Sila semak sambungan internet.", "error");
@@ -564,6 +636,11 @@ Muhammad Danish bin Rosli|070303-03-9012|3 Bestari|2025'></textarea>
         if (!querySnapshot.empty) {
           const existing = querySnapshot.docs[0];
           return { success: false, message: `No. IC ${icNumber} sudah wujud untuk ${existing.data().fullname}` };
+        }
+        
+        // Validate empty fields
+        if (!fullname.trim() || !icNumber.trim()) {
+          return { success: false, message: "Nama dan No. IC tidak boleh kosong!" };
         }
         
         const newStudent = {
@@ -585,6 +662,9 @@ Muhammad Danish bin Rosli|070303-03-9012|3 Bestari|2025'></textarea>
         updateTotalCount();
         updateClassFilter();
         
+        // ⭐ Auto-delete selepas tambah pelajar
+        await autoDeleteInvalidStudents();
+        
         return { success: true, student: newStudent };
       } catch (error) {
         console.error("Error adding student:", error);
@@ -595,6 +675,12 @@ Muhammad Danish bin Rosli|070303-03-9012|3 Bestari|2025'></textarea>
     // ==================== EDIT STUDENT ====================
     window.editStudentFullInFirebase = async function(id, newFullname, newIcNumber, newClass, newSession) {
       try {
+        // Validate empty fields
+        if (!newFullname.trim() || !newIcNumber.trim()) {
+          showMessage("❌ Nama dan No. IC tidak boleh kosong!", "error");
+          return false;
+        }
+        
         if (newIcNumber) {
           const q = query(studentsCollection, where("icNumber", "==", newIcNumber));
           const querySnapshot = await getDocs(q);
